@@ -44,9 +44,9 @@ const HeroSection: React.FC = () => {
     <Hero>
       <Overlay />
       <Content>
-        <img src="/assets/react.svg" alt="Logo" style={{ width: 80, marginBottom: '1rem' }} />
-        <Title>A Great Place for Your Wedding</Title>
-        <Subtitle>사람들의 결혼이야기</Subtitle>
+        <img src="/images/logo.png" alt="Logo" style={{ width: 400, marginBottom: '1rem' }} />
+        <Title>Flowy-Pro</Title>
+        <Subtitle>모든 회의들을 서포트 해주는 웹서비스</Subtitle>
       </Content>
     </Hero>
   );
