@@ -53,10 +53,10 @@ const Navbar: React.FC = () => {
       <Logo>PAGE</Logo>
       <Menu>
         <MenuItem>ABOUT</MenuItem>
-        <MenuItem>WEDDING HALL</MenuItem>
-        <MenuItem>PARTY</MenuItem>
-        <MenuItem>FACILITIES</MenuItem>
-        <MenuItem>OFFERS</MenuItem>
+        <MenuItem>MENU1</MenuItem>
+        <MenuItem>MENU2</MenuItem>
+        <MenuItem>MENU3</MenuItem>
+        <MenuItem>MENU4</MenuItem>
         <MenuItem>CONTACT</MenuItem>
       </Menu>
       <RightSection>
