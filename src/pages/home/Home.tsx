@@ -5,7 +5,6 @@ import HeroSection from './HeroSection';
 const Home: React.FC = () => {
   return (
     <>
-      <Navbar/>
       <HeroSection/>
     </>
   );
