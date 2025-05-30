@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Nav = styled.nav`
@@ -16,6 +17,7 @@ const Nav = styled.nav`
 `;
 
 const Logo = styled.div`
+  cursor: pointer;
   font-size: 1.5rem;
   font-weight: bold;
 `;
@@ -48,12 +50,13 @@ const Button = styled.button`
 `;
 
 const Navbar: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <Nav>
-      <Logo>PAGE</Logo>
+      <Logo onClick={() => navigate("/")}>PAGE</Logo>
       <Menu>
         <MenuItem>ABOUT</MenuItem>
-        <MenuItem>MENU1</MenuItem>
+        <MenuItem onClick={() => navigate("/dashboard")} >DASHBOARD</MenuItem>
         <MenuItem>MENU2</MenuItem>
         <MenuItem>MENU3</MenuItem>
         <MenuItem>MENU4</MenuItem>
