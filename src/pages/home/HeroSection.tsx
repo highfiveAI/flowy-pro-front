@@ -39,9 +39,6 @@ const Subtitle = styled.p`
   font-size: 1.2rem;
 `;
 
-const Logo = styled.img`
-`
-
 const HeroSection: React.FC = () => {
   return (
     <Hero>
