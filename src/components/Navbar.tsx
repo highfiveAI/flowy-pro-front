@@ -1,6 +1,6 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 const Nav = styled.nav`
   display: flex;
@@ -13,7 +13,7 @@ const Nav = styled.nav`
   top: 0;
   width: 100%;
   z-index: 1000;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const Logo = styled.div`
@@ -56,14 +56,18 @@ const Navbar: React.FC = () => {
       <Logo onClick={() => navigate("/")}>PAGE</Logo>
       <Menu>
         <MenuItem>ABOUT</MenuItem>
-        <MenuItem onClick={() => navigate("/dashboard")} >DASHBOARD</MenuItem>
-        <MenuItem>MENU2</MenuItem>
-        <MenuItem>MENU3</MenuItem>
+        <MenuItem onClick={() => navigate("/dashboard")}>DASHBOARD</MenuItem>
+        <MenuItem onClick={() => navigate("/insert_info")}>COMMENCE</MenuItem>
+        <MenuItem onClick={() => navigate("/result")}>RESULT</MenuItem>
         <MenuItem>MENU4</MenuItem>
         <MenuItem>CONTACT</MenuItem>
       </Menu>
       <RightSection>
-        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" width="20" />
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"
+          alt="Instagram"
+          width="20"
+        />
         <Button>RESERVATION</Button>
       </RightSection>
     </Nav>

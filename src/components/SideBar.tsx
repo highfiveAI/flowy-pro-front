@@ -1,8 +1,9 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const Sidebar = styled.div`
   width: 200px;
+  height: 100%;
   background-color: #ddd;
   padding: 20px;
 `;
