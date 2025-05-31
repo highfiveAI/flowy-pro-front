@@ -1,6 +1,6 @@
 import React from "react";
+import FileUpload from "./FileUpload";
 import SideBar from "../../components/SideBar";
-import DashboardContents from "./DashBoardContents";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -10,13 +10,22 @@ const Container = styled.div`
   background-color: #f7f7f7;
 `;
 
-const Dashboard: React.FC = () => {
+const MainContent = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const InsertConferenceInfo: React.FC = () => {
   return (
     <Container>
       <SideBar />
-      <DashboardContents />
+      <MainContent>
+        <FileUpload />
+      </MainContent>
     </Container>
   );
 };
 
-export default Dashboard;
+export default InsertConferenceInfo;

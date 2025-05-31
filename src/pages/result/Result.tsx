@@ -1,7 +1,7 @@
 import React from "react";
 import SideBar from "../../components/SideBar";
-import DashboardContents from "./DashBoardContents";
 import styled from "styled-components";
+import ResultContents from "./ResultContents";
 
 const Container = styled.div`
   display: flex;
@@ -10,13 +10,22 @@ const Container = styled.div`
   background-color: #f7f7f7;
 `;
 
-const Dashboard: React.FC = () => {
+const MainContent = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Result: React.FC = () => {
   return (
     <Container>
       <SideBar />
-      <DashboardContents />
+      <MainContent>
+        <ResultContents />
+      </MainContent>
     </Container>
   );
 };
 
-export default Dashboard;
+export default Result;
