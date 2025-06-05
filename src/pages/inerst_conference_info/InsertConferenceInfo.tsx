@@ -55,17 +55,17 @@ const InsertConferenceInfo: React.FC = () => {
       return false;
     }
 
-    if (!file) {
-      setError("파일을 업로드하거나 녹음을 완료해주세요.");
-      return false;
-    }
-
     const hasEmptyFields = attendees.some(
       attendee => !attendee.name.trim() || !attendee.email.trim() || !attendee.role.trim()
     );
 
     if (hasEmptyFields) {
       setError("모든 참석자의 정보를 입력해주세요.");
+      return false;
+    }
+
+    if (!file) {
+      setError("파일을 업로드하거나 녹음을 완료해주세요.");
       return false;
     }
 
