@@ -116,6 +116,12 @@ const InsertConferenceInfo: React.FC = () => {
         formData.append('attendees_email', att.email);
         formData.append('attendees_role', att.role);
       });
+
+      // // formData 값 콘솔 출력
+      // for (let pair of formData.entries()) {
+      //   console.log(pair[0] + ': ' + pair[1]);
+      // }
+
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/v1/stt/`,
