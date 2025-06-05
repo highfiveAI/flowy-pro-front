@@ -7,6 +7,7 @@ import Loading from '../../components/Loading';
 import RecordInfoUpload from './RecordInfoUpload';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import ResultContents from '../result/ResultContents';
 
 const Container = styled.div`
   display: flex;
@@ -58,6 +59,7 @@ function formatDateToKST(date: Date): string {
 }
 
 const InsertConferenceInfo: React.FC = () => {
+  const [isCompleted, setIsCompleted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [subject, setSubject] = React.useState('');
   const [attendees, setAttendees] = React.useState([
@@ -67,6 +69,7 @@ const InsertConferenceInfo: React.FC = () => {
   const [error, setError] = React.useState<string>('');
   const [agenda, setAgenda] = React.useState('');
   const [meetingDate, setMeetingDate] = React.useState<Date | null>(null);
+  const [result, setResult] = React.useState<any>(null);
 
   const validateForm = (): boolean => {
     if (!subject.trim()) {
@@ -136,6 +139,8 @@ const InsertConferenceInfo: React.FC = () => {
         setFile(null);
         setAgenda('');
         setMeetingDate(null);
+        setResult(result);
+        setIsCompleted(true);
       } catch (error) {
         setError(
           error instanceof Error
@@ -152,7 +157,9 @@ const InsertConferenceInfo: React.FC = () => {
     <Container>
       <SideBar />
       <MainContent>
-        {isLoading ? (
+        {isCompleted ? (
+          <ResultContents result={result} />
+        ) : isLoading ? (
           <Loading />
         ) : (
           <>
@@ -166,14 +173,31 @@ const InsertConferenceInfo: React.FC = () => {
               <label style={{ fontWeight: 'bold' }}>회의 안건 (선택)</label>
               <textarea
                 value={agenda}
-                onChange={e => setAgenda(e.target.value)}
+                onChange={(e) => setAgenda(e.target.value)}
                 placeholder="회의 안건을 입력하세요 (선택)"
-                style={{ width: '100%', minHeight: 60, marginTop: 8, borderRadius: 6, border: '1px solid #ccc', padding: 8 }}
+                style={{
+                  width: '100%',
+                  minHeight: 60,
+                  marginTop: 8,
+                  borderRadius: 6,
+                  border: '1px solid #ccc',
+                  padding: 8,
+                }}
               />
             </div>
             <div style={{ width: '100%', maxWidth: 500 }}>
-              <label style={{ fontWeight: 'bold' }}>회의 일시 <span style={{ color: '#dc3545' }}>*</span></label>
-              <div style={{ width: '100%', marginTop: 8, borderRadius: 6, border: '1px solid #ccc', padding: 8 }}>
+              <label style={{ fontWeight: 'bold' }}>
+                회의 일시 <span style={{ color: '#dc3545' }}>*</span>
+              </label>
+              <div
+                style={{
+                  width: '100%',
+                  marginTop: 8,
+                  borderRadius: 6,
+                  border: '1px solid #ccc',
+                  padding: 8,
+                }}
+              >
                 <DatePicker
                   selected={meetingDate}
                   onChange={(date: Date | null) => setMeetingDate(date)}
