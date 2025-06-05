@@ -1,4 +1,4 @@
-// FileUpload.tsx
+
 import React from "react";
 import styled from "styled-components";
 
@@ -40,12 +40,15 @@ interface FileUploadProps {
   setFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
+
 const FileUpload: React.FC<FileUploadProps> = ({ setFile }) => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setFile(event.target.files[0]);
     }
   };
+
+
 
   return (
     <Wrapper>
@@ -57,6 +60,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ setFile }) => {
           type="file"
           onChange={handleFileChange}
         />
+
       </Container>
     </Wrapper>
   );
