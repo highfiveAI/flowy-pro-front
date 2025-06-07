@@ -8,6 +8,10 @@ import SignUp from "./pages/sign_up/SignUp";
 import SignIn from "./sign_in/SignIn";
 import { useEffect } from "react";
 import SocialSignUp from "./pages/social_sign_up/SocialSignUp";
+import DocsAgentTest from "./pages/docs_agent_test/docs_agent_test";
+import AdminUser from "./pages/admin/AdminUser";
+import AdminCom from "./pages/admin/AdminCom";
+import AdminPosition from "./pages/admin/AdminPosition";
 
 function App() {
   async function checkAuth() {
@@ -43,6 +47,10 @@ function App() {
         <Route path="/sign_up" element={<SignUp />} />
         <Route path="/sign_in" element={<SignIn />} />
         <Route path="/social_sign_up" element={<SocialSignUp />} />
+        <Route path="/docs_agent_test" element={<DocsAgentTest />} />
+        <Route path="/admin/user" element={<AdminUser />} />
+        <Route path="/admin/company" element={<AdminCom />} />
+        <Route path="/admin/position" element={<AdminPosition />} />
       </Route>
     </Routes>
   );

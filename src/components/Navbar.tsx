@@ -59,7 +59,10 @@ const Navbar: React.FC = () => {
         <MenuItem onClick={() => navigate("/dashboard")}>DASHBOARD</MenuItem>
         <MenuItem onClick={() => navigate("/insert_info")}>COMMENCE</MenuItem>
         <MenuItem onClick={() => navigate("/result")}>RESULT</MenuItem>
-        <MenuItem>MENU4</MenuItem>
+        <MenuItem onClick={() => navigate("/docs_agent_test")}>Docs</MenuItem>
+        <MenuItem onClick={() => navigate("/admin/user")}>User</MenuItem>
+        <MenuItem onClick={() => navigate("/admin/company")}>Company</MenuItem>
+        <MenuItem onClick={() => navigate("/admin/position")}>Position</MenuItem>
         <MenuItem>CONTACT</MenuItem>
       </Menu>
       <RightSection>
