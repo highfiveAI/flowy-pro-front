@@ -119,9 +119,9 @@ const SignUp: React.FC = () => {
             company: formData.company,
             department: formData.department,
             team: formData.team,
-            position: "aaf44bda-6a64-4611-b0ca-4083b59c8e6e",
+            position: "aaf44bda-6a64-4611-b0ca-4083b59c8e6e", // 더미 데이터
             job: "개발자",
-            sysrole: "c4cb5e53-617e-463f-8ddb-67252f9a9742",
+            sysrole: "c4cb5e53-617e-463f-8ddb-67252f9a9742", // 더미 데이터
           }),
         }
       );

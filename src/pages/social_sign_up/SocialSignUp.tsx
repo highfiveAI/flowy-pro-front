@@ -98,12 +98,6 @@ const SocialSignUp: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // if (formData.password !== formData.confirmPassword) {
-    //   alert("비밀번호가 일치하지 않습니다.");
-    //   return;
-    // }
-
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/social_signup`,
@@ -120,9 +114,9 @@ const SocialSignUp: React.FC = () => {
             company: formData.company,
             department: formData.department,
             team: formData.team,
-            position: "aaf44bda-6a64-4611-b0ca-4083b59c8e6e",
+            position: "aaf44bda-6a64-4611-b0ca-4083b59c8e6e", // 더미 데이터
             job: "개발자",
-            sysrole: "c4cb5e53-617e-463f-8ddb-67252f9a9742",
+            sysrole: "c4cb5e53-617e-463f-8ddb-67252f9a9742", // 더미 데이터
           }),
         }
       );
@@ -144,26 +138,6 @@ const SocialSignUp: React.FC = () => {
         <FormContainer>
           <Title>소셜 회원가입</Title>
           <Form onSubmit={handleSubmit}>
-            {/* <InputGroup>
-              <Label>이름 *</Label>
-              <Input
-                name="name"
-                type="text"
-                placeholder="이름을 입력하세요"
-                required
-                onChange={handleChange}
-              />
-            </InputGroup> */}
-            {/* <InputGroup>
-              <Label>이메일주소 *</Label>
-              <Input
-                name="email"
-                type="email"
-                placeholder="이메일을 입력하세요"
-                required
-                onChange={handleChange}
-              />
-            </InputGroup> */}
             <InputGroup>
               <Label>핸드폰번호 *</Label>
               <Input
@@ -184,26 +158,6 @@ const SocialSignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
-            {/* <InputGroup>
-              <Label>비밀번호 *</Label>
-              <Input
-                name="password"
-                type="password"
-                placeholder="영문+숫자+특수문자 조합, 8~16자"
-                required
-                onChange={handleChange}
-              />
-            </InputGroup>
-            <InputGroup>
-              <Label>비밀번호 확인 *</Label>
-              <Input
-                name="confirmPassword"
-                type="password"
-                placeholder="비밀번호를 다시 입력하세요"
-                required
-                onChange={handleChange}
-              />
-            </InputGroup> */}
             <InputGroup>
               <Label>소속 회사명 *</Label>
               <Select name="company" required onChange={handleChange}>
