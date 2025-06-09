@@ -6,13 +6,14 @@ const Wrapper = styled.div`
   width: 100%;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
   background-color: #f8f9fa;
+  padding-top: 2rem;
 `;
 
 const Box = styled.div`
-  width: 400px;
+  width: 90%;
   min-height: 100px;
   border: 2px solid #ccc;
   border-radius: 12px;
@@ -43,6 +44,8 @@ const ResultContents: React.FC<{ result: any }> = ({ result }) => {
       <Box>{result.summary || '요약 정보가 없습니다.'}</Box>
       역할분담
       <Box>{result.roles || '역할 정보가 없습니다.'}</Box>
+      피드백
+      <Box>{result.feedback || '피드백이 없습니다.'}</Box>
       추천 문서
       <Box>
         {Array.isArray(result.search_result) &&

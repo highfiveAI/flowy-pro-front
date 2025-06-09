@@ -190,8 +190,8 @@ const CreateButton = styled.button`
     }
 `;
 
-const Modal = styled.div<{ isOpen: boolean }>`
-    display: ${props => props.isOpen ? 'flex' : 'none'};
+const Modal = styled.div<{ $isOpen: boolean }>`
+    display: ${props => props.$isOpen ? 'flex' : 'none'};
     position: fixed;
     top: 0;
     left: 0;
@@ -238,8 +238,8 @@ const CloseButton = styled.button`
     }
 `;
 
-const EditSection = styled.div<{ isVisible: boolean }>`
-    display: ${props => props.isVisible ? 'block' : 'none'};
+const EditSection = styled.div<{ $isVisible: boolean }>`
+    display: ${props => props.$isVisible ? 'block' : 'none'};
     background-color: white;
     padding: 1.5rem;
     border-radius: 8px;
@@ -432,7 +432,7 @@ const AdminUser: React.FC = () => {
                 </UserTable>
 
                 {/* 생성 모달 */}
-                <Modal isOpen={isCreateModalOpen}>
+                <Modal $isOpen={isCreateModalOpen}>
                     <ModalContent>
                         <ModalHeader>
                             <h2>새 사용자 생성</h2>
@@ -558,7 +558,7 @@ const AdminUser: React.FC = () => {
                 </Modal>
 
                 {/* 수정 모달 */}
-                <Modal isOpen={isEditModalOpen}>
+                <Modal $isOpen={isEditModalOpen}>
                     <ModalContent>
                         <ModalHeader>
                             <h2>사용자 정보 수정</h2>
