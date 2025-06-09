@@ -175,7 +175,7 @@ const AdminCom: React.FC = () => {
     // 회사 목록 조회
     const fetchCompanies = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/companies');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/companies`);
             const data = await response.json();
             setCompanies(data);
         } catch (error) {
@@ -200,7 +200,7 @@ const AdminCom: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/companies', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/companies`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -222,7 +222,7 @@ const AdminCom: React.FC = () => {
     // 회사 수정
     const handleUpdate = async (companyId: string) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/admin/companies/${companyId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -242,7 +242,7 @@ const AdminCom: React.FC = () => {
     const handleDelete = async (companyId: string) => {
         if (window.confirm('정말로 이 회사를 삭제하시겠습니까?')) {
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/admin/companies/${companyId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`, {
                     method: 'DELETE',
                 });
                 if (response.ok) {

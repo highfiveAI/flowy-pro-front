@@ -177,7 +177,7 @@ const AdminPosition: React.FC = () => {
     // 직급 목록 조회
     const fetchPositions = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/positions');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/positions`);
             const data = await response.json();
             setPositions(data);
         } catch (error) {
@@ -202,7 +202,7 @@ const AdminPosition: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/positions', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/positions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -225,7 +225,7 @@ const AdminPosition: React.FC = () => {
     // 직급 수정
     const handleUpdate = async (positionId: string) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/admin/positions/${positionId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -245,7 +245,7 @@ const AdminPosition: React.FC = () => {
     const handleDelete = async (positionId: string) => {
         if (window.confirm('정말로 이 직급을 삭제하시겠습니까?')) {
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/admin/positions/${positionId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`, {
                     method: 'DELETE',
                 });
                 if (response.ok) {

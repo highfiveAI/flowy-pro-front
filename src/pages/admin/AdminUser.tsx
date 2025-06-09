@@ -250,339 +250,101 @@ const ModalHeader = styled.div`
 // `;
 
 const AdminUser: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [selectedDepartment, setSelectedDepartment] = useState('HDX');
-  const [selectedLevel, setSelectedLevel] = useState('최신순');
+    const [users, setUsers] = useState<User[]>([]);
+    const [selectedDepartment, setSelectedDepartment] = useState('HDX');
+    const [selectedLevel, setSelectedLevel] = useState('최신순');
+    
+    // 모달 상태 관리
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    
+    // 폼 데이터 초기 상태
+    const initialFormData = {
+        user_name: '',
+        user_email: '',
+        user_login_id: '',
+        user_password: '',
+        user_phonenum: '',
+        user_dept_name: '',
+        user_team_name: '',
+        user_jobname: '',
+        user_company_id: '',
+        user_position_id: '',
+        user_sysrole_id: '',
+    };
 
-  // 모달 상태 관리
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [formData, setFormData] = useState(initialFormData);
+    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
-  // 폼 데이터 초기 상태
-  const initialFormData = {
-    user_name: '',
-    user_email: '',
-    user_login_id: '',
-    user_password: '',
-    user_phonenum: '',
-    user_dept_name: '',
-    user_team_name: '',
-    user_jobname: '',
-    user_company_id: '',
-    user_position_id: '',
-    user_sysrole_id: '',
-  };
-
-  const [formData, setFormData] = useState(initialFormData);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-
-  // 기존 API 호출 함수들 유지
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/api/v1/admin/users');
-      const data = await response.json();
-      setUsers(data);
-    } catch (error) {
-      console.error('사용자 목록 조회 실패:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8000/api/v1/admin/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        fetchUsers();
-        setFormData(initialFormData);
-      }
-    } catch (error) {
-      console.error('사용자 생성 실패:', error);
-    }
-  };
-
-  const handleUpdate = async (userId: string) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8000/api/v1/admin/users/${userId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
+    // 기존 API 호출 함수들 유지
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users`);
+            const data = await response.json();
+            setUsers(data);
+        } catch (error) {
+            console.error('사용자 목록 조회 실패:', error);
         }
-      );
-      if (response.ok) {
+    };
+
+    useEffect(() => {
         fetchUsers();
-        setSelectedUserId(null);
-      }
-    } catch (error) {
-      console.error('사용자 수정 실패:', error);
-    }
-  };
+    }, []);
 
-  const handleDelete = async (userId: string) => {
-    if (window.confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
-      try {
-        const response = await fetch(
-          `http://localhost:8000/api/v1/admin/users/${userId}`,
-          {
-            method: 'DELETE',
-          }
-        );
-        if (response.ok) {
-          fetchUsers();
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+            if (response.ok) {
+                fetchUsers();
+                setFormData(initialFormData);
+            }
+        } catch (error) {
+            console.error('사용자 생성 실패:', error);
         }
-      } catch (error) {
-        console.error('사용자 삭제 실패:', error);
-      }
-    }
-  };
+    };
 
-  const handleCreateClick = () => {
-    setFormData(initialFormData);
-    setIsCreateModalOpen(true);
-  };
+    const handleUpdate = async (userId: string) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+            if (response.ok) {
+                fetchUsers();
+                setSelectedUserId(null);
+            }
+        } catch (error) {
+            console.error('사용자 수정 실패:', error);
+        }
+    };
 
-  const handleRowClick = (user: User) => {
-    setSelectedUserId(user.user_id);
-    setFormData({
-      user_name: user.user_name,
-      user_email: user.user_email,
-      user_login_id: user.user_login_id,
-      user_password: '',
-      user_phonenum: user.user_phonenum,
-      user_dept_name: user.user_dept_name || '',
-      user_team_name: user.user_team_name || '',
-      user_jobname: user.user_jobname || '',
-      user_company_id: user.user_company_id || '',
-      user_position_id: user.user_position_id || '',
-      user_sysrole_id: user.user_sysrole_id || '',
-    });
-    setIsEditModalOpen(true);
-  };
+    const handleDelete = async (userId: string) => {
+        if (window.confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users/${userId}`, {
+                    method: 'DELETE',
+                });
+                if (response.ok) {
+                    fetchUsers();
 
-  return (
-    <Container>
-      <MainContent>
-        <PageHeader>
-          <h1>사용자 관리</h1>
-          <CreateButton onClick={handleCreateClick}>
-            + 새 사용자 생성
-          </CreateButton>
-        </PageHeader>
-
-        <FilterSection>
-          <FilterSelect
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.target.value)}
-          >
-            <option value="HDX">HDX</option>
-          </FilterSelect>
-
-          <FilterSelect
-            value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value)}
-          >
-            <option value="최신순">최신순</option>
-          </FilterSelect>
-        </FilterSection>
-
-        <UserTable>
-          <thead>
-            <tr>
-              <th>Requested ID</th>
-              <th>아이디</th>
-              <th>이름</th>
-              <th>소속 부서명</th>
-              <th>소속 팀명</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr
-                key={user.user_id}
-                onClick={() => handleRowClick(user)}
-                style={{ cursor: 'pointer' }}
-              >
-                <td>{user.user_id}</td>
-                <td>{user.user_login_id}</td>
-                <td>{user.user_name}</td>
-                <td>{user.user_dept_name}</td>
-                <td>{user.user_team_name}</td>
-                <td>
-                  <StatusBadge status={user.status || 'pending'}>
-                    {user.status || 'Pending'}
-                  </StatusBadge>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </UserTable>
-
-        {/* 생성 모달 */}
-        <Modal $isOpen={isCreateModalOpen}>
-          <ModalContent>
-            <ModalHeader>
-              <h2>새 사용자 생성</h2>
-              <button onClick={() => setIsCreateModalOpen(false)}>×</button>
-            </ModalHeader>
-            <Form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit(e);
-                setIsCreateModalOpen(false);
-              }}
-            >
-              <FormGroup>
-                <label>이름</label>
-                <input
-                  type="text"
-                  name="user_name"
-                  value={formData.user_name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>이메일</label>
-                <input
-                  type="email"
-                  name="user_email"
-                  value={formData.user_email}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>로그인 ID</label>
-                <input
-                  type="text"
-                  name="user_login_id"
-                  value={formData.user_login_id}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>비밀번호</label>
-                <input
-                  type="password"
-                  name="user_password"
-                  value={formData.user_password}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>전화번호</label>
-                <input
-                  type="tel"
-                  name="user_phonenum"
-                  value={formData.user_phonenum}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>회사</label>
-                <input
-                  type="text"
-                  name="user_company_id"
-                  value={formData.user_company_id}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>직급</label>
-                <input
-                  type="text"
-                  name="user_position_id"
-                  value={formData.user_position_id}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>시스템 역할</label>
-                <input
-                  type="text"
-                  name="user_sysrole_id"
-                  value={formData.user_sysrole_id}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>부서명</label>
-                <input
-                  type="text"
-                  name="user_dept_name"
-                  value={formData.user_dept_name}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>팀명</label>
-                <input
-                  type="text"
-                  name="user_team_name"
-                  value={formData.user_team_name}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>직무</label>
-                <input
-                  type="text"
-                  name="user_jobname"
-                  value={formData.user_jobname}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <Button type="submit">생성</Button>
-                <Button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                >
-                  취소
-                </Button>
-              </div>
-            </Form>
-          </ModalContent>
-        </Modal>
-
-        {/* 수정 모달 */}
-        <Modal $isOpen={isEditModalOpen}>
-          <ModalContent>
-            <ModalHeader>
-              <h2>사용자 정보 수정</h2>
-              <button onClick={() => setIsEditModalOpen(false)}>×</button>
-            </ModalHeader>
-            <Form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (selectedUserId) {
-                  handleUpdate(selectedUserId);
-                  setIsEditModalOpen(false);
                 }
               }}
             >
