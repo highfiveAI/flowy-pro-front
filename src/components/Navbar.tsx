@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -31,6 +31,35 @@ const Menu = styled.ul`
 const MenuItem = styled.li`
   cursor: pointer;
   font-weight: 500;
+  position: relative;
+  padding: 0.5rem 0;
+
+  &:hover {
+    color: #002b5c;
+  }
+`;
+
+const DropdownMenu = styled.ul<{ isOpen: boolean }>`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 0.5rem 0;
+  min-width: 150px;
+  display: ${props => props.isOpen ? 'block' : 'none'};
+  list-style: none;
+`;
+
+const DropdownItem = styled.li`
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #f5f5f5;
+    color: #002b5c;
+  }
 `;
 
 const RightSection = styled.div`
@@ -51,6 +80,16 @@ const Button = styled.button`
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
+
+  const systemMenuItems = [
+    { name: "문서 에이전트", path: "/docs_agent_test" },
+    { name: "사용자 관리", path: "/admin/user" },
+    { name: "회사 관리", path: "/admin/company" },
+    { name: "직책 관리", path: "/admin/position" },
+    { name: "템플릿 관리", path: "/admin/template" }
+  ];
+
   return (
     <Nav>
       <Logo onClick={() => navigate("/")}>PAGE</Logo>
@@ -59,7 +98,22 @@ const Navbar: React.FC = () => {
         <MenuItem onClick={() => navigate("/dashboard")}>DASHBOARD</MenuItem>
         <MenuItem onClick={() => navigate("/insert_info")}>COMMENCE</MenuItem>
         <MenuItem onClick={() => navigate("/result")}>RESULT</MenuItem>
-        <MenuItem>MENU4</MenuItem>
+        <MenuItem 
+          onMouseEnter={() => setIsSystemMenuOpen(true)}
+          onMouseLeave={() => setIsSystemMenuOpen(false)}
+        >
+          시스템관리
+          <DropdownMenu isOpen={isSystemMenuOpen}>
+            {systemMenuItems.map((item, index) => (
+              <DropdownItem 
+                key={index}
+                onClick={() => navigate(item.path)}
+              >
+                {item.name}
+              </DropdownItem>
+            ))}
+          </DropdownMenu>
+        </MenuItem>
         <MenuItem>CONTACT</MenuItem>
       </Menu>
       <RightSection>
