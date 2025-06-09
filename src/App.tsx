@@ -6,16 +6,24 @@ import InsertConferenceInfo from "./pages/inerst_conference_info/InsertConferenc
 import Result from "./pages/result/Result";
 import SignUp from "./pages/sign_up/SignUp";
 import SignIn from "./sign_in/SignIn";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import SocialSignUp from "./pages/social_sign_up/SocialSignUp";
 import DocsAgentTest from "./pages/docs_agent_test/docs_agent_test";
 import AdminUser from "./pages/admin/AdminUser";
 import AdminCom from "./pages/admin/AdminCom";
 import AdminPosition from "./pages/admin/AdminPosition";
 import AdminTemplate from "./pages/admin/AdminTemplate";
+
+import Login from "./pages/log_in/Login";
+import ChooseMethod from "./pages/sign_up/choose_method";
+import MyPage from "./pages/mypage/MyPage";
+import AlterInfo from "./pages/mypage/alterInfo";
 import Calendar from "./pages/calendar/Calendar";
 
+
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+
   async function checkAuth() {
     const res = await fetch(
       `${import.meta.env.VITE_API_URL}/api/v1/users/auth/check`,
@@ -28,9 +36,11 @@ function App() {
     if (res.ok) {
       const data = await res.json();
       console.log("현재 접속중:", data);
+      setIsLoggedIn(data.authenticated);
       return data.authenticated;
     } else {
       console.log("로그인 필요");
+      setIsLoggedIn(false);
       return false;
     }
   }
@@ -41,12 +51,14 @@ function App() {
 
   return (
     <Routes>
-      <Route element={<Layout />}>
+      <Route path="/login" element={<Login />} />
+      <Route element={<Layout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<DashBoard />} />
         <Route path="/insert_info" element={<InsertConferenceInfo />} />
         <Route path="/result" element={<Result />} />
-        <Route path="/sign_up" element={<SignUp />} />
+        <Route path="/sign_up" element={<ChooseMethod />} />
+        <Route path="/sign_up/form" element={<SignUp />} />
         <Route path="/sign_in" element={<SignIn />} />
         <Route path="/social_sign_up" element={<SocialSignUp />} />
         <Route path="/docs_agent_test" element={<DocsAgentTest />} />
@@ -54,6 +66,8 @@ function App() {
         <Route path="/admin/company" element={<AdminCom />} />
         <Route path="/admin/position" element={<AdminPosition />} />
         <Route path="/admin/template" element={<AdminTemplate />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/mypage/alterInfo" element={<AlterInfo />} />
         <Route path="/calendar" element={<Calendar />} />
       </Route>
     </Routes>
