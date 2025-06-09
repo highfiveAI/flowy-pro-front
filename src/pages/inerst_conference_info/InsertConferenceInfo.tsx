@@ -18,10 +18,12 @@ const Container = styled.div`
 const MainContent = styled.div`
   flex: 1;
   display: flex;
-  flex-direction: column; /* ⭐⭐⭐ 세로 방향으로 변경 */
-  justify-content: center; /* 수직 중앙 정렬 */
-  align-items: center; /* 수평 중앙 정렬 */
-  gap: 2rem; /* 두 컴포넌트 사이 간격 주기 (선택) */
+  flex-direction: column;
+  justify-content: flex-start; /* 위에서부터 정렬 */
+  align-items: center;
+  gap: 1rem; /* 간격 줄임 */
+  padding-top: 2rem; /* 위쪽에 여유 공간 */
+  overflow-y: auto; /* 필요시 스크롤 */
 `;
 
 const UploadButton = styled.button`
@@ -168,7 +170,7 @@ const InsertConferenceInfo: React.FC = () => {
               setSubject={setSubject}
               setAttendees={setAttendees}
             />
-            <div style={{ width: '100%', maxWidth: 500 }}>
+            <div style={{ width: '100%', maxWidth: 500, marginBottom: '1rem' }}>
               <label style={{ fontWeight: 'bold' }}>회의 안건 (선택)</label>
               <textarea
                 value={agenda}
@@ -177,7 +179,7 @@ const InsertConferenceInfo: React.FC = () => {
                 style={{ width: '100%', minHeight: 60, marginTop: 8, borderRadius: 6, border: '1px solid #ccc', padding: 8 }}
               />
             </div>
-            <div style={{ width: '100%', maxWidth: 500 }}>
+            <div style={{ width: '100%', maxWidth: 500, marginBottom: '1rem' }}>
               <label style={{ fontWeight: 'bold' }}>회의 일시 <span style={{ color: '#dc3545' }}>*</span></label>
               <div style={{ width: '100%', marginTop: 8, borderRadius: 6, border: '1px solid #ccc', padding: 8 }}>
                 <DatePicker
