@@ -115,8 +115,8 @@ const CreateButton = styled.button`
     }
 `;
 
-const Modal = styled.div<{ isOpen: boolean }>`
-    display: ${props => props.isOpen ? 'flex' : 'none'};
+const Modal = styled.div<{ $isOpen: boolean }>`
+    display: ${props => props.$isOpen ? 'flex' : 'none'};
     position: fixed;
     top: 0;
     left: 0;
@@ -177,7 +177,7 @@ const AdminPosition: React.FC = () => {
     // 직급 목록 조회
     const fetchPositions = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/positions');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/positions`);
             const data = await response.json();
             setPositions(data);
         } catch (error) {
@@ -202,7 +202,7 @@ const AdminPosition: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/positions', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/positions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -225,7 +225,7 @@ const AdminPosition: React.FC = () => {
     // 직급 수정
     const handleUpdate = async (positionId: string) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/admin/positions/${positionId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -245,7 +245,7 @@ const AdminPosition: React.FC = () => {
     const handleDelete = async (positionId: string) => {
         if (window.confirm('정말로 이 직급을 삭제하시겠습니까?')) {
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/admin/positions/${positionId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`, {
                     method: 'DELETE',
                 });
                 if (response.ok) {
@@ -301,7 +301,7 @@ const AdminPosition: React.FC = () => {
                 </Table>
 
                 {/* 생성 모달 */}
-                <Modal isOpen={isCreateModalOpen}>
+                <Modal $isOpen={isCreateModalOpen}>
                     <ModalContent>
                         <ModalHeader>
                             <h2>새 직급 등록</h2>
@@ -353,7 +353,7 @@ const AdminPosition: React.FC = () => {
                 </Modal>
 
                 {/* 수정 모달 */}
-                <Modal isOpen={isEditModalOpen}>
+                <Modal $isOpen={isEditModalOpen}>
                     <ModalContent>
                         <ModalHeader>
                             <h2>직급 정보 수정</h2>

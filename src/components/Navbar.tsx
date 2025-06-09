@@ -123,6 +123,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
           src="/images/flowyLogo.svg" 
           alt="Flowy Logo" 
           onClick={() => navigate('/')}
+
         />
         <Menu>
           <MenuItem onClick={() => handleNavigation('/')}>Flowy<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>

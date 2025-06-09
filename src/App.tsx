@@ -13,10 +13,13 @@ import AdminUser from "./pages/admin/AdminUser";
 import AdminCom from "./pages/admin/AdminCom";
 import AdminPosition from "./pages/admin/AdminPosition";
 import AdminTemplate from "./pages/admin/AdminTemplate";
+
 import Login from "./pages/log_in/Login";
 import ChooseMethod from "./pages/sign_up/choose_method";
 import MyPage from "./pages/mypage/MyPage";
 import AlterInfo from "./pages/mypage/alterInfo";
+import Calendar from "./pages/calendar/Calendar";
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
@@ -65,6 +68,7 @@ function App() {
         <Route path="/admin/template" element={<AdminTemplate />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/mypage/alterInfo" element={<AlterInfo />} />
+        <Route path="/calendar" element={<Calendar />} />
       </Route>
     </Routes>
   );

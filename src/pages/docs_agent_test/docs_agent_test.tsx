@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styled from "styled-components";
 
-// API URL 설정
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 interface Document {
     id: string;
@@ -158,7 +156,7 @@ const DocumentRecommend: React.FC = () => {
 
         try {
             const response = await axios.post<RecommendResponse>(
-                `${API_URL}/api/v1/docs/recommend`,
+                `${import.meta.env.VITE_API_URL}/api/v1/docs/recommend`,
                 { query }
             );
 

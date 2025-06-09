@@ -1,6 +1,7 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import React, { useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -111,10 +112,10 @@ const SignIn: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
-    username: "",
-    password: "",
+    username: '',
+    password: '',
   });
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -123,16 +124,16 @@ const SignIn: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(""); // 기존 에러 초기화
+    setError(''); // 기존 에러 초기화
 
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/login`,
         {
-          method: "POST",
-          credentials: "include",
+          method: 'POST',
+          credentials: 'include',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             email: formData.username,
@@ -143,9 +144,9 @@ const SignIn: React.FC = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError("아이디 또는 비밀번호가 올바르지 않습니다.");
+          setError('아이디 또는 비밀번호가 올바르지 않습니다.');
         } else {
-          setError("서버 오류가 발생했습니다. 다시 시도해주세요.");
+          setError('서버 오류가 발생했습니다. 다시 시도해주세요.');
         }
         return;
       }
@@ -154,11 +155,11 @@ const SignIn: React.FC = () => {
 
       // 로그인 성공 처리
 
-      console.log("로그인 성공:", data);
-      navigate("/");
+      console.log('로그인 성공:', data);
+      navigate('/');
     } catch (error) {
-      console.error("로그인 중 오류 발생:", error);
-      setError("네트워크 오류가 발생했습니다.");
+      console.error('로그인 중 오류 발생:', error);
+      setError('네트워크 오류가 발생했습니다.');
     }
   };
 
@@ -166,6 +167,10 @@ const SignIn: React.FC = () => {
     window.location.href = `${
       import.meta.env.VITE_API_URL
     }/api/v1/users/auth/google/login`;
+    // fetch('http://localhost:8000/auth/google/login', {
+    //   method: 'GET',
+    //   credentials: 'include', // 이게 핵심입니다
+    // });
   };
 
   return (
@@ -196,12 +201,12 @@ const SignIn: React.FC = () => {
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
             alt="Google"
-            style={{ width: "20px", marginRight: "8px" }}
+            style={{ width: '20px', marginRight: '8px' }}
           />
           구글 이메일로 로그인
         </GoogleButton>
         <BottomLinks>
-          <a href="#">아이디 찾기</a> | <a href="#">비밀번호 찾기</a> |{" "}
+          <a href="#">아이디 찾기</a> | <a href="#">비밀번호 찾기</a> |{' '}
           <a href="#">회원가입</a>
         </BottomLinks>
       </FormBox>

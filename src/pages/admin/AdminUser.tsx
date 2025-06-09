@@ -190,8 +190,8 @@ const CreateButton = styled.button`
     }
 `;
 
-const Modal = styled.div<{ isOpen: boolean }>`
-    display: ${props => props.isOpen ? 'flex' : 'none'};
+const Modal = styled.div<{ $isOpen: boolean }>`
+    display: ${props => props.$isOpen ? 'flex' : 'none'};
     position: fixed;
     top: 0;
     left: 0;
@@ -238,8 +238,8 @@ const CloseButton = styled.button`
     }
 `;
 
-const EditSection = styled.div<{ isVisible: boolean }>`
-    display: ${props => props.isVisible ? 'block' : 'none'};
+const EditSection = styled.div<{ $isVisible: boolean }>`
+    display: ${props => props.$isVisible ? 'block' : 'none'};
     background-color: white;
     padding: 1.5rem;
     border-radius: 8px;
@@ -277,7 +277,7 @@ const AdminUser: React.FC = () => {
     // 기존 API 호출 함수들 유지
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/users');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users`);
             const data = await response.json();
             setUsers(data);
         } catch (error) {
@@ -300,7 +300,7 @@ const AdminUser: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/users', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -318,7 +318,7 @@ const AdminUser: React.FC = () => {
 
     const handleUpdate = async (userId: string) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/admin/users/${userId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -337,7 +337,7 @@ const AdminUser: React.FC = () => {
     const handleDelete = async (userId: string) => {
         if (window.confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/admin/users/${userId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users/${userId}`, {
                     method: 'DELETE',
                 });
                 if (response.ok) {
@@ -432,7 +432,7 @@ const AdminUser: React.FC = () => {
                 </UserTable>
 
                 {/* 생성 모달 */}
-                <Modal isOpen={isCreateModalOpen}>
+                <Modal $isOpen={isCreateModalOpen}>
                     <ModalContent>
                         <ModalHeader>
                             <h2>새 사용자 생성</h2>
@@ -558,7 +558,7 @@ const AdminUser: React.FC = () => {
                 </Modal>
 
                 {/* 수정 모달 */}
-                <Modal isOpen={isEditModalOpen}>
+                <Modal $isOpen={isEditModalOpen}>
                     <ModalContent>
                         <ModalHeader>
                             <h2>사용자 정보 수정</h2>
