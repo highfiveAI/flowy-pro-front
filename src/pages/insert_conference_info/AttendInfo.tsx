@@ -13,13 +13,6 @@ const AttendInfoWrapper = styled.div`
   width: 100%;
 `;
 
-const SectionTitle = styled.div`
-  font-weight: bold;
-  margin-bottom: 15px;
-  font-size: 1.1rem;
-  color: #fff;
-`;
-
 const AttendeeInputGroup = styled.div`
   display: flex;
   gap: 10px;
@@ -34,11 +27,27 @@ const StyledAttendeeInput = styled.input`
   background-color: rgba(255, 255, 255, 0.9);
   color: #333;
   font-size: 1rem;
-  flex-grow: 1;
+  flex-shrink: 0; /* 축소 방지 */
+  box-sizing: border-box; /* 패딩과 테두리가 너비에 포함되도록 */
 
   &::placeholder {
     color: #999;
   }
+`;
+
+const NameInput = styled(StyledAttendeeInput)`
+  flex-grow: 0;
+  width: calc((90% - 20px) * 1 / 6); /* 이름: 전체 너비의 중 차지하는 비율로 표시, 20px는 gap 총합 (10px * 2) */
+`;
+
+const EmailInput = styled(StyledAttendeeInput)`
+  flex-grow: 0;
+  width: calc((90% - 20px) * 3 / 6); /* 이메일: 전체 너비의 중 차지하는 비율로 표시 */
+`;
+
+const RoleInput = styled(StyledAttendeeInput)`
+  flex: 2 0 0; 
+  width: calc((90% - 20px) * 2 / 6); /* 역할: 전체 너비의 중 차지하는 비율로 표시 */
 `;
 
 const RemoveButton = styled.button`
@@ -55,30 +64,11 @@ const RemoveButton = styled.button`
   }
 `;
 
-const AddButton = styled.button`
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 15px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  margin-top: 10px;
-
-  &:hover {
-    background-color: #218838;
-  }
-`;
-
 const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees }) => {
   const handleAttendeeChange = (idx: number, field: string, value: string) => {
     const updated = [...attendees];
     updated[idx] = { ...updated[idx], [field]: value };
     setAttendees(updated);
-  };
-
-  const handleAddAttendee = () => {
-    setAttendees([...attendees, { name: "", email: "", role: "" }]);
   };
 
   const handleRemoveAttendee = (idx: number) => {
@@ -87,22 +77,21 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees }) => {
 
   return (
     <AttendInfoWrapper>
-      <SectionTitle>참석자 정보</SectionTitle>
       {attendees.map((att, idx) => (
         <AttendeeInputGroup key={idx}>
-          <StyledAttendeeInput
+          <NameInput
             type="text"
             placeholder="이름"
             value={att.name}
             onChange={e => handleAttendeeChange(idx, "name", e.target.value)}
           />
-          <StyledAttendeeInput
+          <EmailInput
             type="email"
             placeholder="이메일"
             value={att.email}
             onChange={e => handleAttendeeChange(idx, "email", e.target.value)}
           />
-          <StyledAttendeeInput
+          <RoleInput
             type="text"
             placeholder="역할"
             value={att.role}
@@ -113,7 +102,6 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees }) => {
           )}
         </AttendeeInputGroup>
       ))}
-      <AddButton type="button" onClick={handleAddAttendee}>참석자 추가</AddButton>
     </AttendInfoWrapper>
   );
 };
