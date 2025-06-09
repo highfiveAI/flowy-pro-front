@@ -1,10 +1,18 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import React from "react";
+import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 const SignUpWrapper = styled.div`
   min-height: 100vh;
-  background: radial-gradient(100% 100% at 50% 0%, #E3CFEE 0%, #A480B8 29.81%, #654477 51.92%, #351745 75.48%, #170222 93.75%), #2E0446;
+  background: radial-gradient(
+      100% 100% at 50% 0%,
+      #e3cfee 0%,
+      #a480b8 29.81%,
+      #654477 51.92%,
+      #351745 75.48%,
+      #170222 93.75%
+    ),
+    #2e0446;
   color: white;
   font-family: "Rethink Sans", sans-serif;
   display: flex;
@@ -20,7 +28,7 @@ const SignUpContainer = styled.div`
   border-radius: 35px;
   width: 90%;
   max-width: 700px;
-  box-shadow: 5px 5px 4px 0px rgba(0, 0, 0, 0.20);
+  box-shadow: 5px 5px 4px 0px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,12 +52,12 @@ const SelectionTitle = styled.div`
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     width: 30%;
     height: 1px;
-    background-color: #E0E0E0;
+    background-color: #e0e0e0;
   }
 
   &::before {
@@ -84,9 +92,9 @@ const OptionCard = styled.div<{ primary?: boolean }>`
   width: 200px;
   height: 200px;
   border-radius: 20px;
-  border: ${props => props.primary ? 'none' : '1px solid #480B6A'};
-  background: ${props => props.primary ? '#480B6A' : '#FFF'};
-  color: ${props => props.primary ? 'white' : '#480B6A'};
+  border: ${(props) => (props.primary ? "none" : "1px solid #480B6A")};
+  background: ${(props) => (props.primary ? "#480B6A" : "#FFF")};
+  color: ${(props) => (props.primary ? "white" : "#480B6A")};
   font-family: "Rethink Sans";
   font-size: 16px;
   font-style: normal;
@@ -97,7 +105,7 @@ const OptionCard = styled.div<{ primary?: boolean }>`
 
   &:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-color: ${props => props.primary ? 'none' : '#A480B8'};
+    border-color: ${(props) => (props.primary ? "none" : "#A480B8")};
   }
 `;
 
@@ -114,28 +122,44 @@ const GoogleIcon = styled.img`
 `;
 
 const ChooseMethod: React.FC = () => {
+  const handleGoogleLogin = () => {
+    window.location.href = `${
+      import.meta.env.VITE_API_URL
+    }/api/v1/users/auth/google/login`;
+  };
+
   return (
     <SignUpWrapper>
       <SignUpContainer>
         <LogoImg src="/images/flowyLogo.svg" alt="Flowy PRO Logo" />
         <SelectionTitle>회원가입 방식 선택</SelectionTitle>
         <SelectionOptions>
-          <Link to="/sign_up/form" style={{ textDecoration: 'none' }}>
+          <Link to="/sign_up/form" style={{ textDecoration: "none" }}>
             <OptionCard primary={true}>
               <MobileIcon src="/images/mobile-icon.svg" alt="Mobile Icon" />
-              휴대폰 번호로<br/>회원가입
+              휴대폰 번호로
+              <br />
+              회원가입
             </OptionCard>
           </Link>
-          <Link to="/social_sign_up" style={{ textDecoration: 'none' }}>
+          <div
+            onClick={() => handleGoogleLogin()}
+            style={{ textDecoration: "none" }}
+          >
             <OptionCard primary={false}>
-              <GoogleIcon src="https://www.google.com/favicon.ico" alt="Google Icon" />
-              구글 이메일로<br/>회원가입
+              <GoogleIcon
+                src="https://www.google.com/favicon.ico"
+                alt="Google Icon"
+              />
+              구글 이메일로
+              <br />
+              회원가입
             </OptionCard>
-          </Link>
+          </div>
         </SelectionOptions>
       </SignUpContainer>
     </SignUpWrapper>
   );
 };
 
-export default ChooseMethod; 
+export default ChooseMethod;
