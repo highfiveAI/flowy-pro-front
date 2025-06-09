@@ -129,7 +129,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
           <MenuItem onClick={() => handleNavigation('/')}>Flowy<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
           <MenuItem onClick={() => handleNavigation('/insert_info')}>새 회의<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
           <MenuItem onClick={() => handleNavigation('/dashboard')}>회의 관리<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/result')}>작업 관리<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
+          <MenuItem onClick={() => handleNavigation('/calendar')}>작업 관리<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
           <MenuItem onClick={() => handleNavigation('/mypage')}>마이페이지<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
         </Menu>
       </Left>
