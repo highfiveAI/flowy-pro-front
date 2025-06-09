@@ -114,7 +114,7 @@ const Navbar: React.FC = () => {
   ))}
 </DropdownMenu>
         </MenuItem>
-        <MenuItem>CONTACT</MenuItem>
+        <MenuItem onClick={() => navigate("/calendar")}>CALENDAR</MenuItem>
       </Menu>
       <RightSection>
         <img

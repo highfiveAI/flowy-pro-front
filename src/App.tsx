@@ -13,6 +13,7 @@ import AdminUser from "./pages/admin/AdminUser";
 import AdminCom from "./pages/admin/AdminCom";
 import AdminPosition from "./pages/admin/AdminPosition";
 import AdminTemplate from "./pages/admin/AdminTemplate";
+import Calendar from "./pages/calendar/Calendar";
 
 function App() {
   async function checkAuth() {
@@ -53,6 +54,7 @@ function App() {
         <Route path="/admin/company" element={<AdminCom />} />
         <Route path="/admin/position" element={<AdminPosition />} />
         <Route path="/admin/template" element={<AdminTemplate />} />
+        <Route path="/calendar" element={<Calendar />} />
       </Route>
     </Routes>
   );
