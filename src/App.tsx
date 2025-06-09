@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/home/Home";
-import DashBoard from "./pages/dash_board/DashBoard";
+import Dashboard from "./pages/dashboard/Dashboard";
 import Layout from "./components/Layout";
 import InsertConferenceInfo from "./pages/insert_conference_info/InsertConferenceInfo";
 import Result from "./pages/result/Result";
@@ -54,7 +54,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route element={<Layout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<DashBoard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/insert_info" element={<InsertConferenceInfo />} />
         <Route path="/result" element={<Result />} />
         <Route path="/sign_up" element={<ChooseMethod />} />
