@@ -253,7 +253,7 @@ const AdminTemplate: React.FC = () => {
         formData.append('update_user_id', '3c89c6ab-c755-4925-8e64-ab134668a253');
 
         try {
-            const response = await fetch('http://localhost:8000/api/v1/docs/', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/docs/`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -290,7 +290,7 @@ const AdminTemplate: React.FC = () => {
         formData.append('update_user_id', '3c89c6ab-c755-4925-8e64-ab134668a253');
 
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/docs/${selectedTemplate.interdocs_id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/docs/${selectedTemplate.interdocs_id}`, {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -322,7 +322,7 @@ const AdminTemplate: React.FC = () => {
     const handleDelete = async (templateId: string) => {
         if (window.confirm('정말로 이 템플릿을 삭제하시겠습니까?')) {
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/docs/${templateId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/docs/${templateId}`, {
                     method: 'DELETE',
                 });
 

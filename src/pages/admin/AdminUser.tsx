@@ -277,7 +277,7 @@ const AdminUser: React.FC = () => {
     // 기존 API 호출 함수들 유지
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/users');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users`);
             const data = await response.json();
             setUsers(data);
         } catch (error) {
@@ -300,7 +300,7 @@ const AdminUser: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/users', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -318,7 +318,7 @@ const AdminUser: React.FC = () => {
 
     const handleUpdate = async (userId: string) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/admin/users/${userId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -337,7 +337,7 @@ const AdminUser: React.FC = () => {
     const handleDelete = async (userId: string) => {
         if (window.confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/admin/users/${userId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users/${userId}`, {
                     method: 'DELETE',
                 });
                 if (response.ok) {
