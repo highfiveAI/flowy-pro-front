@@ -39,7 +39,8 @@ const MenuItem = styled.li`
   }
 `;
 
-const DropdownMenu = styled.ul<{ isOpen: boolean }>`
+const DropdownMenu = styled.ul<{ $isOpen: boolean }>`
+  display: ${props => props.$isOpen ? 'block' : 'none'};
   position: absolute;
   top: 100%;
   left: 0;
@@ -48,7 +49,6 @@ const DropdownMenu = styled.ul<{ isOpen: boolean }>`
   border-radius: 4px;
   padding: 0.5rem 0;
   min-width: 150px;
-  display: ${props => props.isOpen ? 'block' : 'none'};
   list-style: none;
 `;
 
@@ -103,16 +103,16 @@ const Navbar: React.FC = () => {
           onMouseLeave={() => setIsSystemMenuOpen(false)}
         >
           시스템관리
-          <DropdownMenu isOpen={isSystemMenuOpen}>
-            {systemMenuItems.map((item, index) => (
-              <DropdownItem 
-                key={index}
-                onClick={() => navigate(item.path)}
-              >
-                {item.name}
-              </DropdownItem>
-            ))}
-          </DropdownMenu>
+          <DropdownMenu $isOpen={isSystemMenuOpen}>
+  {systemMenuItems.map((item, index) => (
+    <DropdownItem 
+      key={index}
+      onClick={() => navigate(item.path)}
+    >
+      {item.name}
+    </DropdownItem>
+  ))}
+</DropdownMenu>
         </MenuItem>
         <MenuItem>CONTACT</MenuItem>
       </Menu>

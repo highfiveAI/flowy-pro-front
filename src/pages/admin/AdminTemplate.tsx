@@ -119,8 +119,8 @@ const ActionButton = styled.button`
     }
 `;
 
-const Modal = styled.div<{ isOpen: boolean }>`
-    display: ${props => props.isOpen ? 'flex' : 'none'};
+const Modal = styled.div<{ $isOpen: boolean }>`
+    display: ${props => props.$isOpen ? 'flex' : 'none'};
     position: fixed;
     top: 0;
     left: 0;
@@ -415,7 +415,7 @@ const AdminTemplate: React.FC = () => {
                 </TemplateGrid>
 
                 {/* 생성 모달 */}
-                <Modal isOpen={isCreateModalOpen}>
+                <Modal $isOpen={isCreateModalOpen}>
                     <ModalContent>
                         <ModalHeader>
                             <h2>새 템플릿 추가</h2>
@@ -441,7 +441,7 @@ const AdminTemplate: React.FC = () => {
                 </Modal>
 
                 {/* 수정 모달 */}
-                <Modal isOpen={isEditModalOpen}>
+                <Modal $isOpen={isEditModalOpen}>
                     <ModalContent>
                         <ModalHeader>
                             <h2>템플릿 수정</h2>
