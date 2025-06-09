@@ -33,4 +33,23 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+}
+
+.demo-app {
+  display: flex;
+  min-height: 100vh;
+  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.demo-app-main {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #ffffff; /* Add a background to make it visible */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.fc .fc-toolbar {
+  margin-bottom: 1.5em;
 } 
