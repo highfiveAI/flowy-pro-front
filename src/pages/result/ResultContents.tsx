@@ -21,6 +21,8 @@ const Box = styled.div`
   background-color: #ffffff;
   padding: 1rem;
   box-sizing: border-box;
+  max-height: 300px;
+  overflow-y: auto;
 `;
 
 const LinkItem = styled.a`
@@ -36,16 +38,67 @@ const LinkItem = styled.a`
 `;
 
 const ResultContents: React.FC<{ result: any }> = ({ result }) => {
+  // 실제 데이터가 있는 경로로 콘솔 로그 추가
+  console.log('result.tagging.assigned_roles.assigned_roles.assigned_todos:', result?.tagging?.assigned_roles?.assigned_roles?.assigned_todos);
+  console.log('result.tagging.feedback.feedback:', result?.tagging?.feedback?.feedback);
+  console.log('result.tagging.summary.agent_output:', result?.tagging?.summary?.agent_output);
+
   if (!result) return null;
 
   return (
     <Wrapper>
-      요약
-      <Box>{result.summary || '요약 정보가 없습니다.'}</Box>
-      역할분담
-      <Box>{result.roles || '역할 정보가 없습니다.'}</Box>
-      피드백
-      <Box>{result.feedback || '피드백이 없습니다.'}</Box>
+      <div style={{ fontWeight: 'bold', fontSize: '1.2em', margin: '1.5em 0 0.5em 0' }}>요약</div>
+      <Box>
+        {result?.tagging?.summary?.agent_output
+          ? Object.entries(result.tagging.summary.agent_output).map(([key, arr]: [string, any]) => (
+              <div key={key} style={{ marginBottom: '0.7em' }}>
+                <strong>{key}</strong>
+                <ul style={{ margin: '0.2em 0 0.2em 1.2em', padding: 0 }}>
+                  {Array.isArray(arr) ? arr.map((item: any, idx: number) => (
+                    <li key={idx} style={{ listStyle: 'disc', marginLeft: '1em', marginBottom: '0.2em' }}>{item}</li>
+                  )) : <li>{arr}</li>}
+                </ul>
+              </div>
+            ))
+          : '요약 정보가 없습니다.'}
+      </Box>
+      <div style={{ fontWeight: 'bold', fontSize: '1.2em', margin: '1.5em 0 0.5em 0' }}>역할분담</div>
+      <Box>
+        {Array.isArray(result?.tagging?.assigned_roles?.assigned_roles?.assigned_todos) && result.tagging.assigned_roles.assigned_roles.assigned_todos.length > 0
+          ? (
+            <ul style={{ margin: 0, padding: 0 }}>
+              {result.tagging.assigned_roles.assigned_roles.assigned_todos.map((todo: any, idx: number) => (
+                <li key={idx} style={{ marginBottom: '0.3em', marginLeft: '1em' }}>
+                  <strong>{todo.assignee}</strong> : {todo.action}
+                  {todo.context && <span style={{ color: '#555' }}> ({todo.context})</span>}
+                </li>
+              ))}
+            </ul>
+          )
+          : '역할 정보가 없습니다.'
+        }
+      </Box>
+      <div style={{ fontWeight: 'bold', fontSize: '1.2em', margin: '1.5em 0 0.5em 0' }}>피드백</div>
+      <Box>
+        {result?.tagging?.feedback?.feedback
+          ? Object.entries(result.tagging.feedback.feedback).map(([key, value]: [string, any]) => (
+              <div key={key} style={{ marginBottom: '0.7em' }}>
+                <strong>{key}</strong>
+                <div style={{ marginLeft: '1em', whiteSpace: 'pre-line' }}>
+                  {Array.isArray(value)
+                    ? (
+                      <ul style={{ margin: 0, padding: 0 }}>
+                        {value.map((item: any, idx: number) => (
+                          <li key={idx} style={{ listStyle: 'circle', marginLeft: '1em', marginBottom: '0.2em' }}>{item}</li>
+                        ))}
+                      </ul>
+                    )
+                    : value}
+                </div>
+              </div>
+            ))
+          : '피드백이 없습니다.'}
+      </Box>
       추천 문서
       <Box>
         {Array.isArray(result.search_result) &&
