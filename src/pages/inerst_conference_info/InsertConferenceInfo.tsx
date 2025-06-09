@@ -1,6 +1,5 @@
 import React from 'react';
 import FileUpload from './FileUpload';
-import SideBar from '../../components/SideBar';
 import styled from 'styled-components';
 import AttendInfo from './AttendInfo';
 import Loading from '../../components/Loading';
@@ -8,43 +7,215 @@ import RecordInfoUpload from './RecordInfoUpload';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ResultContents from '../result/ResultContents';
+import { useNavigate } from 'react-router-dom';
 
-const Container = styled.div`
+const PageWrapper = styled.div`
   display: flex;
-  flex-direction: row;
+  width: 100vw;
   height: 100vh;
-  background-color: #f7f7f7;
+  overflow: hidden;
 `;
 
-const MainContent = styled.div`
-  flex: 1;
+const ContentWrapper = styled.div`
   display: flex;
-  flex-direction: column; /* ⭐⭐⭐ 세로 방향으로 변경 */
-  justify-content: center; /* 수직 중앙 정렬 */
-  align-items: center; /* 수평 중앙 정렬 */
-  gap: 2rem; /* 두 컴포넌트 사이 간격 주기 (선택) */
+  flex: 1;
 `;
 
-const UploadButton = styled.button`
-  padding: 12px 24px;
-  background-color: #007bff;
+const LeftPanel = styled.div`
+  flex: 1;
+  background-color: #f7f7f7; /* 좌측 패널 배경색 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+  font-size: 2rem;
+  /* 추후 프로젝트 목록 등 내용 추가 */
+`;
+
+const RightPanel = styled.div`
+  width: 600px;
+  background-color: #351745; /* 우측 패널 배경색 */
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
   color: white;
+  position: relative;
+  overflow-y: auto;
+`;
+
+const FormHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+`;
+
+const BackButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 20px;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const PageTitle = styled.h1`
+  font-size: 1.8rem;
+  margin: 0;
+  flex-grow: 1;
+  text-align: center;
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 25px; /* 각 폼 그룹 간 간격 */
+  width: 100%;
+`;
+
+const StyledLabel = styled.label`
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #fff;
+
+  span {
+    color: #ffcc00; /* 필수 입력 표시를 위한 색상 */
+  }
+`;
+
+const StyledInput = styled.input`
+  width: 100%;
+  padding: 12px 15px;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 1rem;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: #999;
+  }
+`;
+
+const StyledTextarea = styled.textarea`
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 1rem;
+  box-sizing: border-box;
+  min-height: 80px;
+  resize: vertical;
+
+  &::placeholder {
+    color: #999;
+  }
+`;
+
+const StyledSelect = styled.select`
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 1rem;
+  box-sizing: border-box;
+  -webkit-appearance: none; /* 기본 select 스타일 제거 */
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.1L146.2%20202.7%2018.5%2074.5a17.6%2017.6%200%200%200-25.1%2024.9l130.2%20129.8c6.8%206.7%2017.7%206.7%2024.5%200l130.2-129.8a17.6%2017.6%200%200%200-11.9-29.4z%22%2F%3E%3C%2Fsvg%3E'); /* 커스텀 화살표 */
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 12px;
+`;
+
+const DatePickerWrapper = styled.div`
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+
+  .custom-datepicker {
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 1rem;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #999;
+    }
+  }
+`;
+
+const StyledUploadSection = styled.div`
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  padding: 20px;
+  position: relative; /* 아이콘 배치를 위해 추가 */
+  min-height: 100px; /* 아이콘을 포함할 수 있도록 최소 높이 설정 */
+
+  h2 {
+    color: #351745;
+  }
+`;
+
+const FileUploadWrapper = styled.div`
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+`;
+
+const RecordUploadWrapper = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+`;
+
+const StyledUploadButton = styled.button`
+  padding: 15px 30px;
+  background-color: #00B4BA; /* 보라색 계열 */
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.2rem;
   cursor: pointer;
-  margin-top: 2rem;
+  width: 100%;
+  margin-top: 30px;
 
   &:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
   }
+
+  &:hover {
+    background-color: #00939a; /* hover 색상 조정 */
+  }
 `;
 
-const ErrorMessage = styled.div`
-  color: #dc3545;
-  margin-top: 1rem;
-  font-size: 14px;
+const StyledErrorMessage = styled.div`
+  color: #ffeb3b; /* 밝은 노란색으로 변경 */
+  margin-top: 15px;
+  font-size: 0.9rem;
+  text-align: center;
 `;
 
 // 날짜를 'YYYY-MM-DD HH:mm:ss' 형식으로 변환하는 함수
@@ -59,6 +230,7 @@ function formatDateToKST(date: Date): string {
 }
 
 const InsertConferenceInfo: React.FC = () => {
+  const navigate = useNavigate();
   const [isCompleted, setIsCompleted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [subject, setSubject] = React.useState('');
@@ -73,7 +245,7 @@ const InsertConferenceInfo: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!subject.trim()) {
-      setError('주제를 입력해주세요.');
+      setError('회의 제목을 입력해주세요.');
       return false;
     }
 
@@ -154,78 +326,104 @@ const InsertConferenceInfo: React.FC = () => {
   };
 
   return (
-    <Container>
-      <SideBar />
-      <MainContent>
-        {isCompleted ? (
-          <ResultContents result={result} />
-        ) : isLoading ? (
-          <Loading />
-        ) : (
-          <>
-            <AttendInfo
-              subject={subject}
-              attendees={attendees}
-              setSubject={setSubject}
-              setAttendees={setAttendees}
-            />
-            <div style={{ width: '100%', maxWidth: 500 }}>
-              <label style={{ fontWeight: 'bold' }}>회의 안건 (선택)</label>
-              <textarea
-                value={agenda}
-                onChange={(e) => setAgenda(e.target.value)}
-                placeholder="회의 안건을 입력하세요 (선택)"
-                style={{
-                  width: '100%',
-                  minHeight: 60,
-                  marginTop: 8,
-                  borderRadius: 6,
-                  border: '1px solid #ccc',
-                  padding: 8,
-                }}
-              />
-            </div>
-            <div style={{ width: '100%', maxWidth: 500 }}>
-              <label style={{ fontWeight: 'bold' }}>
-                회의 일시 <span style={{ color: '#dc3545' }}>*</span>
-              </label>
-              <div
-                style={{
-                  width: '100%',
-                  marginTop: 8,
-                  borderRadius: 6,
-                  border: '1px solid #ccc',
-                  padding: 8,
-                }}
-              >
-                <DatePicker
-                  selected={meetingDate}
-                  onChange={(date: Date | null) => setMeetingDate(date)}
-                  showTimeSelect
-                  timeFormat="HH:mm"
-                  timeIntervals={15}
-                  dateFormat="yyyy-MM-dd HH:mm"
-                  placeholderText="날짜와 시간을 선택하세요"
-                  className="custom-datepicker"
+    <PageWrapper>
+      <ContentWrapper>
+        <LeftPanel>{/* 프로젝트 목록 영역 */}</LeftPanel>
+        <RightPanel>
+          <FormHeader>
+            <BackButton onClick={() => navigate(-1)}>← 메인 화면으로 돌아가기</BackButton>
+            <PageTitle>새 회의 정보 입력하기</PageTitle>
+          </FormHeader>
+          {isCompleted ? (
+            <ResultContents result={result} />
+          ) : isLoading ? (
+            <Loading />
+          ) : (
+            <>
+              <FormGroup>
+                <StyledLabel htmlFor="project-name">프로젝트명 <span>*</span></StyledLabel>
+                <StyledSelect id="project-name">
+                  <option value="">상위 프로젝트를 선택해주세요.</option>
+                  {/* 프로젝트 목록 동적 생성 */} 
+                </StyledSelect>
+              </FormGroup>
+              
+              <FormGroup>
+                <StyledLabel htmlFor="meeting-subject">회의 제목 <span>*</span></StyledLabel>
+                <StyledInput
+                  type="text"
+                  id="meeting-subject"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="회의 제목을 입력해주세요."
                 />
-              </div>
-            </div>
-            {file ? (
-              <div style={{ fontWeight: 'bold', marginBottom: '1rem' }}>
-                파일명: {file.name}
-              </div>
-            ) : (
-              <>
-                <FileUpload setFile={setFile} />
-                <RecordInfoUpload setFile={setFile} />
-              </>
-            )}
-            <UploadButton onClick={handleUpload}>업로드</UploadButton>
-            {error && <ErrorMessage>{error}</ErrorMessage>}
-          </>
-        )}
-      </MainContent>
-    </Container>
+                {/* <p style={{ color: '#ffeb3b', fontSize: '0.8rem', marginTop: '5px' }}>
+                  * 이 프로젝트에서 사용 중인 회의 제목입니다.
+                </p> */} {/* 이미지에 있는 노란색 텍스트 (주석 처리)*/}
+              </FormGroup>
+
+              <FormGroup>
+                <StyledLabel htmlFor="meeting-date">회의 일시 <span>*</span></StyledLabel>
+                <DatePickerWrapper>
+                  <DatePicker
+                    selected={meetingDate}
+                    onChange={(date: Date | null) => setMeetingDate(date)}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    timeIntervals={15}
+                    dateFormat="yyyy-MM-dd HH:mm"
+                    placeholderText="회의 일시를 선택하세요."
+                    className="custom-datepicker"
+                  />
+                </DatePickerWrapper>
+              </FormGroup>
+
+              <FormGroup>
+                <StyledLabel htmlFor="meeting-agenda">회의 안건</StyledLabel>
+                <StyledTextarea
+                  id="meeting-agenda"
+                  value={agenda}
+                  onChange={(e) => setAgenda(e.target.value)}
+                  placeholder="회의 안건을 입력하세요."
+                />
+              </FormGroup>
+
+              <FormGroup>
+                <StyledLabel>회의 참석자 <span>*</span></StyledLabel>
+                {/* AttendInfo 컴포넌트 내부 스타일 조정 필요 시 여기에 Wrapper 적용 */} 
+                <AttendInfo
+                  attendees={attendees}
+                  setAttendees={setAttendees}
+                />
+              </FormGroup>
+
+              <FormGroup>
+                <StyledLabel>회의 음성 <span>*</span></StyledLabel>
+                <StyledUploadSection>
+                  {file ? (
+                    <div style={{ fontWeight: 'bold', marginBottom: '1rem', color: '#351745' }}>
+                      파일명: {file.name}
+                    </div>
+                  ) : (
+                    <>
+                      <FileUploadWrapper>
+                        <FileUpload setFile={setFile} />
+                      </FileUploadWrapper>
+                      <RecordUploadWrapper>
+                        <RecordInfoUpload setFile={setFile} />
+                      </RecordUploadWrapper>
+                    </>
+                  )}
+                </StyledUploadSection>
+              </FormGroup>
+
+              <StyledUploadButton onClick={handleUpload}>회의 분석하기</StyledUploadButton>
+              {error && <StyledErrorMessage>{error}</StyledErrorMessage>}
+            </>
+          )}
+        </RightPanel>
+      </ContentWrapper>
+    </PageWrapper>
   );
 };
 

@@ -13,7 +13,7 @@ const NavbarContainer = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 20px 40px;
-  background: transparent;
+  background: white; /* 배경을 흰색으로 변경 */
   font-family: "Rethink Sans", sans-serif;
 `;
 
@@ -22,85 +22,116 @@ const Left = styled.div`
   align-items: center;
 `;
 
-const LogoImg = styled.img`
-  width: 100px;
-  height: auto;
-  cursor: pointer;
-`;
-
-const Menu = styled.ul`
-  list-style: none;
-  display: flex;
-  gap: 20px;
-`;
-
-const MenuItem = styled.li`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
-
-const MenuIcon = styled.img`
-  width: 20px;
-  height: 20px;
-`;
-
 const Right = styled.div`
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1rem;
+`;
+
+const Logo = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #351745; /* 텍스트 색상 변경 */
+`;
+
+const Menu = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  margin-left: 76px;
+`;
+
+const MenuItem = styled.div`
+  color: #351745; /* 텍스트 색상 변경 */
+  font-family: 'Rethink Sans', sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const TextButton = styled.button`
+  background: none;
+  color: #351745; /* 텍스트 색상 변경 */
+  border: none;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+`;
+
+const FilledButton = styled.button`
+  background: #480B6A;
+  color: #FFF;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+`;
+
+const LogoImg = styled.img`
+  width: 93.273px;
+  height: 44.591px;
+  margin-right: 12px;
+  cursor: pointer;
+`;
+
+const MenuIcon = styled.img`
+  width: 8px;
+  height: 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+  stroke-width: 1px;
+  stroke: #351745; /* 아이콘 색상 변경 */
 `;
 
 const ProfileSection = styled.div`
   display: flex;
   align-items: center;
+  gap: 1.5rem;
   cursor: pointer;
 `;
 
 const ProfileIconCircle = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background-color: #fff;
+  background-color: #D9D9D9;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 `;
 
 const ProfileIcon = styled.svg`
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
+  fill: #351745; /* 사람 아이콘 색상 변경 */
 `;
 
 const LogoutText = styled.span`
-  margin-left: 10px;
+  color: #351745; /* 텍스트 색상 변경 */
+  font-family: "Rethink Sans", sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
 `;
 
-const TextButton = styled.button`
-  background: none;
-  border: none;
-  font: inherit;
-  cursor: pointer;
-  outline: inherit;
-`;
-
-const FilledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font: inherit;
-  cursor: pointer;
-  outline: inherit;
-`;
-
-interface NavbarProps {
+interface NavbarSubProps {
   isLoggedIn: boolean;
   setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
+const NavbarSub: React.FC<NavbarSubProps> = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
@@ -112,8 +143,10 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    navigate('/');
+    // 실제 로그아웃 API 호출 로직 (예: fetch 또는 axios)
+    // fetch('/api/logout', { method: 'POST' });
+    setIsLoggedIn(false); // 로그인 상태를 false로 변경
+    navigate('/'); // 메인 화면으로 이동
   };
 
   return (
@@ -157,4 +190,4 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
   );
 };
 
-export default Navbar; 
+export default NavbarSub; 
