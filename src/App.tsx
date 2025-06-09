@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./pages/home/Home";
 import DashBoard from "./pages/dash_board/DashBoard";
 import Layout from "./components/Layout";
-import InsertConferenceInfo from "./pages/inerst_conference_info/InsertConferenceInfo";
+import InsertConferenceInfo from "./pages/insert_conference_info/InsertConferenceInfo";
 import Result from "./pages/result/Result";
 import SignUp from "./pages/sign_up/SignUp";
 import SignIn from "./sign_in/SignIn";
