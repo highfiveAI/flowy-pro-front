@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import SignUpSuccessModal from "../sign_up/SignUpSuccessModal";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import SignUpSuccessModal from '../sign_up/SignUpSuccessModal';
 
 export const Wrapper = styled.div`
   display: flex;
@@ -77,15 +77,15 @@ export const SubmitButton = styled.button`
 
 const SocialSignUp: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    username: "",
+    name: '',
+    email: '',
+    phone: '',
+    username: '',
     // password: "",
-    confirmPassword: "",
-    company: "",
-    department: "",
-    team: "",
+    confirmPassword: '',
+    company: '',
+    department: '',
+    team: '',
   });
   const [showModal, setShowModal] = useState(false);
 
@@ -101,34 +101,35 @@ const SocialSignUp: React.FC = () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/social_signup`,
+        // `/api/v1/users/social_signup`,
         {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             // name: formData.name,
             // email: formData.email,
             login_id: formData.username,
-            password: "none",
+            password: 'none',
             phone: formData.phone,
             company: formData.company,
             department: formData.department,
             team: formData.team,
-            position: "aaf44bda-6a64-4611-b0ca-4083b59c8e6e", // 더미 데이터
-            job: "개발자",
-            sysrole: "c4cb5e53-617e-463f-8ddb-67252f9a9742", // 더미 데이터
+            position: 'aaf44bda-6a64-4611-b0ca-4083b59c8e6e', // 더미 데이터
+            job: '개발자',
+            sysrole: 'c4cb5e53-617e-463f-8ddb-67252f9a9742', // 더미 데이터
           }),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "회원가입 실패");
+        throw new Error(errorData.message || '회원가입 실패');
       }
 
       setShowModal(true); // 회원가입 성공 시 모달 열기
     } catch (error: any) {
-      console.error("error:", error);
+      console.error('error:', error);
       alert(`오류 발생: ${error.message}`);
     }
   };
