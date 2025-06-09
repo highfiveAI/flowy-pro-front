@@ -1,7 +1,6 @@
-import React from "react";
-import SideBar from "../../components/SideBar";
-import styled from "styled-components";
-import ResultContents from "./ResultContents";
+import React from 'react';
+import SideBar from '../../components/SideBar';
+import styled from 'styled-components';
 
 const Container = styled.div`
   display: flex;
@@ -21,9 +20,7 @@ const Result: React.FC = () => {
   return (
     <Container>
       <SideBar />
-      <MainContent>
-        <ResultContents />
-      </MainContent>
+      <MainContent>{/* <ResultContents /> */}</MainContent>
     </Container>
   );
 };
