@@ -17,6 +17,7 @@ const MainContent = styled.main`
   flex-grow: 1; /* 남은 공간을 채우도록 */
   padding-top: ${NAVBAR_HEIGHT}; /* 고정된 네비바 아래로 콘텐츠를 밀어냄 */
   min-height: calc(100vh - ${NAVBAR_HEIGHT}); /* 네비바를 제외한 나머지 뷰포트 높이 */
+  background-color: #ffffff;
 `;
 
 interface LayoutProps {
