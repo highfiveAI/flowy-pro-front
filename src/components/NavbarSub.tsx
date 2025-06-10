@@ -1,7 +1,8 @@
-import React from 'react';
-import styled from "styled-components";
+import React, { useState } from 'react';
+import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
-import type { Dispatch, SetStateAction } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { logout } from '../utils/auth';
 
 const NavbarContainer = styled.nav`
   position: fixed;
@@ -14,7 +15,7 @@ const NavbarContainer = styled.nav`
   align-items: center;
   padding: 20px 40px;
   background: white; /* 배경을 흰색으로 변경 */
-  font-family: "Rethink Sans", sans-serif;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Left = styled.div`
@@ -28,11 +29,11 @@ const Right = styled.div`
   gap: 1rem;
 `;
 
-const Logo = styled.div`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #351745; /* 텍스트 색상 변경 */
-`;
+// const Logo = styled.div`
+//   font-size: 1.5rem;
+//   font-weight: bold;
+//   color: #351745; /* 텍스트 색상 변경 */
+// `;
 
 const Menu = styled.div`
   display: flex;
@@ -41,7 +42,7 @@ const Menu = styled.div`
 `;
 
 const MenuItem = styled.div`
-  color: #351745; /* 텍스트 색상 변경 */
+  color: #351745;
   font-family: 'Rethink Sans', sans-serif;
   font-size: 15px;
   font-style: normal;
@@ -50,6 +51,7 @@ const MenuItem = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
+  position: relative;
 `;
 
 const TextButton = styled.button`
@@ -65,8 +67,8 @@ const TextButton = styled.button`
 `;
 
 const FilledButton = styled.button`
-  background: #480B6A;
-  color: #FFF;
+  background: #480b6a;
+  color: #fff;
   border: none;
   border-radius: 6px;
   font-size: 15px;
@@ -96,7 +98,7 @@ const ProfileIconCircle = styled.div`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -110,12 +112,13 @@ const ProfileIcon = styled.svg`
 
 const LogoutText = styled.span`
   color: #351745; /* 텍스트 색상 변경 */
-  font-family: "Rethink Sans", sans-serif;
+  font-family: 'Rethink Sans', sans-serif;
   font-size: 15px;
   font-style: normal;
   font-weight: 500;
   line-height: 20px;
 `;
+
 
 const MenuIcon = styled.img`
   width: 20px;
@@ -128,46 +131,94 @@ interface NavbarSubProps {
   setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 }
 
-const NavbarSub: React.FC<NavbarSubProps> = ({ isLoggedIn, setIsLoggedIn }) => {
-  const navigate = useNavigate();
 
-  const handleNavigation = (path: string) => {
-    if (isLoggedIn) {
-      navigate(path);
-    } else {
-      navigate('/login');
+
+const DropdownItem = styled.div`
+    padding: 0.75rem 1rem;
+    color: #351745;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+        background-color: #f8f5ff;
     }
-  };
+`;
 
-  const handleLogout = () => {
-    // 실제 로그아웃 API 호출 로직 (예: fetch 또는 axios)
-    // fetch('/api/logout', { method: 'POST' });
-    setIsLoggedIn(false); // 로그인 상태를 false로 변경
-    navigate('/'); // 메인 화면으로 이동
+const NavbarSub: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, setUser } = useAuth();
+  const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
+
+  const systemMenuItems = [
+    { name: "문서 에이전트", path: "/docs_agent_test" },
+    { name: "사용자 관리", path: "/admin/user" },
+    { name: "회사 관리", path: "/admin/company" },
+    { name: "직책 관리", path: "/admin/position" },
+    { name: "템플릿 관리", path: "/admin/template" }
+  ];
+
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      console.log('로그아웃 성공');
+      setUser(null);
+      navigate('/');
+    } else {
+      alert('로그아웃에 실패했습니다.');
+    }
   };
 
   return (
     <NavbarContainer>
       <Left>
-        <LogoImg 
-          src="/images/flowyLogo.svg" 
-          alt="Flowy Logo" 
+        <LogoImg
+          src="/images/flowyLogo.svg"
+          alt="Flowy Logo"
           onClick={() => navigate('/')}
         />
         <Menu>
-          <MenuItem onClick={() => handleNavigation('/')}>Flowy<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/insert_info')}>새 회의<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/dashboard')}>회의 관리<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/calendar')}>작업 관리<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/mypage')}>마이페이지<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
+          <MenuItem onClick={() => navigate('/')}>
+            Flowy
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/insert_info')}>
+            새 회의
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/dashboard')}>
+            회의 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem 
+            onMouseEnter={() => setIsSystemMenuOpen(true)}
+            onMouseLeave={() => setIsSystemMenuOpen(false)}
+          >
+            시스템관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+            <DropdownMenu $isOpen={isSystemMenuOpen}>
+              {systemMenuItems.map((item, index) => (
+                <DropdownItem 
+                  key={index}
+                  onClick={() => navigate(item.path)}
+                >
+                  {item.name}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/mypage')}>
+            마이페이지
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
         </Menu>
       </Left>
       <Right>
-        {isLoggedIn ? (
-          <ProfileSection onClick={handleLogout}>
+        {user ? (
+          <ProfileSection onClick={() => handleLogout()}>
             <ProfileIconCircle>
               <ProfileIcon viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </ProfileIcon>
             </ProfileIconCircle>
             <LogoutText>로그아웃</LogoutText>
@@ -187,4 +238,4 @@ const NavbarSub: React.FC<NavbarSubProps> = ({ isLoggedIn, setIsLoggedIn }) => {
   );
 };
 
-export default NavbarSub; 
+export default NavbarSub;

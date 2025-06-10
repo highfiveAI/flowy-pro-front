@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from "styled-components";
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 const MyPageWrapper = styled.div`
@@ -69,7 +69,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  background-color: #480B6A;
+  background-color: #480b6a;
   color: #fff;
   padding: 12px 20px;
   border: none;
@@ -92,18 +92,18 @@ const ErrorText = styled.p`
 `;
 
 const MyPage: React.FC = () => {
-  const [id, setId] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  // const [id, setId] = useState("");
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (true) {
-      setError("");
+      setError('');
       navigate('/mypage/alterInfo');
     } else {
-      setError("입력하신 비밀번호가 올바르지 않습니다.");
+      setError('입력하신 비밀번호가 올바르지 않습니다.');
     }
   };
 
@@ -112,17 +112,30 @@ const MyPage: React.FC = () => {
       <PageTitle>마이페이지</PageTitle>
       <FormArea>
         <FormContainer>
-          <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
             <InputGroup>
               <Label htmlFor="id">아이디</Label>
-              <Input type="text" id="id" value="사용자 아이디 자동 입력되도록 변경 필요" readOnly />
+              <Input
+                type="text"
+                id="id"
+                value="사용자 아이디 자동 입력되도록 변경 필요"
+                readOnly
+              />
             </InputGroup>
             <InputGroup>
               <Label htmlFor="password">비밀번호</Label>
-              <Input 
-                type="password" 
-                id="password" 
-                value={password} 
+              <Input
+                type="password"
+                id="password"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </InputGroup>
@@ -135,4 +148,4 @@ const MyPage: React.FC = () => {
   );
 };
 
-export default MyPage; 
+export default MyPage;

@@ -6,7 +6,15 @@ const Hero = styled.section`
   height: 100vh;
   min-width: 320px;
   min-height: 600px;
-  background: radial-gradient(100% 100% at 50% 0%, #E3CFEE 0%, #A480B8 29.81%, #654477 51.92%, #351745 75.48%, #170222 93.75%), #2E0446;
+  background: radial-gradient(
+      100% 100% at 50% 0%,
+      #e3cfee 0%,
+      #a480b8 29.81%,
+      #654477 51.92%,
+      #351745 75.48%,
+      #170222 93.75%
+    ),
+    #2e0446;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,9 +30,9 @@ const Content = styled.div`
 `;
 
 const CenteredText = styled.h1`
-  color: #FFF;
+  color: #fff;
   text-align: center;
-  font-family: "Rethink Sans";
+  font-family: 'Rethink Sans';
   font-size: 100px;
   font-style: normal;
   font-weight: 700;
@@ -38,7 +46,8 @@ const HeroSection: React.FC = () => {
     <Hero>
       <Content>
         <CenteredText>
-          회의하세요,<br />
+          회의하세요,
+          <br />
           나머진 저희가 할게요.
         </CenteredText>
       </Content>
