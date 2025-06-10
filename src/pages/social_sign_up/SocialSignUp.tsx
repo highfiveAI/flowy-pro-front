@@ -6,72 +6,106 @@ export const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 4rem 1rem;
-  background: linear-gradient(to bottom, #bca0d6, #3d1454);
+  padding: 20px;
+  background: radial-gradient(100% 100% at 50% 0%, #E3CFEE 0%, #A480B8 29.81%, #654477 51.92%, #351745 75.48%, #170222 93.75%), #2E0446;
   min-height: 100vh;
+  font-family: "Rethink Sans", sans-serif;
 `;
 
 export const FormContainer = styled.div`
   background-color: white;
-  padding: 3rem 2rem;
-  border-radius: 2rem;
+  padding: 40px 60px;
+  border-radius: 35px;
   width: 100%;
-  max-width: 500px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 533px;
+  box-shadow: 5px 5px 4px 0px rgba(0, 0, 0, 0.20);
 `;
 
 export const Title = styled.h2`
   text-align: center;
-  font-size: 2rem;
+  font-size: 32px;
   font-weight: bold;
-  color: #4a1168;
-  margin-bottom: 2rem;
+  color: #480B6A;
+  margin-bottom: 40px;
 `;
 
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 `;
 
 export const InputGroup = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  border: 1px solid #C6C6C7;
+  padding: 0 16px;
+  height: 50px;
 `;
 
 export const Label = styled.label`
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  width: 150px;
+  flex-shrink: 0;
+  margin-right: 20px;
+  font-weight: 500;
   color: #333;
+  font-size: 16px;
+`;
+
+export const StyledAsterisk = styled.span`
+  color: #ED6E00;
+  margin-left: 2px;
 `;
 
 export const Input = styled.input`
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+  flex-grow: 1;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  outline: none;
+  color: black;
+
+  &::placeholder {
+    color: #A0A0A0;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: right;
+  }
 `;
 
 export const Select = styled.select`
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+  flex-grow: 1;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  outline: none;
+  color: black;
+
+  &::placeholder {
+    color: #A0A0A0;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: right;
+  }
 `;
 
 export const SubmitButton = styled.button`
-  margin-top: 2rem;
-  background-color: #4a1168;
+  height: 66px;
+  border-radius: 8px;
+  background-color: #480B6A;
   color: white;
-  font-size: 1.1rem;
-  font-weight: bold;
-  padding: 0.75rem;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 8px 16px;
   border: none;
-  border-radius: 0.5rem;
   cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #3a0d54;
+    background-color: #35084d;
   }
 `;
 
@@ -123,8 +157,14 @@ const SocialSignUp: React.FC = () => {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '회원가입 실패');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "회원가입 실패");
+        } else {
+          throw new Error(response.statusText || "회원가입 실패: 서버 응답 오류");
+        }
+
       }
 
       setShowModal(true); // 회원가입 성공 시 모달 열기
@@ -140,7 +180,7 @@ const SocialSignUp: React.FC = () => {
           <Title>소셜 회원가입</Title>
           <Form onSubmit={handleSubmit}>
             <InputGroup>
-              <Label>핸드폰번호 *</Label>
+              <Label>핸드폰번호 <StyledAsterisk>*</StyledAsterisk></Label>
               <Input
                 name="phone"
                 type="tel"
@@ -150,7 +190,7 @@ const SocialSignUp: React.FC = () => {
               />
             </InputGroup>
             <InputGroup>
-              <Label>아이디 *</Label>
+              <Label>아이디 <StyledAsterisk>*</StyledAsterisk></Label>
               <Input
                 name="username"
                 type="text"
@@ -160,7 +200,7 @@ const SocialSignUp: React.FC = () => {
               />
             </InputGroup>
             <InputGroup>
-              <Label>소속 회사명 *</Label>
+              <Label>소속 회사명 <StyledAsterisk>*</StyledAsterisk></Label>
               <Select name="company" required onChange={handleChange}>
                 <option value="">선택</option>
                 <option value="3db3ef9a-947e-4237-93da-d306b7bdb52d">
@@ -181,10 +221,12 @@ const SocialSignUp: React.FC = () => {
           </Form>
         </FormContainer>
       </Wrapper>
-      <SignUpSuccessModal
-        visible={showModal}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <SignUpSuccessModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   );
 };

@@ -1,130 +1,169 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { logout } from '../utils/auth';
 
-const Nav = styled.nav`
+const NavbarContainer = styled.nav`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 2rem;
-  height: 70px;
-  background-color: white;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px 40px;
+  background: transparent;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
-const Logo = styled.div`
+const Left = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const LogoImg = styled.img`
+  width: 100px;
+  height: auto;
   cursor: pointer;
-  font-size: 1.5rem;
-  font-weight: bold;
 `;
 
 const Menu = styled.ul`
-  display: flex;
   list-style: none;
-  gap: 1.5rem;
+  display: flex;
+  gap: 20px;
 `;
 
 const MenuItem = styled.li`
   cursor: pointer;
-  font-weight: 500;
-  position: relative;
-  padding: 0.5rem 0;
-
-  &:hover {
-    color: #002b5c;
-  }
-`;
-
-const DropdownMenu = styled.ul<{ $isOpen: boolean }>`
-  display: ${props => props.$isOpen ? 'block' : 'none'};
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  padding: 0.5rem 0;
-  min-width: 150px;
-  list-style: none;
-`;
-
-const DropdownItem = styled.li`
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #f5f5f5;
-    color: #002b5c;
-  }
-`;
-
-const RightSection = styled.div`
   display: flex;
-  gap: 1rem;
   align-items: center;
+  gap: 5px;
 `;
 
-const Button = styled.button`
-  background-color: #002b5c;
-  color: white;
-  padding: 0.5rem 1.2rem;
-  border-radius: 4px;
-  border: none;
-  font-weight: bold;
+const MenuIcon = styled.img`
+  width: 20px;
+  height: 20px;
+`;
+
+const Right = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+const ProfileSection = styled.div`
+  display: flex;
+  align-items: center;
   cursor: pointer;
+`;
+
+const ProfileIconCircle = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ProfileIcon = styled.svg`
+  width: 24px;
+  height: 24px;
+`;
+
+const LogoutText = styled.span`
+  margin-left: 10px;
+`;
+
+const TextButton = styled.button`
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+`;
+
+const FilledButton = styled.button`
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 `;
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
-  const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
+  const { user, setUser } = useAuth();
 
-  const systemMenuItems = [
-    { name: "문서 에이전트", path: "/docs_agent_test" },
-    { name: "사용자 관리", path: "/admin/user" },
-    { name: "회사 관리", path: "/admin/company" },
-    { name: "직책 관리", path: "/admin/position" },
-    { name: "템플릿 관리", path: "/admin/template" }
-  ];
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      console.log('로그아웃 성공');
+      setUser(null);
+      navigate('/');
+    } else {
+      alert('로그아웃에 실패했습니다.');
+    }
+  };
 
   return (
-    <Nav>
-      <Logo onClick={() => navigate("/")}>PAGE</Logo>
-      <Menu>
-        <MenuItem>ABOUT</MenuItem>
-        <MenuItem onClick={() => navigate("/dashboard")}>DASHBOARD</MenuItem>
-        <MenuItem onClick={() => navigate("/insert_info")}>COMMENCE</MenuItem>
-        <MenuItem onClick={() => navigate("/result")}>RESULT</MenuItem>
-        <MenuItem 
-          onMouseEnter={() => setIsSystemMenuOpen(true)}
-          onMouseLeave={() => setIsSystemMenuOpen(false)}
-        >
-          시스템관리
-          <DropdownMenu $isOpen={isSystemMenuOpen}>
-  {systemMenuItems.map((item, index) => (
-    <DropdownItem 
-      key={index}
-      onClick={() => navigate(item.path)}
-    >
-      {item.name}
-    </DropdownItem>
-  ))}
-</DropdownMenu>
-        </MenuItem>
-        <MenuItem>CONTACT</MenuItem>
-      </Menu>
-      <RightSection>
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"
-          alt="Instagram"
-          width="20"
+    <NavbarContainer>
+      <Left>
+        <LogoImg
+          src="/images/flowyLogo.svg"
+          alt="Flowy Logo"
+          onClick={() => navigate('/')}
         />
-        <Button>RESERVATION</Button>
-      </RightSection>
-    </Nav>
+        <Menu>
+          <MenuItem onClick={() => navigate('/')}>
+            Flowy
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/insert_info')}>
+            새 회의
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/dashboard')}>
+            회의 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/calendar')}>
+            작업 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/mypage')}>
+            마이페이지
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+        </Menu>
+      </Left>
+      <Right>
+        {user ? (
+          <ProfileSection onClick={() => handleLogout()}>
+            <ProfileIconCircle>
+              <ProfileIcon viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </ProfileIcon>
+            </ProfileIconCircle>
+            <LogoutText>로그아웃</LogoutText>
+          </ProfileSection>
+        ) : (
+          <>
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <TextButton>로그인</TextButton>
+            </Link>
+            <Link to="/sign_up" style={{ textDecoration: 'none' }}>
+              <FilledButton>회원가입</FilledButton>
+            </Link>
+          </>
+        )}
+      </Right>
+    </NavbarContainer>
   );
 };
 
