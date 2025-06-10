@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import type { ChangeEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import NavbarSub from '../../components/NavbarSub';
 import { useAuth } from '../../contexts/AuthContext';
+import NavbarSub from '../../components/NavbarSub';
 
 const LoginWrapper = styled.div`
   min-height: 100vh;
@@ -170,7 +170,7 @@ interface FormData {
 }
 
 const Login: React.FC = () => {
-  const { user, setUser } = useAuth();
+  const { setUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || '/';
@@ -236,7 +236,7 @@ const Login: React.FC = () => {
 
   return (
     <LoginWrapper>
-      {/* <NavbarSub isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /> */}
+      <NavbarSub />
       <LoginFormContainer onSubmit={handleSubmit}>
         <LogoImg src="/images/flowyLogo.svg" alt="Flowy PRO Logo" />
 
