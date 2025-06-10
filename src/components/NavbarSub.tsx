@@ -85,15 +85,6 @@ const LogoImg = styled.img`
   cursor: pointer;
 `;
 
-const MenuIcon = styled.img`
-  width: 8px;
-  height: 4px;
-  margin-left: 4px;
-  vertical-align: middle;
-  stroke-width: 1px;
-  stroke: #351745; /* 아이콘 색상 변경 */
-`;
-
 const ProfileSection = styled.div`
   display: flex;
   align-items: center;
@@ -124,6 +115,12 @@ const LogoutText = styled.span`
   font-style: normal;
   font-weight: 500;
   line-height: 20px;
+`;
+
+const MenuIcon = styled.img`
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
 `;
 
 interface NavbarSubProps {

@@ -28,11 +28,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ isLoggedIn, setIsLoggedIn }) => {
   return (
     <LayoutWrapper>
-      {isLoggedIn ? (
-        <NavbarSub isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-      ) : (
-        <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-      )}
+      <NavbarSub isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       <MainContent>
         <Outlet />
       </MainContent>
