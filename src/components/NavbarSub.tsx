@@ -87,15 +87,6 @@ const LogoImg = styled.img`
   cursor: pointer;
 `;
 
-const MenuIcon = styled.img`
-  width: 8px;
-  height: 4px;
-  margin-left: 4px;
-  vertical-align: middle;
-  stroke-width: 1px;
-  stroke: #351745; /* 아이콘 색상 변경 */
-`;
-
 const ProfileSection = styled.div`
   display: flex;
   align-items: center;
@@ -128,31 +119,19 @@ const LogoutText = styled.span`
   line-height: 20px;
 `;
 
-const DropdownMenu = styled.div<{ $isOpen: boolean }>`
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    min-width: 200px;
-    display: ${props => props.$isOpen ? 'block' : 'none'};
-    z-index: 1000;
-    margin-top: 0.5rem;
-    padding: 0.5rem 0;
 
-    &::before {
-        content: '';
-        position: absolute;
-        top: -6px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-bottom: 6px solid white;
-    }
+const MenuIcon = styled.img`
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
 `;
+
+interface NavbarSubProps {
+  isLoggedIn: boolean;
+  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+}
+
+
 
 const DropdownItem = styled.div`
     padding: 0.75rem 1rem;

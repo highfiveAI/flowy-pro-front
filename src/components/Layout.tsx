@@ -34,7 +34,10 @@ const Layout: React.FC = () => {
   const { user } = useAuth();
   return (
     <LayoutWrapper>
-      {user ? <NavbarSub /> : <Navbar />}
+      {/*  
+      <NavbarSub isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />             // 항상 로그인 된 상태로 작업하기 위함
+      */}
+      {user ? <NavbarSub /> : <Navbar />}                       // 로그인 
       <MainContent>
         <Outlet />
       </MainContent>
