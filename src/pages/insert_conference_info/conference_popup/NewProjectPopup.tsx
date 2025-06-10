@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import AddProjectIcon from "/images/addprojecticon.svg"; // AddProjectIcon 임포트
-import AddProjectIcon2 from "/images/addprojecticon2.svg"; // AddProjectIcon2 임포트
+// import AddProjectIcon from "/images/addprojecticon.svg"; // AddProjectIcon 임포트
+import AddProjectIcon2 from '/images/addprojecticon2.svg'; // AddProjectIcon2 임포트
 
 interface PopupProps {
   onClose: () => void;
@@ -23,7 +23,8 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
     <PopupOverlay>
       <PopupContent>
         <PopupHeader>
-          <ProjectIcon src={AddProjectIcon2} alt="새 프로젝트 생성" /> {/* 아이콘을 AddProjectIcon2로 변경 */}
+          <ProjectIcon src={AddProjectIcon2} alt="새 프로젝트 생성" />{' '}
+          {/* 아이콘을 AddProjectIcon2로 변경 */}
           <PopupTitle>새 프로젝트 생성하기</PopupTitle>
           {/* <CloseButton onClick={onClose}>×</CloseButton> */}
         </PopupHeader>
@@ -46,7 +47,9 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
             placeholder="프로젝트 참여자를 선택해주세요."
           />
         </FormGroup>
-        <CreateProjectButton onClick={handleCreateProject}>프로젝트 생성</CreateProjectButton>
+        <CreateProjectButton onClick={handleCreateProject}>
+          프로젝트 생성
+        </CreateProjectButton>
       </PopupContent>
     </PopupOverlay>
   );
@@ -92,7 +95,9 @@ const ProjectIcon = styled.img`
   height: 28px;
   /* margin-top: 2px; */ /* 아이콘을 텍스트와 시각적으로 정렬하기 위해 약간 아래로 내림 */
   /* vertical-align: middle; */ /* 텍스트와 수직 중앙 정렬 */
-  transform: translateY(2px); /* 아이콘을 텍스트와 시각적으로 정렬하기 위해 미세 조정 */
+  transform: translateY(
+    2px
+  ); /* 아이콘을 텍스트와 시각적으로 정렬하기 위해 미세 조정 */
 `;
 
 const PopupTitle = styled.h2`
@@ -150,7 +155,7 @@ const StyledTextarea = styled.textarea`
 
 const CreateProjectButton = styled.button`
   padding: 15px 30px;
-  background-color: #00B4BA; /* 보라색 계열 */
+  background-color: #00b4ba; /* 보라색 계열 */
   color: white;
   border: none;
   border-radius: 50px; /* 둥근 버튼 */
