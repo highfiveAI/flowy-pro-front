@@ -1,7 +1,8 @@
 import React from 'react';
-import styled from "styled-components";
+import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
-import type { Dispatch, SetStateAction } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { logout } from '../utils/auth';
 
 const NavbarContainer = styled.nav`
   position: fixed;
@@ -14,7 +15,7 @@ const NavbarContainer = styled.nav`
   align-items: center;
   padding: 20px 40px;
   background: transparent;
-  font-family: "Rethink Sans", sans-serif;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Left = styled.div`
@@ -95,50 +96,58 @@ const FilledButton = styled.button`
   outline: inherit;
 `;
 
-interface NavbarProps {
-  isLoggedIn: boolean;
-  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
+const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const { user, setUser } = useAuth();
 
-  const handleNavigation = (path: string) => {
-    if (isLoggedIn) {
-      navigate(path);
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      console.log('로그아웃 성공');
+      setUser(null);
+      navigate('/');
     } else {
-      navigate('/login');
+      alert('로그아웃에 실패했습니다.');
     }
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    navigate('/');
   };
 
   return (
     <NavbarContainer>
       <Left>
-        <LogoImg 
-          src="/images/flowyLogo.svg" 
-          alt="Flowy Logo" 
+        <LogoImg
+          src="/images/flowyLogo.svg"
+          alt="Flowy Logo"
           onClick={() => navigate('/')}
-
         />
         <Menu>
-          <MenuItem onClick={() => handleNavigation('/')}>Flowy<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/insert_info')}>새 회의<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/dashboard')}>회의 관리<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/calendar')}>작업 관리<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
-          <MenuItem onClick={() => handleNavigation('/mypage')}>마이페이지<MenuIcon src="/images/navibaricon.svg" alt="menu icon" /></MenuItem>
+          <MenuItem onClick={() => navigate('/')}>
+            Flowy
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/insert_info')}>
+            새 회의
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/dashboard')}>
+            회의 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/calendar')}>
+            작업 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/mypage')}>
+            마이페이지
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
         </Menu>
       </Left>
       <Right>
-        {isLoggedIn ? (
-          <ProfileSection onClick={handleLogout}>
+        {user ? (
+          <ProfileSection onClick={() => handleLogout()}>
             <ProfileIconCircle>
               <ProfileIcon viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </ProfileIcon>
             </ProfileIconCircle>
             <LogoutText>로그아웃</LogoutText>
@@ -158,4 +167,4 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
   );
 };
 
-export default Navbar; 
+export default Navbar;
