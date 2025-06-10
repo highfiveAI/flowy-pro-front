@@ -215,6 +215,20 @@ interface Template {
     interdocs_update_user_id: string;
 }
 
+// 파일 확장자에 따른 이미지 경로를 반환하는 함수
+const getFileIcon = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    
+    switch (extension) {
+        case 'docx':
+            return '/images/word.png';  // 슬래시(/)로 시작하는 절대 경로
+        case 'xlsx':
+            return '/images/excel.png';  // 슬래시(/)로 시작하는 절대 경로
+        default:
+            return '/images/file.png';   // 기본 아이콘
+    }
+};
+
 const AdminTemplate: React.FC = () => {
     const [templates, setTemplates] = useState<Template[]>([]);
     const [selectedDepartment, setSelectedDepartment] = useState('HDX');
@@ -344,13 +358,6 @@ const AdminTemplate: React.FC = () => {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            // 파일 형식 검증
-            // const allowedTypes = ['text/plain', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-            // if (!allowedTypes.includes(file.type)) {
-            //     alert('지원하지 않는 파일 형식입니다. (지원 형식: txt, pdf, doc, docx)');
-            //     e.target.value = '';
-            //     return;
-            // }
             setSelectedFile(file);
         }
     };
@@ -391,7 +398,15 @@ const AdminTemplate: React.FC = () => {
                             }}
                         >
                             <TemplatePreview>
-                                <img src="/path/to/preview-icon.png" alt="Preview" />
+                                <img 
+                                    src={getFileIcon(template.interdocs_filename)}
+                                    alt="File icon"
+                                    style={{ 
+                                        width: '100px', 
+                                        height: '100px',
+                                        objectFit: 'contain'  // 이미지 비율 유지
+                                    }} 
+                                />
                             </TemplatePreview>
                             <TemplateInfo>
                                 <h3>{template.interdocs_filename}</h3>

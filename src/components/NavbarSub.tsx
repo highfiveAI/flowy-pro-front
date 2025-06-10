@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -42,7 +42,7 @@ const Menu = styled.div`
 `;
 
 const MenuItem = styled.div`
-  color: #351745; /* 텍스트 색상 변경 */
+  color: #351745;
   font-family: 'Rethink Sans', sans-serif;
   font-size: 15px;
   font-style: normal;
@@ -51,6 +51,7 @@ const MenuItem = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
+  position: relative;
 `;
 
 const TextButton = styled.button`
@@ -127,9 +128,56 @@ const LogoutText = styled.span`
   line-height: 20px;
 `;
 
+const DropdownMenu = styled.div<{ $isOpen: boolean }>`
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    display: ${props => props.$isOpen ? 'block' : 'none'};
+    z-index: 1000;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid white;
+    }
+`;
+
+const DropdownItem = styled.div`
+    padding: 0.75rem 1rem;
+    color: #351745;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+        background-color: #f8f5ff;
+    }
+`;
+
 const NavbarSub: React.FC = () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
+  const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
+
+  const systemMenuItems = [
+    { name: "문서 에이전트", path: "/docs_agent_test" },
+    { name: "사용자 관리", path: "/admin/user" },
+    { name: "회사 관리", path: "/admin/company" },
+    { name: "직책 관리", path: "/admin/position" },
+    { name: "템플릿 관리", path: "/admin/template" }
+  ];
 
   const handleLogout = async () => {
     const success = await logout();
@@ -163,9 +211,22 @@ const NavbarSub: React.FC = () => {
             회의 관리
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
-          <MenuItem onClick={() => navigate('/calendar')}>
-            작업 관리
+          <MenuItem 
+            onMouseEnter={() => setIsSystemMenuOpen(true)}
+            onMouseLeave={() => setIsSystemMenuOpen(false)}
+          >
+            시스템관리
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+            <DropdownMenu $isOpen={isSystemMenuOpen}>
+              {systemMenuItems.map((item, index) => (
+                <DropdownItem 
+                  key={index}
+                  onClick={() => navigate(item.path)}
+                >
+                  {item.name}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
           </MenuItem>
           <MenuItem onClick={() => navigate('/mypage')}>
             마이페이지

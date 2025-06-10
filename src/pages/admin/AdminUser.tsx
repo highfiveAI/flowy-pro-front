@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
 // Container와 MainContent 스타일 유지
@@ -65,48 +65,98 @@ const UserTable = styled.table`
     }
 `;
 
-const StatusBadge = styled.span<{ status: string }>`
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 500;
+// StatusBadge 컴포넌트 수정 - 클릭 가능한 드롭다운 스타일
+const StatusBadge = styled.div<{ $status: string }>`
+    position: relative;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+        font-weight: 600;
     
-    &::before {
-        content: '';
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        margin-right: 0.5rem;
-    }
-
     ${props => {
-        switch (props.status.toLowerCase()) {
-            case 'approved':
+        switch (props.$status) {
+            case 'Approved':
                 return `
-                    background-color: #dcfce7;
-                    color: #15803d;
-                    &::before { background-color: #15803d; }
+                    background-color: rgba(34, 197, 94, 0.1);
+                    color: #16a34a;
+                    border: 1px solid rgba(34, 197, 94, 0.2);
                 `;
-            case 'pending':
+            case 'Pending':
                 return `
-                    background-color: #fef9c3;
-                    color: #854d0e;
-                    &::before { background-color: #854d0e; }
+                    background-color: rgba(234, 179, 8, 0.1);
+                    color: #b45309;
+                    border: 1px solid rgba(234, 179, 8, 0.2);
                 `;
-            case 'rejected':
+            case 'Rejected':
                 return `
-                    background-color: #fee2e2;
+                    background-color: rgba(239, 68, 68, 0.1);
                     color: #dc2626;
-                    &::before { background-color: #dc2626; }
+                    border: 1px solid rgba(239, 68, 68, 0.2);
                 `;
             default:
                 return `
-                    background-color: #e2e8f0;
+                    background-color: rgba(148, 163, 184, 0.1);
                     color: #64748b;
-                    &::before { background-color: #64748b; }
+                    border: 1px solid rgba(148, 163, 184, 0.2);
                 `;
+        }
+    }}
+
+    &::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        
+        ${props => {
+            switch (props.$status) {
+                case 'Approved':
+                    return `background-color: #16a34a;`;
+                case 'Pending':
+                    return `background-color: #b45309;`;
+                case 'Rejected':
+                    return `background-color: #dc2626;`;
+                default:
+                    return `background-color: #64748b;`;
+            }
+        }}
+    }
+`;
+
+const StatusDropdown = styled.div`
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 150px;
+    margin-top: 4px;
+`;
+
+const StatusOption = styled.div<{ $status: string }>`
+    padding: 8px 12px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #f8fafc;
+    }
+    
+    ${props => {
+        switch (props.$status) {
+            case 'Approved':
+                return `color: #16a34a;`;
+            case 'Pending':
+                return `color: #b45309;`;
+            case 'Rejected':
+                return `color: #dc2626;`;
+            default:
+                return `color: #64748b;`;
         }
     }}
 `;
@@ -160,9 +210,9 @@ const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
 // 기존 인터페이스 유지
 interface User {
     user_id: string;
-    user_name: string;
-    user_email: string;
     user_login_id: string;
+    user_email: string;
+    user_name: string;
     user_phonenum: string;
     user_dept_name: string;
     user_team_name: string;
@@ -170,7 +220,10 @@ interface User {
     user_company_id: string;
     user_position_id: string;
     user_sysrole_id: string;
-    status?: string; // 상태 필드 추가
+    signup_completed_status: string;  // signup_status 필드 추가
+    company_name: string;
+    position_name: string;
+    sysrole_name: string;
 }
 
 const CreateButton = styled.button`
@@ -247,6 +300,83 @@ const EditSection = styled.div<{ $isVisible: boolean }>`
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 `;
 
+// 정렬 방향을 위한 타입 추가
+type SortDirection = 'asc' | 'desc' | null;
+
+// 정렬 상태를 위한 인터페이스
+interface SortState {
+    field: string;
+    direction: SortDirection;
+}
+
+// 테이블 헤더 스타일 수정
+const TableHeader = styled.th`
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 1rem;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+
+    &:hover {
+        background-color: #f1f5f9;
+    }
+`;
+
+const SortIcon = styled.span<{ $direction: SortDirection }>`
+    display: inline-block;
+    margin-left: 4px;
+    vertical-align: middle;
+    
+    &::before,
+    &::after {
+        content: '';
+        display: block;
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+    }
+
+    &::before {
+        border-bottom: 4px solid ${props => 
+            props.$direction === 'asc' ? '#2563eb' : '#cbd5e1'};
+        margin-bottom: 2px;
+    }
+
+    &::after {
+        border-top: 4px solid ${props => 
+            props.$direction === 'desc' ? '#2563eb' : '#cbd5e1'};
+    }
+`;
+
+// 필터 버튼 스타일 추가
+const FilterButton = styled.button<{ $isActive: boolean }>`
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background-color: ${props => props.$isActive ? '#480b6a' : 'white'};
+    color: ${props => props.$isActive ? 'white' : '#351745'};
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: ${props => props.$isActive ? '#3a0854' : '#f8f5ff'};
+    }
+`;
+
+const FilterContainer = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+`;
+
 const AdminUser: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedDepartment, setSelectedDepartment] = useState('HDX');
@@ -269,22 +399,34 @@ const AdminUser: React.FC = () => {
         user_company_id: '',
         user_position_id: '',
         user_sysrole_id: '',
+        signup_completed_status: '',
+        company_name: '',
+        position_name: '',
+        sysrole_name: '',
     };
 
     const [formData, setFormData] = useState(initialFormData);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+    const [activeStatusDropdown, setActiveStatusDropdown] = useState<string | null>(null);
+    const [sortState, setSortState] = useState<SortState>({
+        field: '',
+        direction: null
+    });
+    const [showPendingOnly, setShowPendingOnly] = useState(false);
 
-    // 기존 API 호출 함수들 유지
+    // API 호출 함수
     const fetchUsers = async () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users`);
             const data = await response.json();
+            console.log('API 응답 데이터:', data); // 데이터 확인용 로그
             setUsers(data);
         } catch (error) {
             console.error('사용자 목록 조회 실패:', error);
         }
     };
 
+    // 컴포넌트 마운트 시 유저 정보 가져오기
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -368,49 +510,129 @@ const AdminUser: React.FC = () => {
             user_company_id: user.user_company_id || '',
             user_position_id: user.user_position_id || '',
             user_sysrole_id: user.user_sysrole_id || '',
+            signup_completed_status: user.signup_completed_status || '',
+            company_name: user.company_name || '',
+            position_name: user.position_name || '',
+            sysrole_name: user.sysrole_name || '',
         });
         setIsEditModalOpen(true);
     };
+
+    // 상태 변경 핸들러
+    const handleStatusChange = async (userId: string, newStatus: string) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/admin/users/${userId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            
+            if (response.ok) {
+                fetchUsers(); // 목록 새로고침
+            }
+        } catch (error) {
+            console.error('상태 변경 실패:', error);
+        }
+        setActiveStatusDropdown(null); // 드롭다운 닫기
+    };
+
+    // 정렬 핸들러
+    const handleSort = (field: string) => {
+        setSortState(prev => ({
+            field,
+            direction: 
+                prev.field === field
+                    ? prev.direction === 'asc'
+                        ? 'desc'
+                        : prev.direction === 'desc'
+                        ? null
+                        : 'asc'
+                    : 'asc'
+        }));
+    };
+
+    // 필터링된 사용자 목록 계산
+    const filteredUsers = useMemo(() => {
+        let filtered = [...users];
+        
+        // Pending 필터 적용
+        if (showPendingOnly) {
+            filtered = filtered.filter(user => user.signup_completed_status === 'Pending');
+        }
+
+        // 기존 정렬 로직 적용
+        if (sortState.direction !== null) {
+            filtered.sort((a, b) => {
+                const aValue = a[sortState.field as keyof User] || '';
+                const bValue = b[sortState.field as keyof User] || '';
+                
+                return sortState.direction === 'asc' 
+                    ? aValue.localeCompare(bValue)
+                    : bValue.localeCompare(aValue);
+            });
+        }
+
+        return filtered;
+    }, [users, showPendingOnly, sortState]);
 
     return (
         <Container>
             <MainContent>
                 <PageHeader>
-                    <h1>사용자 관리</h1>
+                <h1>사용자 관리</h1>
                     <CreateButton onClick={handleCreateClick}>
                         + 새 사용자 생성
                     </CreateButton>
                 </PageHeader>
 
-                <FilterSection>
-                    <FilterSelect 
-                        value={selectedDepartment}
-                        onChange={(e) => setSelectedDepartment(e.target.value)}
+                <FilterContainer>
+                    <FilterButton 
+                        $isActive={!showPendingOnly}
+                        onClick={() => setShowPendingOnly(false)}
                     >
-                        <option value="HDX">HDX</option>
-                    </FilterSelect>
-
-                    <FilterSelect
-                        value={selectedLevel}
-                        onChange={(e) => setSelectedLevel(e.target.value)}
+                        전체 보기
+                    </FilterButton>
+                    <FilterButton 
+                        $isActive={showPendingOnly}
+                        onClick={() => setShowPendingOnly(true)}
                     >
-                        <option value="최신순">최신순</option>
-                    </FilterSelect>
-                </FilterSection>
+                        대기중인 사용자만 보기
+                    </FilterButton>
+                </FilterContainer>
 
                 <UserTable>
                     <thead>
                         <tr>
-                            <th>Requested ID</th>
-                            <th>아이디</th>
-                            <th>이름</th>
-                            <th>소속 부서명</th>
-                            <th>소속 팀명</th>
-                            <th>Status</th>
+                            <TableHeader onClick={() => handleSort('user_id')}>
+                                Requested ID
+                                <SortIcon $direction={sortState.field === 'user_id' ? sortState.direction : null} />
+                            </TableHeader>
+                            <TableHeader onClick={() => handleSort('user_login_id')}>
+                                아이디
+                                <SortIcon $direction={sortState.field === 'user_login_id' ? sortState.direction : null} />
+                            </TableHeader>
+                            <TableHeader onClick={() => handleSort('user_name')}>
+                                이름
+                                <SortIcon $direction={sortState.field === 'user_name' ? sortState.direction : null} />
+                            </TableHeader>
+                            <TableHeader onClick={() => handleSort('user_dept_name')}>
+                                소속 부서명
+                                <SortIcon $direction={sortState.field === 'user_dept_name' ? sortState.direction : null} />
+                            </TableHeader>
+                            <TableHeader onClick={() => handleSort('user_team_name')}>
+                                소속 팀명
+                                <SortIcon $direction={sortState.field === 'user_team_name' ? sortState.direction : null} />
+                            </TableHeader>
+                            <TableHeader onClick={() => handleSort('signup_completed_status')}>
+                                가입 상태
+                                <SortIcon $direction={sortState.field === 'signup_completed_status' ? sortState.direction : null} />
+                            </TableHeader>
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => (
+                        {filteredUsers.map(user => (
                             <tr 
                                 key={user.user_id}
                                 onClick={() => handleRowClick(user)}
@@ -421,9 +643,34 @@ const AdminUser: React.FC = () => {
                                 <td>{user.user_name}</td>
                                 <td>{user.user_dept_name}</td>
                                 <td>{user.user_team_name}</td>
-                                <td>
-                                    <StatusBadge status={user.status || 'pending'}>
-                                        {user.status || 'Pending'}
+                                <td onClick={(e) => e.stopPropagation()}>  {/* 행 클릭 이벤트와 분리 */}
+                                    <StatusBadge 
+                                        $status={user.signup_completed_status}
+                                        onClick={() => setActiveStatusDropdown(activeStatusDropdown === user.user_id ? null : user.user_id)}
+                                    >
+                                        {user.signup_completed_status || 'Unknown'}
+                                        {activeStatusDropdown === user.user_id && (
+                                            <StatusDropdown>
+                                                <StatusOption 
+                                                    $status="Approved"
+                                                    onClick={() => handleStatusChange(user.user_id, 'Approved')}
+                                                >
+                                                    승인
+                                                </StatusOption>
+                                                <StatusOption 
+                                                    $status="Pending"
+                                                    onClick={() => handleStatusChange(user.user_id, 'Pending')}
+                                                >
+                                                    대기
+                                                </StatusOption>
+                                                <StatusOption 
+                                                    $status="Rejected"
+                                                    onClick={() => handleStatusChange(user.user_id, 'Rejected')}
+                                                >
+                                                    거절
+                                                </StatusOption>
+                                            </StatusDropdown>
+                                        )}
                                     </StatusBadge>
                                 </td>
                             </tr>
@@ -443,117 +690,117 @@ const AdminUser: React.FC = () => {
                             handleSubmit(e);
                             setIsCreateModalOpen(false);
                         }}>
-                            <FormGroup>
-                                <label>이름</label>
-                                <input
-                                    type="text"
-                                    name="user_name"
-                                    value={formData.user_name}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>이메일</label>
-                                <input
-                                    type="email"
-                                    name="user_email"
-                                    value={formData.user_email}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>로그인 ID</label>
-                                <input
-                                    type="text"
-                                    name="user_login_id"
-                                    value={formData.user_login_id}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>비밀번호</label>
-                                <input
-                                    type="password"
-                                    name="user_password"
-                                    value={formData.user_password}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>전화번호</label>
-                                <input
-                                    type="tel"
-                                    name="user_phonenum"
-                                    value={formData.user_phonenum}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>회사</label>
-                                <input
-                                    type="text"
-                                    name="user_company_id"
-                                    value={formData.user_company_id}
-                                    onChange={handleInputChange}
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>직급</label>
-                                <input
-                                    type="text"
-                                    name="user_position_id"
-                                    value={formData.user_position_id}
-                                    onChange={handleInputChange}
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>시스템 역할</label>
-                                <input
-                                    type="text"
-                                    name="user_sysrole_id"
-                                    value={formData.user_sysrole_id}
-                                    onChange={handleInputChange}
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>부서명</label>
-                                <input
-                                    type="text"
-                                    name="user_dept_name"
-                                    value={formData.user_dept_name}
-                                    onChange={handleInputChange}
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>팀명</label>
-                                <input
-                                    type="text"
-                                    name="user_team_name"
-                                    value={formData.user_team_name}
-                                    onChange={handleInputChange}
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <label>직무</label>
-                                <input
-                                    type="text"
-                                    name="user_jobname"
-                                    value={formData.user_jobname}
-                                    onChange={handleInputChange}
-                                />
-                            </FormGroup>
+                    <FormGroup>
+                        <label>이름</label>
+                        <input
+                            type="text"
+                            name="user_name"
+                            value={formData.user_name}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>이메일</label>
+                        <input
+                            type="email"
+                            name="user_email"
+                            value={formData.user_email}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>로그인 ID</label>
+                        <input
+                            type="text"
+                            name="user_login_id"
+                            value={formData.user_login_id}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>비밀번호</label>
+                        <input
+                            type="password"
+                            name="user_password"
+                            value={formData.user_password}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>전화번호</label>
+                        <input
+                            type="tel"
+                            name="user_phonenum"
+                            value={formData.user_phonenum}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>회사</label>
+                        <input
+                            type="text"
+                            name="user_company_id"
+                            value={formData.user_company_id}
+                            onChange={handleInputChange}
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>직급</label>
+                        <input
+                            type="text"
+                            name="user_position_id"
+                            value={formData.user_position_id}
+                            onChange={handleInputChange}
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>시스템 역할</label>
+                        <input
+                            type="text"
+                            name="user_sysrole_id"
+                            value={formData.user_sysrole_id}
+                            onChange={handleInputChange}
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>부서명</label>
+                        <input
+                            type="text"
+                            name="user_dept_name"
+                            value={formData.user_dept_name}
+                            onChange={handleInputChange}
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>팀명</label>
+                        <input
+                            type="text"
+                            name="user_team_name"
+                            value={formData.user_team_name}
+                            onChange={handleInputChange}
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <label>직무</label>
+                        <input
+                            type="text"
+                            name="user_jobname"
+                            value={formData.user_jobname}
+                            onChange={handleInputChange}
+                        />
+                    </FormGroup>
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                 <Button type="submit">생성</Button>
                                 <Button type="button" onClick={() => setIsCreateModalOpen(false)}>
                                     취소
-                                </Button>
+                    </Button>
                             </div>
-                        </Form>
+                </Form>
                     </ModalContent>
                 </Modal>
 
@@ -625,8 +872,8 @@ const AdminUser: React.FC = () => {
                                 <label>회사</label>
                                 <input
                                     type="text"
-                                    name="user_company_id"
-                                    value={formData.user_company_id}
+                                    name="company_name"
+                                    value={formData.company_name}
                                     onChange={handleInputChange}
                                 />
                             </FormGroup>
@@ -634,8 +881,8 @@ const AdminUser: React.FC = () => {
                                 <label>직급</label>
                                 <input
                                     type="text"
-                                    name="user_position_id"
-                                    value={formData.user_position_id}
+                                    name="position_name"
+                                    value={formData.position_name}
                                     onChange={handleInputChange}
                                 />
                             </FormGroup>
@@ -643,8 +890,8 @@ const AdminUser: React.FC = () => {
                                 <label>시스템 역할</label>
                                 <input
                                     type="text"
-                                    name="user_sysrole_id"
-                                    value={formData.user_sysrole_id}
+                                    name="sysrole_name"
+                                    value={formData.sysrole_name}
                                     onChange={handleInputChange}
                                 />
                             </FormGroup>
@@ -677,18 +924,18 @@ const AdminUser: React.FC = () => {
                             </FormGroup>
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                 <Button type="submit">수정</Button>
-                                <Button 
+                                    <Button 
                                     type="button" 
-                                    variant="danger"
+                                        variant="danger"
                                     onClick={() => {
                                         if (selectedUserId) {
                                             handleDelete(selectedUserId);
                                             setIsEditModalOpen(false);
                                         }
                                     }}
-                                >
-                                    삭제
-                                </Button>
+                                    >
+                                        삭제
+                                    </Button>
                                 <Button type="button" onClick={() => setIsEditModalOpen(false)}>
                                     취소
                                 </Button>
