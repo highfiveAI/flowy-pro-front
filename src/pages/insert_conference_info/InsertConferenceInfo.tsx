@@ -12,6 +12,7 @@ import AddUserIcon from "/images/adduser.svg"; // adduser.svg 임포트
 import NewMeetingIcon from "/images/newmeetingicon.svg"; // newmeetingicon.svg 임포트
 import AddProjectIcon from "/images/addprojecticon.svg"; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
+import { useAuth } from '../../contexts/AuthContext';
 
 const StyledErrorMessage = styled.div`
   color: #dc3545; /* 밝은 노란색에서 붉은색으로 변경 */
@@ -115,6 +116,7 @@ const NewProjectTextsContainer = styled.div`
   gap: 0px; /* 텍스트 간격 조정 */
 `;
 
+
 // 날짜를 'YYYY-MM-DD HH:mm:ss' 형식으로 변환하는 함수
 function formatDateToKST(date: Date): string {
   const year = date.getFullYear();
@@ -127,6 +129,7 @@ function formatDateToKST(date: Date): string {
 }
 
 const InsertConferenceInfo: React.FC = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [isCompleted, setIsCompleted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -140,9 +143,9 @@ const InsertConferenceInfo: React.FC = () => {
   const [meetingDate, setMeetingDate] = React.useState<Date | null>(null);
   const [result, setResult] = React.useState<any>(null);
   const [projectName, setProjectName] = React.useState<string>('애완동물 프로젝트');
-  // const projectName = ['프로젝트A', '프로젝트B', '프로젝트C']; // 예시 프로젝트명
   const [username, setUsername] = React.useState<string>(''); 
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
+  const [projects, setProjects] = React.useState<{userName: string, projectName: string}[]>([]); // 프로젝트 목록 상태 추가
 
   //db에서 불러오기
   React.useEffect(() => {
@@ -160,7 +163,25 @@ const InsertConferenceInfo: React.FC = () => {
       });
   }, []);
 
-
+  // user.id로 프로젝트 목록 불러오기
+  React.useEffect(() => {
+    if (!user?.id) return;
+    fetch(`${import.meta.env.VITE_API_URL}/projects/${user.id}`, {
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        // [[userName, projectName], ...] 형태를 [{userName, projectName}, ...]으로 변환
+        const arr = data.projects.map((item: [string, string]) => ({
+          userName: item[0],
+          projectName: item[1]
+        }));
+        setProjects(arr);
+      });
+  }, [user?.id]);
 
   const handleAddAttendee = () => { // 참석자 추가 함수
     setAttendees([...attendees, { name: "", email: "", role: "" }]);
@@ -273,12 +294,15 @@ const InsertConferenceInfo: React.FC = () => {
             </SortWrapper>
             {/* db에서 불러오기 */}
             <ProjectList>
-              {/* 프로젝트 목록 동적 생성 예시 */}
-              {[...Array(10)].map((_, index) => (
-                <ProjectListItem key={index}>
-                  <span>PitchPal</span>
-                </ProjectListItem>
-              ))}
+              {projects.length > 0 ? (
+                projects.map((proj, index) => (
+                  <ProjectListItem key={index}>
+                    <span>{proj.projectName}</span>
+                  </ProjectListItem>
+                ))
+              ) : (
+                <ProjectListItem>프로젝트가 없습니다.</ProjectListItem>
+              )}
             </ProjectList>
           </ProjectListContainer>
         </LeftPanel>
