@@ -1,10 +1,7 @@
 import React from 'react';
-import SideBar from '../../components/SideBar';
 import styled from 'styled-components';
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: row;
   height: 100vh;
   background-color: #f7f7f7;
 `;
@@ -19,7 +16,6 @@ const MainContent = styled.div`
 const Result: React.FC = () => {
   return (
     <Container>
-      <SideBar />
       <MainContent>{/* <ResultContents /> */}</MainContent>
     </Container>
   );

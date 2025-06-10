@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import SideBar from "../../components/SideBar";
 import styled from "styled-components";
 
-// API URL 설정
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 interface Document {
     id: string;
@@ -21,16 +18,14 @@ interface RecommendResponse {
 }
 
 const Container = styled.div`
-    display: flex;
-    flex-direction: row;
     height: 100vh;
     background-color: #f7f7f7;
+    padding: 2rem;
 `;
 
 const MainContent = styled.div`
-    flex: 1;
-    padding: 2rem;
-    overflow-y: auto;
+    max-width: 1200px;
+    margin: 0 auto;
 `;
 
 const SearchContainer = styled.div`
@@ -161,7 +156,7 @@ const DocumentRecommend: React.FC = () => {
 
         try {
             const response = await axios.post<RecommendResponse>(
-                `${API_URL}/api/v1/docs/recommend`,
+                `${import.meta.env.VITE_API_URL}/api/v1/docs/recommend`,
                 { query }
             );
 
@@ -180,7 +175,6 @@ const DocumentRecommend: React.FC = () => {
 
     return (
         <Container>
-            <SideBar />
             <MainContent>
                 <SearchContainer>
                     <SearchInput>

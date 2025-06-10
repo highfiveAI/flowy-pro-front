@@ -1,26 +1,26 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Hero = styled.section`
-  width: 100%;
+  width: 100vw;
   height: 100vh;
-  background-image: url('https://your-image-url.com/hero.jpg'); // 대체 이미지 URL
-  background-size: cover;
-  background-position: center;
+  min-width: 320px;
+  min-height: 600px;
+  background: radial-gradient(
+      100% 100% at 50% 0%,
+      #e3cfee 0%,
+      #a480b8 29.81%,
+      #654477 51.92%,
+      #351745 75.48%,
+      #170222 93.75%
+    ),
+    #2e0446;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
-  padding-top: 70px; // navbar 높이 보정
-`;
-
-const Overlay = styled.div`
-  background-color: rgba(0, 0, 0, 0.4);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
 `;
 
 const Content = styled.div`
@@ -30,23 +30,27 @@ const Content = styled.div`
   z-index: 10;
 `;
 
-const Title = styled.h1`
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.2rem;
+const CenteredText = styled.h1`
+  color: #fff;
+  text-align: center;
+  font-family: 'Rethink Sans';
+  font-size: 100px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 120px;
+  letter-spacing: -2px;
+  margin-top: 120px;
 `;
 
 const HeroSection: React.FC = () => {
   return (
     <Hero>
-      <Overlay />
       <Content>
-        <img src="/images/logo.png" alt="Logo" style={{ width: 400, marginBottom: '1rem' }} />
-        <Title>Flowy-Pro</Title>
-        <Subtitle>모든 회의들을 서포트 해주는 웹서비스</Subtitle>
+        <CenteredText>
+          회의하세요,
+          <br />
+          나머진 저희가 할게요.
+        </CenteredText>
       </Content>
     </Hero>
   );

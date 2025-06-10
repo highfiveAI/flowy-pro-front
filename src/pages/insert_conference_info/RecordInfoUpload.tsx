@@ -1,30 +1,35 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-
-const Wrapper = styled.div`
-  text-align: center;
-  margin-top: 2rem;
-`;
-
-const Title = styled.h2`
-  margin-bottom: 2rem;
-`;
+import RecordIcon from "/images/record.svg";
 
 const ButtonGroup = styled.div`
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 `;
 
 const Button = styled.button<{ color?: string }>`
-  font-size: 24px;
-  margin-left: 10px;
-  color: ${({ color }) => color || '#222'};
-  background: #f5f5f5;
-  border: 1px solid #ccc;
+  font-size: 1rem;
+  color: white;
+  background-color: ${({ color }) => (color === 'red' ? 'transparent' : color || '#6a0dad')};
+  border: none;
   border-radius: 8px;
-  padding: 10px 18px;
+  padding: ${({ color }) => (color === 'red' ? '0' : '10px 18px')};
   cursor: pointer;
-  &:first-child {
-    margin-left: 0;
+
+  &:hover {
+    background-color: ${({ color }) => {
+      if (color === 'red') return 'transparent';
+      if (color === 'gray') return '#6c757d';
+      return '#5a099a';
+    }};
+    opacity: ${({ color }) => (color === 'red' ? '0.8' : '1')};
+  }
+
+  img {
+    width: 24px;
+    height: 24px;
   }
 `;
 
@@ -36,11 +41,15 @@ const AudioPlayer = styled.audio`
 const DownloadButton = styled.button`
   margin-top: 1rem;
   padding: 8px 18px;
-  background: #007bff;
+  background-color: #6a0dad; /* InsertConferenceInfo.tsx의 버튼 색상 */
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+
+  &:hover {
+    background-color: #5a099a;
+  }
 `;
 
 interface RecordUploadProps {
@@ -160,12 +169,11 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
   };
 
   return (
-    <Wrapper>
-      <Title>실시간 음성 녹음</Title>
+    <div>
       <ButtonGroup>
         {!isRecording && !isPaused && !audioBlob && (
           <Button color="red" onClick={startRecording}>
-            ● 녹음 시작
+            <img src={RecordIcon} alt="녹음 시작" />
           </Button>
         )}
         {isRecording && <Button onClick={pauseRecording}>⏸️ 일시정지</Button>}
@@ -181,7 +189,7 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
       </ButtonGroup>
       {audioUrl && (
         <div>
-          <div style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>
+          <div style={{ marginBottom: '0.5rem', fontWeight: 'bold', color: '#351745' }}>
             파일명: {fileName}
           </div>
           <AudioPlayer src={audioUrl} controls />
@@ -190,7 +198,7 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
           </DownloadButton>
         </div>
       )}
-    </Wrapper>
+    </div>
   );
 };
 
