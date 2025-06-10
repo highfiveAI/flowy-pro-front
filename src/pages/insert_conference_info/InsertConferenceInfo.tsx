@@ -8,9 +8,9 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ResultContents from '../result/ResultContents';
 import { useNavigate } from 'react-router-dom';
-import AddUserIcon from "/images/adduser.svg"; // adduser.svg 임포트
-import NewMeetingIcon from "/images/newmeetingicon.svg"; // newmeetingicon.svg 임포트
-import AddProjectIcon from "/images/addprojecticon.svg"; // addprojecticon.svg 임포트
+import AddUserIcon from '/images/adduser.svg'; // adduser.svg 임포트
+import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg 임포트
+import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
 
 const StyledErrorMessage = styled.div`
@@ -82,7 +82,7 @@ const NewProjectTextTop = styled.span`
 `;
 
 const NewProjectTextBottom = styled.span`
-  color: #00B4BA;
+  color: #00b4ba;
   font-size: 15px;
   font-style: normal;
   font-weight: 600;
@@ -140,11 +140,12 @@ const InsertConferenceInfo: React.FC = () => {
   const [meetingDate, setMeetingDate] = React.useState<Date | null>(null);
   const [result, setResult] = React.useState<any>(null);
   const [projectName, setProjectName] = React.useState<string>('');
-  const [username, setUsername] = React.useState<string>('사용자이름'); // 임시 username 상태 추가
+  const [username] = React.useState<string>('사용자이름'); // 임시 username 상태 추가
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
 
-  const handleAddAttendee = () => { // 참석자 추가 함수
-    setAttendees([...attendees, { name: "", email: "", role: "" }]);
+  const handleAddAttendee = () => {
+    // 참석자 추가 함수
+    setAttendees([...attendees, { name: '', email: '', role: '' }]);
   };
 
   const validateForm = (): boolean => {
@@ -239,12 +240,16 @@ const InsertConferenceInfo: React.FC = () => {
     <PageWrapper>
       <ContentWrapper>
         <LeftPanel>
-          <ProjectListTitle>[ {username} ] 님이 참여 중인 프로젝트 목록</ProjectListTitle>
+          <ProjectListTitle>
+            [ {username} ] 님이 참여 중인 프로젝트 목록
+          </ProjectListTitle>
           <NewProjectWrapper onClick={() => setShowPopup(true)}>
             <img src={AddProjectIcon} alt="신규 프로젝트 추가" />
             <NewProjectTextsContainer>
               <NewProjectTextTop>찾는 프로젝트가 없나요?</NewProjectTextTop>
-              <NewProjectTextBottom>신규 프로젝트 추가하기</NewProjectTextBottom>
+              <NewProjectTextBottom>
+                신규 프로젝트 추가하기
+              </NewProjectTextBottom>
             </NewProjectTextsContainer>
           </NewProjectWrapper>
           <ProjectListContainer>
@@ -263,7 +268,9 @@ const InsertConferenceInfo: React.FC = () => {
         </LeftPanel>
         <RightPanel>
           <FormHeader>
-            <BackButton onClick={() => navigate(-1)}>← 메인 화면으로 돌아가기</BackButton>
+            <BackButton onClick={() => navigate(-1)}>
+              ← 메인 화면으로 돌아가기
+            </BackButton>
           </FormHeader>
           <PageTitle>
             <img src={NewMeetingIcon} alt="새 회의" />새 회의 정보 입력하기
@@ -275,15 +282,23 @@ const InsertConferenceInfo: React.FC = () => {
           ) : (
             <>
               <FormGroup>
-                <StyledLabel htmlFor="project-name">프로젝트명 <span>*</span></StyledLabel>
-                <StyledSelect id="project-name" value={projectName} onChange={(e) => setProjectName(e.target.value)}>
+                <StyledLabel htmlFor="project-name">
+                  프로젝트명 <span>*</span>
+                </StyledLabel>
+                <StyledSelect
+                  id="project-name"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                >
                   <option value="">상위 프로젝트를 선택해주세요.</option>
-                  {/* 프로젝트 목록 동적 생성 */} 
+                  {/* 프로젝트 목록 동적 생성 */}
                 </StyledSelect>
               </FormGroup>
-              
+
               <FormGroup>
-                <StyledLabel htmlFor="meeting-subject">회의 제목 <span>*</span></StyledLabel>
+                <StyledLabel htmlFor="meeting-subject">
+                  회의 제목 <span>*</span>
+                </StyledLabel>
                 <StyledInput
                   type="text"
                   id="meeting-subject"
@@ -294,7 +309,9 @@ const InsertConferenceInfo: React.FC = () => {
               </FormGroup>
 
               <FormGroup>
-                <StyledLabel htmlFor="meeting-date">회의 일시 <span>*</span></StyledLabel>
+                <StyledLabel htmlFor="meeting-date">
+                  회의 일시 <span>*</span>
+                </StyledLabel>
                 <DatePickerWrapper>
                   <DatePicker
                     selected={meetingDate}
@@ -321,44 +338,57 @@ const InsertConferenceInfo: React.FC = () => {
 
               <FormGroup>
                 <LabelButtonWrapper>
-                  <StyledLabel>회의 참석자 <span>*</span></StyledLabel>
-                  <StyledAddAttendeeButton type="button" onClick={handleAddAttendee}>
+                  <StyledLabel>
+                    회의 참석자 <span>*</span>
+                  </StyledLabel>
+                  <StyledAddAttendeeButton
+                    type="button"
+                    onClick={handleAddAttendee}
+                  >
                     <img src={AddUserIcon} alt="참석자 추가" />
                   </StyledAddAttendeeButton>
                 </LabelButtonWrapper>
-                <AttendInfo
-                  attendees={attendees}
-                  setAttendees={setAttendees}
-                />
+                <AttendInfo attendees={attendees} setAttendees={setAttendees} />
               </FormGroup>
 
               <FormGroup>
-                <StyledLabel>회의 음성 <span>*</span></StyledLabel>
+                <StyledLabel>
+                  회의 음성 <span>*</span>
+                </StyledLabel>
                 <StyledUploadSection>
                   {file ? (
-                    <div style={{ fontWeight: 'bold', marginBottom: '1rem', color: '#351745' }}>
+                    <div
+                      style={{
+                        fontWeight: 'bold',
+                        marginBottom: '1rem',
+                        color: '#351745',
+                      }}
+                    >
                       파일명: {file.name}
                     </div>
                   ) : (
                     <>
                       <FileUploadWrapper>
-                          <FileUpload setFile={setFile} />
+                        <FileUpload setFile={setFile} />
                       </FileUploadWrapper>
                       <RecordUploadWrapper>
-                          <RecordInfoUpload setFile={setFile} />
+                        <RecordInfoUpload setFile={setFile} />
                       </RecordUploadWrapper>
                     </>
                   )}
                 </StyledUploadSection>
               </FormGroup>
 
-              <StyledUploadButton onClick={handleUpload}>회의 분석하기</StyledUploadButton>
+              <StyledUploadButton onClick={handleUpload}>
+                회의 분석하기
+              </StyledUploadButton>
               {error && <StyledErrorMessage>{error}</StyledErrorMessage>}
             </>
           )}
         </RightPanel>
       </ContentWrapper>
-      {showPopup && <NewProjectPopup onClose={() => setShowPopup(false)} />} {/* 팝업 렌더링 */}
+      {showPopup && <NewProjectPopup onClose={() => setShowPopup(false)} />}{' '}
+      {/* 팝업 렌더링 */}
     </PageWrapper>
   );
 };
@@ -454,7 +484,7 @@ const BackButton = styled.button`
   background: none;
   border: none;
   color: white;
-  font-size: 1.0rem;
+  font-size: 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -493,7 +523,7 @@ const StyledLabel = styled.label`
   color: #fff;
 
   span {
-    color: #ED6E00; /* 필수 입력 표시를 위한 색상 변경 */
+    color: #ed6e00; /* 필수 입력 표시를 위한 색상 변경 */
   }
 `;
 
@@ -602,7 +632,7 @@ const RecordUploadWrapper = styled.div`
 
 const StyledUploadButton = styled.button`
   padding: 15px 30px;
-  background-color: #00B4BA; /* 보라색 계열 */
+  background-color: #00b4ba; /* 보라색 계열 */
   color: white;
   border: none;
   border-radius: 50px;

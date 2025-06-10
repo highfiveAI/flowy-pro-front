@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../../contexts/AuthContext';
 
 const Hero = styled.section`
   width: 100vw;
