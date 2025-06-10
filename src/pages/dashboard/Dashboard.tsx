@@ -1,5 +1,8 @@
 import React from "react";
 import styled from "styled-components";
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 // Main container for the whole page
 const Container = styled.div`
@@ -281,6 +284,88 @@ const Dashboard: React.FC = () => {
 
   const attendees = ["김다연", "김시훈", "정다희", "윤지환", "박예빈"];
 
+  const [tasks, setTasks] = React.useState<typeof dummyTasks>(dummyTasks);
+  // 날짜 편집 상태 관리
+  const [editingDate, setEditingDate] = React.useState<{col: string, idx: number} | null>(null);
+
+  // 날짜를 '~6/9(월)' 형식으로 변환
+  const formatDateToKR = (date: Date) => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const week = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayOfWeek = week[date.getDay()];
+    return `~${month}/${day}(${dayOfWeek})`;
+  };
+
+  // 날짜 변경 핸들러
+  const handleDateChange = (col: string, idx: number, date: Date | null) => {
+    setTasks(prev => {
+      const newTasks = { ...prev };
+      const taskList = [...(newTasks[col as keyof typeof newTasks] as any[])];
+      // 이미 선택된 날짜와 같은 날짜를 다시 선택하면 '미정' 처리
+      const prevDate = parseDate(taskList[idx].date);
+      if (date && prevDate && date.getFullYear() === prevDate.getFullYear() && date.getMonth() === prevDate.getMonth() && date.getDate() === prevDate.getDate()) {
+        taskList[idx] = {
+          ...taskList[idx],
+          date: '미정',
+        };
+      } else if (date) {
+        taskList[idx] = {
+          ...taskList[idx],
+          date: formatDateToKR(date),
+        };
+      } else {
+        taskList[idx] = {
+          ...taskList[idx],
+          date: '미정',
+        };
+      }
+      newTasks[col as keyof typeof newTasks] = taskList;
+      return newTasks;
+    });
+    setEditingDate(null);
+  };
+
+  // 드래그 종료 시 처리
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (!over) return;
+    const [fromColumn, fromIdx] = active.id.split('__');
+    const [toColumn] = over.id.split('__');
+    if (fromColumn === toColumn && active.id === over.id) return;
+
+    // 이동할 task 정보
+    const movingTask = tasks[fromColumn as keyof typeof tasks][parseInt(fromIdx, 10)];
+    // 원래 위치에서 제거
+    const newFrom = tasks[fromColumn as keyof typeof tasks].filter((_: any, idx: number) => idx !== parseInt(fromIdx, 10));
+    // 새 위치에 추가 (맨 뒤에)
+    const newTo = [...tasks[toColumn as keyof typeof tasks], movingTask];
+    setTasks({
+      ...tasks,
+      [fromColumn]: newFrom,
+      [toColumn]: newTo,
+    });
+  };
+
+  const parseDate = (dateStr: string): Date | null => {
+    if (!dateStr || dateStr === '미정') return null;
+    // YYYY-MM-DD 또는 YYYY-MM-DD HH:mm 등 형식만 파싱
+    const match = dateStr.match(/\d{4}-\d{2}-\d{2}( \d{2}:\d{2})?/);
+    if (match) {
+      return new Date(match[0]);
+    }
+    // ~6/9(월) 형식도 파싱 시도
+    const tildeMatch = dateStr.match(/~(\d{1,2})\/(\d{1,2})/);
+    if (tildeMatch) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = parseInt(tildeMatch[1], 10) - 1;
+      const day = parseInt(tildeMatch[2], 10);
+      return new Date(year, month, day);
+    }
+    return null;
+  };
+
   return (
     <Container>
       <PageTitle>회의 관리</PageTitle>
@@ -367,37 +452,72 @@ const Dashboard: React.FC = () => {
             <EditButton>수정</EditButton>
           </SectionHeader>
           <SectionBody>
-            <TaskGridContainer>
-              <TaskCard isUnassigned>
-                <TaskCardHeader>
-                  <TaskCardTitle isUnassigned>미할당 작업 목록</TaskCardTitle>
-                </TaskCardHeader>
-                <TaskCardList>
-                  {dummyTasks.unassigned.map((task, index) => (
-                    <TaskCardListItem key={index}>
-                      {task.description}
-                      <TaskCardDate>{task.date}</TaskCardDate>
-                    </TaskCardListItem>
-                  ))}
-                </TaskCardList>
-              </TaskCard>
-
-              {attendees.map((attendee) => (
-                <TaskCard key={attendee}>
-                  <TaskCardHeader>
-                    <TaskCardTitle>{attendee}</TaskCardTitle>
-                  </TaskCardHeader>
-                  <TaskCardList>
-                    {dummyTasks[attendee as keyof typeof dummyTasks]?.map((task, index) => (
-                      <TaskCardListItem key={index}>
-                        {task.description}
-                        <TaskCardDate>{task.date}</TaskCardDate>
-                      </TaskCardListItem>
-                    ))}
-                  </TaskCardList>
-                </TaskCard>
-              ))}
-            </TaskGridContainer>
+            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <TaskGridContainer>
+                {["unassigned", ...attendees].map((col) => (
+                  <div key={col} style={{ height: '100%' }}>
+                    <TaskCard
+                      isUnassigned={col === "unassigned"}
+                      onDragOver={e => e.preventDefault()}
+                      onDrop={e => {
+                        const from = e.dataTransfer.getData('text/plain');
+                        if (!from) return;
+                        const [fromCol, fromIdx] = from.split('__');
+                        if (fromCol === col) return;
+                        const movingTask = tasks[fromCol as keyof typeof tasks][parseInt(fromIdx, 10)];
+                        const newFrom = tasks[fromCol as keyof typeof tasks].filter((_: any, i: number) => i !== parseInt(fromIdx, 10));
+                        const newTo = [...tasks[col as keyof typeof tasks], movingTask];
+                        setTasks({
+                          ...tasks,
+                          [fromCol]: newFrom,
+                          [col]: newTo,
+                        });
+                      }}
+                    >
+                      <TaskCardHeader>
+                        <TaskCardTitle isUnassigned={col === "unassigned"}>
+                          {col === "unassigned" ? "미할당 작업 목록" : col}
+                        </TaskCardTitle>
+                      </TaskCardHeader>
+                      <TaskCardList>
+                        {tasks[col as keyof typeof tasks].map((task, idx) => (
+                          <div
+                            key={col + "__" + idx}
+                            id={col + "__" + idx}
+                            style={{ cursor: 'grab' }}
+                            draggable
+                            onDragStart={e => {
+                              e.dataTransfer.setData('text/plain', col + "__" + idx);
+                            }}
+                          >
+                            <TaskCardListItem>
+                              {task.description}
+                              <TaskCardDate style={{ cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setEditingDate({col, idx}); }}>
+                                {editingDate && editingDate.col === col && editingDate.idx === idx ? (
+                                  <DatePicker
+                                    selected={parseDate(task.date)}
+                                    onChange={date => handleDateChange(col, idx, date)}
+                                    onBlur={() => setEditingDate(null)}
+                                    dateFormat="yyyy-MM-dd"
+                                    autoFocus
+                                    open
+                                    onClickOutside={() => setEditingDate(null)}
+                                    popperPlacement="bottom"
+                                    placeholderText="날짜 선택"
+                                  />
+                                ) : (
+                                  task.date && task.date !== '' ? task.date : '미정'
+                                )}
+                              </TaskCardDate>
+                            </TaskCardListItem>
+                          </div>
+                        ))}
+                      </TaskCardList>
+                    </TaskCard>
+                  </div>
+                ))}
+              </TaskGridContainer>
+            </DndContext>
           </SectionBody>
         </Section>
 
