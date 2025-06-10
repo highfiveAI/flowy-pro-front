@@ -1,10 +1,10 @@
-import styled from "styled-components";
-import { Outlet } from "react-router-dom";
-import Navbar from "./Navbar";
-import NavbarSub from "./NavbarSub";
-import type { Dispatch, SetStateAction } from "react";
+import styled from 'styled-components';
+import { Outlet } from 'react-router-dom';
+import Navbar from './Navbar';
+import NavbarSub from './NavbarSub';
+import { useAuth } from '../contexts/AuthContext';
 
-const NAVBAR_HEIGHT = "70px"; // 네비바 높이를 약 70px로 가정
+const NAVBAR_HEIGHT = '70px'; // 네비바 높이를 약 70px로 가정
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -30,19 +30,11 @@ const MainContent = styled.main`
   background-color: #ffffff;
 `;
 
-interface LayoutProps {
-  isLoggedIn: boolean;
-  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
-}
-
-const Layout: React.FC<LayoutProps> = ({ isLoggedIn, setIsLoggedIn }) => {
+const Layout: React.FC = () => {
+  const { user } = useAuth();
   return (
     <LayoutWrapper>
-      {isLoggedIn ? (
-        <NavbarSub isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-      ) : (
-        <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-      )}
+      {user ? <NavbarSub /> : <Navbar />}
       <MainContent>
         <Outlet />
       </MainContent>

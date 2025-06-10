@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import type { ChangeEvent } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import NavbarSub from "../../components/NavbarSub";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import type { ChangeEvent } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import NavbarSub from '../../components/NavbarSub';
+import { useAuth } from '../../contexts/AuthContext';
 
 const LoginWrapper = styled.div`
   min-height: 100vh;
@@ -16,7 +17,7 @@ const LoginWrapper = styled.div`
     ),
     #2e0446;
   color: white;
-  font-family: "Rethink Sans", sans-serif;
+  font-family: 'Rethink Sans', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,7 +55,7 @@ const InputGroup = styled.div`
 
 const InputLabel = styled.label`
   color: #333;
-  font-family: "Rethink Sans";
+  font-family: 'Rethink Sans';
   font-size: 16px;
   font-style: normal;
   font-weight: 600;
@@ -72,7 +73,7 @@ const InputField = styled.input`
   font-size: 18px;
   box-sizing: border-box;
   color: black;
-  font-family: "Rethink Sans";
+  font-family: 'Rethink Sans';
   font-style: normal;
   font-weight: 600;
   line-height: 20px;
@@ -83,7 +84,7 @@ const InputField = styled.input`
 
 const ErrorMessage = styled.p`
   color: #ff4d4f;
-  font-family: "Rethink Sans";
+  font-family: 'Rethink Sans';
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
@@ -150,7 +151,7 @@ const LinkContainer = styled.div`
   a {
     color: #717171;
     text-align: center;
-    font-family: "Rethink Sans";
+    font-family: 'Rethink Sans';
     font-size: 15px;
     font-style: normal;
     font-weight: 500;
@@ -169,15 +170,16 @@ interface FormData {
 }
 
 const Login: React.FC = () => {
+  const { user, setUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || '/';
 
   const [formData, setFormData] = useState<FormData>({
-    username: "",
-    password: "",
+    username: '',
+    password: '',
   });
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -186,16 +188,16 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(""); // 기존 에러 초기화
+    setError(''); // 기존 에러 초기화
 
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/login`,
         {
-          method: "POST",
-          credentials: "include",
+          method: 'POST',
+          credentials: 'include',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             email: formData.username,
@@ -206,9 +208,9 @@ const Login: React.FC = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError("아이디 또는 비밀번호가 올바르지 않습니다.");
+          setError('아이디 또는 비밀번호가 올바르지 않습니다.');
         } else {
-          setError("서버 오류가 발생했습니다. 다시 시도해주세요.");
+          setError('서버 오류가 발생했습니다. 다시 시도해주세요.');
         }
         return;
       }
@@ -217,11 +219,12 @@ const Login: React.FC = () => {
 
       // 로그인 성공 처리
 
-      console.log("로그인 성공:", data);
+      console.log('로그인 성공:', data);
+      setUser(data.user);
       navigate(from, { replace: true });
     } catch (error) {
-      console.error("로그인 중 오류 발생:", error);
-      setError("네트워크 오류가 발생했습니다.");
+      console.error('로그인 중 오류 발생:', error);
+      setError('네트워크 오류가 발생했습니다.');
     }
   };
 

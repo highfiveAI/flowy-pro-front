@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
   id: string;
@@ -9,11 +9,13 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  setUser: () => {},
   loading: true,
 });
 
@@ -25,20 +27,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const res = await fetch(
       `${import.meta.env.VITE_API_URL}/api/v1/users/auth/check`,
       {
-        method: "GET",
-        credentials: "include", // 쿠키 포함 필수
+        method: 'GET',
+        credentials: 'include', // 쿠키 포함 필수
       }
     );
 
     if (res.ok) {
       const data = await res.json();
-      console.log("현재 접속중:", data);
+      console.log('현재 접속중:', data);
       if (data.user) {
         setUser(data.user);
       }
       setLoading(false);
     } else {
-      console.log("로그인 필요");
+      console.log('로그인 필요');
       setLoading(false);
       return false;
     }
@@ -61,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   //   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );
