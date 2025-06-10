@@ -6,32 +6,36 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f7f7f7;
+  position: relative; /* PageTitle 절대 위치를 위한 기준 */
 `;
 
-// Main content area, takes available space
 const MainContent = styled.div`
   flex: 1;
   padding: 20px;
+  padding-top: 120px; /* PageTitle 높이를 고려하여 조정 */
   max-width: 1200px; /* Limit width for better readability */
   margin: 0 auto; /* Center the content */
   width: 100%;
 `;
 
 // Header for the entire dashboard page (e.g., "회의 관리")
-const DashboardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background-color: #fff;
-  border-bottom: 1px solid #eee;
-`;
+// const DashboardHeader = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   padding: 20px;
+//   background-color: #fff;
+//   border-bottom: 1px solid #eee;
+// `;
 
 const PageTitle = styled.h1`
-  font-size: 24px;
-  color: #333;
+  color: #351745;
+  font-size: 2rem;
+  position: absolute; /* 절대 위치 */
+  top: 30px; /* Container의 상단으로부터의 거리 */
+  left: 40px; /* Container의 좌측으로부터의 거리 */
   margin: 0;
+  padding: 0;
 `;
 
 // Section for "회의 분석 결과 조회"
@@ -52,10 +56,6 @@ const MeetingAnalysisTitle = styled.h2`
   margin: 0;
   display: flex;
   align-items: center;
-
-  svg {
-    margin-left: 8px;
-  }
 `;
 
 const DropdownGroup = styled.div`
@@ -90,18 +90,22 @@ const Dropdown = styled.select`
 `;
 
 const Section = styled.div`
-  background: #fff;
-  border-radius: 8px;
-  padding: 20px;
+  background: #fff; /* 배경색 다시 추가 */
+  border-radius: 8px; /* 모서리 둥글게 */
+  /* padding: 20px; */ /* 내부 패딩 제거 */
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 그림자 효과 다시 추가 */
 `;
 
 const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */ /* 본문과의 간격 조절 */
+  background-color: #f0f0f0;
+  padding: 10px 20px;
+  border-radius: 0 0 0 0;
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */ /* 전체 섹션에 그림자 있으므로 제거 */
 `;
 
 const SectionTitle = styled.h3`
@@ -110,17 +114,23 @@ const SectionTitle = styled.h3`
   margin: 0;
 `;
 
+const SectionBody = styled.div`
+  padding: 20px; /* 본문 내부 패딩 */
+  overflow-y: auto; /* 내용이 넘치면 세로 스크롤 */
+  max-height: 400px; /* 최대 높이 설정 (필요에 따라 조정) */
+`;
+
 const EditButton = styled.button`
-  background-color: #6a0dad;
+  background-color: #480B6A;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 50px;
   padding: 8px 15px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
 
   &:hover {
-    background-color: #5a0c9c;
+    background-color: #480B6A;
   }
 `;
 
@@ -143,32 +153,142 @@ const PlaceholderContent = styled.div`
   color: #888;
   text-align: center;
   padding: 30px;
-  border: 1px dashed #ddd;
+  /* border: 1px dashed #ddd; */
+  /* border-radius: 8px; */
+`;
+
+const SummaryContent = styled.div`
+  padding: 0;
+  text-align: left;
+`;
+
+const TaskListContent = styled.div`
+  color: #888;
+  text-align: center;
+  padding: 30px;
+`;
+
+const FeedbackContent = styled.div`
+  color: #888;
+  text-align: center;
+  padding: 30px;
+`;
+
+const SummarySection = styled.div`
+  margin-bottom: 20px;
+`;
+
+const SummarySectionHeader = styled.h4`
+  color: #480B6A;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+`;
+
+const SummaryList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const SummaryListItem = styled.li`
+  margin-bottom: 8px;
+  color: #333;
+  line-height: 1.5;
+`;
+
+const TaskGridContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+`;
+
+const TaskCard = styled.div<{ isUnassigned?: boolean }>`
   border-radius: 8px;
+  border: 1px solid ${props => props.isUnassigned ? 'rgba(210, 0, 0, 0.80)' : 'rgba(108, 108, 108, 0.80)'};
+  background: ${props => props.isUnassigned ? 'rgba(255, 255, 255, 0.10)' : 'rgba(255, 255, 255, 0.10)'};
+  padding: 15px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+`;
+
+const TaskCardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+const TaskCardTitle = styled.h4<{ isUnassigned?: boolean }>`
+  font-size: 1rem;
+  margin: 0;
+  color: ${props => props.isUnassigned ? 'rgba(210, 0, 0, 0.80)' : '#480B6A'};
+`;
+
+const TaskCardList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+`;
+
+const TaskCardListItem = styled.li`
+  margin-bottom: 8px;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  line-height: 1.4;
+
+  &::before {
+    content: '•';
+    color: #333;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+  }
+`;
+
+const TaskCardDate = styled.span`
+  color: #888;
+  font-size: 0.85rem;
+  margin-left: 10px;
+  white-space: nowrap;
 `;
 
 const Dashboard: React.FC = () => {
+  const dummyTasks = {
+    unassigned: [
+      { description: "사용자 역할별 접근 제어 UI 설계", date: "미정" },
+      { description: "요약 결과 화면 시각 디자인", date: "~6/9(월)" },
+    ],
+    김다연: [
+      { description: "전체 서비스 구조도 및 PRD 초안 정리", date: "~6/5(목)" },
+    ],
+    김시훈: [
+      { description: "API 구조 초안 설계", date: "~6/9(월)" },
+    ],
+    정다희: [
+      { description: "회의 업로드/요약 결과 화면 와이어프레임", date: "~6/9(월)" },
+    ],
+    윤지환: [
+      { description: "LLM 모델 연동 및 기술 제약 정리", date: "~6/5(목)" },
+    ],
+    박예빈: [],
+  };
+
+  const attendees = ["김다연", "김시훈", "정다희", "윤지환", "박예빈"];
+
   return (
     <Container>
-      <DashboardHeader>
-        <PageTitle>회의 관리</PageTitle>
-        <div></div>
-      </DashboardHeader>
+      <PageTitle>회의 관리</PageTitle>
 
       <MainContent>
         <MeetingAnalysisHeader>
           <MeetingAnalysisTitle>
             회의 분석 결과 조회
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 0 24 24"
-              width="24px"
-              fill="#000000"
-            >
-              <path d="M0 0h24v24H0V0z" fill="none" />
-              <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
-            </svg>
           </MeetingAnalysisTitle>
           <DropdownGroup>
             <DropdownWrapper>
@@ -190,24 +310,26 @@ const Dashboard: React.FC = () => {
           <SectionHeader>
             <SectionTitle>회의 기본 정보</SectionTitle>
           </SectionHeader>
-          <BasicInfoGrid>
-            <InfoLabel>회의 제목</InfoLabel>
-            <InfoContent>기능 정의 Kick-off</InfoContent>
+          <SectionBody>
+            <BasicInfoGrid>
+              <InfoLabel>회의 제목</InfoLabel>
+              <InfoContent>기능 정의 Kick-off</InfoContent>
 
-            <InfoLabel>회의 일시</InfoLabel>
-            <InfoContent>2025-06-03 10:00</InfoContent>
+              <InfoLabel>회의 일시</InfoLabel>
+              <InfoContent>2025-06-03 10:00</InfoContent>
 
-            <InfoLabel>회의 참석자</InfoLabel>
-            <InfoContent>김다연, 김시훈, 정다희, 윤지환, 박예빈</InfoContent>
+              <InfoLabel>회의 참석자</InfoLabel>
+              <InfoContent>김다연, 김시훈, 정다희, 윤지환, 박예빈</InfoContent>
 
-            <InfoLabel>회의 안건</InfoLabel>
-            <InfoContent>
-              <div>전체 서비스 플로우 설명</div>
-              <div>기능 우선순위 정의</div>
-              <div>기술적 제한 사항 공유</div>
-              <div>초기 화면 구성 및 정보 흐름</div>
-            </InfoContent>
-          </BasicInfoGrid>
+              <InfoLabel>회의 안건</InfoLabel>
+              <InfoContent>
+                <div>전체 서비스 플로우 설명</div>
+                <div>기능 우선순위 정의</div>
+                <div>기술적 제한 사항 공유</div>
+                <div>초기 화면 구성 및 정보 흐름</div>
+              </InfoContent>
+            </BasicInfoGrid>
+          </SectionBody>
         </Section>
 
         <Section>
@@ -215,7 +337,28 @@ const Dashboard: React.FC = () => {
             <SectionTitle>회의 요약</SectionTitle>
             <EditButton>수정</EditButton>
           </SectionHeader>
-          <PlaceholderContent>회의 요약 내용이 여기에 표시됩니다.</PlaceholderContent>
+          <SectionBody>
+            <SummaryContent>
+              <SummarySection>
+                <SummarySectionHeader>[ 회의 내용 ]</SummarySectionHeader>
+                <SummaryList>
+                  <SummaryListItem>전체 서비스 플로우를 설명하며 핵심 기능 흐름을 "회의 업로드 → 요약 → 업무 자동 추출 → 메일 공유"로 정리함</SummaryListItem>
+                  <SummaryListItem>STT(음성 인식), 요약, 역할 할당 기능을 우선 개발</SummaryListItem>
+                  <SummaryListItem>LLM 처리 속도와 GPU 사용 제한 등 기술적 제한사항을 간단히 공유함</SummaryListItem>
+                  <SummaryListItem>사용자 여정에 따른 첫 화면 구성안, 요약 결과 시각화 방식 제안함</SummaryListItem>
+                  <SummaryListItem>논의 안됨: 사용자별 역할/권한에 따른 UI 차별화 필요 여부 (시간 부족으로 다음 회의로 이월)</SummaryListItem>
+                </SummaryList>
+              </SummarySection>
+              <SummarySection>
+                <SummarySectionHeader>[ 결정 사항 ]</SummarySectionHeader>
+                <SummaryList>
+                  <SummaryListItem>MVP 범위: 회의 요약, 업무 추출, 메일 전송으로 한정</SummaryListItem>
+                  <SummaryListItem>'피드백' 기능: 기능 정의만 하고, 구현은 2차 버전으로 미룸</SummaryListItem>
+                  <SummaryListItem>사용자 역할 구분: 관리자 / 참석자 2단계로 단순화</SummaryListItem>
+                </SummaryList>
+              </SummarySection>
+            </SummaryContent>
+          </SectionBody>
         </Section>
 
         <Section>
@@ -223,14 +366,48 @@ const Dashboard: React.FC = () => {
             <SectionTitle>작업 목록</SectionTitle>
             <EditButton>수정</EditButton>
           </SectionHeader>
-          <PlaceholderContent>작업 목록이 여기에 표시됩니다.</PlaceholderContent>
+          <SectionBody>
+            <TaskGridContainer>
+              <TaskCard isUnassigned>
+                <TaskCardHeader>
+                  <TaskCardTitle isUnassigned>미할당 작업 목록</TaskCardTitle>
+                </TaskCardHeader>
+                <TaskCardList>
+                  {dummyTasks.unassigned.map((task, index) => (
+                    <TaskCardListItem key={index}>
+                      {task.description}
+                      <TaskCardDate>{task.date}</TaskCardDate>
+                    </TaskCardListItem>
+                  ))}
+                </TaskCardList>
+              </TaskCard>
+
+              {attendees.map((attendee) => (
+                <TaskCard key={attendee}>
+                  <TaskCardHeader>
+                    <TaskCardTitle>{attendee}</TaskCardTitle>
+                  </TaskCardHeader>
+                  <TaskCardList>
+                    {dummyTasks[attendee as keyof typeof dummyTasks]?.map((task, index) => (
+                      <TaskCardListItem key={index}>
+                        {task.description}
+                        <TaskCardDate>{task.date}</TaskCardDate>
+                      </TaskCardListItem>
+                    ))}
+                  </TaskCardList>
+                </TaskCard>
+              ))}
+            </TaskGridContainer>
+          </SectionBody>
         </Section>
 
         <Section>
           <SectionHeader>
             <SectionTitle>회의 피드백</SectionTitle>
           </SectionHeader>
-          <PlaceholderContent>회의 피드백 내용이 여기에 표시됩니다.</PlaceholderContent>
+          <SectionBody>
+            <FeedbackContent>회의 피드백 내용이 여기에 표시됩니다.</FeedbackContent>
+          </SectionBody>
         </Section>
       </MainContent>
     </Container>
