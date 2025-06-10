@@ -209,7 +209,7 @@ const AdminPosition: React.FC = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions`,
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
         {
           method: 'POST',
           headers: {

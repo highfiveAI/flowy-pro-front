@@ -422,7 +422,7 @@ const AdminUser: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/users`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/`
       );
       const data = await response.json();
       console.log('API 응답 데이터:', data); // 데이터 확인용 로그
@@ -449,7 +449,7 @@ const AdminUser: React.FC = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/users`,
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/`,
         {
           method: 'POST',
           headers: {
