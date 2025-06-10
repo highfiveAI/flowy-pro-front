@@ -139,9 +139,28 @@ const InsertConferenceInfo: React.FC = () => {
   const [agenda, setAgenda] = React.useState('');
   const [meetingDate, setMeetingDate] = React.useState<Date | null>(null);
   const [result, setResult] = React.useState<any>(null);
-  const [projectName, setProjectName] = React.useState<string>('');
-  const [username, setUsername] = React.useState<string>('사용자이름'); // 임시 username 상태 추가
+  const [projectName, setProjectName] = React.useState<string>('애완동물 프로젝트');
+  // const projectName = ['프로젝트A', '프로젝트B', '프로젝트C']; // 예시 프로젝트명
+  const [username, setUsername] = React.useState<string>(''); 
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
+
+  //db에서 불러오기
+  React.useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/me`, {
+      credentials: 'include', // 쿠키/세션 인증 시 필요
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // 토큰 인증 시 필요
+      }
+    })
+      .then(res => res.json())
+      .then(data => setUsername(data.username)) // 또는 data.nickname 등
+      .catch(err => {
+        console.error('사용자 정보 불러오기 실패:', err);
+        setUsername('알 수 없음');
+      });
+  }, []);
+
+
 
   const handleAddAttendee = () => { // 참석자 추가 함수
     setAttendees([...attendees, { name: "", email: "", role: "" }]);
@@ -187,6 +206,7 @@ const InsertConferenceInfo: React.FC = () => {
       formData.append('file', file, file.name);
       formData.append('subject', subject);
       formData.append('agenda', agenda);
+      formData.append('project_name', projectName);
       if (meetingDate) {
         formData.append('meeting_date', formatDateToKST(meetingDate)); // 'YYYY-MM-DD HH:mm:ss' 포맷
       }
@@ -251,6 +271,7 @@ const InsertConferenceInfo: React.FC = () => {
             <SortWrapper>
               <SortText>최신순 으로 정렬</SortText>
             </SortWrapper>
+            {/* db에서 불러오기 */}
             <ProjectList>
               {/* 프로젝트 목록 동적 생성 예시 */}
               {[...Array(10)].map((_, index) => (
@@ -274,13 +295,15 @@ const InsertConferenceInfo: React.FC = () => {
             <Loading />
           ) : (
             <>
-              <FormGroup>
-                <StyledLabel htmlFor="project-name">프로젝트명 <span>*</span></StyledLabel>
-                <StyledSelect id="project-name" value={projectName} onChange={(e) => setProjectName(e.target.value)}>
-                  <option value="">상위 프로젝트를 선택해주세요.</option>
-                  {/* 프로젝트 목록 동적 생성 */} 
-                </StyledSelect>
-              </FormGroup>
+                <FormGroup>
+                  <StyledLabel htmlFor="project-name">프로젝트명 <span>*</span></StyledLabel>
+                  <StyledSelect id="project-name" value={projectName} onChange={(e) => setProjectName(e.target.value)}>
+                    <option value="">상위 프로젝트를 선택해주세요.</option>
+                    <option value="프로젝트A">프로젝트A</option>
+                    <option value="프로젝트B">프로젝트B</option>
+                    <option value="프로젝트C">프로젝트C</option>
+                  </StyledSelect>
+                </FormGroup>
               
               <FormGroup>
                 <StyledLabel htmlFor="meeting-subject">회의 제목 <span>*</span></StyledLabel>

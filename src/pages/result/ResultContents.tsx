@@ -10,6 +10,7 @@ const Wrapper = styled.div`
   min-height: 100vh;
   background-color: #f8f9fa;
   padding-top: 2rem;
+  color: #000;
 `;
 
 const Box = styled.div`
@@ -23,6 +24,7 @@ const Box = styled.div`
   box-sizing: border-box;
   max-height: 300px;
   overflow-y: auto;
+  color: #000;
 `;
 
 const LinkItem = styled.a`
