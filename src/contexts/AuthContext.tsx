@@ -50,18 +50,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
-  //   useEffect(() => {
-  //     fetch("/api/session", { credentials: "include" })
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         if (data.user) {
-  //           setUser(data.user);
-  //         }
-  //         setLoading(false);
-  //       })
-  //       .catch(() => setLoading(false));
-  //   }, []);
-
   return (
     <AuthContext.Provider value={{ user, setUser, loading }}>
       {children}
