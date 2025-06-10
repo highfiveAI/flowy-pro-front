@@ -60,6 +60,8 @@ function formatDateToKST(date: Date): string {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
+const projects = ['프로젝트A', '프로젝트B', '프로젝트C']; // 예시 프로젝트명
+
 const InsertConferenceInfo: React.FC = () => {
   const [isCompleted, setIsCompleted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -72,8 +74,13 @@ const InsertConferenceInfo: React.FC = () => {
   const [agenda, setAgenda] = React.useState('');
   const [meetingDate, setMeetingDate] = React.useState<Date | null>(null);
   const [result, setResult] = React.useState<any>(null);
+  const [selectedProject, setSelectedProject] = React.useState('');
 
   const validateForm = (): boolean => {
+    if (!selectedProject) {
+      setError('프로젝트를 선택하세요.');
+      return false;
+    }
     if (!subject.trim()) {
       setError('주제를 입력해주세요.');
       return false;
@@ -110,6 +117,7 @@ const InsertConferenceInfo: React.FC = () => {
     console.log('함수 실행중...');
     const formData = new FormData();
     if (file) {
+      formData.append('project_name', selectedProject);
       formData.append('file', file, file.name);
       formData.append('subject', subject);
       formData.append('agenda', agenda);
@@ -147,6 +155,7 @@ const InsertConferenceInfo: React.FC = () => {
         setFile(null);
         setAgenda('');
         setMeetingDate(null);
+        setSelectedProject('');
         setResult(result);
         setIsCompleted(true);
       } catch (error) {
@@ -165,6 +174,27 @@ const InsertConferenceInfo: React.FC = () => {
     <Container>
       <SideBar />
       <MainContent>
+        {/* 프로젝트 선택 토글 */}
+        {!(isCompleted || isLoading) && (
+          <div style={{ width: '100%', maxWidth: 500, marginTop: '1rem' }}>
+            <label style={{ fontWeight: 'bold', marginRight: 8 }}>프로젝트 선택</label>
+            <select
+              value={selectedProject}
+              onChange={e => setSelectedProject(e.target.value)}
+              style={{
+                padding: '8px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                minWidth: 150,
+              }}
+            >
+              <option value="">프로젝트를 선택하세요</option>
+              {projects.map((proj, idx) => (
+                <option key={idx} value={proj}>{proj}</option>
+              ))}
+            </select>
+          </div>
+        )}
         {isCompleted ? (
           <ResultContents result={result} />
         ) : isLoading ? (

@@ -70,6 +70,10 @@ const ResultContents: React.FC<{ result: any }> = ({ result }) => {
               {result.tagging.assigned_roles.assigned_roles.assigned_todos.map((todo: any, idx: number) => (
                 <li key={idx} style={{ marginBottom: '0.3em', marginLeft: '1em' }}>
                   <strong>{todo.assignee}</strong> : {todo.action}
+                  {todo.schedule && todo.schedule.trim() !== ''
+                    ? <span style={{ color: '#007bff', marginLeft: '0.5em' }}>[예상 일정: {todo.schedule}]</span>
+                    : <span style={{ color: '#aaa', marginLeft: '0.5em' }}>[예상 일정: 미정]</span>
+                  }
                   {todo.context && <span style={{ color: '#555' }}> ({todo.context})</span>}
                 </li>
               ))}
