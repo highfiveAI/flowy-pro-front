@@ -207,7 +207,7 @@ const AdminCom: React.FC = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies`,
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
         {
           method: 'POST',
           headers: {
