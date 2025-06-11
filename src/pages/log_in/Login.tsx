@@ -238,6 +238,7 @@ const Login: React.FC = () => {
   return (
     <LoginWrapper>
       <Navbar />
+      <LoginFormContainer>
         <InputGroup>
           <InputLabel htmlFor="username">아이디</InputLabel>
           <InputField
