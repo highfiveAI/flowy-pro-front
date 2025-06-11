@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
-import NavbarSub from './NavbarSub';
 import { useAuth } from '../contexts/AuthContext';
 
 const NAVBAR_HEIGHT = '70px'; // 네비바 높이를 약 70px로 가정
@@ -34,10 +33,7 @@ const Layout: React.FC = () => {
   const { user } = useAuth();
   return (
     <LayoutWrapper>
-      {/*  
-      <NavbarSub isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />             // 항상 로그인 된 상태로 작업하기 위함
-      */}
-      {user ? <NavbarSub /> : <Navbar />}                       // 로그인 
+      <Navbar />
       <MainContent>
         <Outlet />
       </MainContent>
