@@ -68,6 +68,7 @@ const ProjectListItem = styled.li`
   color: #333;
   font-weight: bold;
   cursor: pointer;
+  font-size: 20px;
 
   &:hover {
     opacity: 0.8; /* 호버 시 투명도 조절 */
@@ -142,7 +143,7 @@ const InsertConferenceInfo: React.FC = () => {
   const [agenda, setAgenda] = React.useState('');
   const [meetingDate, setMeetingDate] = React.useState<Date | null>(null);
   const [result, setResult] = React.useState<any>(null);
-  const [projectName, setProjectName] = React.useState<string>('애완동물 프로젝트');
+  const [projectName, setProjectName] = React.useState<string>('');
   const [username, setUsername] = React.useState<string>(''); 
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
   const [projects, setProjects] = React.useState<{userName: string, projectName: string}[]>([]); // 프로젝트 목록 상태 추가
@@ -282,7 +283,7 @@ const InsertConferenceInfo: React.FC = () => {
             <ProjectList>
               {projects.length > 0 ? (
                 projects.map((proj, index) => (
-                  <ProjectListItem key={index}>
+                  <ProjectListItem key={index} onClick={() => setProjectName(proj.projectName)}>
                     <span>{proj.projectName}</span>
                   </ProjectListItem>
                 ))
@@ -307,12 +308,14 @@ const InsertConferenceInfo: React.FC = () => {
             <>
                 <FormGroup>
                   <StyledLabel htmlFor="project-name">프로젝트명 <span>*</span></StyledLabel>
-                  <StyledSelect id="project-name" value={projectName} onChange={(e) => setProjectName(e.target.value)}>
-                    <option value="">상위 프로젝트를 선택해주세요.</option>
-                    <option value="프로젝트A">프로젝트A</option>
-                    <option value="프로젝트B">프로젝트B</option>
-                    <option value="프로젝트C">프로젝트C</option>
-                  </StyledSelect>
+                  <StyledInput
+                    type="text"
+                    id="project-name"
+                    value={projectName}
+                    readOnly
+                    placeholder="프로젝트 목록에서 선택해주세요."
+                    onClick={() => alert('프로젝트 목록중에서 선택해주세요')}
+                  />
                 </FormGroup>
               
               <FormGroup>
