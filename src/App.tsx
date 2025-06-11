@@ -19,6 +19,8 @@ import AlterInfo from './pages/mypage/alterInfo';
 import Calendar from './pages/calendar/Calendar';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ProjectListPage from './pages/dashboard/projectlist';
+import ConferenceListPage from './pages/dashboard/conferencelist';
 
 function App() {
   return (
@@ -83,6 +85,16 @@ function App() {
           <Route path="/calendar" element={
             <ProtectedRoute>
               <Calendar />
+            </ProtectedRoute>
+          } />
+          <Route path="/projectlist" element={
+            <ProtectedRoute>
+              <ProjectListPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/conferencelist" element={
+            <ProtectedRoute>
+              <ConferenceListPage />
             </ProtectedRoute>
           } />
         </Route>

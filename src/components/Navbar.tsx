@@ -179,7 +179,7 @@ const Navbar: React.FC = () => {
             새 회의
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
-          <MenuItem onClick={() => navigate('/dashboard')}>
+          <MenuItem onClick={() => navigate('/projectlist')}>
             회의 관리
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
