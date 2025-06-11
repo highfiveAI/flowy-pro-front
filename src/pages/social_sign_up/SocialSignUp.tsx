@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SignUpSuccessModal from '../sign_up/SignUpSuccessModal';
+import {
+  fetchSignupInfos,
+  type Company,
+  type CompanyPosition,
+} from '../../api/fetchSignupInfos';
 
 export const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background: radial-gradient(100% 100% at 50% 0%, #E3CFEE 0%, #A480B8 29.81%, #654477 51.92%, #351745 75.48%, #170222 93.75%), #2E0446;
+  background: radial-gradient(
+      100% 100% at 50% 0%,
+      #e3cfee 0%,
+      #a480b8 29.81%,
+      #654477 51.92%,
+      #351745 75.48%,
+      #170222 93.75%
+    ),
+    #2e0446;
   min-height: 100vh;
-  font-family: "Rethink Sans", sans-serif;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 export const FormContainer = styled.div`
@@ -18,14 +31,14 @@ export const FormContainer = styled.div`
   border-radius: 35px;
   width: 100%;
   max-width: 533px;
-  box-shadow: 5px 5px 4px 0px rgba(0, 0, 0, 0.20);
+  box-shadow: 5px 5px 4px 0px rgba(0, 0, 0, 0.2);
 `;
 
 export const Title = styled.h2`
   text-align: center;
   font-size: 32px;
   font-weight: bold;
-  color: #480B6A;
+  color: #480b6a;
   margin-bottom: 40px;
 `;
 
@@ -38,7 +51,7 @@ export const InputGroup = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  border: 1px solid #C6C6C7;
+  border: 1px solid #c6c6c7;
   padding: 0 16px;
   height: 50px;
 `;
@@ -53,7 +66,7 @@ export const Label = styled.label`
 `;
 
 export const StyledAsterisk = styled.span`
-  color: #ED6E00;
+  color: #ed6e00;
   margin-left: 2px;
 `;
 
@@ -67,7 +80,7 @@ export const Input = styled.input`
   color: black;
 
   &::placeholder {
-    color: #A0A0A0;
+    color: #a0a0a0;
     font-size: 14px;
     font-weight: 400;
     text-align: right;
@@ -84,7 +97,7 @@ export const Select = styled.select`
   color: black;
 
   &::placeholder {
-    color: #A0A0A0;
+    color: #a0a0a0;
     font-size: 14px;
     font-weight: 400;
     text-align: right;
@@ -94,7 +107,7 @@ export const Select = styled.select`
 export const SubmitButton = styled.button`
   height: 66px;
   border-radius: 8px;
-  background-color: #480B6A;
+  background-color: #480b6a;
   color: white;
   font-size: 18px;
   font-weight: 700;
@@ -119,15 +132,36 @@ const SocialSignUp: React.FC = () => {
     confirmPassword: '',
     company: '',
     department: '',
+    position: '',
     team: '',
+    job: '',
   });
   const [showModal, setShowModal] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [positions, setPositions] = useState<CompanyPosition[]>([]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'company') {
+      const selectedCompany = companies.find((c) => c.company_id === value);
+      if (selectedCompany) {
+        setPositions(selectedCompany.company_positions || []);
+      } else {
+        setPositions([]);
+      }
+
+      // 회사 변경 시 직급 초기화
+      setFormData((prev) => ({
+        ...prev,
+        company: value,
+        position: '', // 직급 초기화
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,14 +178,15 @@ const SocialSignUp: React.FC = () => {
             // name: formData.name,
             // email: formData.email,
             login_id: formData.username,
-            password: 'none',
+            password: null,
             phone: formData.phone,
             company: formData.company,
             department: formData.department,
             team: formData.team,
-            position: 'aaf44bda-6a64-4611-b0ca-4083b59c8e6e', // 더미 데이터
-            job: '개발자',
-            sysrole: 'c4cb5e53-617e-463f-8ddb-67252f9a9742', // 더미 데이터
+            position: formData.position,
+            job: formData.job,
+            sysrole: '4864c9d2-7f9c-4862-9139-4e8b0ed117f4', // 일반 사원 데이터
+            login_type: 'google',
           }),
         }
       );
@@ -160,11 +195,12 @@ const SocialSignUp: React.FC = () => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
-          throw new Error(errorData.message || "회원가입 실패");
+          throw new Error(errorData.message || '회원가입 실패');
         } else {
-          throw new Error(response.statusText || "회원가입 실패: 서버 응답 오류");
+          throw new Error(
+            response.statusText || '회원가입 실패: 서버 응답 오류'
+          );
         }
-
       }
 
       setShowModal(true); // 회원가입 성공 시 모달 열기
@@ -173,6 +209,21 @@ const SocialSignUp: React.FC = () => {
       alert(`오류 발생: ${error.message}`);
     }
   };
+
+  useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        const result = await fetchSignupInfos();
+        setCompanies(result.companies);
+      } catch (err) {
+        // 에러 처리
+        console.error('회사 목록 로딩 실패:', err);
+      }
+    };
+
+    loadCompanies();
+  }, []);
+
   return (
     <>
       <Wrapper>
@@ -180,7 +231,9 @@ const SocialSignUp: React.FC = () => {
           <Title>소셜 회원가입</Title>
           <Form onSubmit={handleSubmit}>
             <InputGroup>
-              <Label>핸드폰번호 <StyledAsterisk>*</StyledAsterisk></Label>
+              <Label>
+                핸드폰번호 <StyledAsterisk>*</StyledAsterisk>
+              </Label>
               <Input
                 name="phone"
                 type="tel"
@@ -190,7 +243,9 @@ const SocialSignUp: React.FC = () => {
               />
             </InputGroup>
             <InputGroup>
-              <Label>아이디 <StyledAsterisk>*</StyledAsterisk></Label>
+              <Label>
+                아이디 <StyledAsterisk>*</StyledAsterisk>
+              </Label>
               <Input
                 name="username"
                 type="text"
@@ -200,14 +255,42 @@ const SocialSignUp: React.FC = () => {
               />
             </InputGroup>
             <InputGroup>
-              <Label>소속 회사명 <StyledAsterisk>*</StyledAsterisk></Label>
-              <Select name="company" required onChange={handleChange}>
-                <option value="">선택</option>
-                <option value="3db3ef9a-947e-4237-93da-d306b7bdb52d">
-                  회사A
-                </option>
-                {/* <option value="회사B">회사B</option> */}
+              <Label>
+                소속 회사명 <StyledAsterisk>*</StyledAsterisk>
+              </Label>
+              <Select
+                name="company"
+                required
+                onChange={handleChange}
+                value={formData.company}
+              >
+                <option value="">회사 선택</option>
+                {companies.map((company) => (
+                  <option key={company.company_id} value={company.company_id}>
+                    {company.company_name}
+                  </option>
+                ))}
               </Select>
+            </InputGroup>
+            <InputGroup>
+              <Label>소속 직급명</Label>
+              <Select
+                name="position"
+                required
+                onChange={handleChange}
+                value={formData.position}
+              >
+                <option value="">직급 선택</option>
+                {positions.map((pos) => (
+                  <option key={pos.position_id} value={pos.position_id}>
+                    {pos.position_name}
+                  </option>
+                ))}
+              </Select>
+            </InputGroup>
+            <InputGroup>
+              <Label>직업군</Label>
+              <Input name="job" type="text" onChange={handleChange} />
             </InputGroup>
             <InputGroup>
               <Label>소속 부서명</Label>
