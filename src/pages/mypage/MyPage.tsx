@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const MyPageWrapper = styled.div`
   display: flex;
@@ -93,6 +94,7 @@ const ErrorText = styled.p`
 
 const MyPage: React.FC = () => {
   // const [id, setId] = useState("");
+  const { user } = useAuth();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -123,12 +125,7 @@ const MyPage: React.FC = () => {
           >
             <InputGroup>
               <Label htmlFor="id">아이디</Label>
-              <Input
-                type="text"
-                id="id"
-                value="사용자 아이디 자동 입력되도록 변경 필요"
-                readOnly
-              />
+              <Input type="text" id="id" value={user?.email} readOnly />
             </InputGroup>
             <InputGroup>
               <Label htmlFor="password">비밀번호</Label>
