@@ -136,6 +136,22 @@ const Navbar: React.FC = () => {
             작업 관리
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
+          <MenuItem onClick={() => navigate('/admin/user')}>
+            사용자 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/admin/company')}>
+            회사 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/admin/position')}>
+            직책 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/admin/template')}>
+            템플릿 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
           <MenuItem onClick={() => navigate('/mypage')}>
             마이페이지
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
