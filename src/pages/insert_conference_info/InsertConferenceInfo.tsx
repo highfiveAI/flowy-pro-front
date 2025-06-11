@@ -147,26 +147,10 @@ const InsertConferenceInfo: React.FC = () => {
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
   const [projects, setProjects] = React.useState<{userName: string, projectName: string}[]>([]); // 프로젝트 목록 상태 추가
 
-  //db에서 불러오기
-  React.useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/me`, {
-      credentials: 'include', // 쿠키/세션 인증 시 필요
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}` // 토큰 인증 시 필요
-      }
-    })
-      .then(res => res.json())
-      .then(data => setUsername(data.username)) // 또는 data.nickname 등
-      .catch(err => {
-        console.error('사용자 정보 불러오기 실패:', err);
-        setUsername('알 수 없음');
-      });
-  }, []);
-
-  // user.id로 프로젝트 목록 불러오기
+  // user.id로 프로젝트 목록과 사용자 이름 불러오기
   React.useEffect(() => {
     if (!user?.id) return;
-    fetch(`${import.meta.env.VITE_API_URL}/projects/${user.id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/projects/${user.id}`, {
       credentials: 'include',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -174,12 +158,14 @@ const InsertConferenceInfo: React.FC = () => {
     })
       .then(res => res.json())
       .then(data => {
-        // [[userName, projectName], ...] 형태를 [{userName, projectName}, ...]으로 변환
-        const arr = data.projects.map((item: [string, string]) => ({
-          userName: item[0],
-          projectName: item[1]
-        }));
-        setProjects(arr);
+        console.log('data:', data);
+        setProjects(data.projects);
+        // projects에서 첫 번째 userName을 username으로 저장
+        if (data.projects && data.projects.length > 0) {
+          setUsername(data.projects[0].userName || data.projects[0][0] || '알 수 없음');
+        } else {
+          setUsername('알 수 없음');
+        }
       });
   }, [user?.id]);
 
