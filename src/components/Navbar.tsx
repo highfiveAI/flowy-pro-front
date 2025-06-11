@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,7 +14,7 @@ const NavbarContainer = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 20px 40px;
-  background: transparent;
+  background: white;
   font-family: 'Rethink Sans', sans-serif;
 `;
 
@@ -23,10 +23,10 @@ const Left = styled.div`
   align-items: center;
 `;
 
-const LogoImg = styled.img`
-  width: 100px;
-  height: auto;
-  cursor: pointer;
+const Right = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;
 
 const Menu = styled.ul`
@@ -40,6 +40,7 @@ const MenuItem = styled.li`
   display: flex;
   align-items: center;
   gap: 5px;
+  position: relative;
 `;
 
 const MenuIcon = styled.img`
@@ -47,58 +48,108 @@ const MenuIcon = styled.img`
   height: 20px;
 `;
 
-const Right = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
+const TextButton = styled.button`
+  background: none;
+  color: #351745;
+  border: none;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+`;
+
+const FilledButton = styled.button`
+  background: #480b6a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+`;
+
+const LogoImg = styled.img`
+  width: 93.273px;
+  height: 44.591px;
+  margin-right: 12px;
+  cursor: pointer;
 `;
 
 const ProfileSection = styled.div`
   display: flex;
   align-items: center;
+  gap: 1.5rem;
   cursor: pointer;
 `;
 
 const ProfileIconCircle = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background-color: #fff;
+  background-color: #d9d9d9;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 `;
 
 const ProfileIcon = styled.svg`
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
+  fill: #351745;
 `;
 
 const LogoutText = styled.span`
-  margin-left: 10px;
+  color: #351745;
+  font-family: 'Rethink Sans', sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
 `;
 
-const TextButton = styled.button`
-  background: none;
-  border: none;
-  font: inherit;
-  cursor: pointer;
-  outline: inherit;
+const DropdownMenu = styled.div<{ $isOpen: boolean }>`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: ${props => props.$isOpen ? 'block' : 'none'};
+  min-width: 150px;
+  z-index: 1000;
 `;
 
-const FilledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font: inherit;
+const DropdownItem = styled.div`
+  padding: 10px 15px;
   cursor: pointer;
-  outline: inherit;
+  color: #351745;
+  font-size: 14px;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
 `;
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
+  const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
+
+  const systemMenuItems = [
+    { name: "문서 에이전트", path: "/docs_agent_test" },
+    { name: "사용자 관리", path: "/admin/user" },
+    { name: "회사 관리", path: "/admin/company" },
+    { name: "직책 관리", path: "/admin/position" },
+    { name: "템플릿 관리", path: "/admin/template" }
+  ];
 
   const handleLogout = async () => {
     const success = await logout();
@@ -136,21 +187,23 @@ const Navbar: React.FC = () => {
             작업 관리
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
-          <MenuItem onClick={() => navigate('/admin/user')}>
-            사용자 관리
+          <MenuItem 
+            onMouseEnter={() => setIsSystemMenuOpen(true)}
+            onMouseLeave={() => setIsSystemMenuOpen(false)}
+            style={{ position: 'relative' }}
+          >
+            시스템 관리
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
-          </MenuItem>
-          <MenuItem onClick={() => navigate('/admin/company')}>
-            회사 관리
-            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
-          </MenuItem>
-          <MenuItem onClick={() => navigate('/admin/position')}>
-            직책 관리
-            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
-          </MenuItem>
-          <MenuItem onClick={() => navigate('/admin/template')}>
-            템플릿 관리
-            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+            <DropdownMenu $isOpen={isSystemMenuOpen}>
+              {systemMenuItems.map((item, index) => (
+                <DropdownItem 
+                  key={index}
+                  onClick={() => navigate(item.path)}
+                >
+                  {item.name}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
           </MenuItem>
           <MenuItem onClick={() => navigate('/mypage')}>
             마이페이지
@@ -183,4 +236,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+export default Navbar; 
