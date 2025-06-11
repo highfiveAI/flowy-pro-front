@@ -1,11 +1,19 @@
 import React from "react";
 import styled from 'styled-components';
 
-type Attendee = { name: string; email: string; role: string };
+type Attendee = { user_id: string; name: string; email: string; user_jobname: string };
+
+interface ProjectUser {
+  user_id: string;
+  name: string;
+  email: string;
+  user_jobname: string;
+}
 
 interface AttendInfoProps {
   attendees: Attendee[];
   setAttendees: (a: Attendee[]) => void;
+  projectUsers: ProjectUser[];
 }
 
 const AttendInfoWrapper = styled.div`
@@ -64,7 +72,22 @@ const RemoveButton = styled.button`
   }
 `;
 
-const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees }) => {
+const StyledSelect = styled.select`
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 1rem;
+  min-width: 180px;
+  box-sizing: border-box;
+  margin-right: 0;
+  &::placeholder {
+    color: #999;
+  }
+`;
+
+const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projectUsers = [] }) => {
   const handleAttendeeChange = (idx: number, field: string, value: string) => {
     const updated = [...attendees];
     updated[idx] = { ...updated[idx], [field]: value };
@@ -75,16 +98,43 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees }) => {
     setAttendees(attendees.filter((_, i) => i !== idx));
   };
 
+  const handleUserSelect = (idx: number, user_id: string) => {
+    const selectedUser = projectUsers.find(u => u.user_id === user_id);
+    if (selectedUser) {
+      const updated = [...attendees];
+      updated[idx] = {
+        user_id: selectedUser.user_id,
+        name: selectedUser.name,
+        email: selectedUser.email || '',
+        user_jobname: selectedUser.user_jobname || ''
+      };
+      setAttendees(updated);
+    } else {
+      // 사용자가 선택되지 않은 경우 빈 값으로 초기화
+      const updated = [...attendees];
+      updated[idx] = {
+        user_id: '',
+        name: '',
+        email: '',
+        user_jobname: ''
+      };
+      setAttendees(updated);
+    }
+  };
+
   return (
     <AttendInfoWrapper>
       {attendees.map((att, idx) => (
         <AttendeeInputGroup key={idx}>
-          <NameInput
-            type="text"
-            placeholder="이름"
-            value={att.name}
-            onChange={e => handleAttendeeChange(idx, "name", e.target.value)}
-          />
+          <StyledSelect
+            value={att.user_id}
+            onChange={e => handleUserSelect(idx, e.target.value)}
+          >
+            <option value="">참석자 선택</option>
+            {projectUsers.map(user => (
+              <option key={user.user_id} value={user.user_id}>{user.name}</option>
+            ))}
+          </StyledSelect>
           <EmailInput
             type="email"
             placeholder="이메일"
@@ -94,8 +144,8 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees }) => {
           <RoleInput
             type="text"
             placeholder="역할"
-            value={att.role}
-            onChange={e => handleAttendeeChange(idx, "role", e.target.value)}
+            value={att.user_jobname}
+            onChange={e => handleAttendeeChange(idx, "user_jobname", e.target.value)}
           />
           {attendees.length > 1 && (
             <RemoveButton type="button" onClick={() => handleRemoveAttendee(idx)}>삭제</RemoveButton>

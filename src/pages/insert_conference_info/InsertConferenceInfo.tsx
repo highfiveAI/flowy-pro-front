@@ -136,7 +136,7 @@ const InsertConferenceInfo: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [subject, setSubject] = React.useState('');
   const [attendees, setAttendees] = React.useState([
-    { name: '', email: '', role: '' },
+    { user_id: '', name: '', email: '', user_jobname: '' }
   ]);
   const [file, setFile] = React.useState<File | null>(null);
   const [error, setError] = React.useState<string>('');
@@ -144,9 +144,11 @@ const InsertConferenceInfo: React.FC = () => {
   const [meetingDate, setMeetingDate] = React.useState<Date | null>(null);
   const [result, setResult] = React.useState<any>(null);
   const [projectName, setProjectName] = React.useState<string>('');
+  const [projectId, setProjectId] = React.useState<string>('');
   const [username, setUsername] = React.useState<string>(''); 
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
-  const [projects, setProjects] = React.useState<{userName: string, projectName: string}[]>([]); // 프로젝트 목록 상태 추가
+  const [projects, setProjects] = React.useState<{userName: string, projectName: string, projectId: string}[]>([]); // projectId 필드 추가
+  const [projectUsers, setProjectUsers] = React.useState<{user_id: string, name: string, email: string, user_jobname: string}[]>([]); // 프로젝트 참여자 목록 상태 추가
 
   // user.id로 프로젝트 목록과 사용자 이름 불러오기
   React.useEffect(() => {
@@ -159,7 +161,11 @@ const InsertConferenceInfo: React.FC = () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log('data:', data);
+        console.log('전체 응답 데이터:', data);
+        console.log('프로젝트 목록 데이터:', data.projects);
+        if (data.projects && data.projects.length > 0) {
+          console.log('첫 번째 프로젝트 데이터:', data.projects[0]);
+        }
         setProjects(data.projects);
         // projects에서 첫 번째 userName을 username으로 저장
         if (data.projects && data.projects.length > 0) {
@@ -170,13 +176,13 @@ const InsertConferenceInfo: React.FC = () => {
       });
   }, [user?.id]);
 
-  const handleAddAttendee = () => { // 참석자 추가 함수
-    setAttendees([...attendees, { name: "", email: "", role: "" }]);
+  const handleAddAttendee = () => {
+    setAttendees([...attendees, { user_id: '', name: '', email: '', user_jobname: '' }]);
   };
 
   const validateForm = (): boolean => {
-    if (!projectName.trim()) {
-      setError('입력하지 않은 필수 항목이 있습니다.');
+    if (!projectName.trim() || !projectId.trim()) {
+      setError('프로젝트를 선택해주세요.');
       return false;
     }
 
@@ -187,7 +193,7 @@ const InsertConferenceInfo: React.FC = () => {
 
     const hasEmptyFields = attendees.some(
       (attendee) =>
-        !attendee.name.trim() || !attendee.email.trim() || !attendee.role.trim()
+        !attendee.name.trim() || !attendee.email.trim() || !attendee.user_jobname.trim()
     );
 
     if (hasEmptyFields) {
@@ -207,49 +213,81 @@ const InsertConferenceInfo: React.FC = () => {
   const handleUpload = async () => {
     if (!validateForm()) return;
 
-    setIsLoading(true); // 로딩 시작
+    setIsLoading(true);
     console.log('함수 실행중...');
     const formData = new FormData();
+    
     if (file) {
-      formData.append('file', file, file.name);
-      formData.append('subject', subject);
-      formData.append('agenda', agenda);
-      formData.append('project_name', projectName);
+      // STT API용 FormData
+      const sttFormData = new FormData();
+      sttFormData.append('file', file, file.name);
+      sttFormData.append('subject', subject);
+      sttFormData.append('agenda', agenda);
+      sttFormData.append('project_name', projectName);
       if (meetingDate) {
-        formData.append('meeting_date', formatDateToKST(meetingDate)); // 'YYYY-MM-DD HH:mm:ss' 포맷
+        sttFormData.append('meeting_date', formatDateToKST(meetingDate));
       }
       attendees.forEach((att) => {
-        formData.append('attendees_name', att.name);
-        formData.append('attendees_email', att.email);
-        formData.append('attendees_role', att.role);
+        sttFormData.append('attendees_name', att.name);
+        sttFormData.append('attendees_email', att.email);
+        sttFormData.append('attendees_role', att.user_jobname);
       });
 
-      // // formData 값 콘솔 출력
-      // for (let pair of formData.entries()) {
-      //   console.log(pair[0] + ': ' + pair[1]);
-      // }
+      // Meeting Upload API용 FormData
+      const meetingFormData = new FormData();
+      meetingFormData.append('file', file);
+      meetingFormData.append('project_id', projectId);
+      meetingFormData.append('meeting_title', subject);
+      meetingFormData.append('meeting_agenda', agenda);
+      if (meetingDate) {
+        meetingFormData.append('meeting_date', formatDateToKST(meetingDate));
+      }
 
       try {
-        const response = await fetch(
+        // STT API 호출
+        const sttResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/v1/stt/`,
           {
             method: 'POST',
-            body: formData,
+            body: sttFormData,
           }
         );
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.detail || '업로드에 실패했습니다.');
+
+        if (!sttResponse.ok) {
+          const errorData = await sttResponse.json().catch(() => null);
+          throw new Error(errorData?.detail || 'STT 업로드에 실패했습니다.');
         }
-        const result = await response.json();
-        console.log('서버 응답:', result);
+
+        // Meeting Upload API 호출
+        const meetingResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting-upload/`,
+          {
+            method: 'POST',
+            body: meetingFormData,
+            credentials: 'include',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
+
+        if (!meetingResponse.ok) {
+          const errorData = await meetingResponse.json().catch(() => null);
+          throw new Error(errorData?.detail || '회의 정보 업로드에 실패했습니다.');
+        }
+
+        const sttResult = await sttResponse.json();
+        const meetingResult = await meetingResponse.json();
+        console.log('STT 서버 응답:', sttResult);
+        console.log('Meeting 서버 응답:', meetingResult);
+        
         alert('업로드가 완료되었습니다.');
         setSubject('');
-        setAttendees([{ name: '', email: '', role: '' }]);
+        setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
         setFile(null);
         setAgenda('');
         setMeetingDate(null);
-        setResult(result);
+        setResult(sttResult); // STT 결과를 결과로 설정
         setIsCompleted(true);
       } catch (error) {
         setError(
@@ -258,8 +296,36 @@ const InsertConferenceInfo: React.FC = () => {
             : '업로드 중 오류가 발생했습니다.'
         );
       } finally {
-        setIsLoading(false); // 로딩 종료
+        setIsLoading(false);
       }
+    }
+  };
+
+  // 프로젝트 선택 핸들러 함수
+  const handleProjectSelect = async (projectId: string, projectName: string) => {
+    setProjectId(projectId);
+    setProjectName(projectName);
+    // 참여자 목록 불러오기
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/project-users/${projectId}`, {
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await res.json();
+      console.log('API 응답 데이터:', data); // 디버깅을 위한 로그
+      setProjectUsers(data.users.map((u: any) => ({ 
+        user_id: u.user_id, 
+        name: u.name,
+        email: u.email,
+        user_jobname: u.user_jobname
+      })));
+      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]); // 항상 1개 이상 입력란 유지
+    } catch (e) {
+      console.error('프로젝트 사용자 정보를 가져오는데 실패했습니다:', e);
+      setProjectUsers([]);
+      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
     }
   };
 
@@ -283,7 +349,12 @@ const InsertConferenceInfo: React.FC = () => {
             <ProjectList>
               {projects.length > 0 ? (
                 projects.map((proj, index) => (
-                  <ProjectListItem key={index} onClick={() => setProjectName(proj.projectName)}>
+                  <ProjectListItem 
+                    key={index} 
+                    onClick={() => {
+                      handleProjectSelect(proj.projectId, proj.projectName);
+                    }}
+                  >
                     <span>{proj.projectName}</span>
                   </ProjectListItem>
                 ))
@@ -365,6 +436,7 @@ const InsertConferenceInfo: React.FC = () => {
                 <AttendInfo
                   attendees={attendees}
                   setAttendees={setAttendees}
+                  projectUsers={projectUsers}
                 />
               </FormGroup>
 
