@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import InfoChangeModal from './mypage_popup/InfoChangeModal';
 import type { User } from '../../types/user';
+import { updateUser } from '../../api/fetchSignupInfos';
 
 const AlterInfoWrapper = styled.div`
   display: flex;
@@ -137,6 +138,22 @@ const AlterInfo: React.FC = () => {
     }
   }
 
+  const runUpdate = async () => {
+    const updateData = {
+      user_team_name: mypageUser?.user_team_name,
+      user_dept_name: mypageUser?.user_dept_name,
+      user_phonenum: mypageUser?.user_phonenum,
+    };
+
+    const result = await updateUser(updateData);
+
+    if (result) {
+      console.log('✅ 업데이트 성공:', result);
+    } else {
+      console.log('❌ 업데이트 실패');
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -175,8 +192,9 @@ const AlterInfo: React.FC = () => {
             <Label>휴대폰 번호</Label>
             <Input
               type="text"
+              name="user_phonenum"
               value={mypageUser?.user_phonenum || ''}
-              readOnly
+              onChange={handleChange}
             />
             <Button onClick={handlePhoneChange}>휴대폰 번호 변경</Button>
           </InputGroup>
@@ -185,7 +203,7 @@ const AlterInfo: React.FC = () => {
             <Label>소속 회사명</Label>
             <Input
               type="text"
-              value={mypageUser?.user_company_id || ''}
+              value={mypageUser?.company.company_name || ''}
               readOnly
             />
           </InputGroup>
@@ -205,10 +223,11 @@ const AlterInfo: React.FC = () => {
             <Label>소속 팀명</Label>
             <Input
               type="text"
+              name="user_team_name"
               value={mypageUser?.user_team_name || ''}
-              readOnly
+              onChange={handleChange}
             />
-            <Button onClick={handleTeamChange}>소속 팀 변경</Button>
+            <Button onClick={() => runUpdate()}>소속 팀 변경</Button>
           </InputGroup>
         </FormContainer>
       </FormArea>
