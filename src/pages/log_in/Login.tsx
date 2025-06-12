@@ -200,7 +200,7 @@ const Login: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: formData.username,
+            login_id: formData.username,
             password: formData.password,
           }),
         }

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import InfoChangeModal from './mypage_popup/InfoChangeModal';
-import type { User } from '../../types/user';
-import { updateUser } from '../../api/fetchSignupInfos';
+import type { User, UserUpdateRequest } from '../../types/user';
+import { updateMypageUser } from '../../api/fetchMypage';
 
 const AlterInfoWrapper = styled.div`
   display: flex;
@@ -138,19 +138,20 @@ const AlterInfo: React.FC = () => {
     }
   }
 
-  const runUpdate = async () => {
-    const updateData = {
-      user_team_name: mypageUser?.user_team_name,
-      user_dept_name: mypageUser?.user_dept_name,
-      user_phonenum: mypageUser?.user_phonenum,
+  const runUpdate = async <K extends keyof UserUpdateRequest>(
+    fieldKey: K,
+    fieldValue: UserUpdateRequest[K]
+  ) => {
+    const updateData: UserUpdateRequest = {
+      [fieldKey]: fieldValue,
     };
 
-    const result = await updateUser(updateData);
+    const result = await updateMypageUser(updateData);
 
     if (result) {
-      console.log('✅ 업데이트 성공:', result);
+      console.log(`✅ ${fieldKey} 업데이트 성공:`, result);
     } else {
-      console.log('❌ 업데이트 실패');
+      console.log(`❌ ${fieldKey} 업데이트 실패`);
     }
   };
 
@@ -182,11 +183,11 @@ const AlterInfo: React.FC = () => {
             />
           </InputGroup>
 
-          <InputGroup>
+          {/* <InputGroup>
             <Label>비밀번호</Label>
             <Input type="password" value="************" readOnly />
             <Button onClick={handlePasswordChange}>비밀번호 변경</Button>
-          </InputGroup>
+          </InputGroup> */}
 
           <InputGroup>
             <Label>휴대폰 번호</Label>
@@ -196,7 +197,14 @@ const AlterInfo: React.FC = () => {
               value={mypageUser?.user_phonenum || ''}
               onChange={handleChange}
             />
-            <Button onClick={handlePhoneChange}>휴대폰 번호 변경</Button>
+            <Button
+              onClick={() => {
+                runUpdate('user_phonenum', mypageUser?.user_phonenum);
+                handlePhoneChange();
+              }}
+            >
+              휴대폰 번호 변경
+            </Button>
           </InputGroup>
 
           <InputGroup>
@@ -216,7 +224,14 @@ const AlterInfo: React.FC = () => {
               value={mypageUser?.user_dept_name || ''}
               onChange={handleChange}
             />
-            <Button onClick={handleDepartmentChange}>소속 부서 변경</Button>
+            <Button
+              onClick={() => {
+                runUpdate('user_dept_name', mypageUser?.user_dept_name);
+                handleDepartmentChange();
+              }}
+            >
+              소속 부서 변경
+            </Button>
           </InputGroup>
 
           <InputGroup>
@@ -227,7 +242,14 @@ const AlterInfo: React.FC = () => {
               value={mypageUser?.user_team_name || ''}
               onChange={handleChange}
             />
-            <Button onClick={() => runUpdate()}>소속 팀 변경</Button>
+            <Button
+              onClick={() => {
+                runUpdate('user_team_name', mypageUser?.user_team_name);
+                handleTeamChange();
+              }}
+            >
+              소속 팀 변경
+            </Button>
           </InputGroup>
         </FormContainer>
       </FormArea>

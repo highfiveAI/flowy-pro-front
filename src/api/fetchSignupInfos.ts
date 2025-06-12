@@ -1,5 +1,3 @@
-import type { UserUpdateRequest } from '../types/user';
-
 export interface Company {
   company_id: string;
   company_name: string;
@@ -51,37 +49,5 @@ export const fetchSignupInfos = async (): Promise<{
   } catch (error) {
     console.error('회사 목록 요청 중 오류 발생:', error);
     throw error;
-  }
-};
-
-// 마이페이지 put 요청
-export const updateUser = async (
-  updateData: UserUpdateRequest
-): Promise<any | null> => {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/v1/users/update`,
-      {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          // "Authorization": "Bearer YOUR_ACCESS_TOKEN", // 필요 시 주석 해제
-        },
-        body: JSON.stringify(updateData),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('업데이트 실패:', errorData);
-      return null;
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error('업데이트 중 오류 발생:', error);
-    return null;
   }
 };

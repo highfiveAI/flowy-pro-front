@@ -22,3 +22,8 @@ export interface UserUpdateRequest {
   user_dept_name?: string;
   user_phonenum?: string;
 }
+
+export interface LoginRequest {
+  login_id: string;
+  password: string;
+}
