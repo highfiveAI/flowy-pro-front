@@ -54,8 +54,8 @@ const ResultContents: React.FC<{ result: any }> = ({ result }) => {
     <Wrapper>
       <div style={{ fontWeight: 'bold', fontSize: '1.2em', margin: '1.5em 0 0.5em 0' }}>요약</div>
       <Box>
-        {agentOutput
-          ? Object.entries(agentOutput).map(([key, arr]: [string, any]) => (
+        {summary
+          ? Object.entries(summary).map(([key, arr]: [string, any]) => (
               <div key={key} style={{ marginBottom: '0.7em' }}>
                 <strong>{key}</strong>
                 <ul style={{ margin: '0.2em 0 0.2em 1.2em', padding: 0 }}>
@@ -69,10 +69,10 @@ const ResultContents: React.FC<{ result: any }> = ({ result }) => {
       </Box>
       <div style={{ fontWeight: 'bold', fontSize: '1.2em', margin: '1.5em 0 0.5em 0' }}>역할분담</div>
       <Box>
-        {Array.isArray(assignedTodos) && assignedTodos.length > 0
+        {Array.isArray(assignedRoles) && assignedRoles.length > 0
           ? (
             <ul style={{ margin: 0, padding: 0 }}>
-              {assignedTodos.map((todo: any, idx: number) => (
+              {assignedRoles.map((todo: any, idx: number) => (
                 <li key={idx} style={{ marginBottom: '0.3em', marginLeft: '1em' }}>
                   <strong>{todo.assignee}</strong> : {todo.action}
                   {todo.schedule && todo.schedule.trim() !== ''
