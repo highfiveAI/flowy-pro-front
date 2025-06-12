@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import type { ChangeEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import NavbarSub from '../../components/NavbarSub';
+import Navbar from '../../components/Navbar';
 
 const LoginWrapper = styled.div`
   min-height: 100vh;
@@ -200,7 +200,7 @@ const Login: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: formData.username,
+            login_id: formData.username,
             password: formData.password,
           }),
         }
@@ -236,10 +236,7 @@ const Login: React.FC = () => {
 
   return (
     <LoginWrapper>
-      <NavbarSub />
       <LoginFormContainer onSubmit={handleSubmit}>
-        <LogoImg src="/images/flowyLogo.svg" alt="Flowy PRO Logo" />
-
         <InputGroup>
           <InputLabel htmlFor="username">아이디</InputLabel>
           <InputField

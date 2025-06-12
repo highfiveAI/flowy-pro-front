@@ -5,6 +5,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  login_id: string;
 }
 
 interface AuthContextType {
@@ -20,6 +21,16 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  // 항상 로그인된 상태로 강제 설정
+  // const [user, setUser] = useState<User | null>({
+  //   id: 'test-id',
+  //   name: '테스트유저',
+  //   email: 'test@example.com',
+  // });
+  // const [loading] = useState(false);
+
+  // 기존 인증 체크 함수 주석 처리
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
