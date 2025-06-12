@@ -1020,6 +1020,7 @@ const AdminUser: React.FC = () => {
                   value={formData.user_name}
                   onChange={handleInputChange}
                   required
+                  disabled
                 />
               </FormGroup>
               <FormGroup>
@@ -1030,6 +1031,7 @@ const AdminUser: React.FC = () => {
                   value={formData.user_email}
                   onChange={handleInputChange}
                   required
+                  disabled
                 />
               </FormGroup>
               <FormGroup>
@@ -1040,16 +1042,7 @@ const AdminUser: React.FC = () => {
                   value={formData.user_login_id}
                   onChange={handleInputChange}
                   required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>비밀번호</label>
-                <input
-                  type="password"
-                  name="user_password"
-                  value={formData.user_password}
-                  onChange={handleInputChange}
-                  required
+                  disabled
                 />
               </FormGroup>
               <FormGroup>
@@ -1060,6 +1053,7 @@ const AdminUser: React.FC = () => {
                   value={formData.user_phonenum}
                   onChange={handleInputChange}
                   required
+                  disabled
                 />
               </FormGroup>
               <FormGroup>
