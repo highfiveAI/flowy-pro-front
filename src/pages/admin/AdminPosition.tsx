@@ -86,6 +86,12 @@ interface Position {
   position_code: string;
   position_name: string;
   position_detail: string;
+  position_company_id: string;
+}
+
+interface Company {
+  company_id: string;
+  company_name: string;
 }
 
 const PageHeader = styled.div`
@@ -220,6 +226,7 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
 
 const AdminPosition: React.FC = () => {
   const [positions, setPositions] = useState<Position[]>([]);
+  const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPositionId, setSelectedPositionId] = useState<string | null>(
@@ -237,13 +244,50 @@ const AdminPosition: React.FC = () => {
     direction: null,
   });
 
+  // 현재 로그인한 사용자의 정보 가져오기
+  const fetchCurrentUser = async () => {
+    try {
+      console.log('사용자 정보 요청 시작');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/users/one`,
+        {
+          credentials: 'include',
+        }
+      );
+      console.log('사용자 정보 응답:', response.status);
+      if (!response.ok) {
+        throw new Error('사용자 정보 조회에 실패했습니다.');
+      }
+      const data = await response.json();
+      console.log('받아온 사용자 데이터:', data);
+      if (data.user_company_id) {
+        setCurrentUserCompany({
+          company_id: data.user_company_id,
+          company_name: data.company_name || ''
+        });
+        console.log('설정된 회사 정보:', {
+          company_id: data.user_company_id,
+          company_name: data.company_name
+        });
+      }
+    } catch (error) {
+      console.error('현재 사용자 정보 조회 실패:', error);
+    }
+  };
+
   // 직급 목록 조회
   const fetchPositions = async () => {
     try {
+      console.log('직급 목록 요청 시작');
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
+        {
+          credentials: 'include',
+        }
       );
+      console.log('직급 목록 응답:', response.status);
       const data = await response.json();
+      console.log('받아온 직급 데이터:', data);
       setPositions(data);
     } catch (error) {
       console.error('직급 목록 조회 실패:', error);
@@ -251,6 +295,7 @@ const AdminPosition: React.FC = () => {
   };
 
   useEffect(() => {
+    fetchCurrentUser();
     fetchPositions();
   }, []);
 
@@ -266,7 +311,18 @@ const AdminPosition: React.FC = () => {
   // 직급 생성
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentUserCompany) {
+      console.error('회사 정보가 없습니다.');
+      return;
+    }
+
     try {
+      const positionData = {
+        ...formData,
+        position_company_id: currentUserCompany.company_id
+      };
+      console.log('생성할 직급 데이터:', positionData);
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
         {
@@ -274,7 +330,8 @@ const AdminPosition: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
+          credentials: 'include',
+          body: JSON.stringify(positionData),
         }
       );
       if (response.ok) {
@@ -284,6 +341,7 @@ const AdminPosition: React.FC = () => {
           position_name: '',
           position_detail: '',
         });
+        setIsCreateModalOpen(false);
       }
     } catch (error) {
       console.error('직급 생성 실패:', error);
@@ -292,7 +350,18 @@ const AdminPosition: React.FC = () => {
 
   // 직급 수정
   const handleUpdate = async (positionId: string) => {
+    if (!currentUserCompany) {
+      console.error('회사 정보가 없습니다.');
+      return;
+    }
+
     try {
+      const positionData = {
+        ...formData,
+        position_company_id: currentUserCompany.company_id
+      };
+      console.log('수정할 직급 데이터:', positionData);
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`,
         {
@@ -300,12 +369,14 @@ const AdminPosition: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
+          credentials: 'include',
+          body: JSON.stringify(positionData),
         }
       );
       if (response.ok) {
         fetchPositions();
         setSelectedPositionId(null);
+        setIsEditModalOpen(false);
       }
     } catch (error) {
       console.error('직급 수정 실패:', error);
@@ -317,11 +388,10 @@ const AdminPosition: React.FC = () => {
     if (window.confirm('정말로 이 직급을 삭제하시겠습니까?')) {
       try {
         const response = await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/api/v1/admin/positions/${positionId}`,
+          `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`,
           {
             method: 'DELETE',
+            credentials: 'include',
           }
         );
         if (response.ok) {
@@ -358,9 +428,24 @@ const AdminPosition: React.FC = () => {
     }));
   };
 
-  // 정렬된 직급 목록 계산
+  // 정렬된 직급 목록 계산 (회사별 필터링 추가)
   const sortedPositions = useMemo(() => {
     let sorted = [...positions];
+    console.log('정렬 전 전체 직급:', sorted);
+    console.log('현재 회사 정보:', currentUserCompany);
+
+    // 현재 사용자의 회사에 속한 직급만 필터링
+    if (currentUserCompany) {
+      sorted = sorted.filter(
+        (position) => {
+          console.log('직급의 회사 ID:', position.position_company_id);
+          console.log('현재 회사 ID:', currentUserCompany.company_id);
+          return position.position_company_id === currentUserCompany.company_id;
+        }
+      );
+    }
+    console.log('필터링 후 직급:', sorted);
+
     if (sortState.direction !== null) {
       sorted.sort((a, b) => {
         const aValue = String(a[sortState.field as keyof Position] || '');
@@ -371,8 +456,9 @@ const AdminPosition: React.FC = () => {
           : bValue.localeCompare(aValue);
       });
     }
+    console.log('최종 정렬된 직급:', sorted);
     return sorted;
-  }, [positions, sortState]);
+  }, [positions, sortState, currentUserCompany]);
 
   return (
     <Container>

@@ -384,6 +384,19 @@ const AdminTemplate: React.FC = () => {
     }
   };
 
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedTemplate(null);
+    setSelectedFile(null);
+    setEditDocType('');
+  };
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+    setSelectedFile(null);
+    setCreateDocType('');
+  };
+
   return (
     <Container>
       <MainContent>
@@ -416,6 +429,7 @@ const AdminTemplate: React.FC = () => {
               key={template.interdocs_id}
               onClick={() => {
                 setSelectedTemplate(template);
+                setEditDocType(template.interdocs_type_name);
                 setIsEditModalOpen(true);
               }}
             >
@@ -458,7 +472,7 @@ const AdminTemplate: React.FC = () => {
           <ModalContent>
             <ModalHeader>
               <h2>새 템플릿 추가</h2>
-              <CloseButton onClick={() => setIsCreateModalOpen(false)}>
+              <CloseButton onClick={closeCreateModal}>
                 ×
               </CloseButton>
             </ModalHeader>
@@ -479,10 +493,7 @@ const AdminTemplate: React.FC = () => {
               </FormGroup>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <Button type="submit">등록</Button>
-                <Button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                >
+                <Button type="button" onClick={closeCreateModal}>
                   취소
                 </Button>
               </div>
@@ -495,7 +506,7 @@ const AdminTemplate: React.FC = () => {
           <ModalContent>
             <ModalHeader>
               <h2>템플릿 수정</h2>
-              <CloseButton onClick={() => setIsEditModalOpen(false)}>
+              <CloseButton onClick={closeEditModal}>
                 ×
               </CloseButton>
             </ModalHeader>
@@ -526,7 +537,7 @@ const AdminTemplate: React.FC = () => {
                 >
                   삭제
                 </Button>
-                <Button type="button" onClick={() => setIsEditModalOpen(false)}>
+                <Button type="button" onClick={closeEditModal}>
                   취소
                 </Button>
               </div>
