@@ -1,12 +1,12 @@
-import React from 'react';
-import styled from 'styled-components';
-import { FiArrowRight } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import styled from "styled-components";
+import { FiArrowRight } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
-const dummyConferences = Array.from({ length: 10 }).map((_, i) => ({
-  name: '기능 정의 kick-off',
-  date: '2025-06-03 10:00',
-  attendees: '김다연, 김시훈, 정다희, ...',
+const dummyConferences = Array.from({ length: 10 }).map((/*_, i*/) => ({
+  name: "기능 정의 kick-off",
+  date: "2025-06-03 10:00",
+  attendees: "김다연, 김시훈, 정다희, ...",
 }));
 
 const ConferenceListPage: React.FC = () => {
@@ -14,7 +14,7 @@ const ConferenceListPage: React.FC = () => {
   return (
     <Container>
       <Title>회의 관리</Title>
-      <Breadcrumb>프로젝트 목록 {'>'} 회의 목록</Breadcrumb>
+      <Breadcrumb>프로젝트 목록 {">"} 회의 목록</Breadcrumb>
       <TableWrapper>
         <Table>
           <thead>
@@ -32,7 +32,9 @@ const ConferenceListPage: React.FC = () => {
                 <Td>{c.date}</Td>
                 <Td>{c.attendees}</Td>
                 <Td>
-                  <IconBtn onClick={() => navigate('/dashboard')}><FiArrowRight /></IconBtn>
+                  <IconBtn onClick={() => navigate("/dashboard")}>
+                    <FiArrowRight />
+                  </IconBtn>
                 </Td>
               </Tr>
             ))}
@@ -53,7 +55,7 @@ const Container = styled.div`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #4B2067;
+  color: #4b2067;
   margin-bottom: 40px;
 `;
 const Breadcrumb = styled.div`
@@ -65,7 +67,7 @@ const Breadcrumb = styled.div`
 const TableWrapper = styled.div`
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(80,0,80,0.04);
+  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.04);
   padding: 32px 24px 24px 24px;
 `;
 const Table = styled.table`
@@ -75,7 +77,7 @@ const Table = styled.table`
 const Th = styled.th`
   text-align: left;
   font-size: 1rem;
-  color: #7B5FA1;
+  color: #7b5fa1;
   font-weight: 600;
   padding: 8px 0 12px 0;
   border-bottom: 1px solid #e5e0ee;
@@ -103,6 +105,6 @@ const IconBtn = styled.button`
   justify-content: center;
   transition: background 0.15s;
   &:hover {
-    background: #4B2067;
+    background: #4b2067;
   }
-`; 
+`;
