@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
-// Container와 MainContent 스타일 유지
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -14,7 +13,6 @@ const MainContent = styled.div`
   padding: 2rem;
 `;
 
-// 새로운 스타일 컴포넌트 추가
 const PageHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -27,18 +25,6 @@ const PageHeader = styled.div`
   }
 `;
 
-// const FilterSection = styled.div`
-//     display: flex;
-//     gap: 1rem;
-//     margin-bottom: 1.5rem;
-// `;
-
-// const FilterSelect = styled.select`
-//     padding: 0.5rem;
-//     border: 1px solid #e2e8f0;
-//     border-radius: 4px;
-//     min-width: 120px;
-// `;
 
 const UserTable = styled.table`
   width: 100%;
@@ -66,7 +52,7 @@ const UserTable = styled.table`
   }
 `;
 
-// StatusBadge 컴포넌트 수정 - 클릭 가능한 드롭다운 스타일
+// status 드롭다운바
 const StatusBadge = styled.div<{ $status: string }>`
   position: relative;
   cursor: pointer;
@@ -162,7 +148,6 @@ const StatusOption = styled.div<{ $status: string }>`
   }}
 `;
 
-// 기존 Form 관련 스타일 유지
 const Form = styled.form`
   background-color: white;
   padding: 2rem;
@@ -209,7 +194,6 @@ const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
   }
 `;
 
-// 기존 인터페이스 유지
 interface User {
   user_id: string;
   user_login_id: string;
@@ -222,10 +206,20 @@ interface User {
   user_company_id: string;
   user_position_id: string;
   user_sysrole_id: string;
-  signup_completed_status: string; // signup_status 필드 추가
+  signup_completed_status: string;
   company_name: string;
   position_name: string;
   sysrole_name: string;
+}
+
+interface Company {
+  company_id: string;
+  company_name: string;
+}
+
+interface Position {
+  position_id: string;
+  position_name: string;
 }
 
 const CreateButton = styled.button`
@@ -280,29 +274,7 @@ const ModalHeader = styled.div`
   }
 `;
 
-// const CloseButton = styled.button`
-//   background: none;
-//   border: none;
-//   font-size: 1.5rem;
-//   cursor: pointer;
-//   padding: 0.5rem;
-//   color: #666;
-
-//   &:hover {
-//     color: #333;
-//   }
-// `;
-
-// const EditSection = styled.div<{ $isVisible: boolean }>`
-//   display: ${(props) => (props.$isVisible ? 'block' : 'none')};
-//   background-color: white;
-//   padding: 1.5rem;
-//   border-radius: 8px;
-//   margin-top: 1rem;
-//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-// `;
-
-// 정렬 방향을 위한 타입 추가
+// 정렬 방향을 위한 타입
 type SortDirection = 'asc' | 'desc' | null;
 
 // 정렬 상태를 위한 인터페이스
@@ -311,7 +283,6 @@ interface SortState {
   direction: SortDirection;
 }
 
-// 테이블 헤더 스타일 수정
 const TableHeader = styled.th`
   background-color: #f8fafc;
   color: #64748b;
@@ -355,7 +326,7 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
   }
 `;
 
-// 필터 버튼 스타일 추가
+// 필터 버튼 스타일
 const FilterButton = styled.button<{ $isActive: boolean }>`
   padding: 8px 16px;
   border-radius: 6px;
@@ -379,10 +350,23 @@ const FilterContainer = styled.div`
   gap: 0.5rem;
 `;
 
+const Select = styled.select`
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+`;
+
 const AdminUser: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  //   const [selectedDepartment, setSelectedDepartment] = useState('HDX');
-  //   const [selectedLevel, setSelectedLevel] = useState('최신순');
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [positions, setPositions] = useState<Position[]>([]);
 
   // 모달 상태 관리
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -425,19 +409,48 @@ const AdminUser: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/api/v1/admin/users/`
       );
       const data = await response.json();
-      console.log('API 응답 데이터:', data); // 데이터 확인용 로그
+      // console.log('API 응답 데이터:', data); // 데이터 확인용 로그
       setUsers(data);
     } catch (error) {
       console.error('사용자 목록 조회 실패:', error);
     }
   };
 
-  // 컴포넌트 마운트 시 유저 정보 가져오기
+  // 회사, 직급, 역할 데이터 가져오기
+  const fetchCompanies = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`
+      );
+      const data = await response.json();
+      setCompanies(data);
+    } catch (error) {
+      console.error('회사 목록 조회 실패:', error);
+    }
+  };
+
+  const fetchPositions = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`
+      );
+      const data = await response.json();
+      setPositions(data);
+    } catch (error) {
+      console.error('직급 목록 조회 실패:', error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 모든 데이터 가져오기
   useEffect(() => {
     fetchUsers();
+    fetchCompanies();
+    fetchPositions();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -524,7 +537,7 @@ const AdminUser: React.FC = () => {
       user_jobname: user.user_jobname || '',
       user_company_id: user.user_company_id || '',
       user_position_id: user.user_position_id || '',
-      user_sysrole_id: user.user_sysrole_id || '',
+      user_sysrole_id: '4864c9d2-7f9c-4862-9139-4e8b0ed117f4',
       signup_completed_status: user.signup_completed_status || '',
       company_name: user.company_name || '',
       position_name: user.position_name || '',
@@ -812,30 +825,35 @@ const AdminUser: React.FC = () => {
               </FormGroup>
               <FormGroup>
                 <label>회사</label>
-                <input
-                  type="text"
+                <Select
                   name="user_company_id"
                   value={formData.user_company_id}
                   onChange={handleInputChange}
-                />
+                  required
+                >
+                  <option value="">회사 선택</option>
+                  {companies.map((company) => (
+                    <option key={company.company_id} value={company.company_id}>
+                      {company.company_name}
+                    </option>
+                  ))}
+                </Select>
               </FormGroup>
               <FormGroup>
                 <label>직급</label>
-                <input
-                  type="text"
+                <Select
                   name="user_position_id"
                   value={formData.user_position_id}
                   onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>시스템 역할</label>
-                <input
-                  type="text"
-                  name="user_sysrole_id"
-                  value={formData.user_sysrole_id}
-                  onChange={handleInputChange}
-                />
+                  required
+                >
+                  <option value="">직급 선택</option>
+                  {positions.map((position) => (
+                    <option key={position.position_id} value={position.position_id}>
+                      {position.position_name}
+                    </option>
+                  ))}
+                </Select>
               </FormGroup>
               <FormGroup>
                 <label>부서명</label>
@@ -945,30 +963,35 @@ const AdminUser: React.FC = () => {
               </FormGroup>
               <FormGroup>
                 <label>회사</label>
-                <input
-                  type="text"
-                  name="company_name"
-                  value={formData.company_name}
+                <Select
+                  name="user_company_id"
+                  value={formData.user_company_id}
                   onChange={handleInputChange}
-                />
+                  required
+                >
+                  <option value="">회사 선택</option>
+                  {companies.map((company) => (
+                    <option key={company.company_id} value={company.company_id}>
+                      {company.company_name}
+                    </option>
+                  ))}
+                </Select>
               </FormGroup>
               <FormGroup>
                 <label>직급</label>
-                <input
-                  type="text"
-                  name="position_name"
-                  value={formData.position_name}
+                <Select
+                  name="user_position_id"
+                  value={formData.user_position_id}
                   onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>시스템 역할</label>
-                <input
-                  type="text"
-                  name="sysrole_name"
-                  value={formData.sysrole_name}
-                  onChange={handleInputChange}
-                />
+                  required
+                >
+                  <option value="">직급 선택</option>
+                  {positions.map((position) => (
+                    <option key={position.position_id} value={position.position_id}>
+                      {position.position_name}
+                    </option>
+                  ))}
+                </Select>
               </FormGroup>
               <FormGroup>
                 <label>부서명</label>
