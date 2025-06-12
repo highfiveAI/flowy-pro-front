@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SignUpSuccessModal from './SignUpSuccessModal';
+import {
+  fetchSignupInfos,
+  type Company,
+  type CompanyPosition,
+  // type Sysrole,
+} from '../../api/fetchSignupInfos';
 
 export const Wrapper = styled.div`
   display: flex;
@@ -126,16 +132,38 @@ const SignUp: React.FC = () => {
     password: '',
     confirmPassword: '',
     company: '',
+    position: '',
     department: '',
     team: '',
+    job: '',
   });
   const [showModal, setShowModal] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [positions, setPositions] = useState<CompanyPosition[]>([]);
+  // const [sysroles, setSysroles] = useState<Sysrole[]>([]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'company') {
+      const selectedCompany = companies.find((c) => c.company_id === value);
+      if (selectedCompany) {
+        setPositions(selectedCompany.company_positions || []);
+      } else {
+        setPositions([]);
+      }
+
+      // 회사 변경 시 직급 초기화
+      setFormData((prev) => ({
+        ...prev,
+        company: value,
+        position: '', // 직급 초기화
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -161,9 +189,9 @@ const SignUp: React.FC = () => {
             company: formData.company,
             department: formData.department,
             team: formData.team,
-            position: 'aaf44bda-6a64-4611-b0ca-4083b59c8e6e', // 더미 데이터
-            job: '개발자',
-            sysrole: 'c4cb5e53-617e-463f-8ddb-67252f9a9742', // 더미 데이터
+            position: formData.position,
+            job: formData.job,
+            sysrole: '4864c9d2-7f9c-4862-9139-4e8b0ed117f4', // 일반 사원 데이터
             login_type: 'general',
           }),
         }
@@ -187,6 +215,20 @@ const SignUp: React.FC = () => {
       alert(`오류 발생: ${error.message}`);
     }
   };
+
+  useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        const result = await fetchSignupInfos();
+        setCompanies(result.companies);
+      } catch (err) {
+        // 에러 처리
+        console.error('회사 목록 로딩 실패:', err);
+      }
+    };
+
+    loadCompanies();
+  }, []);
   return (
     <>
       <Wrapper>
@@ -269,13 +311,39 @@ const SignUp: React.FC = () => {
               <Label>
                 소속 회사명 <StyledAsterisk>*</StyledAsterisk>
               </Label>
-              <Select name="company" required onChange={handleChange}>
-                <option value="">선택</option>
-                <option value="3db3ef9a-947e-4237-93da-d306b7bdb52d">
-                  회사A
-                </option>
-                {/* <option value="회사B">회사B</option> */}
+              <Select
+                name="company"
+                required
+                onChange={handleChange}
+                value={formData.company}
+              >
+                <option value="">회사 선택</option>
+                {companies.map((company) => (
+                  <option key={company.company_id} value={company.company_id}>
+                    {company.company_name}
+                  </option>
+                ))}
               </Select>
+            </InputGroup>
+            <InputGroup>
+              <Label>소속 직급명</Label>
+              <Select
+                name="position"
+                required
+                onChange={handleChange}
+                value={formData.position}
+              >
+                <option value="">직급 선택</option>
+                {positions.map((pos) => (
+                  <option key={pos.position_id} value={pos.position_id}>
+                    {pos.position_name}
+                  </option>
+                ))}
+              </Select>
+            </InputGroup>
+            <InputGroup>
+              <Label>직업군</Label>
+              <Input name="job" type="text" onChange={handleChange} />
             </InputGroup>
             <InputGroup>
               <Label>소속 부서명</Label>

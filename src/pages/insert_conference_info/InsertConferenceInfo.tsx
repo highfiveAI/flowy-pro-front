@@ -139,7 +139,8 @@ const InsertConferenceInfo: React.FC = () => {
   const [agenda, setAgenda] = React.useState('');
   const [meetingDate, setMeetingDate] = React.useState<Date | null>(null);
   const [result, setResult] = React.useState<any>(null);
-  const [projectName, setProjectName] = React.useState<string>('');
+  const [projectName, setProjectName] =
+    React.useState<string>('애완동물프로젝트');
   const [username] = React.useState<string>('사용자이름'); // 임시 username 상태 추가
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
 
@@ -188,6 +189,7 @@ const InsertConferenceInfo: React.FC = () => {
       formData.append('file', file, file.name);
       formData.append('subject', subject);
       formData.append('agenda', agenda);
+      formData.append('project_name', projectName);
       if (meetingDate) {
         formData.append('meeting_date', formatDateToKST(meetingDate)); // 'YYYY-MM-DD HH:mm:ss' 포맷
       }
@@ -290,7 +292,9 @@ const InsertConferenceInfo: React.FC = () => {
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
                 >
-                  <option value="">상위 프로젝트를 선택해주세요.</option>
+                  <option value="애완동물프로젝트">
+                    상위 프로젝트를 선택해주세요.
+                  </option>
                   {/* 프로젝트 목록 동적 생성 */}
                 </StyledSelect>
               </FormGroup>
