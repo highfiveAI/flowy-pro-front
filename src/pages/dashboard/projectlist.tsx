@@ -1,12 +1,12 @@
-import React from 'react';
-import styled from 'styled-components';
-import { FiEdit2, FiTrash2, FiArrowRight } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import styled from "styled-components";
+import { FiEdit2, FiTrash2, FiArrowRight } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
-const dummyProjects = Array.from({ length: 10 }).map((_, i) => ({
-  name: 'Pitchpal',
-  created: '2025-05-15',
-  end: '2025-08-31',
+const dummyProjects = Array.from({ length: 10 }).map((/*_, i*/) => ({
+  name: "Pitchpal",
+  created: "2025-05-15",
+  end: "2025-08-31",
 }));
 
 const ProjectListPage: React.FC = () => {
@@ -33,9 +33,15 @@ const ProjectListPage: React.FC = () => {
                 <Td>{p.end}</Td>
                 <Td>
                   <IconGroup>
-                    <IconBtn><FiEdit2 /></IconBtn>
-                    <IconBtn><FiTrash2 /></IconBtn>
-                    <ArrowBtn onClick={() => navigate('/conferencelist')}><FiArrowRight /></ArrowBtn>
+                    <IconBtn>
+                      <FiEdit2 />
+                    </IconBtn>
+                    <IconBtn>
+                      <FiTrash2 />
+                    </IconBtn>
+                    <ArrowBtn onClick={() => navigate("/conferencelist")}>
+                      <FiArrowRight />
+                    </ArrowBtn>
                   </IconGroup>
                 </Td>
               </Tr>
@@ -57,7 +63,7 @@ const Container = styled.div`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #4B2067;
+  color: #4b2067;
   margin-bottom: 40px;
 `;
 const SectionTitle = styled.h2`
@@ -69,7 +75,7 @@ const SectionTitle = styled.h2`
 const TableWrapper = styled.div`
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(80,0,80,0.04);
+  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.04);
   padding: 32px 24px 24px 24px;
 `;
 const Table = styled.table`
@@ -79,7 +85,7 @@ const Table = styled.table`
 const Th = styled.th`
   text-align: left;
   font-size: 1rem;
-  color: #7B5FA1;
+  color: #7b5fa1;
   font-weight: 600;
   padding: 8px 0 12px 0;
   border-bottom: 1px solid #e5e0ee;
@@ -100,7 +106,7 @@ const IconBtn = styled.button`
   border-radius: 6px;
   padding: 6px 8px;
   margin-right: 6px;
-  color: #7B5FA1;
+  color: #7b5fa1;
   font-size: 1.1rem;
   cursor: pointer;
   transition: background 0.15s;
@@ -121,11 +127,11 @@ const ArrowBtn = styled.button`
   justify-content: center;
   transition: background 0.15s;
   &:hover {
-    background: #4B2067;
+    background: #4b2067;
   }
 `;
 const IconGroup = styled.div`
   display: flex;
   align-items: center;
   margin-left: -100px;
-`; 
+`;

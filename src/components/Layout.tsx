@@ -1,10 +1,10 @@
-import styled from 'styled-components';
-import { Outlet, Navigate, useLocation } from 'react-router-dom';
-import Navbar from './Navbar';
-import { useAuth } from '../contexts/AuthContext';
-import Loading from './Loading';
+import styled from "styled-components";
+import { Outlet /*, useLocation*/ } from "react-router-dom";
+import Navbar from "./Navbar";
+import { useAuth } from "../contexts/AuthContext";
+import Loading from "./Loading";
 
-const NAVBAR_HEIGHT = '70px';
+const NAVBAR_HEIGHT = "70px";
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -28,22 +28,22 @@ const MainContent = styled.main`
   background-color: #ffffff;
 `;
 
-const PublicLayoutWrapper = styled.div`
-  min-height: 100vh;
-  background: radial-gradient(
-      100% 100% at 50% 0%,
-      #e3cfee 0%,
-      #a480b8 29.81%,
-      #654477 51.92%,
-      #351745 75.48%,
-      #170222 93.75%
-    ),
-    #2e0446;
-`;
+// const PublicLayoutWrapper = styled.div`
+//   min-height: 100vh;
+//   background: radial-gradient(
+//       100% 100% at 50% 0%,
+//       #e3cfee 0%,
+//       #a480b8 29.81%,
+//       #654477 51.92%,
+//       #351745 75.48%,
+//       #170222 93.75%
+//     ),
+//     #2e0446;
+// `;
 
 const Layout: React.FC = () => {
   const { user, loading } = useAuth();
-  const location = useLocation();
+  // const location = useLocation();
 
   // 로딩 중일 때는 Loading 컴포넌트 표시
   if (loading) {
