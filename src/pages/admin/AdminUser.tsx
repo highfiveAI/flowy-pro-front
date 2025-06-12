@@ -367,6 +367,8 @@ const AdminUser: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
+  const [companyPositions, setCompanyPositions] = useState<{ [key: string]: Position[] }>({});
+  const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(null);
 
   // 모달 상태 관리
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -406,7 +408,10 @@ const AdminUser: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/`,
+        {
+          credentials: 'include',
+        }
       );
       const data = await response.json();
       // console.log('API 응답 데이터:', data); // 데이터 확인용 로그
@@ -420,7 +425,10 @@ const AdminUser: React.FC = () => {
   const fetchCompanies = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
+        {
+          credentials: 'include',
+        }
       );
       const data = await response.json();
       setCompanies(data);
@@ -432,7 +440,10 @@ const AdminUser: React.FC = () => {
   const fetchPositions = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
+        {
+          credentials: 'include',
+        }
       );
       const data = await response.json();
       setPositions(data);
@@ -441,12 +452,64 @@ const AdminUser: React.FC = () => {
     }
   };
 
-  // 컴포넌트 마운트 시 모든 데이터 가져오기
+  // 회사별 직급 데이터 가져오기
+  const fetchCompanyPositions = async (companyId: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}/positions/`,
+        {
+          credentials: 'include',
+        }
+      );
+      const data = await response.json();
+      setCompanyPositions(prev => ({
+        ...prev,
+        [companyId]: data
+      }));
+    } catch (error) {
+      console.error('회사별 직급 목록 조회 실패:', error);
+    }
+  };
+
+  // 현재 로그인한 사용자의 정보 가져오기
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/users/one`,
+        {
+          credentials: 'include',
+        }
+      );
+      if (!response.ok) {
+        throw new Error('사용자 정보 조회에 실패했습니다.');
+      }
+      const data = await response.json();
+      // 사용자의 회사 정보 설정
+      if (data.user_company_id) {
+        const company = companies.find(c => c.company_id === data.user_company_id);
+        setCurrentUserCompany(company || null);
+        // 회사의 직급 정보도 미리 가져오기
+        fetchCompanyPositions(data.user_company_id);
+      }
+    } catch (error) {
+      console.error('현재 사용자 정보 조회 실패:', error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
     fetchUsers();
     fetchCompanies();
     fetchPositions();
+    fetchCurrentUser();
   }, []);
+
+  // companies가 변경될 때 현재 사용자의 회사 정보 업데이트
+  useEffect(() => {
+    if (companies.length > 0) {
+      fetchCurrentUser();
+    }
+  }, [companies]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -456,6 +519,22 @@ const AdminUser: React.FC = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  // 회사 선택 시 해당 회사의 직급 목록 가져오기
+  const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const companyId = e.target.value;
+    handleInputChange(e);
+    
+    // 회사가 선택되었을 때만 직급 목록 가져오기
+    if (companyId) {
+      fetchCompanyPositions(companyId);
+      // 직급 초기화
+      setFormData(prev => ({
+        ...prev,
+        user_position_id: ''
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -468,6 +547,7 @@ const AdminUser: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(formData),
         }
       );
@@ -489,6 +569,7 @@ const AdminUser: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(formData),
         }
       );
@@ -508,6 +589,7 @@ const AdminUser: React.FC = () => {
           `${import.meta.env.VITE_API_URL}/api/v1/admin/users/${userId}`,
           {
             method: 'DELETE',
+            credentials: 'include',
           }
         );
         if (response.ok) {
@@ -520,7 +602,10 @@ const AdminUser: React.FC = () => {
   };
 
   const handleCreateClick = () => {
-    setFormData(initialFormData);
+    setFormData({
+      ...initialFormData,
+      user_company_id: currentUserCompany?.company_id || ''
+    });
     setIsCreateModalOpen(true);
   };
 
@@ -535,7 +620,7 @@ const AdminUser: React.FC = () => {
       user_dept_name: user.user_dept_name || '',
       user_team_name: user.user_team_name || '',
       user_jobname: user.user_jobname || '',
-      user_company_id: user.user_company_id || '',
+      user_company_id: currentUserCompany?.company_id || '',
       user_position_id: user.user_position_id || '',
       user_sysrole_id: '4864c9d2-7f9c-4862-9139-4e8b0ed117f4',
       signup_completed_status: user.signup_completed_status || '',
@@ -543,6 +628,12 @@ const AdminUser: React.FC = () => {
       position_name: user.position_name || '',
       sysrole_name: user.sysrole_name || '',
     });
+    
+    // 회사 ID가 있으면 해당 회사의 직급 목록 가져오기
+    if (currentUserCompany?.company_id) {
+      fetchCompanyPositions(currentUserCompany.company_id);
+    }
+    
     setIsEditModalOpen(true);
   };
 
@@ -556,6 +647,7 @@ const AdminUser: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({ status: newStatus }),
         }
       );
@@ -588,6 +680,13 @@ const AdminUser: React.FC = () => {
   const filteredUsers = useMemo(() => {
     let filtered = [...users];
 
+    // 현재 사용자의 회사에 속한 사용자들만 필터링
+    if (currentUserCompany) {
+      filtered = filtered.filter(
+        (user) => user.user_company_id === currentUserCompany.company_id
+      );
+    }
+
     // Pending 필터 적용
     if (showPendingOnly) {
       filtered = filtered.filter(
@@ -608,7 +707,7 @@ const AdminUser: React.FC = () => {
     }
 
     return filtered;
-  }, [users, showPendingOnly, sortState]);
+  }, [users, showPendingOnly, sortState, currentUserCompany]);
 
   return (
     <Container>
@@ -827,16 +926,17 @@ const AdminUser: React.FC = () => {
                 <label>회사</label>
                 <Select
                   name="user_company_id"
-                  value={formData.user_company_id}
-                  onChange={handleInputChange}
+                  value={currentUserCompany?.company_id || ''}
+                  onChange={handleCompanyChange}
                   required
+                  disabled
                 >
                   <option value="">회사 선택</option>
-                  {companies.map((company) => (
-                    <option key={company.company_id} value={company.company_id}>
-                      {company.company_name}
+                  {currentUserCompany && (
+                    <option value={currentUserCompany.company_id}>
+                      {currentUserCompany.company_name}
                     </option>
-                  ))}
+                  )}
                 </Select>
               </FormGroup>
               <FormGroup>
@@ -846,9 +946,10 @@ const AdminUser: React.FC = () => {
                   value={formData.user_position_id}
                   onChange={handleInputChange}
                   required
+                  disabled={!formData.user_company_id}
                 >
                   <option value="">직급 선택</option>
-                  {positions.map((position) => (
+                  {formData.user_company_id && companyPositions[formData.user_company_id]?.map((position) => (
                     <option key={position.position_id} value={position.position_id}>
                       {position.position_name}
                     </option>
@@ -965,16 +1066,17 @@ const AdminUser: React.FC = () => {
                 <label>회사</label>
                 <Select
                   name="user_company_id"
-                  value={formData.user_company_id}
-                  onChange={handleInputChange}
+                  value={currentUserCompany?.company_id || ''}
+                  onChange={handleCompanyChange}
                   required
+                  disabled
                 >
                   <option value="">회사 선택</option>
-                  {companies.map((company) => (
-                    <option key={company.company_id} value={company.company_id}>
-                      {company.company_name}
+                  {currentUserCompany && (
+                    <option value={currentUserCompany.company_id}>
+                      {currentUserCompany.company_name}
                     </option>
-                  ))}
+                  )}
                 </Select>
               </FormGroup>
               <FormGroup>
@@ -984,9 +1086,10 @@ const AdminUser: React.FC = () => {
                   value={formData.user_position_id}
                   onChange={handleInputChange}
                   required
+                  disabled={!formData.user_company_id}
                 >
                   <option value="">직급 선택</option>
-                  {positions.map((position) => (
+                  {formData.user_company_id && companyPositions[formData.user_company_id]?.map((position) => (
                     <option key={position.position_id} value={position.position_id}>
                       {position.position_name}
                     </option>
