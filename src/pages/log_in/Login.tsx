@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import type { ChangeEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import NavbarSub from '../../components/NavbarSub';
 import { useAuth } from '../../contexts/AuthContext';
+import Navbar from '../../components/Navbar';
 
 const LoginWrapper = styled.div`
   min-height: 100vh;
@@ -170,7 +170,7 @@ interface FormData {
 }
 
 const Login: React.FC = () => {
-  const { user, setUser } = useAuth();
+  const { setUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || '/';
@@ -200,7 +200,7 @@ const Login: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: formData.username,
+            login_id: formData.username,
             password: formData.password,
           }),
         }
@@ -236,10 +236,8 @@ const Login: React.FC = () => {
 
   return (
     <LoginWrapper>
-      {/* <NavbarSub isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /> */}
+      <Navbar />
       <LoginFormContainer onSubmit={handleSubmit}>
-        <LogoImg src="/images/flowyLogo.svg" alt="Flowy PRO Logo" />
-
         <InputGroup>
           <InputLabel htmlFor="username">아이디</InputLabel>
           <InputField
