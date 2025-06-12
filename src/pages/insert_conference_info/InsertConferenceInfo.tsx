@@ -281,14 +281,49 @@ const InsertConferenceInfo: React.FC = () => {
         console.log('STT 서버 응답:', sttResult);
         console.log('Meeting 서버 응답:', meetingResult);
         
-        alert('업로드가 완료되었습니다.');
-        setSubject('');
-        setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
-        setFile(null);
-        setAgenda('');
-        setMeetingDate(null);
-        setResult(sttResult); // STT 결과를 결과로 설정
-        setIsCompleted(true);
+        // === analyze-meeting 연속 호출 추가 ===
+        const meetingId = meetingResult.meeting_id;
+        if (meetingId) {
+          const analyzeFormData = new FormData();
+          analyzeFormData.append('meeting_id', meetingId);
+          analyzeFormData.append('project_name', projectName);
+          analyzeFormData.append('subject', subject);
+          analyzeFormData.append('chunks', JSON.stringify(sttResult.chunks || []));
+          analyzeFormData.append('attendees_list', JSON.stringify(attendees));
+          analyzeFormData.append('agenda', agenda);
+          if (meetingDate) {
+            analyzeFormData.append('meeting_date', formatDateToKST(meetingDate));
+          } else {
+            analyzeFormData.append('meeting_date', '');
+          }
+
+          const analyzeResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/v1/stt/analyze-meeting/`,
+            {
+              method: 'POST',
+              body: analyzeFormData,
+              credentials: 'include',
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+              }
+            }
+          );
+          const analyzeData = await analyzeResponse.json();
+          console.log('분석 결과:', analyzeData);
+
+          alert('업로드가 완료되었습니다.');
+          setSubject('');
+          setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+          setFile(null);
+          setAgenda('');
+          setMeetingDate(null);
+          setResult(analyzeData); // 분석 결과를 결과로 설정
+          setIsCompleted(true);
+        } else {
+          alert('업로드가 완료되었지만, 분석 결과를 가져오지 못했습니다.');
+          setResult(null);
+          setIsCompleted(true);
+        }
       } catch (error) {
         setError(
           error instanceof Error

@@ -41,18 +41,21 @@ const LinkItem = styled.a`
 
 const ResultContents: React.FC<{ result: any }> = ({ result }) => {
   // 실제 데이터가 있는 경로로 콘솔 로그 추가
-  console.log('result.tagging.assigned_roles.assigned_roles.assigned_todos:', result?.tagging?.assigned_roles?.assigned_roles?.assigned_todos);
-  console.log('result.tagging.feedback.feedback:', result?.tagging?.feedback?.feedback);
-  console.log('result.tagging.summary.agent_output:', result?.tagging?.summary?.agent_output);
-
+  const assignedRoles = result?.tagging?.assigned_roles?.assigned_roles?.assigned_todos;
+  const feedback = result?.tagging?.feedback?.feedback;
+  const summary = result?.tagging?.summary?.agent_output;
+  console.log('tagging:', result?.tagging);
+  console.log('assignedRoles:', assignedRoles);
+  console.log('feedback:', feedback);
+  console.log('summary:', summary);
   if (!result) return null;
 
   return (
     <Wrapper>
       <div style={{ fontWeight: 'bold', fontSize: '1.2em', margin: '1.5em 0 0.5em 0' }}>요약</div>
       <Box>
-        {result?.tagging?.summary?.agent_output
-          ? Object.entries(result.tagging.summary.agent_output).map(([key, arr]: [string, any]) => (
+        {agentOutput
+          ? Object.entries(agentOutput).map(([key, arr]: [string, any]) => (
               <div key={key} style={{ marginBottom: '0.7em' }}>
                 <strong>{key}</strong>
                 <ul style={{ margin: '0.2em 0 0.2em 1.2em', padding: 0 }}>
@@ -66,10 +69,10 @@ const ResultContents: React.FC<{ result: any }> = ({ result }) => {
       </Box>
       <div style={{ fontWeight: 'bold', fontSize: '1.2em', margin: '1.5em 0 0.5em 0' }}>역할분담</div>
       <Box>
-        {Array.isArray(result?.tagging?.assigned_roles?.assigned_roles?.assigned_todos) && result.tagging.assigned_roles.assigned_roles.assigned_todos.length > 0
+        {Array.isArray(assignedTodos) && assignedTodos.length > 0
           ? (
             <ul style={{ margin: 0, padding: 0 }}>
-              {result.tagging.assigned_roles.assigned_roles.assigned_todos.map((todo: any, idx: number) => (
+              {assignedTodos.map((todo: any, idx: number) => (
                 <li key={idx} style={{ marginBottom: '0.3em', marginLeft: '1em' }}>
                   <strong>{todo.assignee}</strong> : {todo.action}
                   {todo.schedule && todo.schedule.trim() !== ''
@@ -86,8 +89,8 @@ const ResultContents: React.FC<{ result: any }> = ({ result }) => {
       </Box>
       <div style={{ fontWeight: 'bold', fontSize: '1.2em', margin: '1.5em 0 0.5em 0' }}>피드백</div>
       <Box>
-        {result?.tagging?.feedback?.feedback
-          ? Object.entries(result.tagging.feedback.feedback).map(([key, value]: [string, any]) => (
+        {feedback
+          ? Object.entries(feedback).map(([key, value]: [string, any]) => (
               <div key={key} style={{ marginBottom: '0.7em' }}>
                 <strong>{key}</strong>
                 <div style={{ marginLeft: '1em', whiteSpace: 'pre-line' }}>
