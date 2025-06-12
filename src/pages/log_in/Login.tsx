@@ -5,7 +5,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Navbar from '../../components/Navbar';
 
-
 const LoginWrapper = styled.div`
   min-height: 100vh;
   background: radial-gradient(

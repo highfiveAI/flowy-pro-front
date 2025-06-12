@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
 // 스타일 컴포넌트 재사용
@@ -165,6 +165,59 @@ const CloseButton = styled.button`
   }
 `;
 
+// 정렬 방향을 위한 타입
+type SortDirection = 'asc' | 'desc' | null;
+
+// 정렬 상태를 위한 인터페이스
+interface SortState {
+  field: string;
+  direction: SortDirection;
+}
+
+// 테이블 헤더 스타일 컴포넌트
+const TableHeader = styled.th`
+  background-color: #f8fafc;
+  color: #64748b;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 1rem;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+
+  &:hover {
+    background-color: #f1f5f9;
+  }
+`;
+
+const SortIcon = styled.span<{ $direction: SortDirection }>`
+  display: inline-block;
+  margin-left: 4px;
+  vertical-align: middle;
+
+  &::before,
+  &::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+  }
+
+  &::before {
+    border-bottom: 4px solid
+      ${(props) => (props.$direction === 'asc' ? '#2563eb' : '#cbd5e1')};
+    margin-bottom: 2px;
+  }
+
+  &::after {
+    border-top: 4px solid
+      ${(props) => (props.$direction === 'desc' ? '#2563eb' : '#cbd5e1')};
+  }
+`;
+
 const AdminPosition: React.FC = () => {
   const [positions, setPositions] = useState<Position[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -176,6 +229,12 @@ const AdminPosition: React.FC = () => {
     position_code: '',
     position_name: '',
     position_detail: '',
+  });
+
+  // 정렬 상태 추가
+  const [sortState, setSortState] = useState<SortState>({
+    field: '',
+    direction: null,
   });
 
   // 직급 목록 조회
@@ -284,6 +343,37 @@ const AdminPosition: React.FC = () => {
     setIsEditModalOpen(true);
   };
 
+  // 정렬 핸들러 추가
+  const handleSort = (field: string) => {
+    setSortState((prev) => ({
+      field,
+      direction:
+        prev.field === field
+          ? prev.direction === 'asc'
+            ? 'desc'
+            : prev.direction === 'desc'
+            ? null
+            : 'asc'
+          : 'asc',
+    }));
+  };
+
+  // 정렬된 직급 목록 계산
+  const sortedPositions = useMemo(() => {
+    let sorted = [...positions];
+    if (sortState.direction !== null) {
+      sorted.sort((a, b) => {
+        const aValue = String(a[sortState.field as keyof Position] || '');
+        const bValue = String(b[sortState.field as keyof Position] || '');
+        
+        return sortState.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    }
+    return sorted;
+  }, [positions, sortState]);
+
   return (
     <Container>
       <MainContent>
@@ -297,13 +387,34 @@ const AdminPosition: React.FC = () => {
         <Table>
           <thead>
             <tr>
-              <th>직급 코드</th>
-              <th>직급명</th>
-              <th>레벨</th>
+              <TableHeader onClick={() => handleSort('position_code')}>
+                직급 코드
+                <SortIcon
+                  $direction={
+                    sortState.field === 'position_code' ? sortState.direction : null
+                  }
+                />
+              </TableHeader>
+              <TableHeader onClick={() => handleSort('position_name')}>
+                직급명
+                <SortIcon
+                  $direction={
+                    sortState.field === 'position_name' ? sortState.direction : null
+                  }
+                />
+              </TableHeader>
+              <TableHeader onClick={() => handleSort('position_detail')}>
+                레벨
+                <SortIcon
+                  $direction={
+                    sortState.field === 'position_detail' ? sortState.direction : null
+                  }
+                />
+              </TableHeader>
             </tr>
           </thead>
           <tbody>
-            {positions.map((position) => (
+            {sortedPositions.map((position) => (
               <tr
                 key={position.position_id}
                 onClick={() => handleRowClick(position)}
