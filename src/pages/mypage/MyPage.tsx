@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { postLogin } from '../../api/fetchMypage';
 
 const MyPageWrapper = styled.div`
   display: flex;
@@ -99,13 +100,19 @@ const MyPage: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (true) {
+  const handleLogin = async () => {
+    const result = await postLogin({
+      login_id: user?.login_id || '',
+      password,
+    });
+
+    if (result) {
+      console.log('✅ 로그인 성공:', result);
       setError('');
       navigate('/mypage/alterInfo');
     } else {
       setError('입력하신 비밀번호가 올바르지 않습니다.');
+      console.log('❌ 로그인 실패');
     }
   };
 
@@ -114,31 +121,21 @@ const MyPage: React.FC = () => {
       <PageTitle>마이페이지</PageTitle>
       <FormArea>
         <FormContainer>
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <InputGroup>
-              <Label htmlFor="id">아이디</Label>
-              <Input type="text" id="id" value={user?.email} readOnly />
-            </InputGroup>
-            <InputGroup>
-              <Label htmlFor="password">비밀번호</Label>
-              <Input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </InputGroup>
-            {error && <ErrorText>{error}</ErrorText>}
-            <Button type="submit">내 정보 확인하기</Button>
-          </form>
+          <InputGroup>
+            <Label htmlFor="id">아이디</Label>
+            <Input type="text" id="id" value={user?.login_id} readOnly />
+          </InputGroup>
+          <InputGroup>
+            <Label htmlFor="password">비밀번호</Label>
+            <Input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </InputGroup>
+          {error && <ErrorText>{error}</ErrorText>}
+          <Button onClick={() => handleLogin()}>내 정보 확인하기</Button>
         </FormContainer>
       </FormArea>
     </MyPageWrapper>

@@ -128,7 +128,7 @@ const SocialSignUp: React.FC = () => {
     email: '',
     phone: '',
     username: '',
-    // password: "",
+    password: '',
     confirmPassword: '',
     company: '',
     department: '',
@@ -166,6 +166,10 @@ const SocialSignUp: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/social_signup`,
@@ -178,7 +182,7 @@ const SocialSignUp: React.FC = () => {
             // name: formData.name,
             // email: formData.email,
             login_id: formData.username,
-            password: null,
+            password: formData.password,
             phone: formData.phone,
             company: formData.company,
             department: formData.department,
@@ -250,6 +254,30 @@ const SocialSignUp: React.FC = () => {
                 name="username"
                 type="text"
                 placeholder="영문소문자/숫자, 6~16자"
+                required
+                onChange={handleChange}
+              />
+            </InputGroup>
+            <InputGroup>
+              <Label>
+                비밀번호 <StyledAsterisk>*</StyledAsterisk>
+              </Label>
+              <Input
+                name="password"
+                type="password"
+                placeholder="영문소문자/숫자, 6~16자"
+                required
+                onChange={handleChange}
+              />
+            </InputGroup>
+            <InputGroup>
+              <Label>
+                비밀번호 확인 <StyledAsterisk>*</StyledAsterisk>
+              </Label>
+              <Input
+                name="confirmPassword"
+                type="password"
+                placeholder="비밀번호를 다시 입력하세요"
                 required
                 onChange={handleChange}
               />

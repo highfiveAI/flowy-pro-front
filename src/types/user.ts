@@ -1,3 +1,5 @@
+import type { Company } from '../api/fetchSignupInfos';
+
 export interface User {
   user_id: string;
   user_name: string;
@@ -12,4 +14,16 @@ export interface User {
   user_company_id: string;
   user_position_id: string;
   user_sysrole_id: string;
+  company: Company;
+}
+
+export interface UserUpdateRequest {
+  user_team_name?: string;
+  user_dept_name?: string;
+  user_phonenum?: string;
+}
+
+export interface LoginRequest {
+  login_id: string;
+  password: string;
 }
