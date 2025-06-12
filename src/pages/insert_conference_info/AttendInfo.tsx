@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from 'styled-components';
 
 type Attendee = { user_id: string; name: string; email: string; user_jobname: string };
@@ -88,6 +88,10 @@ const StyledSelect = styled.select`
 `;
 
 const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projectUsers = [] }) => {
+  const [hostId, setHostId] = useState('');
+  const [hostEmail, setHostEmail] = useState('');
+  const [hostJobname, setHostJobname] = useState('');
+
   const handleAttendeeChange = (idx: number, field: string, value: string) => {
     const updated = [...attendees];
     updated[idx] = { ...updated[idx], [field]: value };
@@ -122,8 +126,43 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projec
     }
   };
 
+  const handleHostSelect = (user_id: string) => {
+    setHostId(user_id);
+    const selectedUser = projectUsers.find(u => u.user_id === user_id);
+    if (selectedUser) {
+      setHostEmail(selectedUser.email || '');
+      setHostJobname(selectedUser.user_jobname || '');
+    } else {
+      setHostEmail('');
+      setHostJobname('');
+    }
+  };
+
   return (
     <AttendInfoWrapper>
+      <AttendeeInputGroup>
+        <StyledSelect
+          value={hostId}
+          onChange={e => handleHostSelect(e.target.value)}
+        >
+          <option value="">회의장 선택</option>
+          {projectUsers.map(user => (
+            <option key={user.user_id} value={user.user_id}>{user.name}</option>
+          ))}
+        </StyledSelect>
+        <EmailInput
+          type="email"
+          placeholder="이메일"
+          value={hostEmail}
+          readOnly
+        />
+        <RoleInput
+          type="text"
+          placeholder="역할"
+          value={hostJobname}
+          readOnly
+        />
+      </AttendeeInputGroup>
       {attendees.map((att, idx) => (
         <AttendeeInputGroup key={idx}>
           <StyledSelect
@@ -131,9 +170,11 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projec
             onChange={e => handleUserSelect(idx, e.target.value)}
           >
             <option value="">참석자 선택</option>
-            {projectUsers.map(user => (
-              <option key={user.user_id} value={user.user_id}>{user.name}</option>
-            ))}
+            {projectUsers
+              .filter(user => user.user_id !== hostId)
+              .map(user => (
+                <option key={user.user_id} value={user.user_id}>{user.name}</option>
+              ))}
           </StyledSelect>
           <EmailInput
             type="email"
