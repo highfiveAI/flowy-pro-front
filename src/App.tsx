@@ -37,66 +37,102 @@ function App() {
           <Route path="/result" element={<Result />} />
 
           {/* 보호된 라우트 */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/insert_info" element={
-            <ProtectedRoute>
-              <InsertConferenceInfo />
-            </ProtectedRoute>
-          } />
-          <Route path="/docs_agent_test" element={
-            <ProtectedRoute>
-              <DocsAgentTest />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/user" element={
-            <ProtectedRoute>
-              <AdminUser />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/company" element={
-            <ProtectedRoute>
-              <AdminCom />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/position" element={
-            <ProtectedRoute>
-              <AdminPosition />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/template" element={
-            <ProtectedRoute>
-              <AdminTemplate />
-            </ProtectedRoute>
-          } />
-          <Route path="/mypage" element={
-            <ProtectedRoute>
-              <MyPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/mypage/alterInfo" element={
-            <ProtectedRoute>
-              <AlterInfo />
-            </ProtectedRoute>
-          } />
-          <Route path="/calendar" element={
-            <ProtectedRoute>
-              <Calendar />
-            </ProtectedRoute>
-          } />
-          <Route path="/projectlist" element={
-            <ProtectedRoute>
-              <ProjectListPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/conferencelist" element={
-            <ProtectedRoute>
-              <ConferenceListPage />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/insert_info"
+            element={
+              <ProtectedRoute>
+                <InsertConferenceInfo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/docs_agent_test"
+            element={
+              <ProtectedRoute>
+                <DocsAgentTest />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/user"
+            element={
+              <ProtectedRoute>
+                <AdminUser />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/company"
+            element={
+              <ProtectedRoute>
+                <AdminCom />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/position"
+            element={
+              <ProtectedRoute>
+                <AdminPosition />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/template"
+            element={
+              <ProtectedRoute>
+                <AdminTemplate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mypage"
+            element={
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mypage/alterInfo"
+            element={
+              <ProtectedRoute>
+                <AlterInfo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <ProtectedRoute>
+                <Calendar />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projectlist"
+            element={
+              <ProtectedRoute>
+                <ProjectListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/conferencelist"
+            element={
+              <ProtectedRoute>
+                <ConferenceListPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </AuthProvider>

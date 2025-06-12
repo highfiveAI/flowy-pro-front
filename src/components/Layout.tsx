@@ -51,9 +51,14 @@ const Layout: React.FC = () => {
   }
 
   // 로그인하지 않은 상태에서 보호된 라우트에 접근하려고 할 때
-  if (!user && location.pathname !== '/login' && location.pathname !== '/sign_up') {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  // if (
+  //   !user &&
+  //   location.pathname !== '/' &&
+  //   location.pathname !== '/login' &&
+  //   location.pathname !== '/sign_up'
+  // ) {
+  //   return <Navigate to="/login" state={{ from: location }} replace />;
+  // }
 
   // 로그인한 상태일 때는 기존 레이아웃 사용
   if (user) {
@@ -69,9 +74,12 @@ const Layout: React.FC = () => {
 
   // 로그인하지 않은 상태일 때는 공개 레이아웃 사용 (로그인, 회원가입 페이지 등)
   return (
-    <PublicLayoutWrapper>
-      <Outlet />
-    </PublicLayoutWrapper>
+    <LayoutWrapper>
+      <Navbar />
+      <MainContent>
+        <Outlet />
+      </MainContent>
+    </LayoutWrapper>
   );
 };
 
