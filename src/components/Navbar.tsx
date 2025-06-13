@@ -121,7 +121,7 @@ const DropdownMenu = styled.div<{ $isOpen: boolean }>`
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: ${props => props.$isOpen ? 'block' : 'none'};
+  display: ${(props) => (props.$isOpen ? 'block' : 'none')};
   min-width: 150px;
   z-index: 1000;
 `;
@@ -144,11 +144,11 @@ const Navbar: React.FC = () => {
   const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
 
   const systemMenuItems = [
-    { name: "문서 에이전트", path: "/docs_agent_test" },
-    { name: "사용자 관리", path: "/admin/user" },
-    { name: "회사 관리", path: "/admin/company" },
-    { name: "직책 관리", path: "/admin/position" },
-    { name: "템플릿 관리", path: "/admin/template" }
+    { name: '문서 에이전트', path: '/docs_agent_test' },
+    { name: '사용자 관리', path: '/admin/user' },
+    { name: '회사 관리', path: '/admin/company' },
+    { name: '직책 관리', path: '/admin/position' },
+    { name: '템플릿 관리', path: '/admin/template' },
   ];
 
   const handleLogout = async () => {
@@ -187,7 +187,7 @@ const Navbar: React.FC = () => {
             작업 관리
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
-          <MenuItem 
+          <MenuItem
             onMouseEnter={() => setIsSystemMenuOpen(true)}
             onMouseLeave={() => setIsSystemMenuOpen(false)}
             style={{ position: 'relative' }}
@@ -196,10 +196,7 @@ const Navbar: React.FC = () => {
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
             <DropdownMenu $isOpen={isSystemMenuOpen}>
               {systemMenuItems.map((item, index) => (
-                <DropdownItem 
-                  key={index}
-                  onClick={() => navigate(item.path)}
-                >
+                <DropdownItem key={index} onClick={() => navigate(item.path)}>
                   {item.name}
                 </DropdownItem>
               ))}
@@ -213,13 +210,13 @@ const Navbar: React.FC = () => {
       </Left>
       <Right>
         {user ? (
-          <ProfileSection onClick={() => handleLogout()}>
+          <ProfileSection>
             <ProfileIconCircle>
               <ProfileIcon viewBox="0 0 24 24">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </ProfileIcon>
             </ProfileIconCircle>
-            <LogoutText>로그아웃</LogoutText>
+            <LogoutText onClick={() => handleLogout()}>로그아웃</LogoutText>
           </ProfileSection>
         ) : (
           <>
@@ -236,4 +233,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

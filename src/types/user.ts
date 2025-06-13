@@ -17,13 +17,23 @@ export interface User {
   company: Company;
 }
 
+// 마이페이지 수정 인터페이스
 export interface UserUpdateRequest {
   user_team_name?: string;
   user_dept_name?: string;
   user_phonenum?: string;
 }
 
+// 마이페이지 인증 인터페이스
 export interface LoginRequest {
   login_id: string;
   password: string;
+}
+
+// 토큰 유저 인터페이스
+export interface TokenUser {
+  id: string;
+  name: string;
+  email: string;
+  login_id: string;
 }

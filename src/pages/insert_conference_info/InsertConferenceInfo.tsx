@@ -13,6 +13,7 @@ import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg �
 import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
 import { useAuth } from '../../contexts/AuthContext';
+import { checkAuth } from '../../api/fetchAuthCheck';
 
 const StyledErrorMessage = styled.div`
   color: #dc3545; /* 밝은 노란색에서 붉은색으로 변경 */
@@ -117,7 +118,6 @@ const NewProjectTextsContainer = styled.div`
   gap: 0px; /* 텍스트 간격 조정 */
 `;
 
-
 // 날짜를 'YYYY-MM-DD HH:mm:ss' 형식으로 변환하는 함수
 function formatDateToKST(date: Date): string {
   const year = date.getFullYear();
@@ -130,13 +130,13 @@ function formatDateToKST(date: Date): string {
 }
 
 const InsertConferenceInfo: React.FC = () => {
-  const { user } = useAuth();
+  const { user, setUser, setLoading } = useAuth();
   const navigate = useNavigate();
   const [isCompleted, setIsCompleted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [subject, setSubject] = React.useState('');
   const [attendees, setAttendees] = React.useState([
-    { user_id: '', name: '', email: '', user_jobname: '' }
+    { user_id: '', name: '', email: '', user_jobname: '' },
   ]);
   const [file, setFile] = React.useState<File | null>(null);
   const [error, setError] = React.useState<string>('');
@@ -145,9 +145,10 @@ const InsertConferenceInfo: React.FC = () => {
   const [result, setResult] = React.useState<any>(null);
   const [projectName, setProjectName] = React.useState<string>('');
   const [projectId, setProjectId] = React.useState<string>('');
-  const [username, setUsername] = React.useState<string>(''); 
+  const [username, setUsername] = React.useState<string>('');
 
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
+
   const [projects, setProjects] = React.useState<{userName: string, projectName: string, projectId: string}[]>([]); // projectId 필드 추가
   const [projectUsers, setProjectUsers] = React.useState<{user_id: string, name: string, email: string, user_jobname: string}[]>([]); // 프로젝트 참여자 목록 상태 추가
   const [hostId, setHostId] = React.useState('');
@@ -155,18 +156,29 @@ const InsertConferenceInfo: React.FC = () => {
   React.useEffect(() => {
     setUsername(user?.name || '');
   }, [user]);
+    
+   React.useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
   
+
   // user.id로 프로젝트 목록과 사용자 이름 불러오기
   React.useEffect(() => {
     if (!user?.id) return;
     fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/projects/${user.id}`, {
       credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         console.log('전체 응답 데이터:', data);
         console.log('프로젝트 목록 데이터:', data.projects);
         if (data.projects && data.projects.length > 0) {
@@ -175,7 +187,9 @@ const InsertConferenceInfo: React.FC = () => {
         setProjects(data.projects);
         // projects에서 첫 번째 userName을 username으로 저장
         // if (data.projects && data.projects.length > 0) {
+
         //   setUsername(data.projects[0].userName || data.projects[0][0] || '알 수 없음');
+
         // } else {
         //   setUsername('알 수 없음');
         // }
@@ -183,7 +197,10 @@ const InsertConferenceInfo: React.FC = () => {
   }, [user?.id]);
 
   const handleAddAttendee = () => {
-    setAttendees([...attendees, { user_id: '', name: '', email: '', user_jobname: '' }]);
+    setAttendees([
+      ...attendees,
+      { user_id: '', name: '', email: '', user_jobname: '' },
+    ]);
   };
 
   const validateForm = (): boolean => {
@@ -199,7 +216,9 @@ const InsertConferenceInfo: React.FC = () => {
 
     const hasEmptyFields = attendees.some(
       (attendee) =>
-        !attendee.name.trim() || !attendee.email.trim() || !attendee.user_jobname.trim()
+        !attendee.name.trim() ||
+        !attendee.email.trim() ||
+        !attendee.user_jobname.trim()
     );
 
     if (hasEmptyFields) {
@@ -221,10 +240,9 @@ const InsertConferenceInfo: React.FC = () => {
 
     setIsLoading(true);
     console.log('함수 실행중...');
-    const formData = new FormData();
-    
-    if (file) {
+    // const formData = new FormData();
 
+    if (file) {
       // STT API용 FormData
       const hostUser = projectUsers.find(u => u.user_id === hostId);
       const hostName = hostUser?.name || '';
@@ -303,21 +321,23 @@ const InsertConferenceInfo: React.FC = () => {
             body: meetingFormData,
             credentials: 'include',
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
           }
         );
 
         if (!meetingResponse.ok) {
           const errorData = await meetingResponse.json().catch(() => null);
-          throw new Error(errorData?.detail || '회의 정보 업로드에 실패했습니다.');
+          throw new Error(
+            errorData?.detail || '회의 정보 업로드에 실패했습니다.'
+          );
         }
 
         const sttResult = await sttResponse.json();
         const meetingResult = await meetingResponse.json();
         console.log('STT 서버 응답:', sttResult);
         console.log('Meeting 서버 응답:', meetingResult);
-        
+
         // === analyze-meeting 연속 호출 추가 ===
         const meetingId = meetingResult.meeting_id;
         if (meetingId) {
@@ -325,14 +345,19 @@ const InsertConferenceInfo: React.FC = () => {
           analyzeFormData.append('meeting_id', meetingId);
           analyzeFormData.append('project_name', projectName);
           analyzeFormData.append('subject', subject);
+
           analyzeFormData.append('chunks', JSON.stringify(sttResult.chunks || []));
           analyzeFormData.append('host_name', hostName);
           analyzeFormData.append('host_email', hostEmail);
           analyzeFormData.append('host_role', hostRole);
+
           analyzeFormData.append('attendees_list', JSON.stringify(attendees));
           analyzeFormData.append('agenda', agenda);
           if (meetingDate) {
-            analyzeFormData.append('meeting_date', formatDateToKST(meetingDate));
+            analyzeFormData.append(
+              'meeting_date',
+              formatDateToKST(meetingDate)
+            );
           } else {
             analyzeFormData.append('meeting_date', '');
           }
@@ -345,8 +370,8 @@ const InsertConferenceInfo: React.FC = () => {
               body: analyzeFormData,
               credentials: 'include',
               headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-              }
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
             }
           );
           const analyzeData = await analyzeResponse.json();
@@ -354,7 +379,9 @@ const InsertConferenceInfo: React.FC = () => {
 
           alert('업로드가 완료되었습니다.');
           setSubject('');
-          setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+          setAttendees([
+            { user_id: '', name: '', email: '', user_jobname: '' },
+          ]);
           setFile(null);
           setAgenda('');
           setMeetingDate(null);
@@ -378,25 +405,33 @@ const InsertConferenceInfo: React.FC = () => {
   };
 
   // 프로젝트 선택 핸들러 함수
-  const handleProjectSelect = async (projectId: string, projectName: string) => {
+  const handleProjectSelect = async (
+    projectId: string,
+    projectName: string
+  ) => {
     setProjectId(projectId);
     setProjectName(projectName);
     // 참여자 목록 불러오기
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/project-users/${projectId}`, {
-        credentials: 'include',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/stt/project-users/${projectId}`,
+        {
+          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         }
-      });
+      );
       const data = await res.json();
       console.log('API 응답 데이터:', data); // 디버깅을 위한 로그
-      setProjectUsers(data.users.map((u: any) => ({ 
-        user_id: u.user_id, 
-        name: u.name,
-        email: u.email,
-        user_jobname: u.user_jobname
-      })));
+      setProjectUsers(
+        data.users.map((u: any) => ({
+          user_id: u.user_id,
+          name: u.name,
+          email: u.email,
+          user_jobname: u.user_jobname,
+        }))
+      );
       setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]); // 항상 1개 이상 입력란 유지
     } catch (e) {
       console.error('프로젝트 사용자 정보를 가져오는데 실패했습니다:', e);
@@ -429,8 +464,8 @@ const InsertConferenceInfo: React.FC = () => {
             <ProjectList>
               {projects.length > 0 ? (
                 projects.map((proj, index) => (
-                  <ProjectListItem 
-                    key={index} 
+                  <ProjectListItem
+                    key={index}
                     onClick={() => {
                       handleProjectSelect(proj.projectId, proj.projectName);
                     }}
@@ -459,19 +494,19 @@ const InsertConferenceInfo: React.FC = () => {
             <Loading />
           ) : (
             <>
-
-                <FormGroup>
-                  <StyledLabel htmlFor="project-name">프로젝트명 <span>*</span></StyledLabel>
-                  <StyledInput
-                    type="text"
-                    id="project-name"
-                    value={projectName}
-                    readOnly
-                    placeholder="프로젝트 목록에서 선택해주세요."
-                    onClick={() => alert('프로젝트 목록중에서 선택해주세요')}
-                  />
-                </FormGroup>
-              
+              <FormGroup>
+                <StyledLabel htmlFor="project-name">
+                  프로젝트명 <span>*</span>
+                </StyledLabel>
+                <StyledInput
+                  type="text"
+                  id="project-name"
+                  value={projectName}
+                  readOnly
+                  placeholder="프로젝트 목록에서 선택해주세요."
+                  onClick={() => alert('프로젝트 목록중에서 선택해주세요')}
+                />
+              </FormGroup>
 
               <FormGroup>
                 <StyledLabel htmlFor="meeting-subject">
@@ -533,7 +568,6 @@ const InsertConferenceInfo: React.FC = () => {
                   hostId={hostId}
                   setHostId={setHostId}
                 />
-
               </FormGroup>
 
               <FormGroup>
@@ -745,23 +779,23 @@ const StyledTextarea = styled.textarea`
   }
 `;
 
-const StyledSelect = styled.select`
-  width: 100%;
-  padding: 12px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #333;
-  font-size: 1rem;
-  box-sizing: border-box;
-  -webkit-appearance: none; /* 기본 select 스타일 제거 */
-  -moz-appearance: none;
-  appearance: none;
-  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.1L146.2%20202.7%2018.5%2074.5a17.6%2017.6%200%200%200-25.1%2024.9l130.2%20129.8c6.8%206.7%2017.7%206.7%2024.5%200l130.2-129.8a17.6%2017.6%200%200%200-11.9-29.4z%22%2F%3E%3C%2Fsvg%3E'); /* 커스텀 화살표 */
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 12px;
-`;
+// const StyledSelect = styled.select`
+//   width: 100%;
+//   padding: 12px 15px;
+//   border: none;
+//   border-radius: 8px;
+//   background-color: rgba(255, 255, 255, 0.9);
+//   color: #333;
+//   font-size: 1rem;
+//   box-sizing: border-box;
+//   -webkit-appearance: none; /* 기본 select 스타일 제거 */
+//   -moz-appearance: none;
+//   appearance: none;
+//   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.1L146.2%20202.7%2018.5%2074.5a17.6%2017.6%200%200%200-25.1%2024.9l130.2%20129.8c6.8%206.7%2017.7%206.7%2024.5%200l130.2-129.8a17.6%2017.6%200%200%200-11.9-29.4z%22%2F%3E%3C%2Fsvg%3E"); /* 커스텀 화살표 */
+//   background-repeat: no-repeat;
+//   background-position: right 15px center;
+//   background-size: 12px;
+// `;
 
 const DatePickerWrapper = styled.div`
   .react-datepicker-wrapper {
