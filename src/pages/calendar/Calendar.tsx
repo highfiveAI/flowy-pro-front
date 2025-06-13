@@ -2,22 +2,21 @@
 // 설치 명령: npm install react-big-calendar moment
 // 타입: npm install --save-dev @types/react-big-calendar @types/moment
 
-import React, { useState } from 'react'
-import Calendar from 'react-calendar'
-import 'react-calendar/dist/Calendar.css'
-import styled from 'styled-components'
-import { INITIAL_EVENTS } from './event-utils'
-import type { CalendarEvent } from './event-utils'
-import { isSameDay } from 'date-fns'
-import { FaRegFileAlt } from 'react-icons/fa'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { useState } from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import styled from 'styled-components';
+import { INITIAL_EVENTS } from './event-utils';
+import { isSameDay } from 'date-fns';
+import { FaRegFileAlt } from 'react-icons/fa';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const CalendarWrapper = styled.div`
   max-width: 1100px;
   margin: 40px auto 0 auto;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(80,0,80,0.06);
+  box-shadow: 0 4px 24px rgba(80, 0, 80, 0.06);
   padding: 40px 32px 32px 32px;
 
   .react-calendar {
@@ -39,7 +38,7 @@ const CalendarWrapper = styled.div`
     padding: 8px 6px 4px 6px;
     text-align: left;
     background: #fff;
-    border: 1px solid #C7B8D9;
+    border: 1px solid #c7b8d9;
     border-radius: 0;
     box-shadow: none;
     position: relative;
@@ -47,7 +46,8 @@ const CalendarWrapper = styled.div`
   .react-calendar__tile abbr {
     display: none !important;
   }
-  .calendar-event, .calendar-todo {
+  .calendar-event,
+  .calendar-todo {
     font-size: 0.85rem;
     margin-top: 0;
   }
@@ -59,7 +59,7 @@ const CalendarWrapper = styled.div`
     padding: 4px 8px;
     margin-bottom: 4px;
     display: inline-block;
-    box-shadow: 0 2px 8px rgba(80,0,80,0.04);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.04);
   }
   .calendar-todo {
     display: flex;
@@ -74,14 +74,14 @@ const CalendarWrapper = styled.div`
     background: #f8f6fa;
   }
   .react-calendar__month-view__weekdays__weekday {
-    color: #5E5553;
+    color: #5e5553;
     padding: 8px 0;
-    border: 1px solid #C7B8D9;
+    border: 1px solid #c7b8d9;
     border-bottom: none;
     background: #f8f6fa;
   }
   .react-calendar__month-view__weekdays__weekday:first-child {
-    color: #C00F0CB2;
+    color: #c00f0cb2;
   }
   .react-calendar__month-view__weekdays__weekday:last-child {
     color: #283990;
@@ -93,7 +93,7 @@ const CalendarWrapper = styled.div`
   .react-calendar__tile--active {
     background: #fff !important;
   }
-`
+`;
 
 const HeaderBar = styled.div`
   display: flex;
@@ -106,7 +106,7 @@ const HeaderBar = styled.div`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #4B2067;
+  color: #4b2067;
   margin: 0 0 16px 0;
 `;
 const MonthNav = styled.div`
@@ -116,7 +116,7 @@ const MonthNav = styled.div`
   margin-bottom: 8px;
 `;
 const NavButton = styled.button`
-  border: 1.5px solid #C7B8D9;
+  border: 1.5px solid #c7b8d9;
   background: #fff;
   color: #351745;
   border-radius: 6px;
@@ -154,7 +154,7 @@ const FilterSelectBox = styled.div`
   display: flex;
   align-items: center;
   background: #fff;
-  border: 1.5px solid #E3D6F2;
+  border: 1.5px solid #e3d6f2;
   border-radius: 8px;
   padding: 0 18px 0 14px;
   height: 48px;
@@ -184,36 +184,46 @@ const ApplyButton = styled.button`
   margin-left: 8px;
   transition: background 0.15s;
   &:hover {
-    background: #4B2067;
+    background: #4b2067;
   }
 `;
 
 function formatYearMonth(date: Date) {
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}`;
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
+    2,
+    '0'
+  )}`;
 }
 
+type TileContentProps = {
+  date: Date;
+  view: 'month' | 'year' | 'decade' | 'century';
+};
+
 export default function CalendarPage() {
-  const [value, setValue] = useState(new Date(2025, 5, 1))
-  const [events, setEvents] = useState(INITIAL_EVENTS)
+  const [value, setValue] = useState(new Date(2025, 5, 1));
+  const [events, setEvents] = useState(INITIAL_EVENTS);
 
   const handleToggleTodo = (id: string) => {
-    setEvents(prevEvents => prevEvents.map(ev =>
-      ev.id === id && ev.type === 'todo'
-        ? { ...ev, completed: !ev.completed }
-        : ev
-    ));
-  }
+    setEvents((prevEvents) =>
+      prevEvents.map((ev) =>
+        ev.id === id && ev.type === 'todo'
+          ? { ...ev, completed: !ev.completed }
+          : ev
+      )
+    );
+  };
 
   // 월 이동 함수
   const handlePrevMonth = () => {
-    setValue(prev => {
+    setValue((prev) => {
       const d = new Date(prev);
       d.setMonth(d.getMonth() - 1);
       return d;
     });
   };
   const handleNextMonth = () => {
-    setValue(prev => {
+    setValue((prev) => {
       const d = new Date(prev);
       d.setMonth(d.getMonth() + 1);
       return d;
@@ -226,15 +236,19 @@ export default function CalendarPage() {
         <div>
           <Title>작업 관리</Title>
           <MonthNav>
-            <NavButton onClick={handlePrevMonth}><FiChevronLeft /></NavButton>
+            <NavButton onClick={handlePrevMonth}>
+              <FiChevronLeft />
+            </NavButton>
             <MonthText>{formatYearMonth(value)}</MonthText>
-            <NavButton onClick={handleNextMonth}><FiChevronRight /></NavButton>
+            <NavButton onClick={handleNextMonth}>
+              <FiChevronRight />
+            </NavButton>
           </MonthNav>
         </div>
         <RightBox>
           <FilterArea>
             <FilterSelectBox>
-              <FaRegFileAlt style={{fontSize:'1.2rem',opacity:0.7}} />
+              <FaRegFileAlt style={{ fontSize: '1.2rem', opacity: 0.7 }} />
               <FilterSelect>
                 <option value="Insightlog">Insightlog</option>
                 <option value="projectname1">projectname1</option>
@@ -247,28 +261,48 @@ export default function CalendarPage() {
       </HeaderBar>
       <Calendar
         value={value}
-        onChange={v => setValue(v as Date)}
-        tileContent={({ date, view }) => {
+        onChange={(v) => {
+          if (v && v instanceof Date) {
+            setValue(v);
+          }
+        }}
+        tileContent={(props: TileContentProps) => {
+          const { date, view } = props;
+
           if (view === 'month') {
             const day = date.getDate().toString().padStart(2, '0');
-            const dayTodos = events.filter(ev => ev.type === 'todo' && isSameDay(new Date(ev.start), date));
-            const dayMeetings = events.filter(ev => ev.type === 'meeting' && isSameDay(new Date(ev.start), date));
+            const dayTodos = events.filter(
+              (ev) => ev.type === 'todo' && isSameDay(new Date(ev.start), date)
+            );
+            const dayMeetings = events.filter(
+              (ev) =>
+                ev.type === 'meeting' && isSameDay(new Date(ev.start), date)
+            );
+
             return (
-              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                <span style={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 10,
-                  fontSize: '1.05rem',
-                  fontWeight: 500,
-                  color: '#333',
-                  zIndex: 2
-                }}>{day}</span>
+              <div
+                style={{ position: 'relative', width: '100%', height: '100%' }}
+              >
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 10,
+                    fontSize: '1.05rem',
+                    fontWeight: 500,
+                    color: '#333',
+                    zIndex: 2,
+                  }}
+                >
+                  {day}
+                </span>
                 <div style={{ width: '100%', paddingTop: 35 }}>
-                  {dayMeetings.map(m => (
-                    <div key={m.id} className="calendar-event">{m.title}</div>
+                  {dayMeetings.map((m) => (
+                    <div key={m.id} className="calendar-event">
+                      {m.title}
+                    </div>
                   ))}
-                  {dayTodos.map(t => (
+                  {dayTodos.map((t) => (
                     <div key={t.id} className="calendar-todo">
                       <input
                         type="checkbox"
@@ -276,18 +310,25 @@ export default function CalendarPage() {
                         onChange={() => handleToggleTodo(t.id)}
                         style={{ marginRight: 4 }}
                       />
-                      <span style={{ textDecoration: t.completed ? 'line-through' : 'none' }}>{t.title}</span>
+                      <span
+                        style={{
+                          textDecoration: t.completed ? 'line-through' : 'none',
+                        }}
+                      >
+                        {t.title}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             );
           }
+
           return null;
         }}
         formatDay={(_, date) => date.getDate().toString().padStart(2, '0')}
         locale="ko-KR"
       />
     </CalendarWrapper>
-  )
+  );
 }

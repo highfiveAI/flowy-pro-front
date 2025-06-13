@@ -1,7 +1,5 @@
-import type { EventInput } from '@fullcalendar/core'
-
-let eventGuid = 0
-let todayStr = new Date().toISOString().replace(/T.*$/, '') // YYYY-MM-DD of today
+let eventGuid = 0;
+// let todayStr = new Date().toISOString().replace(/T.*$/, '') // YYYY-MM-DD of today
 
 export type CalendarEvent = {
   id: string;
@@ -72,5 +70,5 @@ export const INITIAL_EVENTS: CalendarEvent[] = [
 ];
 
 export function createEventId() {
-  return String(eventGuid++)
+  return String(eventGuid++);
 }
