@@ -9,6 +9,8 @@ import styled from 'styled-components'
 import { INITIAL_EVENTS } from './event-utils'
 import type { CalendarEvent } from './event-utils'
 import { isSameDay } from 'date-fns'
+import { FaRegFileAlt } from 'react-icons/fa'
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
 const CalendarWrapper = styled.div`
   max-width: 1100px;
@@ -93,6 +95,103 @@ const CalendarWrapper = styled.div`
   }
 `
 
+const HeaderBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+`;
+
+const Title = styled.h1`
+  font-size: 2rem;
+  font-weight: 700;
+  color: #4B2067;
+  margin: 0 0 16px 0;
+`;
+const MonthNav = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+`;
+const NavButton = styled.button`
+  border: 1.5px solid #C7B8D9;
+  background: #fff;
+  color: #351745;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover {
+    background: #f3e6ff;
+  }
+`;
+const MonthText = styled.span`
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  min-width: 120px;
+  text-align: center;
+  user-select: none;
+`;
+const RightBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+const FilterArea = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+const FilterSelectBox = styled.div`
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid #E3D6F2;
+  border-radius: 8px;
+  padding: 0 18px 0 14px;
+  height: 48px;
+  min-width: 220px;
+  font-size: 1.08rem;
+  color: #351745;
+  gap: 10px;
+`;
+const FilterSelect = styled.select`
+  border: none;
+  background: transparent;
+  font-size: 1.08rem;
+  color: #351745;
+  outline: none;
+  padding: 0 8px;
+`;
+const ApplyButton = styled.button`
+  background: #351745;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  height: 48px;
+  padding: 0 32px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background 0.15s;
+  &:hover {
+    background: #4B2067;
+  }
+`;
+
+function formatYearMonth(date: Date) {
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
 export default function CalendarPage() {
   const [value, setValue] = useState(new Date(2025, 5, 1))
   const [events, setEvents] = useState(INITIAL_EVENTS)
@@ -105,8 +204,47 @@ export default function CalendarPage() {
     ));
   }
 
+  // 월 이동 함수
+  const handlePrevMonth = () => {
+    setValue(prev => {
+      const d = new Date(prev);
+      d.setMonth(d.getMonth() - 1);
+      return d;
+    });
+  };
+  const handleNextMonth = () => {
+    setValue(prev => {
+      const d = new Date(prev);
+      d.setMonth(d.getMonth() + 1);
+      return d;
+    });
+  };
+
   return (
     <CalendarWrapper>
+      <HeaderBar>
+        <div>
+          <Title>작업 관리</Title>
+          <MonthNav>
+            <NavButton onClick={handlePrevMonth}><FiChevronLeft /></NavButton>
+            <MonthText>{formatYearMonth(value)}</MonthText>
+            <NavButton onClick={handleNextMonth}><FiChevronRight /></NavButton>
+          </MonthNav>
+        </div>
+        <RightBox>
+          <FilterArea>
+            <FilterSelectBox>
+              <FaRegFileAlt style={{fontSize:'1.2rem',opacity:0.7}} />
+              <FilterSelect>
+                <option value="Insightlog">Insightlog</option>
+                <option value="projectname1">projectname1</option>
+                <option value="projectname2">projectname2</option>
+              </FilterSelect>
+            </FilterSelectBox>
+            <ApplyButton>적용</ApplyButton>
+          </FilterArea>
+        </RightBox>
+      </HeaderBar>
       <Calendar
         value={value}
         onChange={v => setValue(v as Date)}
