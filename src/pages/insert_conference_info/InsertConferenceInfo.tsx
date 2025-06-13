@@ -13,6 +13,7 @@ import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg �
 import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
 import { useAuth } from '../../contexts/AuthContext';
+import { checkAuth } from '../../api/fetchAuthCheck';
 
 const StyledErrorMessage = styled.div`
   color: #dc3545; /* 밝은 노란색에서 붉은색으로 변경 */
@@ -129,7 +130,7 @@ function formatDateToKST(date: Date): string {
 }
 
 const InsertConferenceInfo: React.FC = () => {
-  const { user } = useAuth();
+  const { user, setUser, setLoading } = useAuth();
   const navigate = useNavigate();
   const [isCompleted, setIsCompleted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -153,6 +154,16 @@ const InsertConferenceInfo: React.FC = () => {
   const [projectUsers, setProjectUsers] = React.useState<
     { user_id: string; name: string; email: string; user_jobname: string }[]
   >([]); // 프로젝트 참여자 목록 상태 추가
+
+  React.useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
   React.useEffect(() => {
     if (user) {
