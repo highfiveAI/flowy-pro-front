@@ -122,6 +122,13 @@ export const SubmitButton = styled.button`
   }
 `;
 
+export const ErrorText = styled.div`
+  color: red;
+  font-size: 13px;
+  margin-bottom: 15px;
+  margin-left: 170px;
+`;
+
 const SocialSignUp: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -139,6 +146,36 @@ const SocialSignUp: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [positions, setPositions] = useState<CompanyPosition[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.phone.match(/^\d+$/)) {
+      newErrors.phone = '전화번호는 숫자만 입력해주세요.';
+    }
+
+    if (!formData.username.match(/^[a-z0-9]{6,16}$/)) {
+      newErrors.username = '아이디는 영문 소문자와 숫자 조합 6~16자입니다.';
+    }
+
+    if (
+      !formData.password.match(
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,16}$/
+      )
+    ) {
+      newErrors.password =
+        '비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자여야 합니다.';
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
+    }
+
+    if (!formData.company) newErrors.company = '회사를 선택해주세요.';
+
+    return newErrors;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -166,10 +203,14 @@ const SocialSignUp: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('비밀번호가 일치하지 않습니다.');
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
+
+    setErrors({});
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/social_signup`,
@@ -214,6 +255,12 @@ const SocialSignUp: React.FC = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   useEffect(() => {
     const loadCompanies = async () => {
       try {
@@ -233,7 +280,7 @@ const SocialSignUp: React.FC = () => {
       <Wrapper>
         <FormContainer>
           <Title>소셜 회원가입</Title>
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
             <InputGroup>
               <Label>
                 핸드폰번호 <StyledAsterisk>*</StyledAsterisk>
@@ -246,6 +293,7 @@ const SocialSignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
             <InputGroup>
               <Label>
                 아이디 <StyledAsterisk>*</StyledAsterisk>
@@ -258,6 +306,7 @@ const SocialSignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.username && <ErrorText>{errors.username}</ErrorText>}
             <InputGroup>
               <Label>
                 비밀번호 <StyledAsterisk>*</StyledAsterisk>
@@ -270,6 +319,7 @@ const SocialSignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.password && <ErrorText>{errors.password}</ErrorText>}
             <InputGroup>
               <Label>
                 비밀번호 확인 <StyledAsterisk>*</StyledAsterisk>
@@ -282,6 +332,9 @@ const SocialSignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.confirmPassword && (
+              <ErrorText>{errors.confirmPassword}</ErrorText>
+            )}
             <InputGroup>
               <Label>
                 소속 회사명 <StyledAsterisk>*</StyledAsterisk>
@@ -300,11 +353,11 @@ const SocialSignUp: React.FC = () => {
                 ))}
               </Select>
             </InputGroup>
+            {errors.company && <ErrorText>{errors.company}</ErrorText>}
             <InputGroup>
               <Label>소속 직급명</Label>
               <Select
                 name="position"
-                required
                 onChange={handleChange}
                 value={formData.position}
               >
