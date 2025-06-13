@@ -1,5 +1,4 @@
-import React from 'react';
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -7,14 +6,14 @@ const ModalOverlay = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2100;
 `;
 const ModalBox = styled.div`
-  background: #FFF;
+  background: #fff;
   border-radius: 50px;
   border: 1px solid #351745;
   box-shadow: 4px 0px 4px 0px rgba(75, 13, 110, 0.21);
@@ -28,7 +27,7 @@ const ModalBox = styled.div`
 `;
 const Title = styled.h2`
   font-size: 1.5rem;
-  color: #4B2067;
+  color: #4b2067;
   font-weight: 700;
   margin-bottom: 24px;
   display: flex;
@@ -41,7 +40,7 @@ const MailIcon = styled.img`
 `;
 const SectionLabel = styled.div`
   font-size: 1.08rem;
-  color: #4B2067;
+  color: #4b2067;
   font-weight: 600;
   margin-bottom: 10px;
   margin-top: 32px;
@@ -62,7 +61,7 @@ const CloseBtn = styled.button`
   background: none;
   border: none;
   font-size: 22px;
-  color: #4B2067;
+  color: #4b2067;
   cursor: pointer;
 `;
 
@@ -77,7 +76,7 @@ const SendButton = styled.button`
   font-weight: 500;
   margin-top: 20px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   &:hover {
     background: #009999;
   }
@@ -92,7 +91,7 @@ const ContentWrapper = styled.div`
   overflow-y: auto;
   padding-right: 8px;
   margin-right: -8px;
-  
+
   /* 스크롤바 스타일링 */
   &::-webkit-scrollbar {
     width: 8px;
@@ -125,15 +124,15 @@ const ContentSection = styled.div`
 
 const ContentTitle = styled.div`
   font-size: 1.1rem;
-  color: #4B2067;
+  color: #4b2067;
   font-weight: 600;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
-  
+
   &::before {
-    content: '';
+    content: "";
     display: inline-block;
     width: 4px;
     height: 16px;
@@ -151,7 +150,7 @@ const TaskItem = styled.div`
   gap: 8px;
 
   &::before {
-    content: '•';
+    content: "•";
     color: #333;
     display: inline-block;
     width: 1em;
@@ -174,7 +173,7 @@ const FeedbackItem = styled.div`
   gap: 8px;
 
   &::before {
-    content: '•';
+    content: "•";
     color: #333;
     display: inline-block;
     width: 1em;
@@ -191,7 +190,7 @@ const SummaryItem = styled.div`
   gap: 8px;
 
   &::before {
-    content: '•';
+    content: "•";
     color: #333;
     display: inline-block;
     width: 1em;
@@ -235,16 +234,33 @@ interface MailPreviewProps {
   };
 }
 
-const MailPreviewDashboard = ({ onClose, onSend, summary, tasks, feedback, mailItems, receivers, meetingInfo }: MailPreviewProps) => {
+const MailPreviewDashboard = ({
+  onClose,
+  onSend,
+  summary,
+  tasks,
+  feedback,
+  mailItems,
+  receivers,
+  meetingInfo,
+}: MailPreviewProps) => {
   const mailPreview: { section: string; items: string[] }[] = [];
   if (mailItems.summary && summary) mailPreview.push(...summary);
   if (mailItems.tasks && tasks) {
     Object.entries(tasks).forEach(([name, items]) => {
       const taskArr = items as any[];
-      if (name === 'unassigned') {
-        if (taskArr.length > 0) mailPreview.push({ section: '[ 미할당 작업 목록 ]', items: taskArr.map((t: any) => t.description) });
+      if (name === "unassigned") {
+        if (taskArr.length > 0)
+          mailPreview.push({
+            section: "[ 미할당 작업 목록 ]",
+            items: taskArr.map((t: any) => t.description),
+          });
       } else {
-        if (taskArr.length > 0) mailPreview.push({ section: `[ ${name} ]`, items: taskArr.map((t: any) => t.description) });
+        if (taskArr.length > 0)
+          mailPreview.push({
+            section: `[ ${name} ]`,
+            items: taskArr.map((t: any) => t.description),
+          });
       }
     });
   }
@@ -252,24 +268,37 @@ const MailPreviewDashboard = ({ onClose, onSend, summary, tasks, feedback, mailI
 
   // 메일 내용을 섹션별로 분리
   const summaryContent = mailItems.summary ? summary : [];
-  const tasksContent = mailItems.tasks ? Object.entries(tasks)
-    .map(([name, items]) => {
-      const taskArr = items as any[];
-      if (name === 'unassigned') {
-        return taskArr.length > 0 ? { 
-          section: '[ 미할당 작업 목록 ]', 
-          items: taskArr.map((t: any) => `${t.description} (${t.date})`) 
-        } : null;
-      }
-      return taskArr.length > 0 ? { 
-        section: `[ ${name} ]`, 
-        items: taskArr.map((t: any) => `${t.description} (${t.date})`) 
-      } : null;
-    })
-    .filter((item): item is { section: string; items: string[] } => item !== null) : [];
+  const tasksContent = mailItems.tasks
+    ? Object.entries(tasks)
+        .map(([name, items]) => {
+          const taskArr = items as any[];
+          if (name === "unassigned") {
+            return taskArr.length > 0
+              ? {
+                  section: "[ 미할당 작업 목록 ]",
+                  items: taskArr.map(
+                    (t: any) => `${t.description} (${t.date})`
+                  ),
+                }
+              : null;
+          }
+          return taskArr.length > 0
+            ? {
+                section: `[ ${name} ]`,
+                items: taskArr.map((t: any) => `${t.description} (${t.date})`),
+              }
+            : null;
+        })
+        .filter(
+          (item): item is { section: string; items: string[] } => item !== null
+        )
+    : [];
   const feedbackContent = mailItems.feedback ? feedback : [];
 
-  const hasContent = summaryContent.length > 0 || tasksContent.length > 0 || feedbackContent.length > 0;
+  const hasContent =
+    summaryContent.length > 0 ||
+    tasksContent.length > 0 ||
+    feedbackContent.length > 0;
 
   const canSendMail = () => {
     if (mailPreview.length === 0) return false;
@@ -288,20 +317,31 @@ const MailPreviewDashboard = ({ onClose, onSend, summary, tasks, feedback, mailI
         <ContentWrapper>
           <SectionLabel>회의 기본 정보</SectionLabel>
           <InfoBox>
-            <div><b>상위 프로젝트:</b> {meetingInfo.project}</div>
-            <div><b>회의 제목:</b> {meetingInfo.title}</div>
-            <div><b>회의 일시:</b> {meetingInfo.date}</div>
-            <div><b>참석자:</b> {meetingInfo.attendees.join(', ')}</div>
-            <div><b>회의 안건:</b>
+            <div>
+              <b>상위 프로젝트:</b> {meetingInfo.project}
+            </div>
+            <div>
+              <b>회의 제목:</b> {meetingInfo.title}
+            </div>
+            <div>
+              <b>회의 일시:</b> {meetingInfo.date}
+            </div>
+            <div>
+              <b>참석자:</b> {meetingInfo.attendees.join(", ")}
+            </div>
+            <div>
+              <b>회의 안건:</b>
               <ul style={{ margin: 0, paddingLeft: 18 }}>
-                {meetingInfo.agenda.map((item, i) => <li key={i}>{item}</li>)}
+                {meetingInfo.agenda.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
               </ul>
             </div>
           </InfoBox>
           <SectionLabel>메일 내용</SectionLabel>
           <InfoBox>
             {!hasContent ? (
-              <div style={{ color: '#aaa' }}>선택된 항목이 없습니다.</div>
+              <div style={{ color: "#aaa" }}>선택된 항목이 없습니다.</div>
             ) : (
               <>
                 {summaryContent.length > 0 && (
@@ -327,7 +367,7 @@ const MailPreviewDashboard = ({ onClose, onSend, summary, tasks, feedback, mailI
                         <SectionContent key={idx}>
                           <SectionTitle>{section.section}</SectionTitle>
                           {section.items.map((item, itemIdx) => {
-                            const [description, date] = item.split(' (');
+                            const [description, date] = item.split(" (");
                             return (
                               <TaskItem key={itemIdx}>
                                 <span>{description}</span>
@@ -364,31 +404,35 @@ const MailPreviewDashboard = ({ onClose, onSend, summary, tasks, feedback, mailI
             {receivers.allAttendees && <div>회의 참석자 전체 수신</div>}
             {receivers.custom && receivers.selectedCustom.length > 0 && (
               <div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {receivers.selectedCustom.map((name: string, index: number) => (
-                    <span key={index} style={{ 
-                      background: '#e6f7f7', 
-                      padding: '4px 8px', 
-                      borderRadius: 4, 
-                      color: '#00b6b6',
-                      fontSize: 13
-                    }}>
-                      {name}
-                    </span>
-                  ))}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {receivers.selectedCustom.map(
+                    (name: string, index: number) => (
+                      <span
+                        key={index}
+                        style={{
+                          background: "#e6f7f7",
+                          padding: "4px 8px",
+                          borderRadius: 4,
+                          color: "#00b6b6",
+                          fontSize: 13,
+                        }}
+                      >
+                        {name}
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
             )}
-            {!receivers.allProject && !receivers.allAttendees && !(receivers.custom && receivers.selectedCustom.length > 0) && 
-              <div style={{ color: '#aaa' }}>선택된 수신자가 없습니다.</div>
-            }
+            {!receivers.allProject &&
+              !receivers.allAttendees &&
+              !(receivers.custom && receivers.selectedCustom.length > 0) && (
+                <div style={{ color: "#aaa" }}>선택된 수신자가 없습니다.</div>
+              )}
           </InfoBox>
         </ContentWrapper>
         <ButtonWrapper>
-          <SendButton 
-            onClick={onSend} 
-            disabled={!canSendMail()}
-          >
+          <SendButton onClick={onSend} disabled={!canSendMail()}>
             메일 발송하기
           </SendButton>
         </ButtonWrapper>
@@ -398,4 +442,4 @@ const MailPreviewDashboard = ({ onClose, onSend, summary, tasks, feedback, mailI
   );
 };
 
-export default MailPreviewDashboard; 
+export default MailPreviewDashboard;

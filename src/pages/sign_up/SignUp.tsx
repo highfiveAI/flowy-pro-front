@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SignUpSuccessModal from './SignUpSuccessModal';
+import {
+  fetchSignupInfos,
+  type Company,
+  type CompanyPosition,
+  // type Sysrole,
+} from '../../api/fetchSignupInfos';
 
 export const Wrapper = styled.div`
   display: flex;
@@ -117,6 +123,13 @@ export const SubmitButton = styled.button`
   }
 `;
 
+export const ErrorText = styled.div`
+  color: red;
+  font-size: 13px;
+  margin-bottom: 15px;
+  margin-left: 170px;
+`;
+
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -126,25 +139,87 @@ const SignUp: React.FC = () => {
     password: '',
     confirmPassword: '',
     company: '',
+    position: '',
     department: '',
     team: '',
+    job: '',
   });
   const [showModal, setShowModal] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [positions, setPositions] = useState<CompanyPosition[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // const [sysroles, setSysroles] = useState<Sysrole[]>([]);
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.name) newErrors.name = '이름을 입력해주세요.';
+    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      newErrors.email = '유효한 이메일 주소를 입력해주세요.';
+    }
+
+    if (!formData.phone.match(/^\d+$/)) {
+      newErrors.phone = '전화번호는 숫자만 입력해주세요.';
+    }
+
+    if (!formData.username.match(/^[a-z0-9]{6,16}$/)) {
+      newErrors.username = '아이디는 영문 소문자와 숫자 조합 6~16자입니다.';
+    }
+
+    if (
+      !formData.password.match(
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,16}$/
+      )
+    ) {
+      newErrors.password =
+        '비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자여야 합니다.';
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
+    }
+
+    if (!formData.company) newErrors.company = '회사를 선택해주세요.';
+
+    return newErrors;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'company') {
+      const selectedCompany = companies.find((c) => c.company_id === value);
+      if (selectedCompany) {
+        setPositions(selectedCompany.company_positions || []);
+      } else {
+        setPositions([]);
+      }
+
+      // 회사 변경 시 직급 초기화
+      setFormData((prev) => ({
+        ...prev,
+        company: value,
+        position: '', // 직급 초기화
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      alert('비밀번호가 일치하지 않습니다.');
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
+
+    setErrors({});
 
     try {
       const response = await fetch(
@@ -161,9 +236,9 @@ const SignUp: React.FC = () => {
             company: formData.company,
             department: formData.department,
             team: formData.team,
-            position: 'aaf44bda-6a64-4611-b0ca-4083b59c8e6e', // 더미 데이터
-            job: '개발자',
-            sysrole: 'c4cb5e53-617e-463f-8ddb-67252f9a9742', // 더미 데이터
+            position: formData.position,
+            job: formData.job,
+            sysrole: '4864c9d2-7f9c-4862-9139-4e8b0ed117f4', // 일반 사원 데이터
             login_type: 'general',
           }),
         }
@@ -187,12 +262,32 @@ const SignUp: React.FC = () => {
       alert(`오류 발생: ${error.message}`);
     }
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
+  useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        const result = await fetchSignupInfos();
+        setCompanies(result.companies);
+      } catch (err) {
+        // 에러 처리
+        console.error('회사 목록 로딩 실패:', err);
+      }
+    };
+
+    loadCompanies();
+  }, []);
   return (
     <>
       <Wrapper>
         <FormContainer>
           <Title>회원가입</Title>
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
             <InputGroup>
               <Label>
                 이름 <StyledAsterisk>*</StyledAsterisk>
@@ -205,6 +300,7 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.name && <ErrorText>{errors.name}</ErrorText>}
             <InputGroup>
               <Label>
                 이메일주소 <StyledAsterisk>*</StyledAsterisk>
@@ -217,6 +313,7 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.email && <ErrorText>{errors.email}</ErrorText>}
             <InputGroup>
               <Label>
                 핸드폰번호 <StyledAsterisk>*</StyledAsterisk>
@@ -229,6 +326,7 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
             <InputGroup>
               <Label>
                 아이디 <StyledAsterisk>*</StyledAsterisk>
@@ -241,6 +339,7 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.username && <ErrorText>{errors.username}</ErrorText>}
             <InputGroup>
               <Label>
                 비밀번호 <StyledAsterisk>*</StyledAsterisk>
@@ -253,6 +352,7 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.password && <ErrorText>{errors.password}</ErrorText>}
             <InputGroup>
               <Label>
                 비밀번호 확인 <StyledAsterisk>*</StyledAsterisk>
@@ -265,17 +365,46 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
+            {errors.confirmPassword && (
+              <ErrorText>{errors.confirmPassword}</ErrorText>
+            )}
             <InputGroup>
               <Label>
                 소속 회사명 <StyledAsterisk>*</StyledAsterisk>
               </Label>
-              <Select name="company" required onChange={handleChange}>
-                <option value="">선택</option>
-                <option value="3db3ef9a-947e-4237-93da-d306b7bdb52d">
-                  회사A
-                </option>
-                {/* <option value="회사B">회사B</option> */}
+              <Select
+                name="company"
+                required
+                onChange={handleChange}
+                value={formData.company}
+              >
+                <option value="">회사 선택</option>
+                {companies.map((company) => (
+                  <option key={company.company_id} value={company.company_id}>
+                    {company.company_name}
+                  </option>
+                ))}
               </Select>
+            </InputGroup>
+            {errors.company && <ErrorText>{errors.company}</ErrorText>}
+            <InputGroup>
+              <Label>소속 직급명</Label>
+              <Select
+                name="position"
+                onChange={handleChange}
+                value={formData.position}
+              >
+                <option value="">직급 선택</option>
+                {positions.map((pos) => (
+                  <option key={pos.position_id} value={pos.position_id}>
+                    {pos.position_name}
+                  </option>
+                ))}
+              </Select>
+            </InputGroup>
+            <InputGroup>
+              <Label>직업군</Label>
+              <Input name="job" type="text" onChange={handleChange} />
             </InputGroup>
             <InputGroup>
               <Label>소속 부서명</Label>
