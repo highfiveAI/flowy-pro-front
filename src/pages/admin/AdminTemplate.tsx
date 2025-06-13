@@ -241,6 +241,8 @@ const AdminTemplate: React.FC = () => {
     null
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [createDocType, setCreateDocType] = useState<string>('');
+  const [editDocType, setEditDocType] = useState<string>('');
 
   // 템플릿 목록 조회
   const fetchTemplates = async () => {
@@ -269,8 +271,8 @@ const AdminTemplate: React.FC = () => {
 
     const formData = new FormData();
     formData.append('file', selectedFile);
-    formData.append('doc_type', 'template');
-    formData.append('update_user_id', '3c89c6ab-c755-4925-8e64-ab134668a253');
+    formData.append('doc_type', createDocType);
+    formData.append('update_user_id', '7f2d2784-b12b-4b8d-a9fc-3857e52f9e96');
 
     try {
       const response = await fetch(
@@ -310,7 +312,8 @@ const AdminTemplate: React.FC = () => {
 
     const formData = new FormData();
     formData.append('file', selectedFile);
-    formData.append('update_user_id', '3c89c6ab-c755-4925-8e64-ab134668a253');
+    formData.append('doc_type', editDocType);
+    formData.append('update_user_id', '7f2d2784-b12b-4b8d-a9fc-3857e52f9e96');
 
     try {
       const response = await fetch(
@@ -381,6 +384,19 @@ const AdminTemplate: React.FC = () => {
     }
   };
 
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedTemplate(null);
+    setSelectedFile(null);
+    setEditDocType('');
+  };
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+    setSelectedFile(null);
+    setCreateDocType('');
+  };
+
   return (
     <Container>
       <MainContent>
@@ -413,6 +429,7 @@ const AdminTemplate: React.FC = () => {
               key={template.interdocs_id}
               onClick={() => {
                 setSelectedTemplate(template);
+                setEditDocType(template.interdocs_type_name);
                 setIsEditModalOpen(true);
               }}
             >
@@ -455,21 +472,28 @@ const AdminTemplate: React.FC = () => {
           <ModalContent>
             <ModalHeader>
               <h2>새 템플릿 추가</h2>
-              <CloseButton onClick={() => setIsCreateModalOpen(false)}>
+              <CloseButton onClick={closeCreateModal}>
                 ×
               </CloseButton>
             </ModalHeader>
             <form onSubmit={handleCreate}>
+              <FormGroup>
+                <label>문서 타입</label>
+                <input
+                    type="text"
+                    value={createDocType}
+                    onChange={(e) => setCreateDocType(e.target.value)}
+                    required
+                    placeholder="문서 타입을 입력하세요"
+                />
+              </FormGroup>
               <FormGroup>
                 <label>템플릿 파일</label>
                 <input type="file" onChange={handleFileChange} required />
               </FormGroup>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <Button type="submit">등록</Button>
-                <Button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                >
+                <Button type="button" onClick={closeCreateModal}>
                   취소
                 </Button>
               </div>
@@ -482,11 +506,21 @@ const AdminTemplate: React.FC = () => {
           <ModalContent>
             <ModalHeader>
               <h2>템플릿 수정</h2>
-              <CloseButton onClick={() => setIsEditModalOpen(false)}>
+              <CloseButton onClick={closeEditModal}>
                 ×
               </CloseButton>
             </ModalHeader>
             <form onSubmit={handleUpdate}>
+              <FormGroup>
+                <label>문서 타입</label>
+                <input
+                    type="text"
+                    value={editDocType}
+                    onChange={(e) => setEditDocType(e.target.value)}
+                    required
+                    placeholder="문서 타입을 입력하세요"
+                />
+              </FormGroup>
               <FormGroup>
                 <label>템플릿 파일</label>
                 <input type="file" onChange={handleFileChange} required />
@@ -503,7 +537,7 @@ const AdminTemplate: React.FC = () => {
                 >
                   삭제
                 </Button>
-                <Button type="button" onClick={() => setIsEditModalOpen(false)}>
+                <Button type="button" onClick={closeEditModal}>
                   취소
                 </Button>
               </div>
