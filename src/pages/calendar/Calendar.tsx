@@ -8,7 +8,7 @@ import 'react-calendar/dist/Calendar.css'
 import styled from 'styled-components'
 import { INITIAL_EVENTS } from './event-utils'
 import type { CalendarEvent } from './event-utils'
-import { isSameDay } from 'date-fns'
+import { isSameDay, getWeek } from 'date-fns'
 import { FaRegFileAlt } from 'react-icons/fa'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
@@ -28,6 +28,9 @@ const CalendarWrapper = styled.div`
     border: none;
     background: #fff;
   }
+  .react-calendar__navigation {
+    display: none;
+  }
   .react-calendar__month-view__days {
     min-height: 600px;
   }
@@ -46,6 +49,11 @@ const CalendarWrapper = styled.div`
   }
   .react-calendar__tile abbr {
     display: none !important;
+  }
+  .react-calendar__month-view__days__day--neighboringMonth {
+    color: #bbb !important;
+    background:rgb(224, 224, 224) !important;
+    opacity: 0.7;
   }
   .calendar-event, .calendar-todo {
     font-size: 0.85rem;
@@ -92,6 +100,22 @@ const CalendarWrapper = styled.div`
   }
   .react-calendar__tile--active {
     background: #fff !important;
+  }
+  .react-calendar__month-view__weekNumbers {
+    color: #351745;
+    font-weight: 600;
+    background: #f8f6fa;
+  }
+  .react-calendar__tile--weekNumber {
+    color: #351745;
+    font-weight: 600;
+    background: #f8f6fa;
+  }
+  .calendar-sunday {
+    color: #C00F0CB2 !important;
+  }
+  .calendar-saturday {
+    color: #283990 !important;
   }
 `
 
@@ -187,14 +211,49 @@ const ApplyButton = styled.button`
     background: #4B2067;
   }
 `;
+const TodayButton = styled(ApplyButton)`
+  margin-left: 0;
+`;
 
 function formatYearMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
 
+function YearMonthPicker({
+  currentDate,
+  onChange,
+  onClose,
+}: {
+  currentDate: Date;
+  onChange: (year: number, month: number) => void;
+  onClose: () => void;
+}) {
+  const [year, setYear] = useState(currentDate.getFullYear());
+  const [month, setMonth] = useState(currentDate.getMonth() + 1);
+  return (
+    <div style={{ position: 'absolute', top: 60, left: '50%', transform: 'translateX(-50%)', background: '#fff', border: '1.5px solid #C7B8D9', borderRadius: 8, padding: 16, zIndex: 100, boxShadow: '0 2px 12px rgba(80,0,80,0.08)', width: 270 }}>
+      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+        <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ fontSize: '1rem', marginRight: 8 }}>
+          {Array.from({ length: 20 }, (_, i) => 2015 + i).map(y => (
+            <option key={y} value={y}>{y}년</option>
+          ))}
+        </select>
+        <select value={month} onChange={e => setMonth(Number(e.target.value))} style={{ fontSize: '1rem', marginRight: 16 }}>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+            <option key={m} value={m}>{m}월</option>
+          ))}
+        </select>
+        <ApplyButton onClick={() => onChange(year, month)} style={{ padding: '0 18px', height: 36, fontSize: '0.8rem', marginLeft: 0 }}>이동</ApplyButton>
+        <button onClick={onClose} style={{ marginLeft: 8, background: 'none', border: 'none', color: '#351745', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}>닫기</button>
+      </div>
+    </div>
+  );
+}
+
 export default function CalendarPage() {
   const [value, setValue] = useState(new Date(2025, 5, 1))
   const [events, setEvents] = useState(INITIAL_EVENTS)
+  const [showPicker, setShowPicker] = useState(false);
 
   const handleToggleTodo = (id: string) => {
     setEvents(prevEvents => prevEvents.map(ev =>
@@ -220,15 +279,33 @@ export default function CalendarPage() {
     });
   };
 
+  const handleYearMonthClick = () => setShowPicker(true);
+  const handleYearMonthChange = (year: number, month: number) => {
+    setValue(new Date(year, month - 1, 1));
+    setShowPicker(false);
+  };
+
+  const handleToday = () => {
+    setValue(new Date());
+  };
+
   return (
     <CalendarWrapper>
       <HeaderBar>
-        <div>
+        <div style={{ position: 'relative' }}>
           <Title>작업 관리</Title>
           <MonthNav>
             <NavButton onClick={handlePrevMonth}><FiChevronLeft /></NavButton>
-            <MonthText>{formatYearMonth(value)}</MonthText>
+            <MonthText onClick={handleYearMonthClick} style={{ cursor: 'pointer' }}>{formatYearMonth(value)}</MonthText>
             <NavButton onClick={handleNextMonth}><FiChevronRight /></NavButton>
+            {showPicker && (
+              <YearMonthPicker
+                currentDate={value}
+                onChange={handleYearMonthChange}
+                onClose={() => setShowPicker(false)}
+              />
+            )}
+            <TodayButton onClick={handleToday}>오늘</TodayButton>
           </MonthNav>
         </div>
         <RightBox>
@@ -253,15 +330,21 @@ export default function CalendarPage() {
             const day = date.getDate().toString().padStart(2, '0');
             const dayTodos = events.filter(ev => ev.type === 'todo' && isSameDay(new Date(ev.start), date));
             const dayMeetings = events.filter(ev => ev.type === 'meeting' && isSameDay(new Date(ev.start), date));
+            const dayOfWeek = date.getDay(); // 0: 일, 6: 토
+            const isCurrentMonth = date.getMonth() === value.getMonth();
+            let dayClass = '';
+            if (isCurrentMonth) {
+              if (dayOfWeek === 0) dayClass = 'calendar-sunday';
+              if (dayOfWeek === 6) dayClass = 'calendar-saturday';
+            }
             return (
               <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                <span style={{
+                <span className={dayClass} style={{
                   position: 'absolute',
                   top: 8,
                   right: 10,
                   fontSize: '1.05rem',
                   fontWeight: 500,
-                  color: '#333',
                   zIndex: 2
                 }}>{day}</span>
                 <div style={{ width: '100%', paddingTop: 35 }}>
@@ -287,6 +370,7 @@ export default function CalendarPage() {
         }}
         formatDay={(_, date) => date.getDate().toString().padStart(2, '0')}
         locale="ko-KR"
+        calendarType="gregory"
       />
     </CalendarWrapper>
   )
