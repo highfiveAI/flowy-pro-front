@@ -126,7 +126,7 @@ function App() {
             }
           />
           <Route
-            path="/conferencelist"
+            path="/conferencelist/:projectId"
             element={
               <ProtectedRoute>
                 <ConferenceListPage />

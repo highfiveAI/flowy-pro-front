@@ -1,16 +1,37 @@
-import React from "react";
-import styled from "styled-components";
-import { FiEdit2, FiTrash2, FiArrowRight } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
-
-const dummyProjects = Array.from({ length: 10 }).map((/*_, i*/) => ({
-  name: "Pitchpal",
-  created: "2025-05-15",
-  end: "2025-08-31",
-}));
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { FiEdit2, FiTrash2, FiArrowRight } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { fetchProject } from '../../api/fetchProject';
+import type { ProjectUser } from '../../types/project';
+import { checkAuth } from '../../api/fetchAuthCheck';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ProjectListPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, setUser, setLoading } = useAuth();
+  const [projects, setProjects] = useState<ProjectUser[]>([]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchProject(user?.id).then((data) => {
+        if (data) {
+          setProjects(data);
+        }
+      });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
   return (
     <Container>
       <Title>회의 관리</Title>
@@ -26,11 +47,20 @@ const ProjectListPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyProjects.map((p, i) => (
+            {projects.map((p, i) => (
               <Tr key={i}>
-                <Td>{p.name}</Td>
-                <Td>{p.created}</Td>
-                <Td>{p.end}</Td>
+                <Td>{p.project.project_name}</Td>
+                <Td>
+                  {new Date(p.project.project_created_date)
+                    .toISOString()
+                    .replace('T', ' ')
+                    .slice(0, 16)}
+                </Td>
+                <Td>
+                  {p.project.project_end_date
+                    ? p.project.project_end_date
+                    : '미정'}
+                </Td>
                 <Td>
                   <IconGroup>
                     <IconBtn>
@@ -39,7 +69,11 @@ const ProjectListPage: React.FC = () => {
                     <IconBtn>
                       <FiTrash2 />
                     </IconBtn>
-                    <ArrowBtn onClick={() => navigate("/conferencelist")}>
+                    <ArrowBtn
+                      onClick={() =>
+                        navigate(`/conferencelist/${p.project.project_id}`)
+                      }
+                    >
                       <FiArrowRight />
                     </ArrowBtn>
                   </IconGroup>
@@ -133,5 +167,5 @@ const ArrowBtn = styled.button`
 const IconGroup = styled.div`
   display: flex;
   align-items: center;
-  margin-left: -100px;
+  margin-left: 200px;
 `;

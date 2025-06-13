@@ -1,20 +1,47 @@
-import React from "react";
-import styled from "styled-components";
-import { FiArrowRight } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { FiArrowRight } from 'react-icons/fi';
+import { useNavigate, useParams } from 'react-router-dom';
+import { checkAuth } from '../../api/fetchAuthCheck';
+import { useAuth } from '../../contexts/AuthContext';
+import { fetchMeetingsWithUsers } from '../../api/fetchProject';
 
 const dummyConferences = Array.from({ length: 10 }).map((/*_, i*/) => ({
-  name: "기능 정의 kick-off",
-  date: "2025-06-03 10:00",
-  attendees: "김다연, 김시훈, 정다희, ...",
+  name: '기능 정의 kick-off',
+  date: '2025-06-03 10:00',
+  attendees: '김다연, 김시훈, 정다희, ...',
 }));
 
 const ConferenceListPage: React.FC = () => {
+  const { user, setUser, setLoading } = useAuth();
+  const [meetings, setMeetings] = useState<any[]>([]);
   const navigate = useNavigate();
+
+  const { projectId } = useParams<{ projectId: string }>();
+
+  useEffect(() => {
+    if (projectId) {
+      fetchMeetingsWithUsers(projectId).then((data) => {
+        if (data) {
+          setMeetings(data);
+        }
+      });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
   return (
     <Container>
       <Title>회의 관리</Title>
-      <Breadcrumb>프로젝트 목록 {">"} 회의 목록</Breadcrumb>
+      <Breadcrumb>프로젝트 목록 {'>'} 회의 목록</Breadcrumb>
       <TableWrapper>
         <Table>
           <thead>
@@ -32,7 +59,7 @@ const ConferenceListPage: React.FC = () => {
                 <Td>{c.date}</Td>
                 <Td>{c.attendees}</Td>
                 <Td>
-                  <IconBtn onClick={() => navigate("/dashboard")}>
+                  <IconBtn onClick={() => navigate('/dashboard')}>
                     <FiArrowRight />
                   </IconBtn>
                 </Td>
