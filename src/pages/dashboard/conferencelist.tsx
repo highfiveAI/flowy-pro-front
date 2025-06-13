@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FiArrowRight } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { checkAuth } from "../../api/fetchAuthCheck";
+import { useAuth } from "../../contexts/AuthContext";
+import { fetchMeetingsWithUsers } from "../../api/fetchProject";
 
 const dummyConferences = Array.from({ length: 10 }).map((/*_, i*/) => ({
   name: "기능 정의 kick-off",
@@ -10,7 +13,32 @@ const dummyConferences = Array.from({ length: 10 }).map((/*_, i*/) => ({
 }));
 
 const ConferenceListPage: React.FC = () => {
+  const { user, setUser, setLoading } = useAuth();
+  const [meetings, setMeetings] = useState<any[]>([]);
   const navigate = useNavigate();
+
+  const { projectId } = useParams<{ projectId: string }>();
+
+  useEffect(() => {
+    if (projectId) {
+      fetchMeetingsWithUsers(projectId).then((data) => {
+        if (data) {
+          console.log(data);
+          setMeetings(data);
+        }
+      });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
   return (
     <Container>
       <Title>회의 관리</Title>
@@ -26,11 +54,19 @@ const ConferenceListPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyConferences.map((c, i) => (
+            {meetings.map((c, i) => (
               <Tr key={i}>
-                <Td>{c.name}</Td>
-                <Td>{c.date}</Td>
-                <Td>{c.attendees}</Td>
+                <Td>{c.meeting_title}</Td>
+                <Td>
+                  {new Date(c.meeting_date)
+                    .toISOString()
+                    .replace("T", " ")
+                    .slice(0, 16)}
+                </Td>
+                <Td>
+                  {/* meeting_users 안의 user 이름 나열 */}
+                  {c.meeting_users.map((mu) => mu.user.user_name).join(", ")}
+                </Td>
                 <Td>
                   <IconBtn onClick={() => navigate("/dashboard")}>
                     <FiArrowRight />
