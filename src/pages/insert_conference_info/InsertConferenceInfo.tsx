@@ -150,8 +150,12 @@ const InsertConferenceInfo: React.FC = () => {
   const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
   const [projects, setProjects] = React.useState<{userName: string, projectName: string, projectId: string}[]>([]); // projectId 필드 추가
   const [projectUsers, setProjectUsers] = React.useState<{user_id: string, name: string, email: string, user_jobname: string}[]>([]); // 프로젝트 참여자 목록 상태 추가
+  const [hostId, setHostId] = React.useState('');
 
-
+  React.useEffect(() => {
+    setUsername(user?.name || '');
+  }, [user]);
+  
   // user.id로 프로젝트 목록과 사용자 이름 불러오기
   React.useEffect(() => {
     if (!user?.id) return;
@@ -170,11 +174,11 @@ const InsertConferenceInfo: React.FC = () => {
         }
         setProjects(data.projects);
         // projects에서 첫 번째 userName을 username으로 저장
-        if (data.projects && data.projects.length > 0) {
-          setUsername(data.projects[0].userName || data.projects[0][0] || '알 수 없음');
-        } else {
-          setUsername('알 수 없음');
-        }
+        // if (data.projects && data.projects.length > 0) {
+        //   setUsername(data.projects[0].userName || data.projects[0][0] || '알 수 없음');
+        // } else {
+        //   setUsername('알 수 없음');
+        // }
       });
   }, [user?.id]);
 
@@ -222,20 +226,31 @@ const InsertConferenceInfo: React.FC = () => {
     if (file) {
 
       // STT API용 FormData
+      const hostUser = projectUsers.find(u => u.user_id === hostId);
+      const hostName = hostUser?.name || '';
+      const hostEmail = hostUser?.email || '';
+      const hostRole = hostUser?.user_jobname || '';
+
+      // 참석자 정보(회의장 제외)
+      const filteredAttendees = attendees.filter(a => a.user_id && a.user_id !== hostId);
+      const attendeesName = filteredAttendees.map(a => a.name);
+      const attendeesEmail = filteredAttendees.map(a => a.email);
+      const attendeesRole = filteredAttendees.map(a => a.user_jobname);
+
       const sttFormData = new FormData();
       sttFormData.append('file', file, file.name);
       sttFormData.append('subject', subject);
       sttFormData.append('agenda', agenda);
+      sttFormData.append('meeting_date', meetingDate ? formatDateToKST(meetingDate) : '');
       sttFormData.append('project_name', projectName);
-
-      if (meetingDate) {
-        sttFormData.append('meeting_date', formatDateToKST(meetingDate));
-      }
-      attendees.forEach((att) => {
-        sttFormData.append('attendees_name', att.name);
-        sttFormData.append('attendees_email', att.email);
-        sttFormData.append('attendees_role', att.user_jobname);
-      });
+      // host 정보
+      sttFormData.append('host_name', hostName);
+      sttFormData.append('host_email', hostEmail);
+      sttFormData.append('host_role', hostRole);
+      // 참석자 정보 (각각 여러 번 append)
+      attendeesName.forEach(name => sttFormData.append('attendees_name', name));
+      attendeesEmail.forEach(email => sttFormData.append('attendees_email', email));
+      attendeesRole.forEach(role => sttFormData.append('attendees_role', role));
 
       // Meeting Upload API용 FormData
       const meetingFormData = new FormData();
@@ -246,6 +261,24 @@ const InsertConferenceInfo: React.FC = () => {
       if (meetingDate) {
         meetingFormData.append('meeting_date', formatDateToKST(meetingDate));
       }
+      // host 정보
+      meetingFormData.append('host_name', hostName);
+      meetingFormData.append('host_email', hostEmail);
+      meetingFormData.append('host_role', hostRole);
+      // 참석자 정보
+      attendeesName.forEach(name => meetingFormData.append('attendees_name', name));
+      attendeesEmail.forEach(email => meetingFormData.append('attendees_email', email));
+      attendeesRole.forEach(role => meetingFormData.append('attendees_role', role));
+
+      
+      // 콘솔로 값 확인
+      console.log('hostId:', hostId);
+      console.log('hostName:', hostName);
+      console.log('hostEmail:', hostEmail);
+      console.log('hostRole:', hostRole);
+      console.log('attendeesName:', attendeesName);
+      console.log('attendeesEmail:', attendeesEmail);
+      console.log('attendeesRole:', attendeesRole);
 
       try {
         // STT API 호출
@@ -293,6 +326,9 @@ const InsertConferenceInfo: React.FC = () => {
           analyzeFormData.append('project_name', projectName);
           analyzeFormData.append('subject', subject);
           analyzeFormData.append('chunks', JSON.stringify(sttResult.chunks || []));
+          analyzeFormData.append('host_name', hostName);
+          analyzeFormData.append('host_email', hostEmail);
+          analyzeFormData.append('host_role', hostRole);
           analyzeFormData.append('attendees_list', JSON.stringify(attendees));
           analyzeFormData.append('agenda', agenda);
           if (meetingDate) {
@@ -300,6 +336,7 @@ const InsertConferenceInfo: React.FC = () => {
           } else {
             analyzeFormData.append('meeting_date', '');
           }
+          
 
           const analyzeResponse = await fetch(
             `${import.meta.env.VITE_API_URL}/api/v1/stt/analyze-meeting/`,
@@ -493,6 +530,8 @@ const InsertConferenceInfo: React.FC = () => {
                   attendees={attendees}
                   setAttendees={setAttendees}
                   projectUsers={projectUsers}
+                  hostId={hostId}
+                  setHostId={setHostId}
                 />
 
               </FormGroup>

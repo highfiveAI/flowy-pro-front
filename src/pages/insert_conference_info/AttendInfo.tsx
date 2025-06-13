@@ -14,6 +14,8 @@ interface AttendInfoProps {
   attendees: Attendee[];
   setAttendees: (a: Attendee[]) => void;
   projectUsers: ProjectUser[];
+  hostId: string;
+  setHostId: (id: string) => void;
 }
 
 const AttendInfoWrapper = styled.div`
@@ -87,8 +89,7 @@ const StyledSelect = styled.select`
   }
 `;
 
-const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projectUsers = [] }) => {
-  const [hostId, setHostId] = useState('');
+const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projectUsers = [], hostId, setHostId }) => {
   const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
 
