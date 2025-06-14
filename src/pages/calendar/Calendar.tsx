@@ -11,6 +11,7 @@ import type { CalendarEvent } from './event-utils'
 import { isSameDay, getWeek } from 'date-fns'
 import { FaRegFileAlt } from 'react-icons/fa'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import CalendarPop from './popup/calendarPop'
 
 const CalendarWrapper = styled.div`
   max-width: 1100px;
@@ -32,10 +33,15 @@ const CalendarWrapper = styled.div`
     display: none;
   }
   .react-calendar__month-view__days {
-    min-height: 600px;
+    display: grid !important;
+    grid-template-rows: repeat(6, 1fr);
+    grid-template-columns: repeat(7, 1fr);
+    min-height: 800px;
+    height: 800px;
   }
   .react-calendar__tile {
-    height: 135px;
+    height: auto !important;
+    min-height: 0;
     vertical-align: top;
     white-space: normal;
     word-break: keep-all;
@@ -58,17 +64,18 @@ const CalendarWrapper = styled.div`
   }
   .calendar-event, .calendar-todo {
 
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     margin-top: 0;
   }
   .calendar-event {
-    background: #e9d6f7;
-    color: #351745;
-    border-radius: 8px;
-    font-weight: 700;
+    background: rgba(190, 32, 116, 0.14);
+    color: #5E5553;
+    border-radius: 3px;
+    font-weight: 600;
     padding: 4px 8px;
     margin-bottom: 4px;
     display: inline-block;
+    font-size: 0.8rem;
     box-shadow: 0 2px 8px rgba(80, 0, 80, 0.04);
   }
   .calendar-todo {
@@ -76,7 +83,8 @@ const CalendarWrapper = styled.div`
     align-items: center;
     gap: 4px;
     margin-bottom: 2px;
-    color: #351745;
+    font-weight: 600;
+    color: #5E5553;
   }
   .react-calendar__month-view__weekdays {
     font-weight: bold;
@@ -215,8 +223,24 @@ const ApplyButton = styled.button`
     background: #4b2067;
   }
 `;
-const TodayButton = styled(ApplyButton)`
+const TodayButton = styled.button`
+  background: white;
+  color: #351745;
+  border: 1.5px solid #351745;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  height: 48px;
+  padding: 0 32px;
+  cursor: pointer;
   margin-left: 0;
+  transition: background 0.15s;
+  &:hover { background: #f3e6ff; }
+`;
+
+const CalendarCheckbox = styled.input.attrs({ type: 'checkbox' })`
+  cursor: pointer;
+  accent-color: #351745;
 `;
 
 function formatYearMonth(date: Date) {
@@ -258,10 +282,10 @@ function YearMonthPicker({
 }
 
 export default function CalendarPage() {
-  const [value, setValue] = useState(new Date(2025, 5, 1))
+  const [value, setValue] = useState<Date>(new Date(2025, 5, 1))
   const [events, setEvents] = useState(INITIAL_EVENTS)
   const [showPicker, setShowPicker] = useState(false);
-
+  const [popupDate, setPopupDate] = useState<Date|null>(null);
 
   const handleToggleTodo = (id: string) => {
     setEvents((prevEvents) =>
@@ -275,18 +299,10 @@ export default function CalendarPage() {
 
   // 월 이동 함수
   const handlePrevMonth = () => {
-    setValue((prev) => {
-      const d = new Date(prev);
-      d.setMonth(d.getMonth() - 1);
-      return d;
-    });
+    setValue(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
   const handleNextMonth = () => {
-    setValue((prev) => {
-      const d = new Date(prev);
-      d.setMonth(d.getMonth() + 1);
-      return d;
-    });
+    setValue(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
   const handleYearMonthClick = () => setShowPicker(true);
@@ -297,6 +313,20 @@ export default function CalendarPage() {
 
   const handleToday = () => {
     setValue(new Date());
+    setShowPicker(false);
+  };
+
+  // 일정 수정 핸들러
+  const handleEditEvent = (edited: any) => {
+    setEvents(prev => prev.map(ev => ev.id === edited.id ? { ...ev, ...edited } : ev));
+  };
+
+  // 팝업 닫기 함수 추가 (팝업이 닫힐 때 포커스 해제)
+  const handleClosePopup = () => {
+    setPopupDate(null);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   };
 
   return (
@@ -316,7 +346,6 @@ export default function CalendarPage() {
               />
             )}
             <TodayButton onClick={handleToday}>오늘</TodayButton>
-
           </MonthNav>
         </div>
         <RightBox>
@@ -335,14 +364,9 @@ export default function CalendarPage() {
       </HeaderBar>
       <Calendar
         value={value}
-        onChange={(v) => {
-          if (v && v instanceof Date) {
-            setValue(v);
-          }
-        }}
-        tileContent={(props: TileContentProps) => {
-          const { date, view } = props;
-
+        onChange={v => setValue(v as Date)}
+        tileContent={({ date, view }) => {
+          if (!date) return null;
           if (view === 'month') {
             const day = date.getDate().toString().padStart(2, '0');
             const dayTodos = events.filter(ev => ev.type === 'todo' && isSameDay(new Date(ev.start), date));
@@ -355,7 +379,13 @@ export default function CalendarPage() {
               if (dayOfWeek === 6) dayClass = 'calendar-saturday';
             }
             return (
-              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+              <div
+                style={{ position: 'relative', width: '100%', height: '100%', cursor: 'pointer' }}
+                onClick={e => {
+                  e.stopPropagation();
+                  setPopupDate(date);
+                }}
+              >
                 <span className={dayClass} style={{
                   position: 'absolute',
                   top: 8,
@@ -365,39 +395,46 @@ export default function CalendarPage() {
                   zIndex: 2
                 }}>{day}</span>
                 <div style={{ width: '100%', paddingTop: 35 }}>
-                  {dayMeetings.map((m) => (
-                    <div key={m.id} className="calendar-event">
-                      {m.title}
-                    </div>
-                  ))}
-                  {dayTodos.map((t) => (
+                  {dayMeetings.map(m => {
+                    let timeStr = '';
+                    if (m.start) {
+                      const d = typeof m.start === 'string' ? new Date(m.start) : m.start;
+                      if (!isNaN(d.getTime()) && (d.getHours() !== 0 || d.getMinutes() !== 0)) {
+                        timeStr = d.toTimeString().slice(0,5) + ' ';
+                      }
+                    }
+                    return (
+                      <div key={m.id} className="calendar-event">{timeStr}{m.title}</div>
+                    );
+                  })}
+                  {dayTodos.map(t => (
                     <div key={t.id} className="calendar-todo">
-                      <input
-                        type="checkbox"
+                      <CalendarCheckbox
                         checked={t.completed}
                         onChange={() => handleToggleTodo(t.id)}
-                        style={{ marginRight: 4 }}
                       />
-                      <span
-                        style={{
-                          textDecoration: t.completed ? 'line-through' : 'none',
-                        }}
-                      >
-                        {t.title}
-                      </span>
+                      <span style={{ textDecoration: t.completed ? 'line-through' : 'none' }}>{t.title}</span>
                     </div>
                   ))}
                 </div>
               </div>
             );
           }
-
           return null;
         }}
         formatDay={(_, date) => date.getDate().toString().padStart(2, '0')}
         locale="ko-KR"
         calendarType="gregory"
       />
+      {popupDate && (
+        <CalendarPop
+          date={popupDate}
+          todos={events.filter(ev => ev.type === 'todo' && isSameDay(new Date(ev.start), popupDate))}
+          meetings={events.filter(ev => ev.type === 'meeting' && isSameDay(new Date(ev.start), popupDate))}
+          onClose={handleClosePopup}
+          onEdit={handleEditEvent}
+        />
+      )}
     </CalendarWrapper>
   );
 }
