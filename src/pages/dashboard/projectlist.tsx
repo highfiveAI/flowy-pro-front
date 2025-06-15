@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FiEdit2, FiTrash2, FiArrowRight } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { deleteProject, fetchProject } from "../../api/fetchProject";
+import {
+  deleteProject,
+  fetchProject,
+  updateProjectName,
+} from "../../api/fetchProject";
 import type { ProjectUser } from "../../types/project";
 import { checkAuth } from "../../api/fetchAuthCheck";
 import { useAuth } from "../../contexts/AuthContext";
@@ -11,6 +15,8 @@ const ProjectListPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, setUser, setLoading } = useAuth();
   const [projects, setProjects] = useState<ProjectUser[]>([]);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState<string>("");
 
   useEffect(() => {
     if (user?.id) {
@@ -50,6 +56,29 @@ const ProjectListPage: React.FC = () => {
     }
   };
 
+  const handleEdit = (id: string, currentName: string) => {
+    setEditId(id);
+    setEditName(currentName);
+  };
+
+  const handleEditSave = async (id: string) => {
+    try {
+      // 여기에 실제 API 호출 함수 작성 (예시)
+      // await updateProjectName(id, editName);
+      await updateProjectName(id, editName);
+      alert("수정 완료");
+      setEditId(null);
+
+      // 데이터 새로고침
+      if (user?.id) {
+        const data = await fetchProject(user.id);
+        if (data) setProjects(data);
+      }
+    } catch (err) {
+      alert("수정 실패");
+    }
+  };
+
   return (
     <Container>
       <Title>회의 관리</Title>
@@ -67,7 +96,22 @@ const ProjectListPage: React.FC = () => {
           <tbody>
             {projects.map((p, i) => (
               <Tr key={i}>
-                <Td>{p.project.project_name}</Td>
+                <Td>
+                  {editId === p.project.project_id ? (
+                    <input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter")
+                          handleEditSave(p.project.project_id);
+                        if (e.key === "Escape") setEditId(null);
+                      }}
+                      autoFocus
+                    />
+                  ) : (
+                    p.project.project_name
+                  )}
+                </Td>
                 <Td>
                   {new Date(p.project.project_created_date)
                     .toISOString()
@@ -81,19 +125,41 @@ const ProjectListPage: React.FC = () => {
                 </Td>
                 <Td>
                   <IconGroup>
-                    <IconBtn>
-                      <FiEdit2 />
-                    </IconBtn>
-                    <IconBtn onClick={() => handleDelete(p.project.project_id)}>
-                      <FiTrash2 />
-                    </IconBtn>
-                    <ArrowBtn
-                      onClick={() =>
-                        navigate(`/conferencelist/${p.project.project_id}`)
-                      }
-                    >
-                      <FiArrowRight />
-                    </ArrowBtn>
+                    {editId === p.project.project_id ? (
+                      <>
+                        <IconBtn
+                          onClick={() => handleEditSave(p.project.project_id)}
+                        >
+                          저장
+                        </IconBtn>
+                        <IconBtn onClick={() => setEditId(null)}>취소</IconBtn>
+                      </>
+                    ) : (
+                      <>
+                        <IconBtn
+                          onClick={() =>
+                            handleEdit(
+                              p.project.project_id,
+                              p.project.project_name
+                            )
+                          }
+                        >
+                          <FiEdit2 />
+                        </IconBtn>
+                        <IconBtn
+                          onClick={() => handleDelete(p.project.project_id)}
+                        >
+                          <FiTrash2 />
+                        </IconBtn>
+                        <ArrowBtn
+                          onClick={() =>
+                            navigate(`/conferencelist/${p.project.project_id}`)
+                          }
+                        >
+                          <FiArrowRight />
+                        </ArrowBtn>
+                      </>
+                    )}
                   </IconGroup>
                 </Td>
               </Tr>

@@ -141,3 +141,35 @@ export async function deleteProject(projectId: string): Promise<void> {
     throw error;
   }
 }
+
+export async function updateProjectName(
+  projectId: string,
+  newName: string
+): Promise<void> {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/projects/${projectId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: `Bearer ${token}`, // 필요 시 인증 토큰 추가
+        },
+        body: JSON.stringify({
+          project_name: newName,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "프로젝트 이름 수정에 실패했습니다.");
+    }
+
+    const result = await response.json();
+    console.log("프로젝트 이름 수정 성공:", result.message);
+  } catch (error) {
+    console.error("프로젝트 이름 수정 중 오류:", error);
+    throw error;
+  }
+}
