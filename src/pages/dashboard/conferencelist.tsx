@@ -6,12 +6,6 @@ import { checkAuth } from "../../api/fetchAuthCheck";
 import { useAuth } from "../../contexts/AuthContext";
 import { fetchMeetingsWithUsers } from "../../api/fetchProject";
 
-const dummyConferences = Array.from({ length: 10 }).map((/*_, i*/) => ({
-  name: "기능 정의 kick-off",
-  date: "2025-06-03 10:00",
-  attendees: "김다연, 김시훈, 정다희, ...",
-}));
-
 const ConferenceListPage: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
   const [meetings, setMeetings] = useState<any[]>([]);
@@ -68,7 +62,9 @@ const ConferenceListPage: React.FC = () => {
                   {c.meeting_users.map((mu) => mu.user.user_name).join(", ")}
                 </Td>
                 <Td>
-                  <IconBtn onClick={() => navigate("/dashboard")}>
+                  <IconBtn
+                    onClick={() => navigate(`/dashboard/${c.meeting_id}`)}
+                  >
                     <FiArrowRight />
                   </IconBtn>
                 </Td>

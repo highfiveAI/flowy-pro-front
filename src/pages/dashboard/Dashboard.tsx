@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 // import { DndContext, closestCenter } from '@dnd-kit/core';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import MailingDashboard from "./popup/mailingDashboard";
 import { closestCenter, DndContext } from "@dnd-kit/core";
+import { fetchMeetings } from "../../api/fetchProject";
+import { useParams } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { checkAuth } from "../../api/fetchAuthCheck";
 
 // Main container for the whole page
 const Container = styled.div`
@@ -416,8 +420,96 @@ const SpeechBubbleButton = styled.button`
     border-right: 10px solid #f3eef8;
   }
 `;
+interface Project {
+  project_name: string;
+  project_id: string;
+}
+
+interface Meeting {
+  meeting_agenda: string;
+  meeting_date: string;
+  meeting_id: string;
+  meeting_title: string;
+}
+
+interface ProjectUser {
+  user_id: string;
+  user_name: string;
+}
+
+interface SummaryLog {
+  summary_log_id: string;
+  updated_summary_contents: Record<string, any>; // 어떤 키든 올 수 있는 JSON
+}
+
+interface Feedback {
+  feedback_id: string;
+  feedback_detail: Record<string, any>;
+}
+
+interface meetingInfo {
+  project: string;
+  title: string;
+  date: string;
+  attendees: string[];
+  agenda: string;
+}
 
 const Dashboard: React.FC = () => {
+  const [project, setProject] = useState<Project>();
+  const [meeting, setMeeting] = useState<Meeting>();
+  const [projectUser, setProjectUser] = useState<ProjectUser[]>([]);
+  const [summaryLog, setSummaryLog] = useState<SummaryLog>();
+  const [feedback, setFeedback] = useState<Feedback>();
+  const { meetingId } = useParams<{ meetingId: string }>();
+  const { user, setUser, setLoading } = useAuth();
+
+  useEffect(() => {
+    if (meetingId) {
+      fetchMeetings(meetingId).then((data) => {
+        if (data) {
+          setProject(data.project);
+          const meeting_data: Meeting = {
+            meeting_id: data.meeting_id,
+            meeting_title: data.meeting_title,
+            meeting_agenda: data.meeting_agenda,
+            meeting_date: data.meeting_date,
+          };
+          setMeeting(meeting_data);
+          if (data?.meeting_users?.length) {
+            const extracted = data.meeting_users.map((mu) => ({
+              user_id: mu.user.user_id,
+              user_name: mu.user.user_name,
+            }));
+            setProjectUser(extracted);
+          }
+
+          setSummaryLog(data.summary_log);
+          setFeedback(data.feedback);
+          console.log(data);
+        }
+      });
+    }
+  }, [user]);
+
+  const mailMeetingInfo: meetingInfo = {
+    project: project?.project_name || "", // undefined 방지
+    title: meeting?.meeting_title || "",
+    date: meeting?.meeting_date || "",
+    attendees: projectUser.map((user) => user.user_name),
+    agenda: meeting?.meeting_agenda || "",
+  };
+
+  useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
   const dummyTasks = {
     unassigned: [
       { description: "사용자 역할별 접근 제어 UI 설계", date: "미정" },
@@ -640,7 +732,7 @@ const Dashboard: React.FC = () => {
   };
 
   // 회의 피드백 데이터(더미)
-  const feedback = [
+  const feedbackdummy = [
     {
       section: "[ 불필요한 대화 ]",
       items: [
@@ -668,20 +760,6 @@ const Dashboard: React.FC = () => {
       ],
     },
   ];
-
-  // 회의 기본 정보 데이터(더미)
-  const meetingInfo = {
-    project: "InsightLog",
-    title: "기능 정의 Kick-off",
-    date: "2025-06-03 10:00",
-    attendees: ["김다연", "김시훈", "정다희", "윤지환", "박예빈"],
-    agenda: [
-      "전체 서비스 플로우 설명",
-      "기능 우선순위 정의",
-      "기술적 제한 사항 공유",
-      "초기 화면 구성 및 정보 흐름",
-    ],
-  };
 
   return (
     <Container>
@@ -713,8 +791,8 @@ const Dashboard: React.FC = () => {
             onClose={() => setShowMailPopup(false)}
             summary={summary}
             tasks={tasks}
-            feedback={feedback}
-            meetingInfo={meetingInfo}
+            feedback={feedbackdummy}
+            meetingInfo={mailMeetingInfo}
           />
         )}
 
@@ -725,20 +803,27 @@ const Dashboard: React.FC = () => {
           <SectionBody>
             <BasicInfoGrid>
               <InfoLabel>상위 프로젝트</InfoLabel>
-              <InfoContent>InsightLog</InfoContent>
+              <InfoContent>{project?.project_name}</InfoContent>
               <InfoLabel>회의 제목</InfoLabel>
-              <InfoContent>기능 정의 Kick-off</InfoContent>
+              <InfoContent>{meeting?.meeting_title}</InfoContent>
               <InfoLabel>회의 일시</InfoLabel>
-              <InfoContent>2025-06-03 10:00</InfoContent>
-              <InfoLabel>회의 참석자</InfoLabel>
-              <InfoContent>김다연, 김시훈, 정다희, 윤지환, 박예빈</InfoContent>
-              <InfoLabel>회의 안건</InfoLabel>
               <InfoContent>
-                <div>전체 서비스 플로우 설명</div>
-                <div>기능 우선순위 정의</div>
-                <div>기술적 제한 사항 공유</div>
-                <div>초기 화면 구성 및 정보 흐름</div>
+                {meeting?.meeting_date
+                  ? new Date(meeting.meeting_date)
+                      .toISOString()
+                      .replace("T", " ")
+                      .slice(0, 16)
+                  : "날짜 없음"}
               </InfoContent>
+              <InfoLabel>회의 참석자</InfoLabel>
+              <InfoContent>
+                {projectUser.length > 0
+                  ? projectUser.map((user) => user.user_name).join(", ")
+                  : "참석자 없음"}
+              </InfoContent>
+
+              <InfoLabel>회의 안건</InfoLabel>
+              <InfoContent>{meeting?.meeting_agenda}</InfoContent>
             </BasicInfoGrid>
           </SectionBody>
         </Section>
@@ -753,7 +838,30 @@ const Dashboard: React.FC = () => {
             )}
           </SectionHeader>
           <SectionBody>
-            {isEditingSummary ? (
+            {summaryLog && (
+              <div className="space-y-4">
+                {Object.entries(summaryLog.updated_summary_contents).map(
+                  ([key, value]) => (
+                    <div key={key}>
+                      <h3 className="text-lg font-semibold mb-1">{key}</h3>
+                      {Array.isArray(value) ? (
+                        <ul className="list-disc pl-5">
+                          {value.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <pre className="bg-gray-100 p-2 rounded">
+                          {JSON.stringify(value, null, 2)}
+                        </pre>
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+
+            {/* {isEditingSummary ? (
               <textarea
                 value={editSummaryText}
                 onChange={(e) => setEditSummaryText(e.target.value)}
@@ -782,7 +890,7 @@ const Dashboard: React.FC = () => {
                   </SummarySection>
                 ))}
               </SummaryContent>
-            )}
+            )} */}
           </SectionBody>
         </Section>
 
@@ -927,7 +1035,7 @@ const Dashboard: React.FC = () => {
           </SectionHeader>
           <SectionBody>
             <SummaryContent>
-              <SummarySection>
+              {/* <SummarySection>
                 <SummarySectionHeader>[ 불필요한 대화 ]</SummarySectionHeader>
                 <SummaryList>
                   <SummaryListItem>
@@ -973,7 +1081,29 @@ const Dashboard: React.FC = () => {
                     낮아지는 경향이 나타남.
                   </SummaryListItem>
                 </SummaryList>
-              </SummarySection>
+              </SummarySection> */}
+              {feedback && (
+                <div className="space-y-4">
+                  {Object.entries(feedback.feedback_detail).map(
+                    ([key, value]) => (
+                      <div key={key}>
+                        <h3 className="text-lg font-semibold mb-1">{key}</h3>
+                        {Array.isArray(value) ? (
+                          <ul className="list-disc pl-5">
+                            {value.map((item, index) => (
+                              <li key={index}>{item}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <pre className="bg-gray-100 p-2 rounded">
+                            {JSON.stringify(value, null, 2)}
+                          </pre>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
             </SummaryContent>
           </SectionBody>
         </Section>
