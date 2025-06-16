@@ -2,15 +2,57 @@ import React from 'react';
 import styled from 'styled-components';
 import { FiEdit2, FiTrash2, FiArrowRight } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
-const dummyProjects = Array.from({ length: 10 }).map((_, i) => ({
-  name: 'Pitchpal',
-  created: '2025-05-15',
-  end: '2025-08-31',
-}));
+interface Project {
+  projectName: string;
+  projectCreatedDate: string;
+  projectEndDate: string;
+  projectId: string;
+  userName: string;
+}
+
+// const dummyProjects = Array.from({ length: 10 }).map((_, i) => ({
+//   name: 'Pitchpal',
+//   created: '2025-05-15',
+//   end: '2025-08-31',
+// }));
 
 const ProjectListPage: React.FC = () => {
+  const { user } = useAuth();
+  const [projects, setProjects] = React.useState<Project[]>([]);
+  
+  // user.id로 프로젝트 목록 불러오기
+  React.useEffect(() => {
+    if (!user?.id) return;
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/projects/${user.id}`, {
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.projects) {
+          setProjects(data.projects);
+        }
+      })
+      .catch(error => {
+        console.error('프로젝트 목록을 불러오는데 실패했습니다:', error);
+      });
+  }, [user?.id]);
+
   const navigate = useNavigate();
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
   return (
     <Container>
       <Title>회의 관리</Title>
@@ -26,16 +68,18 @@ const ProjectListPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyProjects.map((p, i) => (
-              <Tr key={i}>
-                <Td>{p.name}</Td>
-                <Td>{p.created}</Td>
-                <Td>{p.end}</Td>
+            {projects.map((project) => (
+              <Tr key={project.projectId}>
+                <Td>{project.projectName}</Td>
+                <Td>{formatDate(project.projectCreatedDate)}</Td>
+                <Td>{formatDate(project.projectEndDate)}</Td>
                 <Td>
                   <IconGroup>
                     <IconBtn><FiEdit2 /></IconBtn>
                     <IconBtn><FiTrash2 /></IconBtn>
-                    <ArrowBtn onClick={() => navigate('/conferencelist')}><FiArrowRight /></ArrowBtn>
+                    <ArrowBtn onClick={() => navigate(`/conferencelist/${project.projectId}`)}>
+                      <FiArrowRight />
+                    </ArrowBtn>
                   </IconGroup>
                 </Td>
               </Tr>
@@ -127,5 +171,5 @@ const ArrowBtn = styled.button`
 const IconGroup = styled.div`
   display: flex;
   align-items: center;
-  margin-left: -100px;
+  margin-left: -30px;
 `; 

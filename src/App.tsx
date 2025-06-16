@@ -22,6 +22,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ProjectListPage from './pages/dashboard/projectlist';
 import ConferenceListPage from './pages/dashboard/conferencelist';
 
+
 function App() {
   return (
     <AuthProvider>
@@ -93,6 +94,11 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/conferencelist" element={
+            <ProtectedRoute>
+              <ConferenceListPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/conferencelist/:projectId" element={
             <ProtectedRoute>
               <ConferenceListPage />
             </ProtectedRoute>

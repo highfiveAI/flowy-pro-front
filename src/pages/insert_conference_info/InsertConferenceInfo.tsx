@@ -13,6 +13,7 @@ import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg �
 import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
 import { useAuth } from '../../contexts/AuthContext';
+import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup'; // 팝업 컴포넌트 임포트
 
 const StyledErrorMessage = styled.div`
   color: #dc3545; /* 밝은 노란색에서 붉은색으로 변경 */
@@ -151,6 +152,7 @@ const InsertConferenceInfo: React.FC = () => {
   const [projects, setProjects] = React.useState<{userName: string, projectName: string, projectId: string}[]>([]); // projectId 필드 추가
   const [projectUsers, setProjectUsers] = React.useState<{user_id: string, name: string, email: string, user_jobname: string}[]>([]); // 프로젝트 참여자 목록 상태 추가
   const [hostId, setHostId] = React.useState('');
+  const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] = React.useState(false);
 
   React.useEffect(() => {
     setUsername(user?.name || '');
@@ -281,7 +283,7 @@ const InsertConferenceInfo: React.FC = () => {
       console.log('attendeesRole:', attendeesRole);
 
       try {
-        // STT API 호출
+        // 1. STT API 호출
         const sttResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/v1/stt/`,
           {
@@ -289,13 +291,12 @@ const InsertConferenceInfo: React.FC = () => {
             body: sttFormData,
           }
         );
-
         if (!sttResponse.ok) {
           const errorData = await sttResponse.json().catch(() => null);
           throw new Error(errorData?.detail || 'STT 업로드에 실패했습니다.');
         }
 
-        // Meeting Upload API 호출
+        // 2. Meeting Upload API 호출
         const meetingResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting-upload/`,
           {
@@ -307,18 +308,14 @@ const InsertConferenceInfo: React.FC = () => {
             }
           }
         );
-
         if (!meetingResponse.ok) {
           const errorData = await meetingResponse.json().catch(() => null);
           throw new Error(errorData?.detail || '회의 정보 업로드에 실패했습니다.');
         }
 
+        // 3. analyze-meeting API 호출 (결과는 기다리지 않음)
         const sttResult = await sttResponse.json();
         const meetingResult = await meetingResponse.json();
-        console.log('STT 서버 응답:', sttResult);
-        console.log('Meeting 서버 응답:', meetingResult);
-        
-        // === analyze-meeting 연속 호출 추가 ===
         const meetingId = meetingResult.meeting_id;
         if (meetingId) {
           const analyzeFormData = new FormData();
@@ -336,9 +333,7 @@ const InsertConferenceInfo: React.FC = () => {
           } else {
             analyzeFormData.append('meeting_date', '');
           }
-          
-
-          const analyzeResponse = await fetch(
+          fetch(
             `${import.meta.env.VITE_API_URL}/api/v1/stt/analyze-meeting/`,
             {
               method: 'POST',
@@ -349,22 +344,18 @@ const InsertConferenceInfo: React.FC = () => {
               }
             }
           );
-          const analyzeData = await analyzeResponse.json();
-          console.log('분석 결과:', analyzeData);
-
-          alert('업로드가 완료되었습니다.');
-          setSubject('');
-          setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
-          setFile(null);
-          setAgenda('');
-          setMeetingDate(null);
-          setResult(analyzeData); // 분석 결과를 결과로 설정
-          setIsCompleted(true);
-        } else {
-          alert('업로드가 완료되었지만, 분석 결과를 가져오지 못했습니다.');
-          setResult(null);
-          setIsCompleted(true);
         }
+
+        // 4. 성공 시 팝업 띄우기
+        setShowAnalysisRequestedPopup(true);
+
+        // 입력값 초기화
+        setSubject('');
+        setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+        setFile(null);
+        setAgenda('');
+        setMeetingDate(null);
+
       } catch (error) {
         setError(
           error instanceof Error
@@ -574,6 +565,12 @@ const InsertConferenceInfo: React.FC = () => {
       </ContentWrapper>
       {showPopup && <NewProjectPopup onClose={() => setShowPopup(false)} />}{' '}
       {/* 팝업 렌더링 */}
+      {showAnalysisRequestedPopup && (
+        <AnalysisRequestedPopup onClose={() => {
+          setShowAnalysisRequestedPopup(false);
+          navigate('/'); // 홈으로 이동
+        }} />
+      )}
     </PageWrapper>
   );
 };

@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiArrowRight } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
-
-const dummyConferences = Array.from({ length: 10 }).map((_, i) => ({
-  name: '기능 정의 kick-off',
-  date: '2025-06-03 10:00',
-  attendees: '김다연, 김시훈, 정다희, ...',
-}));
+import { useNavigate, useParams } from 'react-router-dom';
 
 const ConferenceListPage: React.FC = () => {
+  const { projectId } = useParams();
+  const [meetings, setMeetings] = useState<any[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!projectId) return;
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/conferencelist/${projectId}`)
+      .then(res => res.json())
+      .then(data => setMeetings(data.meetings));
+  }, [projectId]);
+
   return (
     <Container>
       <Title>회의 관리</Title>
@@ -26,7 +30,7 @@ const ConferenceListPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyConferences.map((c, i) => (
+            {meetings.map((c, i) => (
               <Tr key={i}>
                 <Td>{c.name}</Td>
                 <Td>{c.date}</Td>
