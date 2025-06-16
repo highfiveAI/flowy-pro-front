@@ -477,7 +477,7 @@ interface meetingInfo {
   project: string;
   title: string;
   date: string;
-  attendees: string[];
+  attendees: { user_id: string; user_name: string }[];
   agenda: string;
 }
 
@@ -574,10 +574,13 @@ const Dashboard: React.FC = () => {
   // }, [assignRole]);
 
   const mailMeetingInfo: meetingInfo = {
-    project: project?.project_name || '', // undefined 방지
+    project: project?.project_name || '',
     title: meeting?.meeting_title || '',
     date: meeting?.meeting_date || '',
-    attendees: projectUser.map((user) => user.user_name),
+    attendees: projectUser.map((user) => ({
+      user_id: user.user_id,
+      user_name: user.user_name,
+    })),
     agenda: meeting?.meeting_agenda || '',
   };
 
@@ -922,9 +925,9 @@ const Dashboard: React.FC = () => {
         {showMailPopup && (
           <MailingDashboard
             onClose={() => setShowMailPopup(false)}
-            summary={summary}
-            tasks={tasks}
-            feedback={feedbackdummy}
+            summary={summaryLog}
+            tasks={assignRole}
+            feedback={feedback}
             meetingInfo={mailMeetingInfo}
           />
         )}
