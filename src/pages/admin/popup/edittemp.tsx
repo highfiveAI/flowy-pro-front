@@ -56,7 +56,9 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   color: #666;
-  &:hover { color: #351745; }
+  &:hover {
+    color: #351745;
+  }
 `;
 
 const Form = styled.form`
@@ -128,17 +130,21 @@ const Button = styled.button<{ $variant?: 'primary' | 'danger' }>`
   width: 200px;
   height: 60px;
   border-radius: 2rem;
-  background: ${props => props.$variant === 'danger' ? '#dc3545' : '#4b1864'};
+  background: ${(props) =>
+    props.$variant === 'danger' ? '#dc3545' : '#4b1864'};
   color: #fff;
   font-size: 1.25rem;
   font-weight: 700;
   display: block;
-  box-shadow: 0 6px 18px ${props => props.$variant === 'danger' ? 'rgba(220, 53, 69, 0.2)' : '#4b186433'};
+  box-shadow: 0 6px 18px
+    ${(props) =>
+      props.$variant === 'danger' ? 'rgba(220, 53, 69, 0.2)' : '#4b186433'};
   border: none;
   transition: background 0.18s;
   cursor: pointer;
-  &:hover { 
-    background: ${props => props.$variant === 'danger' ? '#c82333' : '#351745'}; 
+  &:hover {
+    background: ${(props) =>
+      props.$variant === 'danger' ? '#c82333' : '#351745'};
   }
 `;
 
@@ -169,7 +175,7 @@ const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
   onClose,
   onUpdate,
   onDelete,
-  selectedTemplate,
+  // selectedTemplate,
   editDocType,
   setEditDocType,
   handleFileChange,
@@ -185,18 +191,33 @@ const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
           <FormGroup>
             <InputBox>
               <label htmlFor="doc_type">문서 양식</label>
-              <input type="text" id="doc_type" name="doc_type" value={editDocType} onChange={(e) => setEditDocType(e.target.value)} required />
+              <input
+                type="text"
+                id="doc_type"
+                name="doc_type"
+                value={editDocType}
+                onChange={(e) => setEditDocType(e.target.value)}
+                required
+              />
             </InputBox>
           </FormGroup>
           <FormGroup>
             <InputBox>
               <label htmlFor="file">템플릿</label>
-              <input type="file" id="file" name="file" onChange={handleFileChange} required />
+              <input
+                type="file"
+                id="file"
+                name="file"
+                onChange={handleFileChange}
+                required
+              />
             </InputBox>
           </FormGroup>
           <ButtonGroup>
             <Button type="submit">수정</Button>
-            <Button type="button" $variant="danger" onClick={onDelete}>삭제</Button>
+            <Button type="button" $variant="danger" onClick={onDelete}>
+              삭제
+            </Button>
           </ButtonGroup>
         </Form>
       </ModalContent>
@@ -204,4 +225,4 @@ const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
   );
 };
 
-export default EditTemplateModal; 
+export default EditTemplateModal;

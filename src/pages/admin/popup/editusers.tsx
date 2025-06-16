@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 const Modal = styled.div<{ $isOpen: boolean }>`
   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
@@ -51,7 +51,9 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   color: #666;
-  &:hover { color: #351745; }
+  &:hover {
+    color: #351745;
+  }
 `;
 const InputBox = styled.div`
   display: flex;
@@ -127,7 +129,9 @@ const ActionButton = styled.button<{ color?: string }>`
   border: none;
   transition: background 0.18s;
   cursor: pointer;
-  &:hover { opacity: 0.92; }
+  &:hover {
+    opacity: 0.92;
+  }
 `;
 
 interface EditUsersProps {
@@ -147,7 +151,12 @@ interface EditUsersProps {
   onClose: () => void;
 }
 
-const EditUsers: React.FC<EditUsersProps> = ({ isOpen, user, onApprove, onReject, onClose }) => {
+const EditUsers: React.FC<EditUsersProps> = ({
+  isOpen,
+  user,
+  onApprove,
+  /*onReject,*/ onClose,
+}) => {
   if (!isOpen) return null;
   return (
     <Modal $isOpen={isOpen}>
@@ -156,7 +165,11 @@ const EditUsers: React.FC<EditUsersProps> = ({ isOpen, user, onApprove, onReject
         <ModalHeader>
           <h2>사용자 정보 수정</h2>
         </ModalHeader>
-        <form onSubmit={e => { e.preventDefault(); }}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
           <FormGroup>
             <InputBox>
               <label>이름</label>
@@ -184,23 +197,37 @@ const EditUsers: React.FC<EditUsersProps> = ({ isOpen, user, onApprove, onReject
           <FormGroup>
             <InputBox>
               <label>부서명</label>
-              <input type="text" name="user_dept_name" value={user.user_dept_name || ''} />
+              <input
+                type="text"
+                name="user_dept_name"
+                value={user.user_dept_name || ''}
+              />
             </InputBox>
           </FormGroup>
           <FormGroup>
             <InputBox>
               <label>팀명</label>
-              <input type="text" name="user_team_name" value={user.user_team_name || ''} />
+              <input
+                type="text"
+                name="user_team_name"
+                value={user.user_team_name || ''}
+              />
             </InputBox>
           </FormGroup>
           <FormGroup>
             <InputBox>
               <label>직무</label>
-              <input type="text" name="user_jobname" value={user.user_jobname || ''} />
+              <input
+                type="text"
+                name="user_jobname"
+                value={user.user_jobname || ''}
+              />
             </InputBox>
           </FormGroup>
           <ButtonRow>
-            <ActionButton type="button" color="#13c7c1" onClick={onApprove}>수정</ActionButton>
+            <ActionButton type="button" color="#13c7c1" onClick={onApprove}>
+              수정
+            </ActionButton>
           </ButtonRow>
         </form>
       </ModalContent>
@@ -208,4 +235,4 @@ const EditUsers: React.FC<EditUsersProps> = ({ isOpen, user, onApprove, onReject
   );
 };
 
-export default EditUsers; 
+export default EditUsers;

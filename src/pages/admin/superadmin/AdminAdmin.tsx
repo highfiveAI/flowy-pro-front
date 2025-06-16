@@ -1,7 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
-import NewAdmin from './popup/newAdmin';
-import EditAdmin from './popup/editAdmin';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -215,7 +213,6 @@ interface User {
   company_name: string;
 }
 
-
 // 정렬 방향을 위한 타입 추가
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -265,17 +262,19 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
 
 const AdminAdmin: React.FC = () => {
   const [admins, setAdmins] = useState<User[]>([]);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    user_id: '',
-    user_name: '',
-    user_email: '',
-    user_phonenum: '',
-    company_name: '',
-    is_active: true,
-  });
+  // const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [selectedAdminId, setSelectedAdminId] = useState<string | null>(
+  //   null
+  // );
+  // const [formData, setFormData] = useState({
+  //   user_id: '',
+  //   user_name: '',
+  //   user_email: '',
+  //   user_phonenum: '',
+  //   company_name: '',
+  //   is_active: true,
+  // });
   const [sortState, setSortState] = useState<SortState>({
     field: '',
     direction: null,
@@ -288,7 +287,7 @@ const AdminAdmin: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/api/v1/admin/users/admin_users`
       );
       const data = await response.json();
-      console.log("받아 온 데이터: ",data)
+      console.log('받아 온 데이터: ', data);
       if (Array.isArray(data)) {
         setAdmins(data);
       } else if (Array.isArray(data.admins)) {
@@ -306,75 +305,75 @@ const AdminAdmin: React.FC = () => {
   }, []);
 
   // 입력 폼 핸들러
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value, type, checked } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: type === 'checkbox' ? checked : value,
+  //   }));
+  // };
 
   // 관리자 생성
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-      if (response.ok) {
-        // fetchAdmins();
-        setFormData({
-          admin_id: '',
-          admin_name: '',
-          admin_email: '',
-          admin_phone: '',
-          company_name: '',
-          is_active: true,
-        });
-        setIsCreateModalOpen(false);
-      }
-    } catch (error) {
-      console.error('관리자 생성 실패:', error);
-    }
-  };
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/`,
+  //       {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(formData),
+  //       }
+  //     );
+  //     if (response.ok) {
+  //       // fetchAdmins();
+  //       setFormData({
+  //         admin_id: '',
+  //         admin_name: '',
+  //         admin_email: '',
+  //         admin_phone: '',
+  //         company_name: '',
+  //         is_active: true,
+  //       });
+  //       setIsCreateModalOpen(false);
+  //     }
+  //   } catch (error) {
+  //     console.error('관리자 생성 실패:', error);
+  //   }
+  // };
 
   // 관리자 수정
-  const handleUpdate = async (adminId: string) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/${adminId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-      if (response.ok) {
-        setAdmins((prev) =>
-          prev.map((admin) =>
-            admin.admin_id === adminId ? { ...admin, ...formData } : admin
-          )
-        );
-        setSelectedAdminId(null);
-        setIsEditModalOpen(false);
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        alert(errorData.message || '수정에 실패했습니다.');
-      }
-    } catch (error) {
-      alert('네트워크 오류 또는 서버 오류로 수정에 실패했습니다.');
-      console.error('관리자 수정 실패:', error);
-    }
-  };
+  // const handleUpdate = async (adminId: string) => {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/${adminId}`,
+  //       {
+  //         method: 'PUT',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(formData),
+  //       }
+  //     );
+  //     if (response.ok) {
+  //       setAdmins((prev) =>
+  //         prev.map((admin) =>
+  //           admin.admin_id === adminId ? { ...admin, ...formData } : admin
+  //         )
+  //       );
+  //       setSelectedAdminId(null);
+  //       setIsEditModalOpen(false);
+  //     } else {
+  //       const errorData = await response.json().catch(() => ({}));
+  //       alert(errorData.message || '수정에 실패했습니다.');
+  //     }
+  //   } catch (error) {
+  //     alert('네트워크 오류 또는 서버 오류로 수정에 실패했습니다.');
+  //     console.error('관리자 수정 실패:', error);
+  //   }
+  // };
 
   // 관리자 삭제
   // const handleDelete = async (adminId: string) => {
@@ -395,30 +394,30 @@ const AdminAdmin: React.FC = () => {
   //   }
   // };
 
-  const handleRowClick = (admin: AdminAccount) => {
-    setSelectedAdminId(admin.admin_id);
-    setFormData({
-      admin_id: admin.admin_id,
-      admin_name: admin.admin_name,
-      admin_email: admin.admin_email,
-      admin_phone: admin.admin_phone,
-      company_name: admin.company_name,
-      is_active: admin.is_active,
-    });
-    setIsEditModalOpen(true);
-  };
+  // const handleRowClick = (admin: AdminAccount) => {
+  //   setSelectedAdminId(admin.admin_id);
+  //   setFormData({
+  //     admin_id: admin.admin_id,
+  //     admin_name: admin.admin_name,
+  //     admin_email: admin.admin_email,
+  //     admin_phone: admin.admin_phone,
+  //     company_name: admin.company_name,
+  //     is_active: admin.is_active,
+  //   });
+  //   setIsEditModalOpen(true);
+  // };
 
-  const handleCreateClick = () => {
-    setFormData({
-      admin_id: '',
-      admin_name: '',
-      admin_email: '',
-      admin_phone: '',
-      company_name: '',
-      is_active: true,
-    });
-    setIsCreateModalOpen(true);
-  };
+  // const handleCreateClick = () => {
+  //   setFormData({
+  //     admin_id: '',
+  //     admin_name: '',
+  //     admin_email: '',
+  //     admin_phone: '',
+  //     company_name: '',
+  //     is_active: true,
+  //   });
+  //   setIsCreateModalOpen(true);
+  // };
 
   // 정렬 핸들러
   const handleSort = (field: string) => {
@@ -440,8 +439,10 @@ const AdminAdmin: React.FC = () => {
     let sorted = [...admins];
     if (sortState.direction !== null) {
       sorted.sort((a, b) => {
-        const aValue = String(a[sortState.field as keyof AdminAccount] || '');
-        const bValue = String(b[sortState.field as keyof AdminAccount] || '');
+        // const aValue = String(a[sortState.field as keyof AdminAccount] || '');
+        // const bValue = String(b[sortState.field as keyof AdminAccount] || '');
+        const aValue = String(a[sortState.field as keyof User] || '');
+        const bValue = String(b[sortState.field as keyof User] || '');
         return sortState.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
@@ -455,7 +456,9 @@ const AdminAdmin: React.FC = () => {
       <MainContent>
         <PageHeader>
           <h1>관리자 계정 관리</h1>
-          <AddButton onClick={handleCreateClick}>+</AddButton>
+          <AddButton onClick={/*handleCreateClick*/ () => console.log('dummy')}>
+            +
+          </AddButton>
         </PageHeader>
 
         <Table>
@@ -463,55 +466,62 @@ const AdminAdmin: React.FC = () => {
             <tr>
               <TableHeader onClick={() => handleSort('user_id')}>
                 USER ID
-
-//                 <SortIcon
-//                   $direction={
-//                     sortState.field === 'admin_id' ? sortState.direction : null
-//                   }
-
-                <SortIcon $direction={sortState.field === 'user_id' ? sortState.direction : null} />
-
+                {/* <SortIcon
+                  $direction={
+                     sortState.field === 'admin_id' ? sortState.direction : null */}
+                <SortIcon
+                  $direction={
+                    sortState.field === 'user_id' ? sortState.direction : null
+                  }
+                />
               </TableHeader>
               <TableHeader onClick={() => handleSort('user_name')}>
                 이름
-
-//                 <SortIcon
-//                   $direction={
-//                     sortState.field === 'admin_name'
-//                       ? sortState.direction
-//                       : null
-//                   }
-
-                <SortIcon $direction={sortState.field === 'user_name' ? sortState.direction : null} />
-
+                {/* <SortIcon
+                   $direction={
+                     sortState.field === 'admin_name'
+                       ? sortState.direction
+                       : null
+                   } */}
+                <SortIcon
+                  $direction={
+                    sortState.field === 'user_name' ? sortState.direction : null
+                  }
+                />
               </TableHeader>
               <TableHeader onClick={() => handleSort('user_email')}>
                 이메일 주소
-
-//                 <SortIcon
-//                   $direction={
-//                     sortState.field === 'admin_email'
-//                       ? sortState.direction
-//                       : null
-//                   }
-//                 />
-
-                <SortIcon $direction={sortState.field === 'user_email' ? sortState.direction : null} />
-
+                {/* <SortIcon
+                  $direction={
+                     sortState.field === 'admin_email'
+                       ? sortState.direction
+                       : null
+                   }
+                 /> */}
+                <SortIcon
+                  $direction={
+                    sortState.field === 'user_email'
+                      ? sortState.direction
+                      : null
+                  }
+                />
               </TableHeader>
               <TableHeader onClick={() => handleSort('user_phonenum')}>
                 연락처
-
-//                 <SortIcon
-//                   $direction={
-//                     sortState.field === 'admin_phone'
-//                       ? sortState.direction
-//                       : null
-//                   }
-//                 />
-
-                <SortIcon $direction={sortState.field === 'user_phonenum' ? sortState.direction : null} />
-
+                {/* <SortIcon
+                  $direction={
+                    sortState.field === 'admin_phone'
+                      ? sortState.direction
+                      : null
+                  }
+                /> */}
+                <SortIcon
+                  $direction={
+                    sortState.field === 'user_phonenum'
+                      ? sortState.direction
+                      : null
+                  }
+                />
               </TableHeader>
               <TableHeader onClick={() => handleSort('company_name')}>
                 회사명
@@ -527,18 +537,21 @@ const AdminAdmin: React.FC = () => {
           </thead>
           <tbody>
             {sortedAdmins.map((admin) => (
+              //               <tr
+              //                 key={admin.admin_id}
+              //                 onClick={() => handleRowClick(admin)}
+              //                 style={{ cursor: 'pointer' }}
+              //               >
+              //                 <td>{admin.admin_id}</td>
+              //                 <td>{admin.admin_name}</td>
+              //                 <td>{admin.admin_email}</td>
+              //                 <td>{admin.admin_phone}</td>
 
-//               <tr
-//                 key={admin.admin_id}
-//                 onClick={() => handleRowClick(admin)}
-//                 style={{ cursor: 'pointer' }}
-//               >
-//                 <td>{admin.admin_id}</td>
-//                 <td>{admin.admin_name}</td>
-//                 <td>{admin.admin_email}</td>
-//                 <td>{admin.admin_phone}</td>
-
-              <tr key={admin.user_id} onClick={() => handleRowClick(admin)} style={{ cursor: 'pointer' }}>
+              <tr
+                key={admin.user_id}
+                onClick={() => /*handleRowClick(admin)*/ console.log('dummy')}
+                style={{ cursor: 'pointer' }}
+              >
                 <td>{admin.user_id}</td>
                 <td>{admin.user_name}</td>
                 <td>{admin.user_email}</td>

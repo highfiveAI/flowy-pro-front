@@ -28,12 +28,12 @@ const PageHeader = styled.div`
   }
 `;
 
-const TopBar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-`;
+// const TopBar = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: 1.5rem;
+// `;
 
 const AddTemplateBtn = styled.button`
   display: flex;
@@ -46,7 +46,7 @@ const AddTemplateBtn = styled.button`
   font-size: 0.8rem;
   cursor: pointer;
   border-radius: 6px;
-  padding: 0.6rem 1.0rem;
+  padding: 0.6rem 1rem;
   transition: background 0.15s;
   &:hover {
     background: rgb(231, 216, 243);
@@ -149,40 +149,40 @@ const TemplateInfo = styled.div`
   }
 `;
 
-const Modal = styled.div<{ $isOpen: boolean }>`
-  display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
+// const Modal = styled.div<{ $isOpen: boolean }>`
+//   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background-color: rgba(0, 0, 0, 0.5);
+//   justify-content: center;
+//   align-items: center;
+//   z-index: 1000;
+// `;
 
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-`;
+// const ModalContent = styled.div`
+//   background-color: white;
+//   padding: 2rem;
+//   border-radius: 8px;
+//   width: 100%;
+//   max-width: 600px;
+//   max-height: 80vh;
+//   overflow-y: auto;
+// `;
 
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+// const ModalHeader = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: 1.5rem;
 
-  h2 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-`;
+//   h2 {
+//     margin: 0;
+//     font-size: 1.5rem;
+//   }
+// `;
 
 const CloseButton = styled.button`
   position: absolute;
@@ -199,50 +199,53 @@ const CloseButton = styled.button`
   }
 `;
 
-const FormGroup = styled.div`
-  margin-bottom: 1rem;
+// const FormGroup = styled.div`
+//   margin-bottom: 1rem;
 
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
+//   label {
+//     display: block;
+//     margin-bottom: 0.5rem;
+//     font-weight: 500;
+//   }
 
-  input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+//   input {
+//     width: 100%;
+//     padding: 0.5rem;
+//     border: 1px solid #ddd;
+//     border-radius: 4px;
+//     font-size: 1rem;
 
-    &:focus {
-      outline: none;
-      border-color: #007bff;
-    }
-  }
-`;
+//     &:focus {
+//       outline: none;
+//       border-color: #007bff;
+//     }
+//   }
+// `;
 
-const Button = styled.button<{ variant?: 'danger' }>`
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  background-color: ${(props) =>
-    props.variant === 'danger' ? '#dc3545' : '#007bff'};
-  color: white;
+// const Button = styled.button<{ variant?: 'danger' }>`
+//   padding: 0.5rem 1rem;
+//   border: none;
+//   border-radius: 4px;
+//   cursor: pointer;
+//   font-weight: 500;
+//   background-color: ${(props) =>
+//     props.variant === 'danger' ? '#dc3545' : '#007bff'};
+//   color: white;
 
-  &:hover {
-    background-color: ${(props) =>
-      props.variant === 'danger' ? '#c82333' : '#0056b3'};
-  }
-`;
+//   &:hover {
+//     background-color: ${(props) =>
+//       props.variant === 'danger' ? '#c82333' : '#0056b3'};
+//   }
+// `;
 
 const DeleteModal = styled.div<{ $isOpen: boolean }>`
   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
   position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.18);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.18);
   justify-content: center;
   align-items: center;
   z-index: 2000;
@@ -285,7 +288,7 @@ const DeleteButton = styled.button`
   border-radius: 2rem;
   padding: 0.8rem 0;
   width: 80%;
-  box-shadow: 0 4px 16px 0 rgba(90,33,114,0.18);
+  box-shadow: 0 4px 16px 0 rgba(90, 33, 114, 0.18);
   cursor: pointer;
   transition: background 0.15s;
   &:hover {
@@ -489,12 +492,23 @@ const AdminTemplate: React.FC = () => {
     <Container>
       <MainContent>
         <PageHeader>
-          <div style={{display:'flex',alignItems:'center'}}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <h1>템플릿 관리</h1>
           </div>
-          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'1rem'}}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '1rem',
+            }}
+          >
             <AddTemplateBtn onClick={() => setIsCreateModalOpen(true)}>
-              <img src="/images/addtemps.svg" alt="add" style={{width:22, height:22, marginRight:6}} />
+              <img
+                src="/images/addtemps.svg"
+                alt="add"
+                style={{ width: 22, height: 22, marginRight: 6 }}
+              />
               템플릿 추가하기
             </AddTemplateBtn>
             <FilterGroup>
@@ -522,7 +536,11 @@ const AdminTemplate: React.FC = () => {
                     setIsEditModalOpen(true);
                   }}
                 >
-                  <img src="/images/edit.svg" alt="edit" style={{width:16, height:16}} />
+                  <img
+                    src="/images/edit.svg"
+                    alt="edit"
+                    style={{ width: 16, height: 16 }}
+                  />
                 </ActionButton>
                 <ActionButton
                   title="다운로드"
@@ -531,7 +549,11 @@ const AdminTemplate: React.FC = () => {
                     window.open(template.interdocs_path, '_blank');
                   }}
                 >
-                  <img src="/images/download.svg" alt="download" style={{width:24, height:24}} />
+                  <img
+                    src="/images/download.svg"
+                    alt="download"
+                    style={{ width: 24, height: 24 }}
+                  />
                 </ActionButton>
                 <ActionButton
                   title="삭제"
@@ -541,21 +563,31 @@ const AdminTemplate: React.FC = () => {
                     setIsDeleteModalOpen(true);
                   }}
                 >
-                  <img src="/images/trash.svg" alt="delete" style={{width:20, height:20}} />
+                  <img
+                    src="/images/trash.svg"
+                    alt="delete"
+                    style={{ width: 20, height: 20 }}
+                  />
                 </ActionButton>
               </CardActions>
               <TemplatePreview>
                 <img
                   src={getFileIcon(template.interdocs_filename)}
                   alt="File icon"
-                  style={{ width: '80px', height: '80px', objectFit: 'contain' }}
+                  style={{
+                    width: '80px',
+                    height: '80px',
+                    objectFit: 'contain',
+                  }}
                 />
               </TemplatePreview>
               <TemplateInfo>
                 <h3>{template.interdocs_filename}</h3>
                 <div className="type">{template.interdocs_type_name}</div>
                 <div className="date">
-                  {new Date(template.interdocs_uploaded_date).toLocaleDateString()}
+                  {new Date(
+                    template.interdocs_uploaded_date
+                  ).toLocaleDateString()}
                 </div>
               </TemplateInfo>
             </TemplateCard>
@@ -577,7 +609,9 @@ const AdminTemplate: React.FC = () => {
           isOpen={isEditModalOpen}
           onClose={closeEditModal}
           onUpdate={handleUpdate}
-          onDelete={() => selectedTemplate && handleDelete(selectedTemplate.interdocs_id)}
+          onDelete={() =>
+            selectedTemplate && handleDelete(selectedTemplate.interdocs_id)
+          }
           selectedTemplate={selectedTemplate}
           editDocType={editDocType}
           setEditDocType={setEditDocType}
@@ -586,8 +620,15 @@ const AdminTemplate: React.FC = () => {
 
         {/* 삭제 확인 모달 */}
         <DeleteModal $isOpen={isDeleteModalOpen}>
-          <DeleteModalContent style={{position:'relative'}}>
-            <CloseButton onClick={() => { setIsDeleteModalOpen(false); setDeleteTargetId(null); }}>×</CloseButton>
+          <DeleteModalContent style={{ position: 'relative' }}>
+            <CloseButton
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setDeleteTargetId(null);
+              }}
+            >
+              ×
+            </CloseButton>
             <DeleteTitle>정말 삭제하시겠습니까?</DeleteTitle>
             <DeleteDesc>삭제한 템플릿은 복원할 수 없습니다.</DeleteDesc>
             <DeleteButton

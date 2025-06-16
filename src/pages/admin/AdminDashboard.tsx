@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 const DashboardContainer = styled.div`
@@ -30,12 +29,10 @@ const AdminDashboard = () => {
     <DashboardContainer>
       <DashboardTitle>대시보드</DashboardTitle>
       <DashboardContent>
-        <DashboardCard>
-          {/* 대시보드 컨텐츠는 추후 추가 예정 */}
-        </DashboardCard>
+        <DashboardCard>{/* 대시보드 컨텐츠는 추후 추가 예정 */}</DashboardCard>
       </DashboardContent>
     </DashboardContainer>
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;
