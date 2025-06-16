@@ -11,7 +11,7 @@ interface EditEventPopProps {
     completed?: boolean;
     comment?: string;
   };
-  onSave: (edited: any) => void;
+  onSave: (id: string, completed: boolean) => void;
   onClose: () => void;
 }
 
@@ -216,14 +216,7 @@ const EditEventPop: React.FC<EditEventPopProps> = ({ type, event, onSave, onClos
           <Textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="메모, 설명, 코멘트 등 입력" />
         </Row>
         <BtnRow>
-          <Button onClick={() => onSave({
-            ...event,
-            title,
-            start: date + (startTime ? 'T'+startTime : ''),
-            end: endTime ? date + 'T'+endTime : undefined,
-            completed: event.completed,
-            comment
-          })}>저장</Button>
+          <Button onClick={() => onSave(event.id, completed)}>저장</Button>
           <Button style={{background:'#aaa'}} onClick={onClose}>닫기</Button>
         </BtnRow>
       </PopContainer>
