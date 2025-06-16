@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { postLogin } from '../../api/fetchMypage';
+import React, { /*useEffect,*/ useState } from "react";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { postLogin } from "../../api/fetchMypage";
 
 const MyPageWrapper = styled.div`
   display: flex;
@@ -96,23 +96,23 @@ const ErrorText = styled.p`
 const MyPage: React.FC = () => {
   // const [id, setId] = useState("");
   const { user } = useAuth();
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     const result = await postLogin({
-      login_id: user?.login_id || '',
+      login_id: user?.login_id || "",
       password,
     });
 
     if (result) {
-      console.log('✅ 로그인 성공:', result);
-      setError('');
-      navigate('/mypage/alterInfo');
+      console.log("✅ 로그인 성공:", result);
+      setError("");
+      navigate("/mypage/alterInfo");
     } else {
-      setError('입력하신 비밀번호가 올바르지 않습니다.');
-      console.log('❌ 로그인 실패');
+      setError("입력하신 비밀번호가 올바르지 않습니다.");
+      console.log("❌ 로그인 실패");
     }
   };
 

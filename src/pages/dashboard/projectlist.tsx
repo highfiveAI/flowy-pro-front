@@ -101,7 +101,7 @@ const Container = styled.div`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #4B2067;
+  color: #4b2067;
   margin-bottom: 40px;
 `;
 const SectionTitle = styled.h2`
@@ -113,7 +113,7 @@ const SectionTitle = styled.h2`
 const TableWrapper = styled.div`
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(80,0,80,0.04);
+  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.04);
   padding: 32px 24px 24px 24px;
 `;
 const Table = styled.table`
@@ -123,7 +123,7 @@ const Table = styled.table`
 const Th = styled.th`
   text-align: left;
   font-size: 1rem;
-  color: #7B5FA1;
+  color: #7b5fa1;
   font-weight: 600;
   padding: 8px 0 12px 0;
   border-bottom: 1px solid #e5e0ee;
@@ -144,7 +144,7 @@ const IconBtn = styled.button`
   border-radius: 6px;
   padding: 6px 8px;
   margin-right: 6px;
-  color: #7B5FA1;
+  color: #7b5fa1;
   font-size: 1.1rem;
   cursor: pointer;
   transition: background 0.15s;
@@ -165,7 +165,7 @@ const ArrowBtn = styled.button`
   justify-content: center;
   transition: background 0.15s;
   &:hover {
-    background: #4B2067;
+    background: #4b2067;
   }
 `;
 const IconGroup = styled.div`
@@ -173,3 +173,4 @@ const IconGroup = styled.div`
   align-items: center;
   margin-left: -30px;
 `; 
+

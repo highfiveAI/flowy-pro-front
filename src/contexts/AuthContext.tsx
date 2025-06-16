@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { checkAuth } from '../api/fetchAuthCheck';
 
 interface User {
   id: string;
@@ -12,28 +13,30 @@ interface AuthContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   setUser: () => {},
   loading: true,
+  setLoading: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // 항상 로그인된 상태로 강제 설정
-  const [user, setUser] = useState<User | null>({
-    id: 'test-id',
-    name: '테스트유저',
-    email: 'test@example.com',
-  });
-  const [loading] = useState(false);
+  // const [user, setUser] = useState<User | null>({
+  //   id: 'test-id',
+  //   name: '테스트유저',
+  //   email: 'test@example.com',
+  // });
+  // const [loading] = useState(false);
 
   // 기존 인증 체크 함수 주석 처리
 
-  // const [user, setUser] = useState<User | null>(null);
-  // const [loading, setLoading] = useState(true);
-  
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
   // async function checkAuth() {
   //   const res = await fetch(
   //     `${import.meta.env.VITE_API_URL}/api/v1/users/auth/check`,
@@ -57,13 +60,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   //   }
   // }
 
-  // useEffect(() => {
-  //   checkAuth();
-  // }, []);    
-
+  useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser, loading, setLoading }}>
       {children}
     </AuthContext.Provider>
   );
