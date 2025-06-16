@@ -2,7 +2,7 @@
 // 설치 명령: npm install react-big-calendar moment
 // 타입: npm install --save-dev @types/react-big-calendar @types/moment
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 import styled from 'styled-components'
@@ -283,19 +283,77 @@ function YearMonthPicker({
 
 export default function CalendarPage() {
   const [value, setValue] = useState<Date>(new Date(2025, 5, 1))
-  const [events, setEvents] = useState(INITIAL_EVENTS)
+  const [events, setEvents] = useState<CalendarEvent[]>([])
+  const [userId, setUserId] = useState<string | null>(null)
   const [showPicker, setShowPicker] = useState(false);
   const [popupDate, setPopupDate] = useState<Date|null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [projects, setProjects] = useState<{ project_id: string; project_name: string }[]>([]);
 
-  const handleToggleTodo = (id: string) => {
-    setEvents((prevEvents) =>
-      prevEvents.map((ev) =>
-        ev.id === id && ev.type === 'todo'
-          ? { ...ev, completed: !ev.completed }
-          : ev
-      )
-    );
-  };
+  // 1. 로그인한 사용자의 user_id를 먼저 가져온다
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/one`, {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.user_id) setUserId(data.user_id)
+      })
+      .catch(err => {
+        console.error('유저 정보 불러오기 실패:', err)
+      })
+  }, [])
+
+  useEffect(() => {
+    if (!userId) return;
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/projects/user_id/${userId}`, {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => {
+        // 중첩된 구조에서 project_id, project_name만 추출
+        const projectList = data.map((item: any) => ({
+          project_id: item.project.project_id,
+          project_name: item.project.project_name,
+        }));
+        setProjects(projectList);
+        if (projectList.length > 0) setSelectedProjectId(projectList[0].project_id);
+      });
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId || !selectedProjectId) return;
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/calendar/${userId}/${selectedProjectId}`, {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => {
+        setEvents(
+          data.map((ev: any) => ({
+            id: ev.calendar_id,
+            user_id: ev.user_id,
+            project_id: ev.project_id,
+            title: ev.title,
+            start: ev.start ? new Date(ev.start) : undefined,
+            end: ev.end ? new Date(ev.end) : undefined,
+            type: ev.calendar_type,
+            completed: ev.completed,
+            created_at: ev.created_at,
+            updated_at: ev.updated_at,
+          }))
+        );
+      });
+  }, [userId, selectedProjectId]);
+
+  // const handleToggleTodo = (id: string) => {
+  //   setEvents((prevEvents) =>
+  //     prevEvents.map((ev) =>
+  //       ev.id === id && ev.type === 'todo'
+  //         ? { ...ev, completed: !ev.completed }
+  //         : ev
+  //     )
+  //   );
+  // };
 
   // 월 이동 함수
   const handlePrevMonth = () => {
@@ -316,9 +374,27 @@ export default function CalendarPage() {
     setShowPicker(false);
   };
 
-  // 일정 수정 핸들러
-  const handleEditEvent = (edited: any) => {
-    setEvents(prev => prev.map(ev => ev.id === edited.id ? { ...ev, ...edited } : ev));
+  // completed만 수정하는 간단한 핸들러
+  const handleEditCompleted = (id: string, completed: boolean) => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/calendar/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        calendar_id: id,
+        completed: completed,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        setEvents(prev =>
+          prev.map(ev =>
+            ev.id === id
+              ? { ...ev, completed: data.completed }
+              : ev
+          )
+        );
+      });
   };
 
   // 팝업 닫기 함수 추가 (팝업이 닫힐 때 포커스 해제)
@@ -352,10 +428,15 @@ export default function CalendarPage() {
           <FilterArea>
             <FilterSelectBox>
               <FaRegFileAlt style={{ fontSize: '1.2rem', opacity: 0.7 }} />
-              <FilterSelect>
-                <option value="Insightlog">Insightlog</option>
-                <option value="projectname1">projectname1</option>
-                <option value="projectname2">projectname2</option>
+              <FilterSelect
+                value={selectedProjectId || ''}
+                onChange={e => setSelectedProjectId(e.target.value)}
+              >
+                {projects.map(proj => (
+                  <option key={proj.project_id} value={proj.project_id}>
+                    {proj.project_name}
+                  </option>
+                ))}
               </FilterSelect>
             </FilterSelectBox>
             <ApplyButton>적용</ApplyButton>
@@ -411,7 +492,10 @@ export default function CalendarPage() {
                     <div key={t.id} className="calendar-todo">
                       <CalendarCheckbox
                         checked={t.completed}
-                        onChange={() => handleToggleTodo(t.id)}
+                        onChange={e => {
+                          e.stopPropagation(); // 체크박스 클릭 시 상위 이벤트 전파 중단
+                          handleEditCompleted(t.id, !t.completed);
+                        }}
                       />
                       <span style={{ textDecoration: t.completed ? 'line-through' : 'none' }}>{t.title}</span>
                     </div>
@@ -432,7 +516,7 @@ export default function CalendarPage() {
           todos={events.filter(ev => ev.type === 'todo' && isSameDay(new Date(ev.start), popupDate))}
           meetings={events.filter(ev => ev.type === 'meeting' && isSameDay(new Date(ev.start), popupDate))}
           onClose={handleClosePopup}
-          onEdit={handleEditEvent}
+          onEdit={handleEditCompleted}
         />
       )}
     </CalendarWrapper>

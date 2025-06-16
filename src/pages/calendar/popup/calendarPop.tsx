@@ -7,7 +7,7 @@ interface CalendarPopProps {
   todos: { id: string; title: string; completed?: boolean; start?: Date|string; end?: Date|string; comment?: string }[];
   meetings: { id: string; title: string; start?: Date|string; end?: Date|string; comment?: string }[];
   onClose: () => void;
-  onEdit?: (edited: any) => void;
+  onEdit?: (id: string, completed: boolean) => void;
 }
 
 const Overlay = styled.div`
@@ -125,7 +125,7 @@ const CalendarPop: React.FC<CalendarPopProps> = ({ date, todos, meetings, onClos
               }
             }
             return (
-              <MeetingBox key={m.id} onClick={() => setEditTarget({ type: 'meeting', event: m })} style={{cursor:'pointer'}}>
+              <MeetingBox key={m.id} /* onClick={() => setEditTarget({ type: 'meeting', event: m })} style={{cursor:'pointer'}}*/>
                 {timeStr && <MeetingTimeBox>{timeStr}</MeetingTimeBox>}{m.title}
               </MeetingBox>
             );
@@ -137,9 +137,11 @@ const CalendarPop: React.FC<CalendarPopProps> = ({ date, todos, meetings, onClos
             <TodoBox key={t.id} onClick={e => { if (e.target === e.currentTarget) setEditTarget({ type: 'todo', event: t }); }} style={{cursor:'pointer'}}>
               <LargeCheckbox
                 checked={t.completed}
+                // onClick={e => e.stopPropagation()}
                 onChange={e => {
                   e.stopPropagation();
-                  onEdit && onEdit({ ...t, completed: !t.completed });
+                  console.log('체크박스 onEdit 호출', t.id, !t.completed);
+                  onEdit && onEdit(t.id, !t.completed);
                 }}
               />
               <span style={{textDecoration: t.completed ? 'line-through' : 'none'}}>{t.title}</span>
@@ -150,8 +152,8 @@ const CalendarPop: React.FC<CalendarPopProps> = ({ date, todos, meetings, onClos
           <EditEventPop
             type={editTarget.type}
             event={editTarget.event}
-            onSave={edited => {
-              onEdit && onEdit(edited);
+            onSave={(id: string, completed: boolean) => {
+              onEdit && onEdit(id, completed);
               setEditTarget(null);
             }}
             onClose={() => setEditTarget(null)}
