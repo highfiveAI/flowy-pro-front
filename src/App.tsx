@@ -9,7 +9,7 @@ import SignIn from './sign_in/SignIn';
 import SocialSignUp from './pages/social_sign_up/SocialSignUp';
 import DocsAgentTest from './pages/docs_agent_test/docs_agent_test';
 import AdminUser from './pages/admin/AdminUser';
-import AdminCom from './pages/admin/AdminCom';
+import AdminCompany from './pages/admin/superadmin/AdminCompany';
 import AdminPosition from './pages/admin/AdminPosition';
 import AdminTemplate from './pages/admin/AdminTemplate';
 import Login from './pages/log_in/Login';
@@ -21,6 +21,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProjectListPage from './pages/dashboard/projectlist';
 import ConferenceListPage from './pages/dashboard/conferencelist';
+import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
+
 
 
 function App() {
@@ -37,72 +39,110 @@ function App() {
           <Route path="/social_sign_up" element={<SocialSignUp />} />
           <Route path="/result" element={<Result />} />
 
-          {/* 보호된 라우트 */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/insert_info" element={
-            <ProtectedRoute>
-              <InsertConferenceInfo />
-            </ProtectedRoute>
-          } />
-          <Route path="/docs_agent_test" element={
-            <ProtectedRoute>
-              <DocsAgentTest />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/user" element={
-            <ProtectedRoute>
-              <AdminUser />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/company" element={
-            <ProtectedRoute>
-              <AdminCom />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/position" element={
-            <ProtectedRoute>
-              <AdminPosition />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/template" element={
-            <ProtectedRoute>
-              <AdminTemplate />
-            </ProtectedRoute>
-          } />
-          <Route path="/mypage" element={
-            <ProtectedRoute>
-              <MyPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/mypage/alterInfo" element={
-            <ProtectedRoute>
-              <AlterInfo />
-            </ProtectedRoute>
-          } />
-          <Route path="/calendar" element={
-            <ProtectedRoute>
-              <Calendar />
-            </ProtectedRoute>
-          } />
-          <Route path="/projectlist" element={
-            <ProtectedRoute>
-              <ProjectListPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/conferencelist" element={
-            <ProtectedRoute>
-              <ConferenceListPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/conferencelist/:projectId" element={
-            <ProtectedRoute>
-              <ConferenceListPage />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/dashboard/:meetingId"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/insert_info"
+            element={
+              <ProtectedRoute>
+                <InsertConferenceInfo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/docs_agent_test"
+            element={
+              <ProtectedRoute>
+                <DocsAgentTest />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/user"
+            element={
+              <ProtectedRoute>
+                <AdminUser />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/company"
+            element={
+              <ProtectedRoute>
+                <AdminCompany />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/position"
+            element={
+              <ProtectedRoute>
+                <AdminPosition />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/template"
+            element={
+              <ProtectedRoute>
+                <AdminTemplate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/admin"
+            element={
+              <ProtectedRoute>
+                <AdminAdmin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mypage"
+            element={
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mypage/alterInfo"
+            element={
+              <ProtectedRoute>
+                <AlterInfo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <ProtectedRoute>
+                <Calendar />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projectlist"
+            element={
+              <ProtectedRoute>
+                <ProjectListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/conferencelist/:projectId"
+            element={
+              <ProtectedRoute>
+                <ConferenceListPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </AuthProvider>
