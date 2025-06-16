@@ -211,7 +211,7 @@ const AlterInfo: React.FC = () => {
             <Label>소속 회사명</Label>
             <Input
               type="text"
-              value={mypageUser?.company.company_name || ""}
+              value={mypageUser?.company_name || ""}
               readOnly
             />
           </InputGroup>

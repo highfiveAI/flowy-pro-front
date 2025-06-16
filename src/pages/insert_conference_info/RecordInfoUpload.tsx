@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import styled from 'styled-components';
+import React, { useRef, useState } from "react";
+import styled from "styled-components";
 import RecordIcon from "/images/record.svg";
 
 const ButtonGroup = styled.div`
@@ -12,19 +12,20 @@ const ButtonGroup = styled.div`
 const Button = styled.button<{ color?: string }>`
   font-size: 1rem;
   color: white;
-  background-color: ${({ color }) => (color === 'red' ? 'transparent' : color || '#6a0dad')};
+  background-color: ${({ color }) =>
+    color === "red" ? "transparent" : color || "#6a0dad"};
   border: none;
   border-radius: 8px;
-  padding: ${({ color }) => (color === 'red' ? '0' : '10px 18px')};
+  padding: ${({ color }) => (color === "red" ? "0" : "10px 18px")};
   cursor: pointer;
 
   &:hover {
     background-color: ${({ color }) => {
-      if (color === 'red') return 'transparent';
-      if (color === 'gray') return '#6c757d';
-      return '#5a099a';
+      if (color === "red") return "transparent";
+      if (color === "gray") return "#6c757d";
+      return "#5a099a";
     }};
-    opacity: ${({ color }) => (color === 'red' ? '0.8' : '1')};
+    opacity: ${({ color }) => (color === "red" ? "0.8" : "1")};
   }
 
   img {
@@ -64,13 +65,13 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
   );
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [fileName, setFileName] = useState<string>('');
+  const [fileName, setFileName] = useState<string>("");
   const audioChunks = useRef<Blob[]>([]);
 
   // 날짜+시간 파일명 생성 함수
   const getCurrentFileName = () => {
     const now = new Date();
-    const pad = (n: number) => n.toString().padStart(2, '0');
+    const pad = (n: number) => n.toString().padStart(2, "0");
     const year = now.getFullYear();
     const month = pad(now.getMonth() + 1);
     const day = pad(now.getDate());
@@ -82,7 +83,7 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
   // 마이크 권한 요청 및 녹음 시작
   const startRecording = async () => {
     if (!navigator.mediaDevices) {
-      alert('이 브라우저는 마이크 녹음을 지원하지 않습니다.');
+      alert("이 브라우저는 마이크 녹음을 지원하지 않습니다.");
       return;
     }
     try {
@@ -95,13 +96,13 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
         }
       };
       recorder.onstop = () => {
-        const blob = new Blob(audioChunks.current, { type: 'audio/webm' });
+        const blob = new Blob(audioChunks.current, { type: "audio/webm" });
         setAudioBlob(blob);
         setAudioUrl(URL.createObjectURL(blob));
         const name = getCurrentFileName();
         setFileName(name);
         // Blob을 File로 변환해서 setFile로 부모에 전달
-        const file = new File([blob], name, { type: 'audio/webm' });
+        const file = new File([blob], name, { type: "audio/webm" });
         setFile(file);
       };
       recorder.start();
@@ -109,13 +110,13 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
       setIsRecording(true);
       setIsPaused(false);
     } catch (err) {
-      alert('마이크 권한이 필요합니다.');
+      alert("마이크 권한이 필요합니다.");
     }
   };
 
   // 녹음 일시정지
   const pauseRecording = () => {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
       mediaRecorder.pause();
       setIsPaused(true);
       setIsRecording(false);
@@ -124,7 +125,7 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
 
   // 녹음 재개
   const resumeRecording = () => {
-    if (mediaRecorder && mediaRecorder.state === 'paused') {
+    if (mediaRecorder && mediaRecorder.state === "paused") {
       mediaRecorder.resume();
       setIsPaused(false);
       setIsRecording(true);
@@ -148,7 +149,7 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
       setIsPaused(false);
       setAudioUrl(null);
       setAudioBlob(null);
-      setFileName('');
+      setFileName("");
       setFile(null);
       audioChunks.current = [];
     }
@@ -158,10 +159,10 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
   const downloadRecording = () => {
     if (audioBlob) {
       const url = window.URL.createObjectURL(audioBlob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
+      const a = document.createElement("a");
+      a.style.display = "none";
       a.href = url;
-      a.download = fileName || 'recorded_audio.webm';
+      a.download = fileName || "recorded_audio.webm";
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -189,7 +190,13 @@ const RecordInfoUpload: React.FC<RecordUploadProps> = ({ setFile }) => {
       </ButtonGroup>
       {audioUrl && (
         <div>
-          <div style={{ marginBottom: '0.5rem', fontWeight: 'bold', color: '#351745' }}>
+          <div
+            style={{
+              marginBottom: "0.5rem",
+              fontWeight: "bold",
+              color: "#351745",
+            }}
+          >
             파일명: {fileName}
           </div>
           <AudioPlayer src={audioUrl} controls />

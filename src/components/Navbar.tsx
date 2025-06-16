@@ -149,6 +149,7 @@ const Navbar: React.FC = () => {
     { name: '회사 관리', path: '/admin/company' },
     { name: '직책 관리', path: '/admin/position' },
     { name: '템플릿 관리', path: '/admin/template' },
+    { name: '관리자 관리', path: '/admin/admin' },
   ];
 
   const handleLogout = async () => {
@@ -185,6 +186,10 @@ const Navbar: React.FC = () => {
           </MenuItem>
           <MenuItem onClick={() => navigate('/calendar')}>
             작업 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/admin/dashboard')}>
+            대시보드
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
           <MenuItem
