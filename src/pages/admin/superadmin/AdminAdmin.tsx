@@ -200,42 +200,21 @@ const AddButton = styled.button`
 //   }
 // `;
 
-interface AdminAccount {
-  admin_id: string;
-  admin_name: string;
-  admin_email: string;
-  admin_phone: string;
+interface User {
+  user_id: string;
+  user_login_id: string;
+  user_email: string;
+  user_name: string;
+  user_phonenum: string;
+  user_dept_name: string;
+  user_team_name: string;
+  user_jobname: string;
+  user_company_id: string;
+  user_position_id: string;
+  user_sysrole_id: string;
   company_name: string;
-  is_active: boolean;
 }
 
-const dummyAdmins: AdminAccount[] = [
-  {
-    admin_id: 'admin0001',
-    admin_name: '관리자1',
-    admin_email: 'adminhimedia@gmail.com',
-    admin_phone: '010-1234-5678',
-    company_name: '하이미디어',
-    is_active: true,
-  },
-  {
-    admin_id: 'admin0002',
-    admin_name: '관리자2',
-    admin_email: 'admin2@himedia.com',
-    admin_phone: '010-2345-6789',
-    company_name: '하이미디어',
-    is_active: true,
-  },
-  {
-    admin_id: 'admin0003',
-    admin_name: '관리자3',
-    admin_email: 'admin3@himedia.com',
-    admin_phone: '010-3456-7890',
-    company_name: '하이미디어',
-    is_active: false,
-  },
-  // ...더 추가 가능
-];
 
 // 정렬 방향을 위한 타입 추가
 type SortDirection = 'asc' | 'desc' | null;
@@ -285,15 +264,15 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
 `;
 
 const AdminAdmin: React.FC = () => {
-  const [admins, setAdmins] = useState<AdminAccount[]>(dummyAdmins);
+  const [admins, setAdmins] = useState<User[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    admin_id: '',
-    admin_name: '',
-    admin_email: '',
-    admin_phone: '',
+    user_id: '',
+    user_name: '',
+    user_email: '',
+    user_phonenum: '',
     company_name: '',
     is_active: true,
   });
@@ -303,27 +282,28 @@ const AdminAdmin: React.FC = () => {
   });
 
   // 관리자 목록 조회 (더미 데이터 사용, 실제 API 연결 시 아래 코드 사용)
-  // const fetchAdmins = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/`
-  //     );
-  //     const data = await response.json();
-  //     if (Array.isArray(data)) {
-  //       setAdmins(data);
-  //     } else if (Array.isArray(data.admins)) {
-  //       setAdmins(data.admins);
-  //     } else {
-  //       setAdmins([]);
-  //     }
-  //   } catch (error) {
-  //     console.error('관리자 목록 조회 실패:', error);
-  //   }
-  // };
+  const fetchAdmins = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/admin_users`
+      );
+      const data = await response.json();
+      console.log("받아 온 데이터: ",data)
+      if (Array.isArray(data)) {
+        setAdmins(data);
+      } else if (Array.isArray(data.admins)) {
+        setAdmins(data.admins);
+      } else {
+        setAdmins([]);
+      }
+    } catch (error) {
+      console.error('관리자 목록 조회 실패:', error);
+    }
+  };
 
-  // useEffect(() => {
-  //   fetchAdmins();
-  // }, []);
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
 
   // 입력 폼 핸들러
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -481,43 +461,57 @@ const AdminAdmin: React.FC = () => {
         <Table>
           <thead>
             <tr>
-              <TableHeader onClick={() => handleSort('admin_id')}>
+              <TableHeader onClick={() => handleSort('user_id')}>
                 USER ID
-                <SortIcon
-                  $direction={
-                    sortState.field === 'admin_id' ? sortState.direction : null
-                  }
-                />
+
+//                 <SortIcon
+//                   $direction={
+//                     sortState.field === 'admin_id' ? sortState.direction : null
+//                   }
+
+                <SortIcon $direction={sortState.field === 'user_id' ? sortState.direction : null} />
+
               </TableHeader>
-              <TableHeader onClick={() => handleSort('admin_name')}>
+              <TableHeader onClick={() => handleSort('user_name')}>
                 이름
-                <SortIcon
-                  $direction={
-                    sortState.field === 'admin_name'
-                      ? sortState.direction
-                      : null
-                  }
-                />
+
+//                 <SortIcon
+//                   $direction={
+//                     sortState.field === 'admin_name'
+//                       ? sortState.direction
+//                       : null
+//                   }
+
+                <SortIcon $direction={sortState.field === 'user_name' ? sortState.direction : null} />
+
               </TableHeader>
-              <TableHeader onClick={() => handleSort('admin_email')}>
+              <TableHeader onClick={() => handleSort('user_email')}>
                 이메일 주소
-                <SortIcon
-                  $direction={
-                    sortState.field === 'admin_email'
-                      ? sortState.direction
-                      : null
-                  }
-                />
+
+//                 <SortIcon
+//                   $direction={
+//                     sortState.field === 'admin_email'
+//                       ? sortState.direction
+//                       : null
+//                   }
+//                 />
+
+                <SortIcon $direction={sortState.field === 'user_email' ? sortState.direction : null} />
+
               </TableHeader>
-              <TableHeader onClick={() => handleSort('admin_phone')}>
+              <TableHeader onClick={() => handleSort('user_phonenum')}>
                 연락처
-                <SortIcon
-                  $direction={
-                    sortState.field === 'admin_phone'
-                      ? sortState.direction
-                      : null
-                  }
-                />
+
+//                 <SortIcon
+//                   $direction={
+//                     sortState.field === 'admin_phone'
+//                       ? sortState.direction
+//                       : null
+//                   }
+//                 />
+
+                <SortIcon $direction={sortState.field === 'user_phonenum' ? sortState.direction : null} />
+
               </TableHeader>
               <TableHeader onClick={() => handleSort('company_name')}>
                 회사명
@@ -533,31 +527,39 @@ const AdminAdmin: React.FC = () => {
           </thead>
           <tbody>
             {sortedAdmins.map((admin) => (
-              <tr
-                key={admin.admin_id}
-                onClick={() => handleRowClick(admin)}
-                style={{ cursor: 'pointer' }}
-              >
-                <td>{admin.admin_id}</td>
-                <td>{admin.admin_name}</td>
-                <td>{admin.admin_email}</td>
-                <td>{admin.admin_phone}</td>
+
+//               <tr
+//                 key={admin.admin_id}
+//                 onClick={() => handleRowClick(admin)}
+//                 style={{ cursor: 'pointer' }}
+//               >
+//                 <td>{admin.admin_id}</td>
+//                 <td>{admin.admin_name}</td>
+//                 <td>{admin.admin_email}</td>
+//                 <td>{admin.admin_phone}</td>
+
+              <tr key={admin.user_id} onClick={() => handleRowClick(admin)} style={{ cursor: 'pointer' }}>
+                <td>{admin.user_id}</td>
+                <td>{admin.user_name}</td>
+                <td>{admin.user_email}</td>
+                <td>{admin.user_phonenum}</td>
+
                 <td>{admin.company_name}</td>
               </tr>
             ))}
           </tbody>
         </Table>
 
-        {/* 생성 모달 */}
+        {/* 생성 모달
         <NewAdmin
           visible={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSubmit={handleSubmit}
           formData={formData}
           onChange={handleInputChange}
-        />
+        /> */}
 
-        {/* 수정 모달 */}
+        {/* 수정 모달
         <EditAdmin
           visible={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
@@ -571,7 +573,7 @@ const AdminAdmin: React.FC = () => {
           }
           formData={formData}
           onChange={handleInputChange}
-        />
+        /> */}
       </MainContent>
     </Container>
   );

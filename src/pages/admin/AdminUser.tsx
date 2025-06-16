@@ -1,53 +1,63 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
+import EditUsers from "./popup/editusers";
+import ManageUsers from "./popup/manageusers";
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   height: 100vh;
-  background-color: #f7f7f7;
+  background: #fff;
 `;
 
 const MainContent = styled.div`
   flex: 1;
-  padding: 2rem;
+  padding: 40px 60px 0 60px;
 `;
 
 const PageHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 
   h1 {
-    font-size: 1.5rem;
-    color: #333;
+    font-size: 2rem;
+    color: #480b6a;
+    font-weight: 700;
+    letter-spacing: -1px;
   }
 `;
 
 const UserTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
+  background: #fff;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 1.05rem;
 
   th,
   td {
-    padding: 1rem;
+    padding: 20px 16px;
     text-align: left;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #ececec;
+    font-size: 1.05rem;
+    color: #222;
+    font-weight: 400;
   }
 
   th {
-    background-color: #f8fafc;
-    color: #64748b;
-    font-weight: 500;
-    white-space: nowrap;
+    background: #fff;
+    color: #351745;
+    font-weight: 600;
+    border-bottom: 2px solid #ececec;
+    font-size: 1.08rem;
+    letter-spacing: -0.5px;
   }
 
   tbody tr:hover {
-    background-color: #f8fafc;
+    background: #f8f5ff;
   }
 `;
 
@@ -223,7 +233,7 @@ interface Position {
 
 const CreateButton = styled.button`
   padding: 0.5rem 1rem;
-  background-color: #007bff;
+  background-color: #480B6A;
   color: white;
   border: none;
   border-radius: 4px;
@@ -234,7 +244,7 @@ const CreateButton = styled.button`
   gap: 0.5rem;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #480B6A;
   }
 `;
 
@@ -315,13 +325,13 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
 
   &::before {
     border-bottom: 4px solid
-      ${(props) => (props.$direction === "asc" ? "#2563eb" : "#cbd5e1")};
+      ${(props) => (props.$direction === "asc" ? "#480B6A" : "#cbd5e1")};
     margin-bottom: 2px;
   }
 
   &::after {
     border-top: 4px solid
-      ${(props) => (props.$direction === "desc" ? "#2563eb" : "#cbd5e1")};
+      ${(props) => (props.$direction === "desc" ? "#480B6A" : "#cbd5e1")};
   }
 `;
 
@@ -376,6 +386,7 @@ const AdminUser: React.FC = () => {
   // 모달 상태 관리
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 
   // 폼 데이터 초기 상태
   const initialFormData = {
@@ -406,6 +417,7 @@ const AdminUser: React.FC = () => {
     direction: null,
   });
   const [showPendingOnly, setShowPendingOnly] = useState(false);
+  const [showRejectedOnly, setShowRejectedOnly] = useState(false);
 
   // API 호출 함수
   const fetchUsers = async () => {
@@ -618,6 +630,7 @@ const AdminUser: React.FC = () => {
   };
 
   const handleRowClick = (user: User) => {
+    if (showRejectedOnly) return; // 반려 목록에서는 팝업 없음
     setSelectedUserId(user.user_id);
     setFormData({
       user_name: user.user_name,
@@ -636,13 +649,14 @@ const AdminUser: React.FC = () => {
       position_name: user.position_name || "",
       sysrole_name: user.sysrole_name || "",
     });
-
-    // 회사 ID가 있으면 해당 회사의 직급 목록 가져오기
     if (currentUserCompany?.company_id) {
       fetchCompanyPositions(currentUserCompany.company_id);
     }
-
-    setIsEditModalOpen(true);
+    if (showPendingOnly) {
+      setIsManageModalOpen(true);
+    } else {
+      setIsEditModalOpen(true);
+    }
   };
 
   // 상태 변경 핸들러
@@ -687,58 +701,69 @@ const AdminUser: React.FC = () => {
   // 필터링된 사용자 목록 계산
   const filteredUsers = useMemo(() => {
     let filtered = [...users];
-
-    // 현재 사용자의 회사에 속한 사용자들만 필터링
     if (currentUserCompany) {
       filtered = filtered.filter(
         (user) => user.user_company_id === currentUserCompany.company_id
       );
     }
-
-    // Pending 필터 적용
     if (showPendingOnly) {
       filtered = filtered.filter(
         (user) => user.signup_completed_status === "Pending"
       );
+    } else if (showRejectedOnly) {
+      filtered = filtered.filter(
+        (user) => user.signup_completed_status === "Rejected"
+      );
+    } else {
+      filtered = filtered.filter(
+        (user) => user.signup_completed_status === "Approved"
+      );
     }
-
-    // 기존 정렬 로직 적용
     if (sortState.direction !== null) {
       filtered.sort((a, b) => {
         const aValue = a[sortState.field as keyof User] || "";
         const bValue = b[sortState.field as keyof User] || "";
-
         return sortState.direction === "asc"
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       });
     }
-
     return filtered;
-  }, [users, showPendingOnly, sortState, currentUserCompany]);
+  }, [users, showPendingOnly, showRejectedOnly, sortState, currentUserCompany]);
+
+  const handleManageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <Container>
       <MainContent>
         <PageHeader>
           <h1>사용자 관리</h1>
-          <CreateButton onClick={handleCreateClick}>
-            + 새 사용자 생성
-          </CreateButton>
         </PageHeader>
 
         <FilterContainer>
           <FilterButton
-            $isActive={!showPendingOnly}
-            onClick={() => setShowPendingOnly(false)}
+            $isActive={!showPendingOnly && !showRejectedOnly}
+            onClick={() => { setShowPendingOnly(false); setShowRejectedOnly(false); }}
           >
-            전체 보기
+            승인된 사용자 목록
           </FilterButton>
           <FilterButton
             $isActive={showPendingOnly}
-            onClick={() => setShowPendingOnly(true)}
+            onClick={() => { setShowPendingOnly(true); setShowRejectedOnly(false); }}
           >
-            대기중인 사용자만 보기
+            승인 대기 중인 사용자 목록
+          </FilterButton>
+          <FilterButton
+            $isActive={showRejectedOnly}
+            onClick={() => { setShowPendingOnly(false); setShowRejectedOnly(true); }}
+          >
+            반려된 사용자 목록
           </FilterButton>
         </FilterContainer>
 
@@ -818,44 +843,35 @@ const AdminUser: React.FC = () => {
                 <td>{user.user_dept_name}</td>
                 <td>{user.user_team_name}</td>
                 <td onClick={(e) => e.stopPropagation()}>
-                  {" "}
                   {/* 행 클릭 이벤트와 분리 */}
                   <StatusBadge
                     $status={user.signup_completed_status}
-                    onClick={() =>
-                      setActiveStatusDropdown(
-                        activeStatusDropdown === user.user_id
-                          ? null
-                          : user.user_id
-                      )
+                    onClick={
+                      showRejectedOnly
+                        ? undefined
+                        : () =>
+                            setActiveStatusDropdown(
+                              activeStatusDropdown === user.user_id
+                                ? null
+                                : user.user_id
+                            )
                     }
+                    style={showRejectedOnly ? { cursor: 'default' } : {}}
                   >
                     {user.signup_completed_status || "Unknown"}
-                    {activeStatusDropdown === user.user_id && (
+                    {!showRejectedOnly && activeStatusDropdown === user.user_id && (
                       <StatusDropdown>
                         <StatusOption
                           $status="Approved"
-                          onClick={() =>
-                            handleStatusChange(user.user_id, "Approved")
-                          }
+                          onClick={() => handleStatusChange(user.user_id, "Approved")}
                         >
                           승인
                         </StatusOption>
                         <StatusOption
-                          $status="Pending"
-                          onClick={() =>
-                            handleStatusChange(user.user_id, "Pending")
-                          }
-                        >
-                          대기
-                        </StatusOption>
-                        <StatusOption
                           $status="Rejected"
-                          onClick={() =>
-                            handleStatusChange(user.user_id, "Rejected")
-                          }
-                        >
-                          거절
+                          onClick={() => handleStatusChange(user.user_id, "Pending")}
+                        >                        
+                          반려
                         </StatusOption>
                       </StatusDropdown>
                     )}
@@ -1011,153 +1027,46 @@ const AdminUser: React.FC = () => {
         </Modal>
 
         {/* 수정 모달 */}
-        <Modal $isOpen={isEditModalOpen}>
-          <ModalContent>
-            <ModalHeader>
-              <h2>사용자 정보 수정</h2>
-              <button onClick={() => setIsEditModalOpen(false)}>×</button>
-            </ModalHeader>
-            <Form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (selectedUserId) {
-                  handleUpdate(selectedUserId);
-                  setIsEditModalOpen(false);
-                }
+        {!showPendingOnly && (
+          <Modal $isOpen={isEditModalOpen}>
+            <EditUsers
+              isOpen={isEditModalOpen}
+              user={formData}
+              onApprove={() => {
+                if (selectedUserId) handleStatusChange(selectedUserId, "Approved");
+                setIsEditModalOpen(false);
               }}
-            >
-              <FormGroup>
-                <label>이름</label>
-                <input
-                  type="text"
-                  name="user_name"
-                  value={formData.user_name}
-                  onChange={handleInputChange}
-                  required
-                  disabled
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>이메일</label>
-                <input
-                  type="email"
-                  name="user_email"
-                  value={formData.user_email}
-                  onChange={handleInputChange}
-                  required
-                  disabled
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>로그인 ID</label>
-                <input
-                  type="text"
-                  name="user_login_id"
-                  value={formData.user_login_id}
-                  onChange={handleInputChange}
-                  required
-                  disabled
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>전화번호</label>
-                <input
-                  type="tel"
-                  name="user_phonenum"
-                  value={formData.user_phonenum}
-                  onChange={handleInputChange}
-                  required
-                  disabled
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>회사</label>
-                <Select
-                  name="user_company_id"
-                  value={currentUserCompany?.company_id || ""}
-                  onChange={handleCompanyChange}
-                  required
-                  disabled
-                >
-                  <option value="">회사 선택</option>
-                  {currentUserCompany && (
-                    <option value={currentUserCompany.company_id}>
-                      {currentUserCompany.company_name}
-                    </option>
-                  )}
-                </Select>
-              </FormGroup>
-              <FormGroup>
-                <label>직급</label>
-                <Select
-                  name="user_position_id"
-                  value={formData.user_position_id}
-                  onChange={handleInputChange}
-                  required
-                  disabled={!formData.user_company_id}
-                >
-                  <option value="">직급 선택</option>
-                  {formData.user_company_id &&
-                    companyPositions[formData.user_company_id]?.map(
-                      (position) => (
-                        <option
-                          key={position.position_id}
-                          value={position.position_id}
-                        >
-                          {position.position_name}
-                        </option>
-                      )
-                    )}
-                </Select>
-              </FormGroup>
-              <FormGroup>
-                <label>부서명</label>
-                <input
-                  type="text"
-                  name="user_dept_name"
-                  value={formData.user_dept_name}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>팀명</label>
-                <input
-                  type="text"
-                  name="user_team_name"
-                  value={formData.user_team_name}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>직무</label>
-                <input
-                  type="text"
-                  name="user_jobname"
-                  value={formData.user_jobname}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <Button type="submit">수정</Button>
-                <Button
-                  type="button"
-                  variant="danger"
-                  onClick={() => {
-                    if (selectedUserId) {
-                      handleDelete(selectedUserId);
-                      setIsEditModalOpen(false);
-                    }
-                  }}
-                >
-                  삭제
-                </Button>
-                <Button type="button" onClick={() => setIsEditModalOpen(false)}>
-                  취소
-                </Button>
-              </div>
-            </Form>
-          </ModalContent>
-        </Modal>
+              onReject={() => {
+                if (selectedUserId) handleStatusChange(selectedUserId, "Rejected");
+                setIsEditModalOpen(false);
+              }}
+              onClose={() => setIsEditModalOpen(false)}
+            />
+          </Modal>
+        )}
+
+        {/* 대기 사용자 관리 모달 */}
+        {showPendingOnly && (
+          <Modal $isOpen={isManageModalOpen}>
+            <ManageUsers
+              isOpen={isManageModalOpen}
+              user={formData}
+              onApprove={() => {
+                if (selectedUserId) {
+                  handleUpdate(selectedUserId); // 변경된 정보 저장
+                  handleStatusChange(selectedUserId, "Approved");
+                }
+                setIsManageModalOpen(false);
+              }}
+              onReject={() => {
+                if (selectedUserId) handleStatusChange(selectedUserId, "Rejected");
+                setIsManageModalOpen(false);
+              }}
+              onClose={() => setIsManageModalOpen(false)}
+              onChange={handleManageInputChange}
+            />
+          </Modal>
+        )}
       </MainContent>
     </Container>
   );
