@@ -38,3 +38,11 @@ export interface ProjectRequestBody {
     role_id: string;
   }[];
 }
+
+export interface Todo {
+  action: string;
+  assignee: string;
+  context: string;
+  schedule?: string;
+}
+[];

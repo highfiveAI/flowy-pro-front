@@ -2,15 +2,14 @@
 // 설치 명령: npm install react-big-calendar moment
 // 타입: npm install --save-dev @types/react-big-calendar @types/moment
 
-import React, { useState } from 'react'
-import Calendar from 'react-calendar'
-import 'react-calendar/dist/Calendar.css'
-import styled from 'styled-components'
-import { INITIAL_EVENTS } from './event-utils'
-import type { CalendarEvent } from './event-utils'
-import { isSameDay, getWeek } from 'date-fns'
-import { FaRegFileAlt } from 'react-icons/fa'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import useState from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import styled from 'styled-components';
+import { INITIAL_EVENTS } from './event-utils';
+import { isSameDay } from 'date-fns';
+import { FaRegFileAlt } from 'react-icons/fa';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const CalendarWrapper = styled.div`
   max-width: 1100px;
@@ -53,11 +52,11 @@ const CalendarWrapper = styled.div`
 
   .react-calendar__month-view__days__day--neighboringMonth {
     color: #bbb !important;
-    background:rgb(224, 224, 224) !important;
+    background: rgb(224, 224, 224) !important;
     opacity: 0.7;
   }
-  .calendar-event, .calendar-todo {
-
+  .calendar-event,
+  .calendar-todo {
     font-size: 0.85rem;
     margin-top: 0;
   }
@@ -115,13 +114,12 @@ const CalendarWrapper = styled.div`
     background: #f8f6fa;
   }
   .calendar-sunday {
-    color: #C00F0CB2 !important;
+    color: #c00f0cb2 !important;
   }
   .calendar-saturday {
     color: #283990 !important;
   }
-`
-
+`;
 
 const HeaderBar = styled.div`
   display: flex;
@@ -238,30 +236,78 @@ function YearMonthPicker({
   const [year, setYear] = useState(currentDate.getFullYear());
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   return (
-    <div style={{ position: 'absolute', top: 60, left: '50%', transform: 'translateX(-50%)', background: '#fff', border: '1.5px solid #C7B8D9', borderRadius: 8, padding: 16, zIndex: 100, boxShadow: '0 2px 12px rgba(80,0,80,0.08)', width: 270 }}>
+    <div
+      style={{
+        position: 'absolute',
+        top: 60,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: '#fff',
+        border: '1.5px solid #C7B8D9',
+        borderRadius: 8,
+        padding: 16,
+        zIndex: 100,
+        boxShadow: '0 2px 12px rgba(80,0,80,0.08)',
+        width: 270,
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-        <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ fontSize: '1rem', marginRight: 8 }}>
-          {Array.from({ length: 20 }, (_, i) => 2015 + i).map(y => (
-            <option key={y} value={y}>{y}년</option>
+        <select
+          value={year}
+          onChange={(e) => setYear(Number(e.target.value))}
+          style={{ fontSize: '1rem', marginRight: 8 }}
+        >
+          {Array.from({ length: 20 }, (_, i) => 2015 + i).map((y) => (
+            <option key={y} value={y}>
+              {y}년
+            </option>
           ))}
         </select>
-        <select value={month} onChange={e => setMonth(Number(e.target.value))} style={{ fontSize: '1rem', marginRight: 16 }}>
-          {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-            <option key={m} value={m}>{m}월</option>
+        <select
+          value={month}
+          onChange={(e) => setMonth(Number(e.target.value))}
+          style={{ fontSize: '1rem', marginRight: 16 }}
+        >
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+            <option key={m} value={m}>
+              {m}월
+            </option>
           ))}
         </select>
-        <ApplyButton onClick={() => onChange(year, month)} style={{ padding: '0 18px', height: 36, fontSize: '0.8rem', marginLeft: 0 }}>이동</ApplyButton>
-        <button onClick={onClose} style={{ marginLeft: 8, background: 'none', border: 'none', color: '#351745', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}>닫기</button>
+        <ApplyButton
+          onClick={() => onChange(year, month)}
+          style={{
+            padding: '0 18px',
+            height: 36,
+            fontSize: '0.8rem',
+            marginLeft: 0,
+          }}
+        >
+          이동
+        </ApplyButton>
+        <button
+          onClick={onClose}
+          style={{
+            marginLeft: 8,
+            background: 'none',
+            border: 'none',
+            color: '#351745',
+            fontWeight: 600,
+            fontSize: '0.8rem',
+            cursor: 'pointer',
+          }}
+        >
+          닫기
+        </button>
       </div>
     </div>
   );
 }
 
 export default function CalendarPage() {
-  const [value, setValue] = useState(new Date(2025, 5, 1))
-  const [events, setEvents] = useState(INITIAL_EVENTS)
+  const [value, setValue] = useState(new Date(2025, 5, 1));
+  const [events, setEvents] = useState(INITIAL_EVENTS);
   const [showPicker, setShowPicker] = useState(false);
-
 
   const handleToggleTodo = (id: string) => {
     setEvents((prevEvents) =>
@@ -305,9 +351,18 @@ export default function CalendarPage() {
         <div style={{ position: 'relative' }}>
           <Title>작업 관리</Title>
           <MonthNav>
-            <NavButton onClick={handlePrevMonth}><FiChevronLeft /></NavButton>
-            <MonthText onClick={handleYearMonthClick} style={{ cursor: 'pointer' }}>{formatYearMonth(value)}</MonthText>
-            <NavButton onClick={handleNextMonth}><FiChevronRight /></NavButton>
+            <NavButton onClick={handlePrevMonth}>
+              <FiChevronLeft />
+            </NavButton>
+            <MonthText
+              onClick={handleYearMonthClick}
+              style={{ cursor: 'pointer' }}
+            >
+              {formatYearMonth(value)}
+            </MonthText>
+            <NavButton onClick={handleNextMonth}>
+              <FiChevronRight />
+            </NavButton>
             {showPicker && (
               <YearMonthPicker
                 currentDate={value}
@@ -316,7 +371,6 @@ export default function CalendarPage() {
               />
             )}
             <TodayButton onClick={handleToday}>오늘</TodayButton>
-
           </MonthNav>
         </div>
         <RightBox>
@@ -345,8 +399,13 @@ export default function CalendarPage() {
 
           if (view === 'month') {
             const day = date.getDate().toString().padStart(2, '0');
-            const dayTodos = events.filter(ev => ev.type === 'todo' && isSameDay(new Date(ev.start), date));
-            const dayMeetings = events.filter(ev => ev.type === 'meeting' && isSameDay(new Date(ev.start), date));
+            const dayTodos = events.filter(
+              (ev) => ev.type === 'todo' && isSameDay(new Date(ev.start), date)
+            );
+            const dayMeetings = events.filter(
+              (ev) =>
+                ev.type === 'meeting' && isSameDay(new Date(ev.start), date)
+            );
             const dayOfWeek = date.getDay(); // 0: 일, 6: 토
             const isCurrentMonth = date.getMonth() === value.getMonth();
             let dayClass = '';
@@ -355,15 +414,22 @@ export default function CalendarPage() {
               if (dayOfWeek === 6) dayClass = 'calendar-saturday';
             }
             return (
-              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                <span className={dayClass} style={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 10,
-                  fontSize: '1.05rem',
-                  fontWeight: 500,
-                  zIndex: 2
-                }}>{day}</span>
+              <div
+                style={{ position: 'relative', width: '100%', height: '100%' }}
+              >
+                <span
+                  className={dayClass}
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 10,
+                    fontSize: '1.05rem',
+                    fontWeight: 500,
+                    zIndex: 2,
+                  }}
+                >
+                  {day}
+                </span>
                 <div style={{ width: '100%', paddingTop: 35 }}>
                   {dayMeetings.map((m) => (
                     <div key={m.id} className="calendar-event">

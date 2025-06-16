@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 // import { DndContext, closestCenter } from '@dnd-kit/core';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import MailingDashboard from "./popup/mailingDashboard";
-import { closestCenter, DndContext } from "@dnd-kit/core";
-import { fetchMeetings } from "../../api/fetchProject";
-import { useParams } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
-import { checkAuth } from "../../api/fetchAuthCheck";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import MailingDashboard from './popup/mailingDashboard';
+import { closestCenter, DndContext } from '@dnd-kit/core';
+import { fetchMeetings, postAssignedTodos } from '../../api/fetchProject';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { checkAuth } from '../../api/fetchAuthCheck';
+import type { Todo } from '../../types/project';
 
 // Main container for the whole page
 const Container = styled.div`
@@ -231,47 +232,47 @@ const SummaryContent = styled.div`
 //   border: 1px dashed #e0e0e0;
 // `;
 
-const SummarySection = styled.div`
-  margin-bottom: 24px;
+// const SummarySection = styled.div`
+//   margin-bottom: 24px;
 
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
+//   &:last-child {
+//     margin-bottom: 0;
+//   }
+// `;
 
-const SummarySectionHeader = styled.h4`
-  color: #351745;
-  font-size: 1.125rem;
-  margin-bottom: 12px;
-  font-weight: 600;
-`;
+// const SummarySectionHeader = styled.h4`
+//   color: #351745;
+//   font-size: 1.125rem;
+//   margin-bottom: 12px;
+//   font-weight: 600;
+// `;
 
-const SummaryList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-`;
+// const SummaryList = styled.ul`
+//   list-style: none;
+//   padding: 0;
+//   margin: 0;
+// `;
 
-const SummaryListItem = styled.li`
-  margin-bottom: 12px;
-  color: #333;
-  line-height: 1.6;
-  font-size: 0.9375rem;
-  padding-left: 20px;
-  position: relative;
+// const SummaryListItem = styled.li`
+//   margin-bottom: 12px;
+//   color: #333;
+//   line-height: 1.6;
+//   font-size: 0.9375rem;
+//   padding-left: 20px;
+//   position: relative;
 
-  &:before {
-    content: "•";
-    color: #351745;
-    position: absolute;
-    left: 0;
-    font-size: 1.2em;
-  }
+//   &:before {
+//     content: "•";
+//     color: #351745;
+//     position: absolute;
+//     left: 0;
+//     font-size: 1.2em;
+//   }
 
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
+//   &:last-child {
+//     margin-bottom: 0;
+//   }
+// `;
 
 const TaskGridContainer = styled.div`
   display: grid;
@@ -305,9 +306,9 @@ const TaskGridContainer = styled.div`
 const TaskCard = styled.div<{ isUnassigned?: boolean }>`
   border-radius: 12px;
   border: 1px solid
-    ${(props) => (props.isUnassigned ? "rgba(210, 0, 0, 0.3)" : "#e0e0e0")};
+    ${(props) => (props.isUnassigned ? 'rgba(210, 0, 0, 0.3)' : '#e0e0e0')};
   background: ${(props) =>
-    props.isUnassigned ? "rgba(210, 0, 0, 0.02)" : "#fff"};
+    props.isUnassigned ? 'rgba(210, 0, 0, 0.02)' : '#fff'};
   padding: 20px;
   min-height: 200px;
   display: flex;
@@ -332,7 +333,7 @@ const TaskCardHeader = styled.div`
 const TaskCardTitle = styled.h4<{ isUnassigned?: boolean }>`
   font-size: 1.125rem;
   margin: 0;
-  color: ${(props) => (props.isUnassigned ? "#d20000" : "#351745")};
+  color: ${(props) => (props.isUnassigned ? '#d20000' : '#351745')};
   font-weight: 600;
 `;
 
@@ -355,7 +356,7 @@ const TaskCardListItem = styled.li`
   position: relative;
 
   &:before {
-    content: "•";
+    content: '•';
     color: #351745;
     position: absolute;
     left: 0;
@@ -408,7 +409,7 @@ const SpeechBubbleButton = styled.button`
     box-shadow: 0 2px 8px rgba(53, 23, 69, 0.08);
   }
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     left: -10px;
     top: 50%;
@@ -420,6 +421,31 @@ const SpeechBubbleButton = styled.button`
     border-right: 10px solid #f3eef8;
   }
 `;
+
+const RoleContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px;
+`;
+
+const Card = styled.div<{ highlight?: boolean }>`
+  border: 1px solid ${({ highlight }) => (highlight ? 'red' : '#ccc')};
+  padding: 16px;
+  border-radius: 8px;
+  background-color: ${({ highlight }) => (highlight ? '#fff6f6' : '#fff')};
+`;
+
+const Title = styled.h3`
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+const TaskItem = styled.div`
+  margin-top: 8px;
+  font-size: 14px;
+`;
+
 interface Project {
   project_name: string;
   project_id: string;
@@ -455,14 +481,42 @@ interface meetingInfo {
   agenda: string;
 }
 
+type TaskItem = {
+  description: string;
+  date: string;
+};
+
+type GroupedTaskState = Record<string, TaskItem[]>;
+
 const Dashboard: React.FC = () => {
   const [project, setProject] = useState<Project>();
   const [meeting, setMeeting] = useState<Meeting>();
   const [projectUser, setProjectUser] = useState<ProjectUser[]>([]);
   const [summaryLog, setSummaryLog] = useState<SummaryLog>();
   const [feedback, setFeedback] = useState<Feedback>();
+  const [assignRole, setAssignRole] = useState<Record<string, Todo[]>>({});
+  // const [groupedtasks, setGroupedTasks] = useState<GroupedTaskState>({});
   const { meetingId } = useParams<{ meetingId: string }>();
   const { user, setUser, setLoading } = useAuth();
+
+  // function convertTodosToTaskState(
+  //   groupedTodos: Record<string, Todo[]>
+  // ): GroupedTaskState {
+  //   const result: GroupedTaskState = {};
+
+  //   Object.entries(groupedTodos).forEach(([assignee, todos]) => {
+  //     const key = assignee === '미지정' ? '미할당' : assignee;
+  //     result[key] = todos.map((todo) => ({
+  //       description: todo.action,
+  //       date:
+  //         !todo.schedule || todo.schedule === '언급 없음'
+  //           ? '미정'
+  //           : todo.schedule,
+  //     }));
+  //   });
+
+  //   return result;
+  // }
 
   useEffect(() => {
     if (meetingId) {
@@ -477,7 +531,7 @@ const Dashboard: React.FC = () => {
           };
           setMeeting(meeting_data);
           if (data?.meeting_users?.length) {
-            const extracted = data.meeting_users.map((mu) => ({
+            const extracted = data.meeting_users.map((mu: any) => ({
               user_id: mu.user.user_id,
               user_name: mu.user.user_name,
             }));
@@ -486,18 +540,45 @@ const Dashboard: React.FC = () => {
 
           setSummaryLog(data.summary_log);
           setFeedback(data.feedback);
+
+          if (data.task_assign_role) {
+            const todos: Todo[] =
+              data.task_assign_role.updated_task_assign_contents.assigned_todos;
+
+            const grouped = todos.reduce<Record<string, Todo[]>>(
+              (acc, todo: Todo) => {
+                const key =
+                  todo.assignee && todo.assignee !== '미지정'
+                    ? todo.assignee
+                    : '미할당';
+                acc[key] = acc[key] || [];
+                acc[key].push(todo);
+                return acc;
+              },
+              {}
+            );
+
+            setAssignRole(grouped);
+          }
           console.log(data);
         }
       });
     }
   }, [user]);
 
+  // useEffect(() => {
+  //   if (assignRole) {
+  //     const converted = convertTodosToTaskState(assignRole);
+  //     setGroupedTasks(converted);
+  //   }
+  // }, [assignRole]);
+
   const mailMeetingInfo: meetingInfo = {
-    project: project?.project_name || "", // undefined 방지
-    title: meeting?.meeting_title || "",
-    date: meeting?.meeting_date || "",
+    project: project?.project_name || '', // undefined 방지
+    title: meeting?.meeting_title || '',
+    date: meeting?.meeting_date || '',
     attendees: projectUser.map((user) => user.user_name),
-    agenda: meeting?.meeting_agenda || "",
+    agenda: meeting?.meeting_agenda || '',
   };
 
   useEffect(() => {
@@ -512,26 +593,33 @@ const Dashboard: React.FC = () => {
 
   const dummyTasks = {
     unassigned: [
-      { description: "사용자 역할별 접근 제어 UI 설계", date: "미정" },
-      { description: "요약 결과 화면 시각 디자인", date: "~6/9(월)" },
+      { description: '사용자 역할별 접근 제어 UI 설계', date: '미정' },
+      { description: '요약 결과 화면 시각 디자인', date: '~6/9(월)' },
     ],
     김다연: [
-      { description: "전체 서비스 구조도 및 PRD 초안 정리", date: "~6/5(목)" },
+      { description: '전체 서비스 구조도 및 PRD 초안 정리', date: '~6/5(목)' },
     ],
-    김시훈: [{ description: "API 구조 초안 설계", date: "~6/9(월)" }],
+    김시훈: [{ description: 'API 구조 초안 설계', date: '~6/9(월)' }],
     정다희: [
       {
-        description: "회의 업로드/요약 결과 화면 와이어프레임",
-        date: "~6/9(월)",
+        description: '회의 업로드/요약 결과 화면 와이어프레임',
+        date: '~6/9(월)',
       },
     ],
     윤지환: [
-      { description: "LLM 모델 연동 및 기술 제약 정리", date: "~6/5(목)" },
+      { description: 'LLM 모델 연동 및 기술 제약 정리', date: '~6/5(목)' },
     ],
     박예빈: [],
   };
 
-  const attendees = ["김다연", "김시훈", "정다희", "윤지환", "박예빈"];
+  // const attendees = ['김다연', '김시훈', '정다희', '윤지환', '박예빈'];
+  // const attendees = React.useMemo(
+  //   () => Object.keys(groupedtasks).filter((k) => k !== '미할당'),
+  //   [groupedtasks]
+  // );
+  // const attendees = Object.keys(groupedtasks).filter(
+  //   (name) => name !== '미할당'
+  // );
 
   const [tasks, setTasks] = React.useState<typeof dummyTasks>(dummyTasks);
   // 날짜 편집 상태 관리
@@ -546,35 +634,35 @@ const Dashboard: React.FC = () => {
   // 회의 요약 state (여러 섹션, 리스트)
   const [summary, setSummary] = useState([
     {
-      section: "[ 회의 내용 ]",
+      section: '[ 회의 내용 ]',
       items: [
         "전체 서비스 플로우를 설명하며 핵심 기능 흐름을 '회의 업로드 → 요약 → 업무 자동 추출 → 메일 공유'로 정리함",
-        "STT(음성 인식), 요약, 역할 할당 기능을 우선 개발",
-        "LLM 처리 속도와 GPU 사용 제한 등 기술적 제한사항을 간단히 공유함",
-        "사용자 여정에 따른 첫 화면 구성안, 요약 결과 시각화 방식 제안함",
-        "논의 안됨: 사용자별 역할/권한에 따른 UI 차별화 필요 여부 (시간 부족으로 다음 회의로 이월)",
+        'STT(음성 인식), 요약, 역할 할당 기능을 우선 개발',
+        'LLM 처리 속도와 GPU 사용 제한 등 기술적 제한사항을 간단히 공유함',
+        '사용자 여정에 따른 첫 화면 구성안, 요약 결과 시각화 방식 제안함',
+        '논의 안됨: 사용자별 역할/권한에 따른 UI 차별화 필요 여부 (시간 부족으로 다음 회의로 이월)',
       ],
     },
     {
-      section: "[ 결정 사항 ]",
+      section: '[ 결정 사항 ]',
       items: [
-        "MVP 범위: 회의 요약, 업무 추출, 메일 전송으로 한정",
+        'MVP 범위: 회의 요약, 업무 추출, 메일 전송으로 한정',
         "'피드백' 기능: 기능 정의만 하고, 구현은 2차 버전으로 미룸",
-        "사용자 역할 구분: 관리자 / 참석자 2단계로 단순화",
+        '사용자 역할 구분: 관리자 / 참석자 2단계로 단순화',
       ],
     },
   ]);
   const [isEditingSummary, setIsEditingSummary] = useState(false);
-  const [editSummaryText, setEditSummaryText] = useState("");
+  const [editSummaryText, setEditSummaryText] = useState('');
 
   // summary 배열을 textarea용 문자열로 변환
   const summaryToText = (summaryArr: typeof summary) => {
     return summaryArr
       .map(
         (sec) =>
-          `${sec.section}\n${sec.items.map((item) => `- ${item}`).join("\n")}`
+          `${sec.section}\n${sec.items.map((item) => `- ${item}`).join('\n')}`
       )
-      .join("\n\n");
+      .join('\n\n');
   };
   // textarea 문자열을 summary 배열로 파싱
   const textToSummary = (text: string) => {
@@ -586,15 +674,15 @@ const Dashboard: React.FC = () => {
 
     lines.forEach((line) => {
       const trimmedLine = line.trim();
-      if (trimmedLine.startsWith("[")) {
+      if (trimmedLine.startsWith('[')) {
         if (currentSection !== null) {
           result.push({ section: currentSection, items: currentItems });
         }
         currentSection = trimmedLine;
         currentItems = [];
-      } else if (trimmedLine.startsWith("- ")) {
+      } else if (trimmedLine.startsWith('- ')) {
         currentItems.push(trimmedLine.slice(2));
-      } else if (trimmedLine === "") {
+      } else if (trimmedLine === '') {
         // 빈 줄은 무시
       } else {
         // 기타 텍스트 무시
@@ -613,7 +701,7 @@ const Dashboard: React.FC = () => {
   const formatDateToKR = (date: Date) => {
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    const week = ["일", "월", "화", "수", "목", "금", "토"];
+    const week = ['일', '월', '화', '수', '목', '금', '토'];
     const dayOfWeek = week[date.getDay()];
     return `~${month}/${day}(${dayOfWeek})`;
   };
@@ -634,7 +722,7 @@ const Dashboard: React.FC = () => {
       ) {
         taskList[idx] = {
           ...taskList[idx],
-          date: "미정",
+          date: '미정',
         };
       } else if (date) {
         taskList[idx] = {
@@ -644,7 +732,7 @@ const Dashboard: React.FC = () => {
       } else {
         taskList[idx] = {
           ...taskList[idx],
-          date: "미정",
+          date: '미정',
         };
       }
 
@@ -657,31 +745,62 @@ const Dashboard: React.FC = () => {
   };
 
   // 드래그 종료 시 처리
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-    if (!over) return;
-    const [fromColumn, fromIdx] = active.id.split("__");
-    const [toColumn] = over.id.split("__");
-    if (fromColumn === toColumn && active.id === over.id) return;
+  // const handleDragEnd = (event: any) => {
+  //   const { active, over } = event;
+  //   if (!over) return;
+  //   const [fromColumn, fromIdx] = active.id.split('__');
+  //   const [toColumn] = over.id.split('__');
+  //   if (fromColumn === toColumn && active.id === over.id) return;
 
-    // 이동할 task 정보
-    const movingTask =
-      tasks[fromColumn as keyof typeof tasks][parseInt(fromIdx, 10)];
-    // 원래 위치에서 제거
-    const newFrom = tasks[fromColumn as keyof typeof tasks].filter(
-      (_: any, idx: number) => idx !== parseInt(fromIdx, 10)
-    );
-    // 새 위치에 추가 (맨 뒤에)
-    const newTo = [...tasks[toColumn as keyof typeof tasks], movingTask];
-    setTasks({
-      ...tasks,
-      [fromColumn]: newFrom,
-      [toColumn]: newTo,
-    });
+  //   // 이동할 task 정보
+  //   const movingTask =
+  //     tasks[fromColumn as keyof typeof tasks][parseInt(fromIdx, 10)];
+  //   // 원래 위치에서 제거
+  //   const newFrom = tasks[fromColumn as keyof typeof tasks].filter(
+  //     (_: any, idx: number) => idx !== parseInt(fromIdx, 10)
+  //   );
+  //   // 새 위치에 추가 (맨 뒤에)
+  //   const newTo = [...tasks[toColumn as keyof typeof tasks], movingTask];
+  //   setTasks({
+  //     ...tasks,
+  //     [fromColumn]: newFrom,
+  //     [toColumn]: newTo,
+  //   });
+  // };
+
+  // 드래그 종료 시 처리 더미 x 버전
+  const handleDragEndTwo = (event: any) => {
+    const { active, over } = event;
+    if (!over || !active.id) return;
+
+    const [fromCol, fromIdxStr] = active.id.split('__');
+    const toCol = over.id.split('__')[0];
+
+    // 같은 컬럼 내 이동 + 같은 위치이면 무시
+    if (fromCol === toCol && active.id === over.id) return;
+
+    const fromIdx = parseInt(fromIdxStr, 10);
+    const movingTask = assignRole[fromCol]?.[fromIdx];
+    if (!movingTask) return;
+
+    const updatedFrom = assignRole[fromCol].filter((_, i) => i !== fromIdx);
+    const updatedTo = [
+      ...(assignRole[toCol] ?? []),
+      {
+        ...movingTask,
+        assignee: toCol,
+      },
+    ];
+
+    setAssignRole((prev) => ({
+      ...prev,
+      [fromCol]: updatedFrom,
+      [toCol]: updatedTo,
+    }));
   };
 
   const parseDate = (dateStr: string): Date | null => {
-    if (!dateStr || dateStr === "미정") return null;
+    if (!dateStr || dateStr === '미정') return null;
     // YYYY-MM-DD 또는 YYYY-MM-DD HH:mm 등 형식만 파싱
     const match = dateStr.match(/\d{4}-\d{2}-\d{2}( \d{2}:\d{2})?/);
     if (match) {
@@ -702,14 +821,23 @@ const Dashboard: React.FC = () => {
   // 추천 문서 임시 데이터
   const recommendFiles = [
     {
-      name: "서비스 기획서.pdf",
-      url: "https://example.com/service-plan.pdf",
+      name: '서비스 기획서.pdf',
+      url: 'https://example.com/service-plan.pdf',
     },
     {
-      name: "API 명세 초안.pdf",
-      url: "https://example.com/api-draft.pdf",
+      name: 'API 명세 초안.pdf',
+      url: 'https://example.com/api-draft.pdf',
     },
   ];
+  const getPostPayload = () => {
+    const allTodos: Todo[] = assignRole ? Object.values(assignRole).flat() : [];
+
+    return {
+      updated_task_assign_contents: {
+        assigned_todos: allTodos,
+      },
+    };
+  };
 
   // 수정 버튼 클릭
   const handleEditSummary = () => {
@@ -725,38 +853,43 @@ const Dashboard: React.FC = () => {
   };
 
   // 작업 목록 저장 핸들러
-  const handleSaveTasks = () => {
+  const handleSaveTasks = async () => {
     setIsEditingTasks(false);
-    // TODO: 여기에 DB 저장 API 호출
-    // await fetch('/api/save-tasks', { method: 'POST', body: JSON.stringify({ tasks }) });
+    const payload = getPostPayload(); // { updated_task_assign_contents: { assigned_todos: Todo[] } }
+    console.log(payload);
+    try {
+      await postAssignedTodos(meetingId, payload.updated_task_assign_contents);
+      console.log('저장 완료');
+    } catch (error) {
+      console.error('저장 실패:', error);
+    }
   };
-
   // 회의 피드백 데이터(더미)
   const feedbackdummy = [
     {
-      section: "[ 불필요한 대화 ]",
+      section: '[ 불필요한 대화 ]',
       items: [
-        "회의 중 10:42~10:46 사이, 참석자 간 점심 메뉴에 대한 대화가 약 4분간 이어짐.",
-        "회의 흐름에 큰 영향은 없었으나 집중력이 일시적으로 저하됨.",
+        '회의 중 10:42~10:46 사이, 참석자 간 점심 메뉴에 대한 대화가 약 4분간 이어짐.',
+        '회의 흐름에 큰 영향은 없었으나 집중력이 일시적으로 저하됨.',
       ],
     },
     {
-      section: "[ 누락된 논의 발생 ]",
+      section: '[ 누락된 논의 발생 ]',
       items: [
-        "사용자 권한에 따른 UI/UX 차별화 여부에 대한 논의는 회의 시간 부족으로 다루지 못함. 다음 회의에서 우선 논의할 필요 있음.",
+        '사용자 권한에 따른 UI/UX 차별화 여부에 대한 논의는 회의 시간 부족으로 다루지 못함. 다음 회의에서 우선 논의할 필요 있음.',
       ],
     },
     {
-      section: "[ 작업 담당자 미정 ]",
+      section: '[ 작업 담당자 미정 ]',
       items: [
-        "주요 기능에 대한 역할 분담은 대체로 완료되었으나, 디자인 시각화 및 역할별 UI 설계 관련 작업은 담당자가 정해지지 않음.",
+        '주요 기능에 대한 역할 분담은 대체로 완료되었으나, 디자인 시각화 및 역할별 UI 설계 관련 작업은 담당자가 정해지지 않음.',
       ],
     },
     {
-      section: "[ 회의 시간 분석 ]",
+      section: '[ 회의 시간 분석 ]',
       items: [
-        "회의는 약 1시간 진행되었으며, 실질적인 논의는 약 50분 정도였음.",
-        "일부 논의에서 발언 중복이 있었고, 후반으로 갈수록 집중도가 낮아지는 경향이 나타남.",
+        '회의는 약 1시간 진행되었으며, 실질적인 논의는 약 50분 정도였음.',
+        '일부 논의에서 발언 중복이 있었고, 후반으로 갈수록 집중도가 낮아지는 경향이 나타남.',
       ],
     },
   ];
@@ -770,9 +903,9 @@ const Dashboard: React.FC = () => {
           <MeetingAnalysisTitle>회의 분석 결과 조회</MeetingAnalysisTitle>
           <div
             style={{
-              marginLeft: "auto",
-              display: "flex",
-              alignItems: "center",
+              marginLeft: 'auto',
+              display: 'flex',
+              alignItems: 'center',
             }}
           >
             <img
@@ -811,15 +944,15 @@ const Dashboard: React.FC = () => {
                 {meeting?.meeting_date
                   ? new Date(meeting.meeting_date)
                       .toISOString()
-                      .replace("T", " ")
+                      .replace('T', ' ')
                       .slice(0, 16)
-                  : "날짜 없음"}
+                  : '날짜 없음'}
               </InfoContent>
               <InfoLabel>회의 참석자</InfoLabel>
               <InfoContent>
                 {projectUser.length > 0
-                  ? projectUser.map((user) => user.user_name).join(", ")
-                  : "참석자 없음"}
+                  ? projectUser.map((user) => user.user_name).join(', ')
+                  : '참석자 없음'}
               </InfoContent>
 
               <InfoLabel>회의 안건</InfoLabel>
@@ -894,7 +1027,7 @@ const Dashboard: React.FC = () => {
           </SectionBody>
         </Section>
 
-        <Section>
+        {/* <Section>
           <SectionHeader>
             <SectionTitle>작업 목록</SectionTitle>
             {isEditingTasks ? (
@@ -912,15 +1045,15 @@ const Dashboard: React.FC = () => {
                 onDragEnd={handleDragEnd}
               >
                 <TaskGridContainer>
-                  {["unassigned", ...attendees].map((col) => (
-                    <div key={col} style={{ height: "100%" }}>
+                  {['unassigned', ...attendees].map((col) => (
+                    <div key={col} style={{ height: '100%' }}>
                       <TaskCard
-                        isUnassigned={col === "unassigned"}
+                        isUnassigned={col === 'unassigned'}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => {
-                          const from = e.dataTransfer.getData("text/plain");
+                          const from = e.dataTransfer.getData('text/plain');
                           if (!from) return;
-                          const [fromCol, fromIdx] = from.split("__");
+                          const [fromCol, fromIdx] = from.split('__');
                           if (fromCol === col) return;
                           const movingTask =
                             tasks[fromCol as keyof typeof tasks][
@@ -943,28 +1076,28 @@ const Dashboard: React.FC = () => {
                         }}
                       >
                         <TaskCardHeader>
-                          <TaskCardTitle isUnassigned={col === "unassigned"}>
-                            {col === "unassigned" ? "미할당 작업 목록" : col}
+                          <TaskCardTitle isUnassigned={col === 'unassigned'}>
+                            {col === 'unassigned' ? '미할당 작업 목록' : col}
                           </TaskCardTitle>
                         </TaskCardHeader>
                         <TaskCardList>
                           {tasks[col as keyof typeof tasks].map((task, idx) => (
                             <div
-                              key={col + "__" + idx}
-                              id={col + "__" + idx}
-                              style={{ cursor: "grab" }}
+                              key={col + '__' + idx}
+                              id={col + '__' + idx}
+                              style={{ cursor: 'grab' }}
                               draggable
                               onDragStart={(e) => {
                                 e.dataTransfer.setData(
-                                  "text/plain",
-                                  col + "__" + idx
+                                  'text/plain',
+                                  col + '__' + idx
                                 );
                               }}
                             >
                               <TaskCardListItem>
                                 {task.description}
                                 <TaskCardDate
-                                  style={{ cursor: "pointer" }}
+                                  style={{ cursor: 'pointer' }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setEditingDate({ col, idx });
@@ -988,10 +1121,10 @@ const Dashboard: React.FC = () => {
                                       popperPlacement="bottom"
                                       placeholderText="날짜 선택"
                                     />
-                                  ) : task.date && task.date !== "" ? (
+                                  ) : task.date && task.date !== '' ? (
                                     task.date
                                   ) : (
-                                    "미정"
+                                    '미정'
                                   )}
                                 </TaskCardDate>
                               </TaskCardListItem>
@@ -1005,19 +1138,174 @@ const Dashboard: React.FC = () => {
               </DndContext>
             ) : (
               <TaskGridContainer>
-                {["unassigned", ...attendees].map((col) => (
-                  <div key={col} style={{ height: "100%" }}>
-                    <TaskCard isUnassigned={col === "unassigned"}>
+                {['unassigned', ...attendees].map((col) => (
+                  <div key={col} style={{ height: '100%' }}>
+                    <TaskCard isUnassigned={col === 'unassigned'}>
                       <TaskCardHeader>
-                        <TaskCardTitle isUnassigned={col === "unassigned"}>
-                          {col === "unassigned" ? "미할당 작업 목록" : col}
+                        <TaskCardTitle isUnassigned={col === 'unassigned'}>
+                          {col === 'unassigned' ? '미할당 작업 목록' : col}
                         </TaskCardTitle>
                       </TaskCardHeader>
                       <TaskCardList>
                         {tasks[col as keyof typeof tasks].map((task, idx) => (
-                          <TaskCardListItem key={col + "__" + idx}>
+                          <TaskCardListItem key={col + '__' + idx}>
                             {task.description}
                             <TaskCardDate>{task.date}</TaskCardDate>
+                          </TaskCardListItem>
+                        ))}
+                      </TaskCardList>
+                    </TaskCard>
+                  </div>
+                ))}
+              </TaskGridContainer>
+            )}
+          </SectionBody>
+        </Section> */}
+
+        <Section>
+          <SectionHeader>
+            <SectionTitle>작업 목록</SectionTitle>
+            {isEditingTasks ? (
+              <EditButton onClick={handleSaveTasks}>저장</EditButton>
+            ) : (
+              <EditButton onClick={() => setIsEditingTasks(true)}>
+                수정
+              </EditButton>
+            )}
+          </SectionHeader>
+          <SectionBody>
+            {isEditingTasks ? (
+              <DndContext
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEndTwo}
+              >
+                <TaskGridContainer>
+                  {Object.entries(assignRole ?? {}).map(([col, todos]) => (
+                    <div key={col} style={{ height: '100%' }}>
+                      <TaskCard
+                        isUnassigned={col === '미지정'}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          const from = e.dataTransfer.getData('text/plain');
+                          if (!from) return;
+
+                          const [fromCol, fromIdx] = from.split('__');
+                          if (fromCol === col) return;
+
+                          if (!assignRole[fromCol] || !assignRole[col]) return;
+
+                          const originalTask =
+                            assignRole[fromCol][parseInt(fromIdx, 10)];
+
+                          // assignee를 새로운 col로 변경
+                          const movingTask = {
+                            ...originalTask,
+                            assignee: col,
+                          };
+
+                          const newFrom = assignRole[fromCol].filter(
+                            (_: any, i: number) => i !== parseInt(fromIdx, 10)
+                          );
+                          const newTo = [...assignRole[col], movingTask];
+
+                          setAssignRole({
+                            ...assignRole,
+                            [fromCol]: newFrom,
+                            [col]: newTo,
+                          });
+                        }}
+                      >
+                        <TaskCardHeader>
+                          <TaskCardTitle isUnassigned={col === '미지정'}>
+                            {col === '미지정' ? '미할당 작업 목록' : col}
+                          </TaskCardTitle>
+                        </TaskCardHeader>
+                        <TaskCardList>
+                          {todos.map((todo, idx) => (
+                            <div
+                              key={`${col}__${idx}`}
+                              id={`${col}__${idx}`}
+                              style={{ cursor: 'grab' }}
+                              draggable
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData(
+                                  'text/plain',
+                                  `${col}__${idx}`
+                                );
+                              }}
+                            >
+                              <TaskCardListItem>
+                                {todo.action}
+                                <TaskCardDate
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingDate({ col, idx });
+                                  }}
+                                >
+                                  {editingDate &&
+                                  editingDate.col === col &&
+                                  editingDate.idx === idx ? (
+                                    <DatePicker
+                                      selected={
+                                        todo.schedule
+                                          ? new Date(todo.schedule)
+                                          : null
+                                      }
+                                      onChange={(date) => {
+                                        const updatedTodos = [...todos];
+                                        updatedTodos[idx] = {
+                                          ...updatedTodos[idx],
+                                          schedule: date
+                                            ?.toISOString()
+                                            .split('T')[0],
+                                        };
+                                        setAssignRole((prev) => ({
+                                          ...prev,
+                                          [col]: updatedTodos,
+                                        }));
+                                      }}
+                                      onBlur={() => setEditingDate(null)}
+                                      dateFormat="yyyy-MM-dd"
+                                      autoFocus
+                                      open
+                                      onClickOutside={() =>
+                                        setEditingDate(null)
+                                      }
+                                      placeholderText="날짜 선택"
+                                    />
+                                  ) : todo.schedule ? (
+                                    todo.schedule
+                                  ) : (
+                                    '미정'
+                                  )}
+                                </TaskCardDate>
+                              </TaskCardListItem>
+                            </div>
+                          ))}
+                        </TaskCardList>
+                      </TaskCard>
+                    </div>
+                  ))}
+                </TaskGridContainer>
+              </DndContext>
+            ) : (
+              <TaskGridContainer>
+                {Object.entries(assignRole ?? {}).map(([col, todos]) => (
+                  <div key={col} style={{ height: '100%' }}>
+                    <TaskCard isUnassigned={col === '미지정'}>
+                      <TaskCardHeader>
+                        <TaskCardTitle isUnassigned={col === '미지정'}>
+                          {col === '미지정' ? '미할당 작업 목록' : col}
+                        </TaskCardTitle>
+                      </TaskCardHeader>
+                      <TaskCardList>
+                        {todos.map((todo, idx) => (
+                          <TaskCardListItem key={`${col}__${idx}`}>
+                            {todo.action}
+                            <TaskCardDate>
+                              {todo.schedule ?? '미정'}
+                            </TaskCardDate>
                           </TaskCardListItem>
                         ))}
                       </TaskCardList>
@@ -1113,7 +1401,7 @@ const Dashboard: React.FC = () => {
             <SectionTitle>추천 문서</SectionTitle>
           </SectionHeader>
           <SectionBody>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {recommendFiles.map((file) => (
                 <RecommendFileItem key={file.name}>
                   <img
@@ -1126,8 +1414,8 @@ const Dashboard: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
-                      color: "#351745",
-                      textDecoration: "underline",
+                      color: '#351745',
+                      textDecoration: 'underline',
                       fontWeight: 500,
                     }}
                   >
