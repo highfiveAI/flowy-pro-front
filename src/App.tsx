@@ -9,7 +9,7 @@ import SignIn from './sign_in/SignIn';
 import SocialSignUp from './pages/social_sign_up/SocialSignUp';
 import DocsAgentTest from './pages/docs_agent_test/docs_agent_test';
 import AdminUser from './pages/admin/AdminUser';
-import AdminCom from './pages/admin/AdminCom';
+import AdminCompany from './pages/admin/superadmin/AdminCompany';
 import AdminPosition from './pages/admin/AdminPosition';
 import AdminTemplate from './pages/admin/AdminTemplate';
 import Login from './pages/log_in/Login';
@@ -21,6 +21,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProjectListPage from './pages/dashboard/projectlist';
 import ConferenceListPage from './pages/dashboard/conferencelist';
+import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
 
 function App() {
   return (
@@ -73,7 +74,7 @@ function App() {
             path="/admin/company"
             element={
               <ProtectedRoute>
-                <AdminCom />
+                <AdminCompany />
               </ProtectedRoute>
             }
           />
@@ -90,6 +91,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminTemplate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/admin"
+            element={
+              <ProtectedRoute>
+                <AdminAdmin />
               </ProtectedRoute>
             }
           />
