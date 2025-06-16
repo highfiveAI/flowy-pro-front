@@ -13,28 +13,28 @@ import { useAuth } from "../../contexts/AuthContext";
 
 
 const ProjectListPage: React.FC = () => {
-  const { user } = useAuth();
-  const [projects, setProjects] = React.useState<Project[]>([]);
+  // const { user } = useAuth();
+  // const [projects, setProjects] = React.useState<Project[]>([]);
   
-  // user.id로 프로젝트 목록 불러오기
-  React.useEffect(() => {
-    if (!user?.id) return;
-    fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/projects/${user.id}`, {
-      credentials: 'include',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.projects) {
-          setProjects(data.projects);
-        }
-      })
-      .catch(error => {
-        console.error('프로젝트 목록을 불러오는데 실패했습니다:', error);
-      });
-  }, [user?.id]);
+  // // user.id로 프로젝트 목록 불러오기
+  // React.useEffect(() => {
+  //   if (!user?.id) return;
+  //   fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/projects/${user.id}`, {
+  //     credentials: 'include',
+  //     headers: {
+  //       'Authorization': `Bearer ${localStorage.getItem('token')}`
+  //     }
+  //   })
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       if (data.projects) {
+  //         setProjects(data.projects);
+  //       }
+  //     })
+  //     .catch(error => {
+  //       console.error('프로젝트 목록을 불러오는데 실패했습니다:', error);
+  //     });
+  // }, [user?.id]);
 
   const navigate = useNavigate();
 
