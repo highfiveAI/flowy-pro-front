@@ -1,26 +1,28 @@
-import { Route, Routes } from "react-router-dom";
-import Home from "./pages/home/Home";
-import Dashboard from "./pages/dashboard/Dashboard";
-import Layout from "./components/Layout";
-import InsertConferenceInfo from "./pages/insert_conference_info/InsertConferenceInfo";
-import Result from "./pages/result/Result";
-import SignUp from "./pages/sign_up/SignUp";
-import SignIn from "./sign_in/SignIn";
-import SocialSignUp from "./pages/social_sign_up/SocialSignUp";
-import DocsAgentTest from "./pages/docs_agent_test/docs_agent_test";
-import AdminUser from "./pages/admin/AdminUser";
-import AdminCom from "./pages/admin/AdminCom";
-import AdminPosition from "./pages/admin/AdminPosition";
-import AdminTemplate from "./pages/admin/AdminTemplate";
-import Login from "./pages/log_in/Login";
-import ChooseMethod from "./pages/sign_up/choose_method";
-import MyPage from "./pages/mypage/MyPage";
-import AlterInfo from "./pages/mypage/alterInfo";
-import Calendar from "./pages/calendar/Calendar";
-import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ProjectListPage from "./pages/dashboard/projectlist";
-import ConferenceListPage from "./pages/dashboard/conferencelist";
+import { Route, Routes } from 'react-router-dom';
+import Home from './pages/home/Home';
+import Dashboard from './pages/dashboard/Dashboard';
+import Layout from './components/Layout';
+import InsertConferenceInfo from './pages/insert_conference_info/InsertConferenceInfo';
+import Result from './pages/result/Result';
+import SignUp from './pages/sign_up/SignUp';
+import SignIn from './sign_in/SignIn';
+import SocialSignUp from './pages/social_sign_up/SocialSignUp';
+import DocsAgentTest from './pages/docs_agent_test/docs_agent_test';
+import AdminUser from './pages/admin/AdminUser';
+import AdminCompany from './pages/admin/superadmin/AdminCompany';
+import AdminPosition from './pages/admin/AdminPosition';
+import AdminTemplate from './pages/admin/AdminTemplate';
+import Login from './pages/log_in/Login';
+import ChooseMethod from './pages/sign_up/choose_method';
+import MyPage from './pages/mypage/MyPage';
+import AlterInfo from './pages/mypage/alterInfo';
+import Calendar from './pages/calendar/Calendar';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import ProjectListPage from './pages/dashboard/projectlist';
+import ConferenceListPage from './pages/dashboard/conferencelist';
+import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
+
 
 function App() {
   return (
@@ -73,7 +75,7 @@ function App() {
             path="/admin/company"
             element={
               <ProtectedRoute>
-                <AdminCom />
+                <AdminCompany />
               </ProtectedRoute>
             }
           />
@@ -90,6 +92,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminTemplate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/admin"
+            element={
+              <ProtectedRoute>
+                <AdminAdmin />
               </ProtectedRoute>
             }
           />
