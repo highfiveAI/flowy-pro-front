@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiArrowRight } from 'react-icons/fi';
@@ -33,6 +34,7 @@ const ConferenceListPage: React.FC = () => {
       setLoading(false);
     })();
   }, []);
+
   return (
     <Container>
       <Title>회의 관리</Title>

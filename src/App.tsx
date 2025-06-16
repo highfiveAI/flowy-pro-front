@@ -24,6 +24,7 @@ import ConferenceListPage from './pages/dashboard/conferencelist';
 import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
 
 
+
 function App() {
   return (
     <AuthProvider>
@@ -38,7 +39,6 @@ function App() {
           <Route path="/social_sign_up" element={<SocialSignUp />} />
           <Route path="/result" element={<Result />} />
 
-          {/* 보호된 라우트 */}
           <Route
             path="/dashboard/:meetingId"
             element={
