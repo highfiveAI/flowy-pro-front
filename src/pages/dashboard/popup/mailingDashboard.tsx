@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import MailPreviewDashboard from "./mailpreviewDashboard";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import MailPreviewDashboard from './mailpreviewDashboard';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -73,7 +73,7 @@ const CheckboxLabel = styled.label`
   font-weight: 500;
   cursor: pointer;
 `;
-const Checkbox = styled.input.attrs({ type: "checkbox" })`
+const Checkbox = styled.input.attrs({ type: 'checkbox' })`
   margin-right: 10px;
   accent-color: #4b2067;
   width: 18px;
@@ -131,14 +131,14 @@ const BottomButton = styled.button`
 
 interface MailingDashboardProps {
   onClose: () => void;
-  summary: { section: string; items: string[] }[];
+  summary?: { section: string; items: string[] }[];
   tasks: any;
   feedback: { section: string; items: string[] }[];
   meetingInfo: {
     project: string;
     title: string;
     date: string;
-    attendees: string[];
+    attendees: { user_id: string; user_name: string }[];
     agenda: string;
   };
 }
@@ -166,7 +166,7 @@ const MailingDashboard = ({
     allProject: false,
     allAttendees: false,
     custom: false,
-    customValue: "",
+    customValue: '',
     selectedAttendees: [],
     selectedCustom: [],
   });
@@ -179,10 +179,10 @@ const MailingDashboard = ({
     // tasks는 attendees별로 되어 있으니, 각 참석자별로 섹션화
     Object.entries(tasks).forEach(([name, items]) => {
       const taskArr = items as any[];
-      if (name === "unassigned") {
+      if (name === 'unassigned') {
         if (taskArr.length > 0)
           mailPreview.push({
-            section: "[ 미할당 작업 목록 ]",
+            section: '[ 미할당 작업 목록 ]',
             items: taskArr.map((t: any) => t.description),
           });
       } else {
@@ -199,24 +199,35 @@ const MailingDashboard = ({
   // 회의 참석자 전체 수신 체크 시 자동 할당
   useEffect(() => {
     if (receivers.allAttendees) {
-      setReceivers((r) => ({ ...r, selectedAttendees: meetingInfo.attendees }));
+      setReceivers((r) => ({
+        ...r,
+        selectedAttendees: meetingInfo.attendees.map((a) => a.user_name),
+      }));
     } else {
       setReceivers((r) => ({ ...r, selectedAttendees: [] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receivers.allAttendees, meetingInfo.attendees]);
 
-  // 개별 수신자 자동완성 후보
-  const filteredCandidates = meetingInfo.attendees.filter(
-    (name) =>
-      receivers.customValue &&
-      name.includes(receivers.customValue) &&
-      !receivers.selectedCustom.includes(name)
-  );
+  const removeReceiver = (nameToRemove: string) => {
+    setReceivers((r) => ({
+      ...r,
+      selectedCustom: r.selectedCustom.filter((name) => name !== nameToRemove),
+    }));
+  };
+
+  const filteredCandidates = meetingInfo.attendees
+    .map((a) => a.user_name)
+    .filter(
+      (name) =>
+        receivers.customValue &&
+        name.includes(receivers.customValue) &&
+        !receivers.selectedCustom.includes(name)
+    );
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (
-      e.key === "Enter" &&
+      e.key === 'Enter' &&
       receivers.customValue &&
       filteredCandidates.length > 0
     ) {
@@ -224,16 +235,9 @@ const MailingDashboard = ({
       setReceivers((r) => ({
         ...r,
         selectedCustom: [...r.selectedCustom, selectedName],
-        customValue: "",
+        customValue: '',
       }));
     }
-  };
-
-  const removeReceiver = (nameToRemove: string) => {
-    setReceivers((r) => ({
-      ...r,
-      selectedCustom: r.selectedCustom.filter((name) => name !== nameToRemove),
-    }));
   };
 
   return (
@@ -255,7 +259,7 @@ const MailingDashboard = ({
             <b>회의 일시:</b> {meetingInfo.date}
           </div>
           <div>
-            <b>참석자:</b> {meetingInfo.attendees.join(", ")}
+            <b>참석자:</b> {meetingInfo.attendees.join(', ')}
           </div>
           <div>
             <b>회의 안건:</b>
@@ -270,7 +274,7 @@ const MailingDashboard = ({
               onChange={(e) =>
                 setMailItems((m) => ({ ...m, summary: e.target.checked }))
               }
-            />{" "}
+            />{' '}
             회의 요약
           </CheckboxLabel>
           <CheckboxLabel>
@@ -279,7 +283,7 @@ const MailingDashboard = ({
               onChange={(e) =>
                 setMailItems((m) => ({ ...m, tasks: e.target.checked }))
               }
-            />{" "}
+            />{' '}
             작업 목록
           </CheckboxLabel>
           <CheckboxLabel>
@@ -288,7 +292,7 @@ const MailingDashboard = ({
               onChange={(e) =>
                 setMailItems((m) => ({ ...m, feedback: e.target.checked }))
               }
-            />{" "}
+            />{' '}
             회의 피드백
           </CheckboxLabel>
         </CheckboxGroup>
@@ -333,8 +337,8 @@ const MailingDashboard = ({
             />
             회의 참석자 전체 수신
             {receivers.allAttendees && (
-              <div style={{ marginLeft: 12, color: "#00b6b6", fontSize: 13 }}>
-                {meetingInfo.attendees.join(", ")}
+              <div style={{ marginLeft: 12, color: '#00b6b6', fontSize: 13 }}>
+                {meetingInfo.attendees.join(', ')}
               </div>
             )}
           </CheckboxLabel>
@@ -361,7 +365,7 @@ const MailingDashboard = ({
             개별 수신자 지정
             {(receivers.custom || receivers.selectedCustom.length > 0) && (
               <div
-                style={{ display: "flex", flexDirection: "column", flex: 1 }}
+                style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
               >
                 <ReceiverInput
                   placeholder="이름 검색"
@@ -377,23 +381,23 @@ const MailingDashboard = ({
                 {receivers.customValue && filteredCandidates.length > 0 && (
                   <div
                     style={{
-                      background: "#fff",
-                      border: "1px solid #eee",
+                      background: '#fff',
+                      border: '1px solid #eee',
                       borderRadius: 6,
                       marginTop: 2,
                       zIndex: 10,
-                      position: "absolute",
+                      position: 'absolute',
                     }}
                   >
                     {filteredCandidates.map((name) => (
                       <div
                         key={name}
-                        style={{ padding: "4px 8px", cursor: "pointer" }}
+                        style={{ padding: '4px 8px', cursor: 'pointer' }}
                         onClick={() =>
                           setReceivers((r) => ({
                             ...r,
                             selectedCustom: [...r.selectedCustom, name],
-                            customValue: "",
+                            customValue: '',
                           }))
                         }
                       >
@@ -403,7 +407,7 @@ const MailingDashboard = ({
                   </div>
                 )}
                 <div
-                  style={{ marginTop: 4, display: "flex", flexWrap: "wrap" }}
+                  style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap' }}
                 >
                   {receivers.selectedCustom.map((name) => (
                     <SelectedReceiver key={name}>
@@ -426,29 +430,34 @@ const MailingDashboard = ({
             onClose={() => setShowPreview(false)}
             onSend={() => {
               // TODO: 실제 메일 발송 로직 구현
-              alert("메일이 발송되었습니다.");
+              alert('메일이 발송되었습니다.');
               setShowPreview(false);
               onClose();
             }}
-            summary={summary}
+            summary={summary ?? []}
             tasks={tasks}
             feedback={feedback}
             mailItems={mailItems}
             receivers={receivers}
-            meetingInfo={meetingInfo}
+            meetingInfo={{
+              ...meetingInfo,
+              agenda: Array.isArray(meetingInfo.agenda)
+                ? meetingInfo.agenda
+                : [meetingInfo.agenda], // string이면 배열로 감싸기
+            }}
           />
         )}
         <button
           onClick={onClose}
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: 24,
             right: 28,
-            background: "none",
-            border: "none",
+            background: 'none',
+            border: 'none',
             fontSize: 22,
-            color: "#4B2067",
-            cursor: "pointer",
+            color: '#4B2067',
+            cursor: 'pointer',
           }}
         >
           &times;

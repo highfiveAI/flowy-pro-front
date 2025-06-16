@@ -27,21 +27,22 @@ const Table = styled.table`
   background: #fff;
   margin-bottom: 2rem;
   font-size: 1.05rem;
-  th, td {
+  th,
+  td {
     padding: 1.2rem 0.5rem;
     text-align: left;
     border: none;
     font-size: 1.05rem;
   }
   th {
-    color: #5E5553;
+    color: #5e5553;
     font-weight: 700;
     font-size: 1.08rem;
     background: #fff;
     border-bottom: 2px solid #eee;
   }
   td {
-    color: #5E5553;
+    color: #5e5553;
     border-bottom: 1.5px solid #eee;
     background: #fff;
   }
@@ -50,51 +51,51 @@ const Table = styled.table`
   }
 `;
 
-const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  margin-right: 0.5rem;
-  background-color: ${(props) =>
-    props.variant === 'danger' ? '#dc3545' : '#007bff'};
-  color: white;
+// const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
+//   padding: 0.5rem 1rem;
+//   border-radius: 4px;
+//   border: none;
+//   cursor: pointer;
+//   margin-right: 0.5rem;
+//   background-color: ${(props) =>
+//     props.variant === 'danger' ? '#dc3545' : '#007bff'};
+//   color: white;
 
-  &:hover {
-    opacity: 0.9;
-  }
-`;
+//   &:hover {
+//     opacity: 0.9;
+//   }
+// `;
 
-const Form = styled.form`
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-`;
+// const Form = styled.form`
+//   background-color: white;
+//   padding: 2rem;
+//   border-radius: 8px;
+//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+//   margin-bottom: 2rem;
+// `;
 
-const FormGroup = styled.div`
-  margin-bottom: 1rem;
+// const FormGroup = styled.div`
+//   margin-bottom: 1rem;
 
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
+//   label {
+//     display: block;
+//     margin-bottom: 0.5rem;
+//     font-weight: 500;
+//   }
 
-  input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+//   input {
+//     width: 100%;
+//     padding: 0.5rem;
+//     border: 1px solid #ddd;
+//     border-radius: 4px;
+//     font-size: 1rem;
 
-    &:focus {
-      outline: none;
-      border-color: #007bff;
-    }
-  }
-`;
+//     &:focus {
+//       outline: none;
+//       border-color: #007bff;
+//     }
+//   }
+// `;
 
 interface Company {
   company_id: string;
@@ -134,59 +135,61 @@ const AddButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(80,0,80,0.08);
+  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.08);
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #4b2067; }
-`;
-
-const Modal = styled.div<{ $isOpen: boolean }>`
-  display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-
-  h2 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  color: #666;
-
   &:hover {
-    color: #333;
+    background: #4b2067;
   }
 `;
+
+// const Modal = styled.div<{ $isOpen: boolean }>`
+//   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background-color: rgba(0, 0, 0, 0.5);
+//   justify-content: center;
+//   align-items: center;
+//   z-index: 1000;
+// `;
+
+// const ModalContent = styled.div`
+//   background-color: white;
+//   padding: 2rem;
+//   border-radius: 8px;
+//   width: 100%;
+//   max-width: 600px;
+//   max-height: 80vh;
+//   overflow-y: auto;
+// `;
+
+// const ModalHeader = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: 1.5rem;
+
+//   h2 {
+//     margin: 0;
+//     font-size: 1.5rem;
+//   }
+// `;
+
+// const CloseButton = styled.button`
+//   background: none;
+//   border: none;
+//   font-size: 1.5rem;
+//   cursor: pointer;
+//   padding: 0.5rem;
+//   color: #666;
+
+//   &:hover {
+//     color: #333;
+//   }
+// `;
 
 const StatusBadge = styled.div<{ $status: boolean }>`
   display: inline-flex;
@@ -196,7 +199,7 @@ const StatusBadge = styled.div<{ $status: boolean }>`
   font-size: 1.02rem;
   font-weight: 600;
   background: #f5f5f7;
-  color: #5E5553;
+  color: #5e5553;
   border: none;
   box-shadow: none;
   &::before {
@@ -248,7 +251,7 @@ interface SortState {
 // 테이블 헤더 스타일 컴포넌트 추가
 const TableHeader = styled.th`
   background-color: #f8fafc;
-  color: #480B6A;
+  color: #480b6a;
   font-weight: 500;
   white-space: nowrap;
   padding: 1rem;
@@ -303,7 +306,9 @@ const AdminCompany: React.FC = () => {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
     null
   );
-  const [activeStatusDropdown, setActiveStatusDropdown] = useState<string | null>(null);
+  const [activeStatusDropdown, setActiveStatusDropdown] = useState<
+    string | null
+  >(null);
   const [formData, setFormData] = useState({
     company_name: '',
     company_scale: '',
@@ -417,23 +422,27 @@ const AdminCompany: React.FC = () => {
   };
 
   // 서비스 상태 변경 함수
-  const handleStatusToggle = async (companyId: string, currentStatus: boolean) => {
+  const handleStatusToggle = async (
+    companyId: string,
+    currentStatus: boolean
+  ) => {
     try {
       const today = new Date().toISOString().split('T')[0];
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}/status`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/v1/admin/companies/${companyId}/status`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             service_status: !currentStatus,
             // 비활성화로 변경할 때만 서비스 종료일 설정, 활성화로 변경할 때는 종료일 초기화
             ...(currentStatus
               ? { service_enddate: today }
-              : { service_enddate: null }
-            )
+              : { service_enddate: null }),
           }),
         }
       );
@@ -493,7 +502,7 @@ const AdminCompany: React.FC = () => {
       sorted.sort((a, b) => {
         const aValue = String(a[sortState.field as keyof Company] || '');
         const bValue = String(b[sortState.field as keyof Company] || '');
-        
+
         return sortState.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
@@ -517,7 +526,9 @@ const AdminCompany: React.FC = () => {
                 회사명
                 <SortIcon
                   $direction={
-                    sortState.field === 'company_name' ? sortState.direction : null
+                    sortState.field === 'company_name'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -525,7 +536,9 @@ const AdminCompany: React.FC = () => {
                 규모
                 <SortIcon
                   $direction={
-                    sortState.field === 'company_scale' ? sortState.direction : null
+                    sortState.field === 'company_scale'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -533,7 +546,9 @@ const AdminCompany: React.FC = () => {
                 서비스 시작일
                 <SortIcon
                   $direction={
-                    sortState.field === 'service_startdate' ? sortState.direction : null
+                    sortState.field === 'service_startdate'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -541,7 +556,9 @@ const AdminCompany: React.FC = () => {
                 서비스 종료일
                 <SortIcon
                   $direction={
-                    sortState.field === 'service_enddate' ? sortState.direction : null
+                    sortState.field === 'service_enddate'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -549,7 +566,9 @@ const AdminCompany: React.FC = () => {
                 서비스 상태
                 <SortIcon
                   $direction={
-                    sortState.field === 'service_status' ? sortState.direction : null
+                    sortState.field === 'service_status'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -617,8 +636,22 @@ const AdminCompany: React.FC = () => {
         <EditCompany
           visible={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          onSubmit={selectedCompanyId ? (e) => { e.preventDefault(); handleUpdate(selectedCompanyId); } : () => {}}
-          onDelete={selectedCompanyId ? () => { handleDelete(selectedCompanyId); setIsEditModalOpen(false); } : () => {}}
+          onSubmit={
+            selectedCompanyId
+              ? (e) => {
+                  e.preventDefault();
+                  handleUpdate(selectedCompanyId);
+                }
+              : () => {}
+          }
+          onDelete={
+            selectedCompanyId
+              ? () => {
+                  handleDelete(selectedCompanyId);
+                  setIsEditModalOpen(false);
+                }
+              : () => {}
+          }
           formData={formData}
           onChange={handleInputChange}
         />
