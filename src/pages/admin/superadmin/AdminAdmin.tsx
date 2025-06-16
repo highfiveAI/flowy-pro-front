@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import NewAdmin from './popup/newAdmin';
 import EditAdmin from './popup/editAdmin';
@@ -26,21 +26,22 @@ const Table = styled.table`
   background: #fff;
   margin-bottom: 2rem;
   font-size: 1.05rem;
-  th, td {
+  th,
+  td {
     padding: 1.2rem 0.5rem;
     text-align: left;
     border: none;
     font-size: 1.05rem;
   }
   th {
-    color: #5E5553;
+    color: #5e5553;
     font-weight: 700;
     font-size: 1.08rem;
     background: #fff;
     border-bottom: 2px solid #eee;
   }
   td {
-    color: #5E5553;
+    color: #5e5553;
     border-bottom: 1.5px solid #eee;
     background: #fff;
   }
@@ -49,19 +50,19 @@ const Table = styled.table`
   }
 `;
 
-const Button = styled.button<{ $variant?: 'primary' | 'danger' }>`
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  margin-right: 0.5rem;
-  background-color: ${(props) =>
-    props.$variant === 'danger' ? '#dc3545' : '#007bff'};
-  color: white;
-  &:hover {
-    opacity: 0.9;
-  }
-`;
+// const Button = styled.button<{ $variant?: 'primary' | 'danger' }>`
+//   padding: 0.5rem 1rem;
+//   border-radius: 4px;
+//   border: none;
+//   cursor: pointer;
+//   margin-right: 0.5rem;
+//   background-color: ${(props) =>
+//     props.$variant === 'danger' ? '#dc3545' : '#007bff'};
+//   color: white;
+//   &:hover {
+//     opacity: 0.9;
+//   }
+// `;
 
 const PageHeader = styled.div`
   display: flex;
@@ -91,109 +92,113 @@ const AddButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(80,0,80,0.08);
+  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.08);
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #4b2067; }
-`;
-
-const Modal = styled.div<{ $isOpen: boolean }>`
-  display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 3.5rem 3rem 2.5rem 3rem;
-  border-radius: 36px;
-  width: 100%;
-  max-width: 520px;
-  max-height: 80vh;
-  overflow-y: auto;
-  border: 2px solid #351745;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  position: relative;
-  box-sizing: border-box;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  margin-bottom: 2.2rem;
-  h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    color: #351745;
-    font-weight: 700;
+  &:hover {
+    background: #4b2067;
   }
 `;
-const CloseButton = styled.button`
-  position: absolute;
-  top: 32px;
-  right: 32px;
-  z-index: 1100;
-  background: none;
-  border: none;
-  font-size: 2.2rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  color: #666;
-  &:hover { color: #351745; }
-`;
-const InputBox = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 56px;
-  border: 1.5px solid #ccc;
-  border-radius: 4px;
-  background: #fff;
-  box-sizing: border-box;
-  padding: 0 1.2rem;
-`;
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  label {
-    min-width: 100px;
-    font-size: 1.08rem;
-    color: #888;
-    font-weight: 500;
-    margin-right: 1.2rem;
-    white-space: nowrap;
-  }
-  input {
-    flex: 1;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 1.1rem;
-    color: #351745;
-    font-weight: 500;
-    font-family: 'Rethink Sans', sans-serif;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    &::placeholder {
-      color: #b0b0b0;
-      font-weight: 500;
-    }
-  }
-`;
+
+// const Modal = styled.div<{ $isOpen: boolean }>`
+//   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background-color: rgba(0, 0, 0, 0.5);
+//   justify-content: center;
+//   align-items: center;
+//   z-index: 1000;
+// `;
+
+// const ModalContent = styled.div`
+//   background-color: white;
+//   padding: 3.5rem 3rem 2.5rem 3rem;
+//   border-radius: 36px;
+//   width: 100%;
+//   max-width: 520px;
+//   max-height: 80vh;
+//   overflow-y: auto;
+//   border: 2px solid #351745;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: stretch;
+//   position: relative;
+//   box-sizing: border-box;
+// `;
+
+// const ModalHeader = styled.div`
+//   display: flex;
+//   justify-content: flex-start;
+//   align-items: center;
+//   margin-bottom: 2.2rem;
+//   h2 {
+//     margin: 0;
+//     font-size: 1.4rem;
+//     color: #351745;
+//     font-weight: 700;
+//   }
+// `;
+// const CloseButton = styled.button`
+//   position: absolute;
+//   top: 32px;
+//   right: 32px;
+//   z-index: 1100;
+//   background: none;
+//   border: none;
+//   font-size: 2.2rem;
+//   cursor: pointer;
+//   padding: 0.5rem;
+//   color: #666;
+//   &:hover {
+//     color: #351745;
+//   }
+// `;
+// const InputBox = styled.div`
+//   display: flex;
+//   align-items: center;
+//   width: 100%;
+//   height: 56px;
+//   border: 1.5px solid #ccc;
+//   border-radius: 4px;
+//   background: #fff;
+//   box-sizing: border-box;
+//   padding: 0 1.2rem;
+// `;
+// const FormGroup = styled.div`
+//   margin-bottom: 1.5rem;
+//   width: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   box-sizing: border-box;
+//   label {
+//     min-width: 100px;
+//     font-size: 1.08rem;
+//     color: #888;
+//     font-weight: 500;
+//     margin-right: 1.2rem;
+//     white-space: nowrap;
+//   }
+//   input {
+//     flex: 1;
+//     border: none;
+//     outline: none;
+//     background: transparent;
+//     font-size: 1.1rem;
+//     color: #351745;
+//     font-weight: 500;
+//     font-family: 'Rethink Sans', sans-serif;
+//     height: 100%;
+//     padding: 0;
+//     margin: 0;
+//     &::placeholder {
+//       color: #b0b0b0;
+//       font-weight: 500;
+//     }
+//   }
+// `;
 
 interface AdminAccount {
   admin_id: string;
@@ -243,7 +248,7 @@ interface SortState {
 
 const TableHeader = styled.th`
   background-color: #f8fafc;
-  color: #480B6A;
+  color: #480b6a;
   font-weight: 500;
   white-space: nowrap;
   padding: 1rem;
@@ -292,7 +297,10 @@ const AdminAdmin: React.FC = () => {
     company_name: '',
     is_active: true,
   });
-  const [sortState, setSortState] = useState<SortState>({ field: '', direction: null });
+  const [sortState, setSortState] = useState<SortState>({
+    field: '',
+    direction: null,
+  });
 
   // 관리자 목록 조회 (더미 데이터 사용, 실제 API 연결 시 아래 코드 사용)
   // const fetchAdmins = async () => {
@@ -342,7 +350,14 @@ const AdminAdmin: React.FC = () => {
       );
       if (response.ok) {
         // fetchAdmins();
-        setFormData({ admin_id: '', admin_name: '', admin_email: '', admin_phone: '', company_name: '', is_active: true });
+        setFormData({
+          admin_id: '',
+          admin_name: '',
+          admin_email: '',
+          admin_phone: '',
+          company_name: '',
+          is_active: true,
+        });
         setIsCreateModalOpen(false);
       }
     } catch (error) {
@@ -365,7 +380,7 @@ const AdminAdmin: React.FC = () => {
       );
       if (response.ok) {
         setAdmins((prev) =>
-          prev.map(admin =>
+          prev.map((admin) =>
             admin.admin_id === adminId ? { ...admin, ...formData } : admin
           )
         );
@@ -382,23 +397,23 @@ const AdminAdmin: React.FC = () => {
   };
 
   // 관리자 삭제
-  const handleDelete = async (adminId: string) => {
-    if (window.confirm('정말로 이 관리자를 삭제하시겠습니까?')) {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/${adminId}`,
-          {
-            method: 'DELETE',
-          }
-        );
-        if (response.ok) {
-          // fetchAdmins();
-        }
-      } catch (error) {
-        console.error('관리자 삭제 실패:', error);
-      }
-    }
-  };
+  // const handleDelete = async (adminId: string) => {
+  //   if (window.confirm('정말로 이 관리자를 삭제하시겠습니까?')) {
+  //     try {
+  //       const response = await fetch(
+  //         `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/${adminId}`,
+  //         {
+  //           method: 'DELETE',
+  //         }
+  //       );
+  //       if (response.ok) {
+  //         // fetchAdmins();
+  //       }
+  //     } catch (error) {
+  //       console.error('관리자 삭제 실패:', error);
+  //     }
+  //   }
+  // };
 
   const handleRowClick = (admin: AdminAccount) => {
     setSelectedAdminId(admin.admin_id);
@@ -414,7 +429,14 @@ const AdminAdmin: React.FC = () => {
   };
 
   const handleCreateClick = () => {
-    setFormData({ admin_id: '', admin_name: '', admin_email: '', admin_phone: '', company_name: '', is_active: true });
+    setFormData({
+      admin_id: '',
+      admin_name: '',
+      admin_email: '',
+      admin_phone: '',
+      company_name: '',
+      is_active: true,
+    });
     setIsCreateModalOpen(true);
   };
 
@@ -461,29 +483,61 @@ const AdminAdmin: React.FC = () => {
             <tr>
               <TableHeader onClick={() => handleSort('admin_id')}>
                 USER ID
-                <SortIcon $direction={sortState.field === 'admin_id' ? sortState.direction : null} />
+                <SortIcon
+                  $direction={
+                    sortState.field === 'admin_id' ? sortState.direction : null
+                  }
+                />
               </TableHeader>
               <TableHeader onClick={() => handleSort('admin_name')}>
                 이름
-                <SortIcon $direction={sortState.field === 'admin_name' ? sortState.direction : null} />
+                <SortIcon
+                  $direction={
+                    sortState.field === 'admin_name'
+                      ? sortState.direction
+                      : null
+                  }
+                />
               </TableHeader>
               <TableHeader onClick={() => handleSort('admin_email')}>
                 이메일 주소
-                <SortIcon $direction={sortState.field === 'admin_email' ? sortState.direction : null} />
+                <SortIcon
+                  $direction={
+                    sortState.field === 'admin_email'
+                      ? sortState.direction
+                      : null
+                  }
+                />
               </TableHeader>
               <TableHeader onClick={() => handleSort('admin_phone')}>
                 연락처
-                <SortIcon $direction={sortState.field === 'admin_phone' ? sortState.direction : null} />
+                <SortIcon
+                  $direction={
+                    sortState.field === 'admin_phone'
+                      ? sortState.direction
+                      : null
+                  }
+                />
               </TableHeader>
               <TableHeader onClick={() => handleSort('company_name')}>
                 회사명
-                <SortIcon $direction={sortState.field === 'company_name' ? sortState.direction : null} />
+                <SortIcon
+                  $direction={
+                    sortState.field === 'company_name'
+                      ? sortState.direction
+                      : null
+                  }
+                />
               </TableHeader>
             </tr>
           </thead>
           <tbody>
             {sortedAdmins.map((admin) => (
-              <tr key={admin.admin_id} onClick={() => handleRowClick(admin)} style={{ cursor: 'pointer' }}>
+              <tr
+                key={admin.admin_id}
+                onClick={() => handleRowClick(admin)}
+                style={{ cursor: 'pointer' }}
+              >
                 <td>{admin.admin_id}</td>
                 <td>{admin.admin_name}</td>
                 <td>{admin.admin_email}</td>
@@ -507,7 +561,14 @@ const AdminAdmin: React.FC = () => {
         <EditAdmin
           visible={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          onSubmit={selectedAdminId ? async (e) => { e.preventDefault(); await handleUpdate(selectedAdminId); } : () => {}}
+          onSubmit={
+            selectedAdminId
+              ? async (e) => {
+                  e.preventDefault();
+                  await handleUpdate(selectedAdminId);
+                }
+              : () => {}
+          }
           formData={formData}
           onChange={handleInputChange}
         />
@@ -516,4 +577,4 @@ const AdminAdmin: React.FC = () => {
   );
 };
 
-export default AdminAdmin; 
+export default AdminAdmin;
