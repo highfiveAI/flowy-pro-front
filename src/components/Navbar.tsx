@@ -188,6 +188,10 @@ const Navbar: React.FC = () => {
             작업 관리
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
+          <MenuItem onClick={() => navigate('/admin/dashboard')}>
+            대시보드
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
           <MenuItem
             onMouseEnter={() => setIsSystemMenuOpen(true)}
             onMouseLeave={() => setIsSystemMenuOpen(false)}

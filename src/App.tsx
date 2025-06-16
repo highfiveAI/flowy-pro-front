@@ -22,6 +22,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ProjectListPage from './pages/dashboard/projectlist';
 import ConferenceListPage from './pages/dashboard/conferencelist';
 import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 
 
@@ -92,6 +93,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminTemplate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
               </ProtectedRoute>
             }
           />
