@@ -1,5 +1,3 @@
-import type { Company } from '../api/fetchSignupInfos';
-
 export interface User {
   user_id: string;
   user_name: string;
@@ -12,9 +10,10 @@ export interface User {
   user_team_name: string;
   user_jobname: string;
   user_company_id: string;
-  user_position_id: string;
-  user_sysrole_id: string;
-  company: Company;
+  // user_position_id: string;
+  // user_sysrole_id: string;
+  company_id: string;
+  company_name: string;
 }
 
 // 마이페이지 수정 인터페이스

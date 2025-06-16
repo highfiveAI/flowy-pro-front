@@ -23,6 +23,7 @@ import ProjectListPage from './pages/dashboard/projectlist';
 import ConferenceListPage from './pages/dashboard/conferencelist';
 import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
 
+
 function App() {
   return (
     <AuthProvider>
@@ -39,7 +40,7 @@ function App() {
 
           {/* 보호된 라우트 */}
           <Route
-            path="/dashboard"
+            path="/dashboard/:meetingId"
             element={
               <ProtectedRoute>
                 <Dashboard />

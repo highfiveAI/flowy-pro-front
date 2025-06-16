@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { FiArrowRight } from "react-icons/fi";
-import { useNavigate, useParams } from "react-router-dom";
-import { checkAuth } from "../../api/fetchAuthCheck";
-import { useAuth } from "../../contexts/AuthContext";
-import { fetchMeetingsWithUsers } from "../../api/fetchProject";
-
-const dummyConferences = Array.from({ length: 10 }).map((/*_, i*/) => ({
-  name: "기능 정의 kick-off",
-  date: "2025-06-03 10:00",
-  attendees: "김다연, 김시훈, 정다희, ...",
-}));
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { FiArrowRight } from 'react-icons/fi';
+import { useNavigate, useParams } from 'react-router-dom';
+import { checkAuth } from '../../api/fetchAuthCheck';
+import { useAuth } from '../../contexts/AuthContext';
+import { fetchMeetingsWithUsers } from '../../api/fetchProject';
 
 const ConferenceListPage: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
@@ -42,7 +36,7 @@ const ConferenceListPage: React.FC = () => {
   return (
     <Container>
       <Title>회의 관리</Title>
-      <Breadcrumb>프로젝트 목록 {">"} 회의 목록</Breadcrumb>
+      <Breadcrumb>프로젝트 목록 {'>'} 회의 목록</Breadcrumb>
       <TableWrapper>
         <Table>
           <thead>
@@ -60,15 +54,19 @@ const ConferenceListPage: React.FC = () => {
                 <Td>
                   {new Date(c.meeting_date)
                     .toISOString()
-                    .replace("T", " ")
+                    .replace('T', ' ')
                     .slice(0, 16)}
                 </Td>
                 <Td>
                   {/* meeting_users 안의 user 이름 나열 */}
-                  {c.meeting_users.map((mu) => mu.user.user_name).join(", ")}
+                  {c.meeting_users
+                    .map((mu: any) => mu.user.user_name)
+                    .join(', ')}
                 </Td>
                 <Td>
-                  <IconBtn onClick={() => navigate("/dashboard")}>
+                  <IconBtn
+                    onClick={() => navigate(`/dashboard/${c.meeting_id}`)}
+                  >
                     <FiArrowRight />
                   </IconBtn>
                 </Td>

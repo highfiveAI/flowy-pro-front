@@ -16,3 +16,33 @@ export interface ProjectUser {
   role_id: string;
   project: Project;
 }
+
+export interface ProjectUserIdName {
+  user_id: string;
+  user_name: string;
+  role_id?: string;
+}
+
+export interface ProjectRoleIdName {
+  role_id: string;
+  role_name: string;
+}
+
+export interface ProjectRequestBody {
+  company_id: string;
+  project_name: string;
+  project_detail: string;
+  project_status: boolean;
+  project_users: {
+    user_id: string;
+    role_id: string;
+  }[];
+}
+
+export interface Todo {
+  action: string;
+  assignee: string;
+  context: string;
+  schedule?: string;
+}
+[];
