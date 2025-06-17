@@ -86,7 +86,6 @@ const FormGroup = styled.div`
     font-size: 1.1rem;
     color: #351745;
     font-weight: 500;
-    font-family: 'Rethink Sans', sans-serif;
     height: 100%;
     padding: 0;
     margin: 0;

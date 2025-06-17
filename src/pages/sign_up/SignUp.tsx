@@ -8,11 +8,8 @@ import {
   // type Sysrole,
 } from '../../api/fetchSignupInfos';
 
-export const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+export const SignUpWrapper = styled.div`
+  min-height: 100vh;
   background: radial-gradient(
       100% 100% at 50% 0%,
       #e3cfee 0%,
@@ -23,7 +20,6 @@ export const Wrapper = styled.div`
     ),
     #2e0446;
   min-height: 100vh;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 export const FormContainer = styled.div`
@@ -284,7 +280,7 @@ const SignUp: React.FC = () => {
   }, []);
   return (
     <>
-      <Wrapper>
+      <SignUpWrapper>
         <FormContainer>
           <Title>회원가입</Title>
           <Form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
@@ -417,7 +413,7 @@ const SignUp: React.FC = () => {
             <SubmitButton type="submit">가입 완료</SubmitButton>
           </Form>
         </FormContainer>
-      </Wrapper>
+      </SignUpWrapper>
       {showModal && (
         <SignUpSuccessModal
           visible={showModal}

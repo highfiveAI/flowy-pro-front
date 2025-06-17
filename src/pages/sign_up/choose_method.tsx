@@ -14,7 +14,6 @@ const SignUpWrapper = styled.div`
     ),
     #2e0446;
   color: white;
-  font-family: "Rethink Sans", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -95,7 +94,6 @@ const OptionCard = styled.div<{ primary?: boolean }>`
   border: ${(props) => (props.primary ? "none" : "1px solid #480B6A")};
   background: ${(props) => (props.primary ? "#480B6A" : "#FFF")};
   color: ${(props) => (props.primary ? "white" : "#480B6A")};
-  font-family: "Rethink Sans";
   font-size: 16px;
   font-style: normal;
   font-weight: 600;

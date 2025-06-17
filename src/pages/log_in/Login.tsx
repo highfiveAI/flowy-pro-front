@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 // import Navbar from '../../components/Navbar';
 
-const LoginWrapper = styled.div`
+const LoginContainer = styled.div`
   min-height: 100vh;
   background: radial-gradient(
       100% 100% at 50% 0%,
@@ -17,7 +17,6 @@ const LoginWrapper = styled.div`
     ),
     #2e0446;
   color: white;
-  font-family: "Rethink Sans", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,7 +54,6 @@ const InputGroup = styled.div`
 
 const InputLabel = styled.label`
   color: #333;
-  font-family: "Rethink Sans";
   font-size: 16px;
   font-style: normal;
   font-weight: 600;
@@ -73,7 +71,6 @@ const InputField = styled.input`
   font-size: 18px;
   box-sizing: border-box;
   color: black;
-  font-family: "Rethink Sans";
   font-style: normal;
   font-weight: 600;
   line-height: 20px;
@@ -84,7 +81,6 @@ const InputField = styled.input`
 
 const ErrorMessage = styled.p`
   color: #ff4d4f;
-  font-family: "Rethink Sans";
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
@@ -151,7 +147,6 @@ const LinkContainer = styled.div`
   a {
     color: #717171;
     text-align: center;
-    font-family: "Rethink Sans";
     font-size: 15px;
     font-style: normal;
     font-weight: 500;
@@ -235,7 +230,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <LoginWrapper>
+    <LoginContainer>
       <LoginFormContainer onSubmit={handleSubmit}>
         <InputGroup>
           <InputLabel htmlFor="username">아이디</InputLabel>
@@ -275,7 +270,7 @@ const Login: React.FC = () => {
           <Link to="/sign_up">회원가입</Link>
         </LinkContainer>
       </LoginFormContainer>
-    </LoginWrapper>
+    </LoginContainer>
   );
 };
 
