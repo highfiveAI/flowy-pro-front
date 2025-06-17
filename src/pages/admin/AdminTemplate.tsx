@@ -408,8 +408,7 @@ const AdminTemplate: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/docs/${
-          selectedTemplate.interdocs_id
+        `${import.meta.env.VITE_API_URL}/api/v1/docs/${selectedTemplate.interdocs_id
         }`,
         {
           method: 'PUT',
@@ -465,6 +464,40 @@ const AdminTemplate: React.FC = () => {
           error instanceof Error ? error.message : '템플릿 삭제에 실패했습니다.'
         );
       }
+    }
+  };
+
+  // 파일 다운로드
+  const handleDownload = async (
+    e: React.MouseEvent,
+    interdocs_id: string
+  ) => {
+    e.stopPropagation();
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/docs/download/${interdocs_id}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('다운로드 링크 요청 실패');
+      }
+
+      // 백엔드에서 { download_url: "..." } 형태로 응답한다고 가정
+      const { download_url } = await response.json();
+
+      // 새 창으로 다운로드 링크 열기 (혹은 a 태그로 다운로드)
+      window.open(download_url, '_blank');
+      // 또는
+      // const a = document.createElement('a');
+      // a.href = download_url;
+      // a.download = ''; // 파일명 지정 필요시 백엔드에서 Content-Disposition 헤더로 처리
+      // document.body.appendChild(a);
+      // a.click();
+      // a.remove();
+    } catch (error) {
+      alert('다운로드에 실패했습니다.');
     }
   };
 
@@ -544,10 +577,7 @@ const AdminTemplate: React.FC = () => {
                 </ActionButton>
                 <ActionButton
                   title="다운로드"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(template.interdocs_path, '_blank');
-                  }}
+                  onClick={(e) => handleDownload(e, template.interdocs_id)}
                 >
                   <img
                     src="/images/download.svg"
