@@ -374,8 +374,10 @@ const Select = styled.select`
 
 const AdminUser: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
+
+  const [companies/*, setCompanies*/] = useState<Company[]>([]);
+
+  // const [positions, setPositions] = useState<Position[]>([]);
   const [companyPositions, setCompanyPositions] = useState<{
     [key: string]: Position[];
   }>({});
@@ -436,37 +438,37 @@ const AdminUser: React.FC = () => {
     }
   };
 
-  // 회사, 직급, 역할 데이터 가져오기
-  const fetchCompanies = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
-        {
-          credentials: 'include',
-        }
-      );
-      const data = await response.json();
-      setCompanies(data);
-    } catch (error) {
-      console.error('회사 목록 조회 실패:', error);
-    }
-  };
+  // // 회사, 직급, 역할 데이터 가져오기
+  // const fetchCompanies = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
+  //       {
+  //         credentials: 'include',
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     setCompanies(data);
+  //   } catch (error) {
+  //     console.error('회사 목록 조회 실패:', error);
+  //   }
+  // };
 
-  const fetchPositions = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
-        {
-          credentials: 'include',
-        }
-      );
-      const data = await response.json();
-      setPositions(data);
-      console.log(positions);
-    } catch (error) {
-      console.error('직급 목록 조회 실패:', error);
-    }
-  };
+  // const fetchPositions = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
+  //       {
+  //         credentials: 'include',
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     setPositions(data);
+  //     console.log(positions);
+  //   } catch (error) {
+  //     console.error('직급 목록 조회 실패:', error);
+  //   }
+  // };
 
   // 회사별 직급 데이터 가져오기
   const fetchCompanyPositions = async (companyId: string) => {
@@ -519,8 +521,8 @@ const AdminUser: React.FC = () => {
   // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
     fetchUsers();
-    fetchCompanies();
-    fetchPositions();
+    // fetchCompanies();
+    // fetchPositions();
     fetchCurrentUser();
   }, []);
 

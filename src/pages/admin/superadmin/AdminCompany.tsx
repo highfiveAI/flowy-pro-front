@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import NewCompany from './popup/newCompany';
 import EditCompany from './popup/editCompany';
+import { useNavigate } from 'react-router-dom';
 
 // 스타일 컴포넌트 재사용
 const Container = styled.div`
@@ -324,12 +325,27 @@ const AdminCompany: React.FC = () => {
     direction: null,
   });
 
+  const navigate = useNavigate();
+  
   // 회사 목록 조회
   const fetchCompanies = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
+        {
+          credentials: 'include',
+        }
       );
+      if (!response.ok) {
+        let errorMsg = '회사 목록 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        navigate('/')
+        throw new Error(errorMsg);
+      }
       const data = await response.json();
       setCompanies(data);
     } catch (error) {

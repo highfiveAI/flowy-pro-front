@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -280,12 +281,27 @@ const AdminAdmin: React.FC = () => {
     direction: null,
   });
 
+  const navigate = useNavigate();
+
   // 관리자 목록 조회 (더미 데이터 사용, 실제 API 연결 시 아래 코드 사용)
   const fetchAdmins = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/admin_users`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/admin_users`,
+        {
+          credentials: 'include',
+        }
       );
+      if (!response.ok) {
+        let errorMsg = '관리자 목록 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        navigate('/')
+        throw new Error(errorMsg);
+      }
       const data = await response.json();
       console.log('받아 온 데이터: ', data);
       if (Array.isArray(data)) {
