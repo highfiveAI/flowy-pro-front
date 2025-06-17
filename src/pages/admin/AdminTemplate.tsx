@@ -490,7 +490,7 @@ const AdminTemplate: React.FC = () => {
       <MainContent>
         <PageHeader>
           <div style={{display:'flex',alignItems:'center'}}>
-            <h1>템플릿 관리</h1>
+          <h1>템플릿 관리</h1>
           </div>
           <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'1rem'}}>
             <AddTemplateBtn onClick={() => setIsCreateModalOpen(true)}>
@@ -499,13 +499,13 @@ const AdminTemplate: React.FC = () => {
             </AddTemplateBtn>
             <FilterGroup>
               <FilterLabel htmlFor="order">정렬 기준</FilterLabel>
-              <FilterSelect
+          <FilterSelect
                 id="order"
-                value={selectedOrder}
-                onChange={(e) => setSelectedOrder(e.target.value)}
-              >
-                <option value="최신순">최신순</option>
-              </FilterSelect>
+            value={selectedOrder}
+            onChange={(e) => setSelectedOrder(e.target.value)}
+          >
+            <option value="최신순">최신순</option>
+          </FilterSelect>
             </FilterGroup>
           </div>
         </PageHeader>
@@ -517,11 +517,11 @@ const AdminTemplate: React.FC = () => {
                   title="수정"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setSelectedTemplate(template);
-                    setEditDocType(template.interdocs_type_name);
-                    setIsEditModalOpen(true);
-                  }}
-                >
+                setSelectedTemplate(template);
+                setEditDocType(template.interdocs_type_name);
+                setIsEditModalOpen(true);
+              }}
+            >
                   <img src="/images/edit.svg" alt="edit" style={{width:16, height:16}} />
                 </ActionButton>
                 <ActionButton
