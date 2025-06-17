@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -132,7 +132,7 @@ const ContentTitle = styled.div`
   gap: 8px;
 
   &::before {
-    content: "";
+    content: '';
     display: inline-block;
     width: 4px;
     height: 16px;
@@ -150,7 +150,7 @@ const TaskItem = styled.div`
   gap: 8px;
 
   &::before {
-    content: "•";
+    content: '•';
     color: #333;
     display: inline-block;
     width: 1em;
@@ -173,7 +173,7 @@ const FeedbackItem = styled.div`
   gap: 8px;
 
   &::before {
-    content: "•";
+    content: '•';
     color: #333;
     display: inline-block;
     width: 1em;
@@ -190,7 +190,7 @@ const SummaryItem = styled.div`
   gap: 8px;
 
   &::before {
-    content: "•";
+    content: '•';
     color: #333;
     display: inline-block;
     width: 1em;
@@ -229,7 +229,7 @@ interface MailPreviewProps {
     project: string;
     title: string;
     date: string;
-    attendees: string[];
+    attendees: { user_id: string; user_name: string }[];
     agenda: string[];
   };
 }
@@ -249,10 +249,10 @@ const MailPreviewDashboard = ({
   if (mailItems.tasks && tasks) {
     Object.entries(tasks).forEach(([name, items]) => {
       const taskArr = items as any[];
-      if (name === "unassigned") {
+      if (name === 'unassigned') {
         if (taskArr.length > 0)
           mailPreview.push({
-            section: "[ 미할당 작업 목록 ]",
+            section: '[ 미할당 작업 목록 ]',
             items: taskArr.map((t: any) => t.description),
           });
       } else {
@@ -272,10 +272,10 @@ const MailPreviewDashboard = ({
     ? Object.entries(tasks)
         .map(([name, items]) => {
           const taskArr = items as any[];
-          if (name === "unassigned") {
+          if (name === 'unassigned') {
             return taskArr.length > 0
               ? {
-                  section: "[ 미할당 작업 목록 ]",
+                  section: '[ 미할당 작업 목록 ]',
                   items: taskArr.map(
                     (t: any) => `${t.description} (${t.date})`
                   ),
@@ -327,7 +327,7 @@ const MailPreviewDashboard = ({
               <b>회의 일시:</b> {meetingInfo.date}
             </div>
             <div>
-              <b>참석자:</b> {meetingInfo.attendees.join(", ")}
+              <b>참석자:</b> {meetingInfo.attendees.join(', ')}
             </div>
             <div>
               <b>회의 안건:</b>
@@ -341,7 +341,7 @@ const MailPreviewDashboard = ({
           <SectionLabel>메일 내용</SectionLabel>
           <InfoBox>
             {!hasContent ? (
-              <div style={{ color: "#aaa" }}>선택된 항목이 없습니다.</div>
+              <div style={{ color: '#aaa' }}>선택된 항목이 없습니다.</div>
             ) : (
               <>
                 {summaryContent.length > 0 && (
@@ -367,7 +367,7 @@ const MailPreviewDashboard = ({
                         <SectionContent key={idx}>
                           <SectionTitle>{section.section}</SectionTitle>
                           {section.items.map((item, itemIdx) => {
-                            const [description, date] = item.split(" (");
+                            const [description, date] = item.split(' (');
                             return (
                               <TaskItem key={itemIdx}>
                                 <span>{description}</span>
@@ -404,16 +404,16 @@ const MailPreviewDashboard = ({
             {receivers.allAttendees && <div>회의 참석자 전체 수신</div>}
             {receivers.custom && receivers.selectedCustom.length > 0 && (
               <div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {receivers.selectedCustom.map(
                     (name: string, index: number) => (
                       <span
                         key={index}
                         style={{
-                          background: "#e6f7f7",
-                          padding: "4px 8px",
+                          background: '#e6f7f7',
+                          padding: '4px 8px',
                           borderRadius: 4,
-                          color: "#00b6b6",
+                          color: '#00b6b6',
                           fontSize: 13,
                         }}
                       >
@@ -427,7 +427,7 @@ const MailPreviewDashboard = ({
             {!receivers.allProject &&
               !receivers.allAttendees &&
               !(receivers.custom && receivers.selectedCustom.length > 0) && (
-                <div style={{ color: "#aaa" }}>선택된 수신자가 없습니다.</div>
+                <div style={{ color: '#aaa' }}>선택된 수신자가 없습니다.</div>
               )}
           </InfoBox>
         </ContentWrapper>

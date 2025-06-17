@@ -27,21 +27,22 @@ const Table = styled.table`
   background: #fff;
   margin-bottom: 2rem;
   font-size: 1.05rem;
-  th, td {
+  th,
+  td {
     padding: 1.2rem 0.5rem;
     text-align: left;
     border: none;
     font-size: 1.05rem;
   }
   th {
-    color: #5E5553;
+    color: #5e5553;
     font-weight: 700;
     font-size: 1.08rem;
     background: #fff;
     border-bottom: 2px solid #eee;
   }
   td {
-    color: #5E5553;
+    color: #5e5553;
     border-bottom: 1.5px solid #eee;
     background: #fff;
   }
@@ -50,50 +51,50 @@ const Table = styled.table`
   }
 `;
 
-const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  margin-right: 0.5rem;
-  background-color: ${(props) =>
-    props.variant === 'danger' ? '#dc3545' : '#007bff'};
-  color: white;
-  &:hover {
-    opacity: 0.9;
-  }
-`;
+// const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
+//   padding: 0.5rem 1rem;
+//   border-radius: 4px;
+//   border: none;
+//   cursor: pointer;
+//   margin-right: 0.5rem;
+//   background-color: ${(props) =>
+//     props.variant === 'danger' ? '#dc3545' : '#007bff'};
+//   color: white;
+//   &:hover {
+//     opacity: 0.9;
+//   }
+// `;
 
-const Form = styled.form`
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-`;
+// const Form = styled.form`
+//   background-color: white;
+//   padding: 2rem;
+//   border-radius: 8px;
+//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+//   margin-bottom: 2rem;
+// `;
 
-const FormGroup = styled.div`
-  margin-bottom: 1rem;
+// const FormGroup = styled.div`
+//   margin-bottom: 1rem;
 
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
+//   label {
+//     display: block;
+//     margin-bottom: 0.5rem;
+//     font-weight: 500;
+//   }
 
-  input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+//   input {
+//     width: 100%;
+//     padding: 0.5rem;
+//     border: 1px solid #ddd;
+//     border-radius: 4px;
+//     font-size: 1rem;
 
-    &:focus {
-      outline: none;
-      border-color: #007bff;
-    }
-  }
-`;
+//     &:focus {
+//       outline: none;
+//       border-color: #007bff;
+//     }
+//   }
+// `;
 
 interface Position {
   position_id: string;
@@ -136,10 +137,12 @@ const AddButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(80,0,80,0.08);
+  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.08);
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #4b2067; }
+  &:hover {
+    background: #4b2067;
+  }
 `;
 
 // 정렬 방향을 위한 타입
@@ -197,7 +200,9 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
 
 const AdminPosition: React.FC = () => {
   const [positions, setPositions] = useState<Position[]>([]);
-  const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(null);
+  const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(
+    null
+  );
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPositionId, setSelectedPositionId] = useState<string | null>(
@@ -234,11 +239,11 @@ const AdminPosition: React.FC = () => {
       if (data.user_company_id) {
         setCurrentUserCompany({
           company_id: data.user_company_id,
-          company_name: data.company_name || ''
+          company_name: data.company_name || '',
         });
         console.log('설정된 회사 정보:', {
           company_id: data.user_company_id,
-          company_name: data.company_name
+          company_name: data.company_name,
         });
       }
     } catch (error) {
@@ -290,7 +295,7 @@ const AdminPosition: React.FC = () => {
     try {
       const positionData = {
         ...formData,
-        position_company_id: currentUserCompany.company_id
+        position_company_id: currentUserCompany.company_id,
       };
       console.log('생성할 직급 데이터:', positionData);
 
@@ -329,7 +334,7 @@ const AdminPosition: React.FC = () => {
     try {
       const positionData = {
         ...formData,
-        position_company_id: currentUserCompany.company_id
+        position_company_id: currentUserCompany.company_id,
       };
       console.log('수정할 직급 데이터:', positionData);
 
@@ -359,7 +364,9 @@ const AdminPosition: React.FC = () => {
     if (window.confirm('정말로 이 직급을 삭제하시겠습니까?')) {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/v1/admin/positions/${positionId}`,
           {
             method: 'DELETE',
             credentials: 'include',
@@ -407,13 +414,11 @@ const AdminPosition: React.FC = () => {
 
     // 현재 사용자의 회사에 속한 직급만 필터링
     if (currentUserCompany) {
-      sorted = sorted.filter(
-        (position) => {
-          console.log('직급의 회사 ID:', position.position_company_id);
-          console.log('현재 회사 ID:', currentUserCompany.company_id);
-          return position.position_company_id === currentUserCompany.company_id;
-        }
-      );
+      sorted = sorted.filter((position) => {
+        console.log('직급의 회사 ID:', position.position_company_id);
+        console.log('현재 회사 ID:', currentUserCompany.company_id);
+        return position.position_company_id === currentUserCompany.company_id;
+      });
     }
     console.log('필터링 후 직급:', sorted);
 
@@ -421,7 +426,7 @@ const AdminPosition: React.FC = () => {
       sorted.sort((a, b) => {
         const aValue = String(a[sortState.field as keyof Position] || '');
         const bValue = String(b[sortState.field as keyof Position] || '');
-        
+
         return sortState.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
@@ -446,7 +451,9 @@ const AdminPosition: React.FC = () => {
                 직급 코드
                 <SortIcon
                   $direction={
-                    sortState.field === 'position_code' ? sortState.direction : null
+                    sortState.field === 'position_code'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -454,7 +461,9 @@ const AdminPosition: React.FC = () => {
                 직급명
                 <SortIcon
                   $direction={
-                    sortState.field === 'position_name' ? sortState.direction : null
+                    sortState.field === 'position_name'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -462,7 +471,9 @@ const AdminPosition: React.FC = () => {
                 직급 설명
                 <SortIcon
                   $direction={
-                    sortState.field === 'position_detail' ? sortState.direction : null
+                    sortState.field === 'position_detail'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>

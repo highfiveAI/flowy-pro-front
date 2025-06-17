@@ -4,10 +4,23 @@ import EditEventPop from './edit_utils';
 
 interface CalendarPopProps {
   date: Date;
-  todos: { id: string; title: string; completed?: boolean; start?: Date|string; end?: Date|string; comment?: string }[];
-  meetings: { id: string; title: string; start?: Date|string; end?: Date|string; comment?: string }[];
+  todos: {
+    id: string;
+    title: string;
+    completed?: boolean;
+    start?: Date | string;
+    end?: Date | string;
+    comment?: string;
+  }[];
+  meetings: {
+    id: string;
+    title: string;
+    start?: Date | string;
+    end?: Date | string;
+    comment?: string;
+  }[];
   onClose: () => void;
-  onEdit?: (edited: any) => void;
+  onEdit?: (id: string, completed: boolean) => void;
 }
 
 const Overlay = styled.div`
@@ -16,7 +29,7 @@ const Overlay = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,7 +41,7 @@ const PopContainer = styled.div`
   min-width: 320px;
   max-width: 90vw;
   padding: 32px 28px 24px 28px;
-  box-shadow: 0 4px 24px rgba(80,0,80,0.13);
+  box-shadow: 0 4px 24px rgba(80, 0, 80, 0.13);
   position: relative;
 `;
 const Title = styled.h2`
@@ -41,7 +54,7 @@ const Section = styled.div`
   margin-bottom: 18px;
 `;
 const MeetingBox = styled.div`
-  color: #5E5553;
+  color: #5e5553;
   border-radius: 3px;
   font-weight: 600;
   padding: 4px 8px;
@@ -56,7 +69,7 @@ const TodoBox = styled.div`
   gap: 4px;
   margin-bottom: 2px;
   font-weight: 600;
-  color: #5E5553;
+  color: #5e5553;
   font-size: 0.9rem;
 `;
 const CloseBtn = styled.button`
@@ -80,7 +93,7 @@ const LargeCheckbox = styled.input.attrs({ type: 'checkbox' })`
 `;
 const MeetingTimeBox = styled.span`
   background: rgba(190, 32, 116, 0.14);
-  color: #5E5553;
+  color: #5e5553;
   border-radius: 3px;
   font-weight: 600;
   padding: 2px 6px;
@@ -89,69 +102,114 @@ const MeetingTimeBox = styled.span`
 `;
 
 // 12시간제 한글 시간 포맷 함수 추가
-function formatTime12(t: Date | string | undefined) {
-  if (!t) return '';
-  const d = typeof t === 'string' ? new Date(t) : t;
-  if (isNaN(d.getTime())) return '';
-  let h = d.getHours();
-  const m = d.getMinutes();
-  const ampm = h < 12 ? '오전' : '오후';
-  let hour12 = h % 12;
-  if (hour12 === 0) hour12 = 12;
-  return `${ampm} ${hour12.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-}
+// function formatTime12(t: Date | string | undefined) {
+//   if (!t) return '';
+//   const d = typeof t === 'string' ? new Date(t) : t;
+//   if (isNaN(d.getTime())) return '';
+//   let h = d.getHours();
+//   const m = d.getMinutes();
+//   const ampm = h < 12 ? '오전' : '오후';
+//   let hour12 = h % 12;
+//   if (hour12 === 0) hour12 = 12;
+//   return `${ampm} ${hour12.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+// }
 
-const CalendarPop: React.FC<CalendarPopProps> = ({ date, todos, meetings, onClose, onEdit }) => {
-  const [editTarget, setEditTarget] = useState<null | { type: 'todo'|'meeting'; event: any }>(null);
+const CalendarPop: React.FC<CalendarPopProps> = ({
+  date,
+  todos,
+  meetings,
+  onClose,
+  onEdit,
+}) => {
+  const [editTarget, setEditTarget] = useState<null | {
+    type: 'todo' | 'meeting';
+    event: any;
+  }>(null);
 
   return (
     <Overlay onClick={onClose}>
-      <PopContainer onClick={e => e.stopPropagation()}>
+      <PopContainer onClick={(e) => e.stopPropagation()}>
         <CloseBtn onClick={onClose}>닫기 ✕</CloseBtn>
-        <Title>{date.getFullYear()}년 {date.getMonth()+1}월 {date.getDate()}일 일정</Title>
+        <Title>
+          {date.getFullYear()}년 {date.getMonth() + 1}월 {date.getDate()}일 일정
+        </Title>
         <Section>
-          <div style={{fontWeight:600, marginBottom:6}}>회의</div>
-          {meetings.length === 0 ? <div style={{color:'#aaa'}}>회의 없음</div> : meetings.map(m => {
-            let timeStr = '';
-            if (m.start) {
-              const d = typeof m.start === 'string' ? new Date(m.start) : m.start;
-              if (!isNaN(d.getTime()) && (d.getHours() !== 0 || d.getMinutes() !== 0)) {
-                const h = d.getHours();
-                const min = d.getMinutes();
-                const ampm = h < 12 ? '오전' : '오후';
-                let hour12 = h % 12;
-                if (hour12 === 0) hour12 = 12;
-                timeStr = `${ampm} ${hour12.toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}`;
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>회의</div>
+          {meetings.length === 0 ? (
+            <div style={{ color: '#aaa' }}>회의 없음</div>
+          ) : (
+            meetings.map((m) => {
+              let timeStr = '';
+              if (m.start) {
+                const d =
+                  typeof m.start === 'string' ? new Date(m.start) : m.start;
+                if (
+                  !isNaN(d.getTime()) &&
+                  (d.getHours() !== 0 || d.getMinutes() !== 0)
+                ) {
+                  const h = d.getHours();
+                  const min = d.getMinutes();
+                  const ampm = h < 12 ? '오전' : '오후';
+                  let hour12 = h % 12;
+                  if (hour12 === 0) hour12 = 12;
+                  timeStr = `${ampm} ${hour12.toString().padStart(2, '0')}:${min
+                    .toString()
+                    .padStart(2, '0')}`;
+                }
               }
-            }
-            return (
-              <MeetingBox key={m.id} onClick={() => setEditTarget({ type: 'meeting', event: m })} style={{cursor:'pointer'}}>
-                {timeStr && <MeetingTimeBox>{timeStr}</MeetingTimeBox>}{m.title}
-              </MeetingBox>
-            );
-          })}
+              return (
+                <MeetingBox
+                  key={
+                    m.id
+                  } /* onClick={() => setEditTarget({ type: 'meeting', event: m })} style={{cursor:'pointer'}}*/
+                >
+                  {timeStr && <MeetingTimeBox>{timeStr}</MeetingTimeBox>}
+                  {m.title}
+                </MeetingBox>
+              );
+            })
+          )}
         </Section>
         <Section>
-          <div style={{fontWeight:600, marginBottom:6}}>할 일</div>
-          {todos.length === 0 ? <div style={{color:'#aaa'}}>할 일 없음</div> : todos.map(t => (
-            <TodoBox key={t.id} onClick={e => { if (e.target === e.currentTarget) setEditTarget({ type: 'todo', event: t }); }} style={{cursor:'pointer'}}>
-              <LargeCheckbox
-                checked={t.completed}
-                onChange={e => {
-                  e.stopPropagation();
-                  onEdit && onEdit({ ...t, completed: !t.completed });
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>할 일</div>
+          {todos.length === 0 ? (
+            <div style={{ color: '#aaa' }}>할 일 없음</div>
+          ) : (
+            todos.map((t) => (
+              <TodoBox
+                key={t.id}
+                onClick={(e) => {
+                  if (e.target === e.currentTarget)
+                    setEditTarget({ type: 'todo', event: t });
                 }}
-              />
-              <span style={{textDecoration: t.completed ? 'line-through' : 'none'}}>{t.title}</span>
-            </TodoBox>
-          ))}
+                style={{ cursor: 'pointer' }}
+              >
+                <LargeCheckbox
+                  checked={t.completed}
+                  // onClick={e => e.stopPropagation()}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    console.log('체크박스 onEdit 호출', t.id, !t.completed);
+                    onEdit && onEdit(t.id, !t.completed);
+                  }}
+                />
+                <span
+                  style={{
+                    textDecoration: t.completed ? 'line-through' : 'none',
+                  }}
+                >
+                  {t.title}
+                </span>
+              </TodoBox>
+            ))
+          )}
         </Section>
         {editTarget && (
           <EditEventPop
             type={editTarget.type}
             event={editTarget.event}
-            onSave={edited => {
-              onEdit && onEdit(edited);
+            onSave={(id: string, completed: boolean) => {
+              onEdit && onEdit(id, completed);
               setEditTarget(null);
             }}
             onClose={() => setEditTarget(null)}
@@ -162,4 +220,4 @@ const CalendarPop: React.FC<CalendarPopProps> = ({ date, todos, meetings, onClos
   );
 };
 
-export default CalendarPop; 
+export default CalendarPop;
