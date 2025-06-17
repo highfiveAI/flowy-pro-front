@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import {
   LineChart,
@@ -680,7 +680,7 @@ const AdminDashboard = () => {
       <SummarySection>
         <SummaryTitle>Summary</SummaryTitle>
         <SummaryGrid>
-          {summaryData.map((item, idx) => (
+          {summaryData.map((item) => (
             <SummaryCard key={item.title}>
               <SummaryCardTitle>{item.title}</SummaryCardTitle>
               <div style={{ width: 140, height: 180, margin: '0 auto 8px auto' }}>
