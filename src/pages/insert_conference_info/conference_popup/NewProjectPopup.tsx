@@ -345,7 +345,6 @@ const StyledTextarea = styled.textarea`
   background-color: #f0f0f0; /* 배경색 변경 */
   color: #333;
   font-size: 1rem;
-  font-family: "Rethink Sans", sans-serif; /* 폰트 변경 */
   box-sizing: border-box;
   min-height: 120px; /* 높이 조정 */
   resize: vertical;

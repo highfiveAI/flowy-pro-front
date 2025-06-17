@@ -24,7 +24,6 @@ const DashboardContainer = styled.div`
   padding: 40px;
   background-color: #f8f9fa;
   min-height: 100vh;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const PageTitle = styled.h1`
@@ -32,14 +31,12 @@ const PageTitle = styled.h1`
   font-weight: 600;
   color: #351745;
   margin-bottom: 30px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const TabContainer = styled.div`
   display: flex;
   gap: 2px;
   margin-bottom: 20px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Tab = styled.button<{ $isActive?: boolean }>`
@@ -50,7 +47,6 @@ const Tab = styled.button<{ $isActive?: boolean }>`
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  font-family: 'Rethink Sans', sans-serif;
 
   &:first-child {
     border-radius: 4px 0 0 4px;
@@ -74,26 +70,22 @@ const FilterSection = styled.div`
   padding: 16px 24px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const FilterGroup = styled.div`
   display: flex;
   gap: 16px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const FilterSelect = styled.div`
   position: relative;
   min-width: 200px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const SelectLabel = styled.div`
   font-size: 12px;
   color: #666;
   margin-bottom: 4px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Select = styled.select`
@@ -109,7 +101,6 @@ const Select = styled.select`
   background-repeat: no-repeat;
   background-position: right 12px center;
   cursor: pointer;
-  font-family: 'Rethink Sans', sans-serif;
 
   &:focus {
     outline: none;
@@ -126,7 +117,6 @@ const ApplyButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-  font-family: 'Rethink Sans', sans-serif;
 
   &:hover {
     background: #4a1168;
@@ -140,7 +130,6 @@ const SummarySection = styled.div`
   padding: 16px 24px 24px 20px;
   margin-bottom: 24px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const SummaryTitle = styled.h2`
@@ -150,19 +139,16 @@ const SummaryTitle = styled.h2`
   margin-top: 0;
   color: #351745;
   text-align: left;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const SummaryGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const SummaryCard = styled.div`
   text-align: center;
-  font-family: 'Rethink Sans', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -176,21 +162,18 @@ const SummaryCardTitle = styled.h3`
   padding: 8px;
   border-radius: 20px;
   display: inline-block;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const ComparisonContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 24px;
-  font-family: 'Rethink Sans', sans-serif;
   text-align: center;
   width: auto;
 `;
 
 const ComparisonItem = styled.div`
   text-align: center;
-  font-family: 'Rethink Sans', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -201,13 +184,11 @@ const ComparisonValue = styled.div<{ $isPrimary?: boolean }>`
   font-weight: 600;
   color: ${props => props.$isPrimary ? '#351745' : '#666'};
   margin-bottom: 8px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const ComparisonLabel = styled.div`
   font-size: 14px;
   color: #666;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 // Feedback Section
@@ -216,7 +197,6 @@ const FeedbackSection = styled.div`
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const FeedbackTitle = styled.h2`
@@ -226,7 +206,6 @@ const FeedbackTitle = styled.h2`
   margin-top: 0;
   color: #351745;
   text-align: left;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const FeedbackSubTitle = styled.div`
@@ -239,27 +218,23 @@ const FeedbackSubTitle = styled.div`
   border-radius: 32px;
   text-align: center;
   margin-bottom: 2px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const ChartContainer = styled.div`
   height: 300px;
   margin-top: 24px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 // 테이블 스타일링
 const TableContainer = styled.div`
   margin-top: 24px;
   overflow-x: auto;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   background: white;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Th = styled.th`
@@ -269,21 +244,18 @@ const Th = styled.th`
   color: #351745;
   font-weight: 600;
   border-bottom: 1px solid #e0e0e0;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Td = styled.td`
   padding: 12px 16px;
   border-bottom: 1px solid #e0e0e0;
   color: #333;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Tr = styled.tr`
   &:hover {
     background-color: #f8f6fa;
   }
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 type PeriodType = 'year' | 'quarter' | 'month' | 'week' | 'day';
@@ -317,7 +289,6 @@ const ModalOverlay = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const ModalContent = styled.div`
@@ -327,7 +298,6 @@ const ModalContent = styled.div`
   min-width: 400px;
   max-width: 500px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const ModalTitle = styled.h3`
@@ -336,7 +306,6 @@ const ModalTitle = styled.h3`
   color: #351745;
   margin-bottom: 20px;
   text-align: center;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const DateRangeContainer = styled.div`
@@ -344,7 +313,6 @@ const DateRangeContainer = styled.div`
   flex-direction: column;
   gap: 16px;
   margin-bottom: 24px;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const DateInputGroup = styled.div`
@@ -353,7 +321,6 @@ const DateInputGroup = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const DateLabel = styled.label`
@@ -362,7 +329,6 @@ const DateLabel = styled.label`
   color: #666;
   margin-bottom: 8px;
   font-weight: 500;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const DateInput = styled.input`
@@ -372,7 +338,6 @@ const DateInput = styled.input`
   border-radius: 6px;
   font-size: 14px;
   color: #333;
-  font-family: 'Rethink Sans', sans-serif;
   
   &:focus {
     outline: none;
@@ -385,7 +350,6 @@ const ButtonGroup = styled.div`
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const ModalButton = styled.button<{ $isPrimary?: boolean }>`
@@ -395,7 +359,6 @@ const ModalButton = styled.button<{ $isPrimary?: boolean }>`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Rethink Sans', sans-serif;
   
   ${props => props.$isPrimary ? `
     background: #351745;
@@ -419,7 +382,6 @@ const SelectedDateRange = styled.div`
   color: #666;
   margin-top: 8px;
   text-align: center;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const AdminDashboard = () => {
