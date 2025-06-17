@@ -284,8 +284,20 @@ const AdminAdmin: React.FC = () => {
   const fetchAdmins = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/admin_users`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/users/admin_users`,
+        {
+          credentials: 'include',
+        }
       );
+      if (!response.ok) {
+        let errorMsg = '관리자 목록 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        throw new Error(errorMsg);
+      }
       const data = await response.json();
       console.log('받아 온 데이터: ', data);
       if (Array.isArray(data)) {

@@ -328,8 +328,20 @@ const AdminCompany: React.FC = () => {
   const fetchCompanies = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
+        {
+          credentials: 'include',
+        }
       );
+      if (!response.ok) {
+        let errorMsg = '회사 목록 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        throw new Error(errorMsg);
+      }
       const data = await response.json();
       setCompanies(data);
     } catch (error) {
