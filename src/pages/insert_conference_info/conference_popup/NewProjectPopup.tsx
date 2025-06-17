@@ -4,7 +4,7 @@ import AddProjectIcon2 from '/images/addprojecticon2.svg'; // AddProjectIcon2 ìž
 import { createProject, fetchProjectMetaData } from '../../../api/fetchProject';
 import type {
   ProjectRequestBody,
-  ProjectRoleIdName,
+  // ProjectRoleIdName,
   ProjectUserIdName,
 } from '../../../types/project';
 import {
@@ -40,7 +40,7 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
     ProjectUserIdName[]
   >([]);
   const [projectDetails, setProjectDetails] = useState<string>('');
-  const [projectRoles, setProjectRoles] = useState<ProjectRoleIdName[]>([]);
+  // const [projectRoles, setProjectRoles] = useState<ProjectRoleIdName[]>([]);
   const [companyId, setCompanyId] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [poId, setPoId] = useState<string>('');
@@ -169,7 +169,7 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
     fetchProjectMetaData().then((data) => {
       if (data) {
         setProjectUsers(data.users);
-        setProjectRoles(data.roles);
+        // setProjectRoles(data.roles);
 
         const poRole = data.roles.find((r: any) => r.role_name === 'PO');
         const ppRole = data.roles.find((r: any) => r.role_name === 'PP');

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import {
   LineChart,
@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Cell
+  Cell,
 } from 'recharts';
 import {
   useReactTable,
@@ -41,8 +41,8 @@ const TabContainer = styled.div`
 
 const Tab = styled.button<{ $isActive?: boolean }>`
   padding: 8px 16px;
-  background: ${props => props.$isActive ? '#351745' : '#f5f5f5'};
-  color: ${props => props.$isActive ? '#fff' : '#666'};
+  background: ${(props) => (props.$isActive ? '#351745' : '#f5f5f5')};
+  color: ${(props) => (props.$isActive ? '#fff' : '#666')};
   border: none;
   cursor: pointer;
   font-size: 14px;
@@ -57,7 +57,7 @@ const Tab = styled.button<{ $isActive?: boolean }>`
   }
 
   &:hover {
-    background: ${props => props.$isActive ? '#351745' : '#e0e0e0'};
+    background: ${(props) => (props.$isActive ? '#351745' : '#e0e0e0')};
   }
 `;
 
@@ -182,7 +182,7 @@ const ComparisonItem = styled.div`
 const ComparisonValue = styled.div<{ $isPrimary?: boolean }>`
   font-size: 24px;
   font-weight: 600;
-  color: ${props => props.$isPrimary ? '#351745' : '#666'};
+  color: ${(props) => (props.$isPrimary ? '#351745' : '#666')};
   margin-bottom: 8px;
 `;
 
@@ -264,7 +264,7 @@ interface ChartData {
   year: string;
   발생빈도: number;
   처리시간: number;
-  period: string;  // 기간 정보 추가
+  period: string; // 기간 정보 추가
 }
 
 // 테이블 데이터 타입
@@ -338,7 +338,7 @@ const DateInput = styled.input`
   border-radius: 6px;
   font-size: 14px;
   color: #333;
-  
+
   &:focus {
     outline: none;
     border-color: #351745;
@@ -359,15 +359,18 @@ const ModalButton = styled.button<{ $isPrimary?: boolean }>`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  
-  ${props => props.$isPrimary ? `
+
+  ${(props) =>
+    props.$isPrimary
+      ? `
     background: #351745;
     color: white;
     
     &:hover {
       background: #4a1168;
     }
-  ` : `
+  `
+      : `
     background: #f5f5f5;
     color: #666;
     
@@ -387,35 +390,42 @@ const SelectedDateRange = styled.div`
 const AdminDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('month');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
 
   // 차트 더미 데이터 - 컴포넌트 외부로 이동하거나 useMemo로 최적화
-  const chartData: ChartData[] = useMemo(() => [
-    // 연별 데이터
-    { year: '2020', 발생빈도: 30, 처리시간: 40, period: 'year' },
-    { year: '2021', 발생빈도: 45, 처리시간: 55, period: 'year' },
-    { year: '2022', 발생빈도: 35, 처리시간: 45, period: 'year' },
-    { year: '2023', 발생빈도: 50, 처리시간: 60, period: 'year' },
-    { year: '2024', 발생빈도: 40, 처리시간: 50, period: 'year' },
-    // 월별 데이터
-    { year: '2024-01', 발생빈도: 15, 처리시간: 20, period: 'month' },
-    { year: '2024-02', 발생빈도: 20, 처리시간: 25, period: 'month' },
-    { year: '2024-03', 발생빈도: 25, 처리시간: 30, period: 'month' },
-    // 주별 데이터
-    { year: '2024-W1', 발생빈도: 5, 처리시간: 8, period: 'week' },
-    { year: '2024-W2', 발생빈도: 7, 처리시간: 10, period: 'week' },
-    // 일별 데이터
-    { year: '2024-03-01', 발생빈도: 2, 처리시간: 3, period: 'day' },
-    { year: '2024-03-02', 발생빈도: 3, 처리시간: 4, period: 'day' },
-    // 분기별 데이터
-    { year: '2024-Q1', 발생빈도: 30, 처리시간: 35, period: 'quarter' },
-    { year: '2024-Q2', 발생빈도: 25, 처리시간: 30, period: 'quarter' },
-  ], []);
+  const chartData: ChartData[] = useMemo(
+    () => [
+      // 연별 데이터
+      { year: '2020', 발생빈도: 30, 처리시간: 40, period: 'year' },
+      { year: '2021', 발생빈도: 45, 처리시간: 55, period: 'year' },
+      { year: '2022', 발생빈도: 35, 처리시간: 45, period: 'year' },
+      { year: '2023', 발생빈도: 50, 처리시간: 60, period: 'year' },
+      { year: '2024', 발생빈도: 40, 처리시간: 50, period: 'year' },
+      // 월별 데이터
+      { year: '2024-01', 발생빈도: 15, 처리시간: 20, period: 'month' },
+      { year: '2024-02', 발생빈도: 20, 처리시간: 25, period: 'month' },
+      { year: '2024-03', 발생빈도: 25, 처리시간: 30, period: 'month' },
+      // 주별 데이터
+      { year: '2024-W1', 발생빈도: 5, 처리시간: 8, period: 'week' },
+      { year: '2024-W2', 발생빈도: 7, 처리시간: 10, period: 'week' },
+      // 일별 데이터
+      { year: '2024-03-01', 발생빈도: 2, 처리시간: 3, period: 'day' },
+      { year: '2024-03-02', 발생빈도: 3, 처리시간: 4, period: 'day' },
+      // 분기별 데이터
+      { year: '2024-Q1', 발생빈도: 30, 처리시간: 35, period: 'quarter' },
+      { year: '2024-Q2', 발생빈도: 25, 처리시간: 30, period: 'quarter' },
+    ],
+    []
+  );
 
   // 선택된 기간에 따라 데이터 필터링
   const filteredChartData = useMemo(() => {
-    return chartData.filter(data => data.period === selectedPeriod);
+    return chartData.filter((data) => data.period === selectedPeriod);
   }, [selectedPeriod, chartData]);
 
   const handlePeriodChange = useCallback((period: PeriodType) => {
@@ -423,38 +433,45 @@ const AdminDashboard = () => {
   }, []);
 
   // 기간별 레이블 매핑
-  const periodLabels: Record<PeriodType, string> = useMemo(() => ({
-    year: 'Year',
-    quarter: 'Quarter',
-    month: 'Month',
-    week: 'Week',
-    day: 'Day'
-  }), []);
+  const periodLabels: Record<PeriodType, string> = useMemo(
+    () => ({
+      year: 'Year',
+      quarter: 'Quarter',
+      month: 'Month',
+      week: 'Week',
+      day: 'Day',
+    }),
+    []
+  );
 
   // 기간 타입 배열을 안전하게 생성
-  const periodTypes: PeriodType[] = useMemo(() => 
-    ['year', 'quarter', 'month', 'week', 'day'], []
+  const periodTypes: PeriodType[] = useMemo(
+    () => ['year', 'quarter', 'month', 'week', 'day'],
+    []
   );
 
   // 테이블 더미 데이터
-  const tableData: TableData[] = useMemo(() => [
-    {
-      period: '2024',
-      target: '불필요대화 30% 이상',
-      value: '50.7건',
-      pop: '-4.5%',
-      prevValue: '51.7건',
-      growth: '-1.9%',
-    },
-    {
-      period: '2024',
-      target: '화제 전환 미숙의',
-      value: '41.2건',
-      pop: '-24.5%',
-      prevValue: '41.7건',
-      growth: '-1.2%',
-    },
-  ], []);
+  const tableData: TableData[] = useMemo(
+    () => [
+      {
+        period: '2024',
+        target: '불필요대화 30% 이상',
+        value: '50.7건',
+        pop: '-4.5%',
+        prevValue: '51.7건',
+        growth: '-1.9%',
+      },
+      {
+        period: '2024',
+        target: '화제 전환 미숙의',
+        value: '41.2건',
+        pop: '-24.5%',
+        prevValue: '41.7건',
+        growth: '-1.2%',
+      },
+    ],
+    []
+  );
 
   // 테이블 컬럼 설정
   const columnHelper = useMemo(() => createColumnHelper<TableData>(), []);
@@ -462,27 +479,27 @@ const AdminDashboard = () => {
     () => [
       columnHelper.accessor('period', {
         header: 'Period',
-        cell: info => info.getValue(),
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('target', {
         header: '피드백 항목',
-        cell: info => info.getValue(),
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('value', {
         header: '조회 결과',
-        cell: info => info.getValue(),
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('pop', {
         header: 'PoP',
-        cell: info => info.getValue(),
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('prevValue', {
         header: '전회 결과',
-        cell: info => info.getValue(),
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor('growth', {
         header: '성장률',
-        cell: info => info.getValue(),
+        cell: (info) => info.getValue(),
       }),
     ],
     [columnHelper]
@@ -495,31 +512,34 @@ const AdminDashboard = () => {
   });
 
   // 차트 컴포넌트 메모이제이션
-  const chartComponent = useMemo(() => (
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={filteredChartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="year" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line
-          type="monotone"
-          dataKey="발생빈도"
-          stroke="#351745"
-          strokeWidth={2}
-          dot={{ fill: '#351745' }}
-        />
-        <Line
-          type="monotone"
-          dataKey="처리시간"
-          stroke="#8884d8"
-          strokeWidth={2}
-          dot={{ fill: '#8884d8' }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  ), [filteredChartData]);
+  const chartComponent = useMemo(
+    () => (
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={filteredChartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="year" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line
+            type="monotone"
+            dataKey="발생빈도"
+            stroke="#351745"
+            strokeWidth={2}
+            dot={{ fill: '#351745' }}
+          />
+          <Line
+            type="monotone"
+            dataKey="처리시간"
+            stroke="#8884d8"
+            strokeWidth={2}
+            dot={{ fill: '#8884d8' }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    ),
+    [filteredChartData]
+  );
 
   // 모달 열기
   const handleOpenModal = useCallback(() => {
@@ -544,7 +564,7 @@ const AdminDashboard = () => {
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   }, []);
 
@@ -588,7 +608,7 @@ const AdminDashboard = () => {
   return (
     <DashboardContainer>
       <PageTitle>대시보드</PageTitle>
-      
+
       <TabContainer>
         {periodTypes.map((period) => (
           <Tab
@@ -639,7 +659,7 @@ const AdminDashboard = () => {
         <ModalOverlay onClick={handleCloseModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
             <ModalTitle>조회 기간 설정</ModalTitle>
-            
+
             <DateRangeContainer>
               <DateInputGroup>
                 <DateLabel>시작일</DateLabel>
@@ -666,9 +686,7 @@ const AdminDashboard = () => {
             </SelectedDateRange>
 
             <ButtonGroup>
-              <ModalButton onClick={handleCloseModal}>
-                취소
-              </ModalButton>
+              <ModalButton onClick={handleCloseModal}>취소</ModalButton>
               <ModalButton $isPrimary onClick={handleApplyDateRange}>
                 적용
               </ModalButton>
@@ -680,27 +698,54 @@ const AdminDashboard = () => {
       <SummarySection>
         <SummaryTitle>Summary</SummaryTitle>
         <SummaryGrid>
-          {summaryData.map((item, idx) => (
+          {summaryData.map((item) => (
             <SummaryCard key={item.title}>
               <SummaryCardTitle>{item.title}</SummaryCardTitle>
-              <div style={{ width: 140, height: 180, margin: '0 auto 8px auto' }}>
+              <div
+                style={{ width: 140, height: 180, margin: '0 auto 8px auto' }}
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={[
-                      { name: item.labelTarget, value: item.target, fill: item.color },
-                      { name: item.labelAvg, value: item.average, fill: item.colorAvg },
+                      {
+                        name: item.labelTarget,
+                        value: item.target,
+                        fill: item.color,
+                      },
+                      {
+                        name: item.labelAvg,
+                        value: item.average,
+                        fill: item.colorAvg,
+                      },
                     ]}
                     barCategoryGap={40}
                     maxBarSize={40}
                   >
                     <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ textAnchor: 'middle' }} />
+                    <XAxis
+                      dataKey="name"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ textAnchor: 'middle' }}
+                    />
                     <YAxis domain={[0, item.yMax]} hide />
                     <Tooltip formatter={(v) => `${v}${item.unit}`} />
-                    <Bar dataKey="value" radius={[8, 8, 0, 0]} isAnimationActive={false}>
+                    <Bar
+                      dataKey="value"
+                      radius={[8, 8, 0, 0]}
+                      isAnimationActive={false}
+                    >
                       {[
-                        { name: item.labelTarget, value: item.target, fill: item.color },
-                        { name: item.labelAvg, value: item.average, fill: item.colorAvg },
+                        {
+                          name: item.labelTarget,
+                          value: item.target,
+                          fill: item.color,
+                        },
+                        {
+                          name: item.labelAvg,
+                          value: item.average,
+                          fill: item.colorAvg,
+                        },
                       ].map((entry, idx) => (
                         <Cell key={`cell-${idx}`} fill={entry.fill} />
                       ))}
@@ -710,11 +755,17 @@ const AdminDashboard = () => {
               </div>
               <ComparisonContainer>
                 <ComparisonItem>
-                  <ComparisonValue $isPrimary>{item.target}{item.unit}</ComparisonValue>
+                  <ComparisonValue $isPrimary>
+                    {item.target}
+                    {item.unit}
+                  </ComparisonValue>
                   <ComparisonLabel>{item.labelTarget}</ComparisonLabel>
                 </ComparisonItem>
                 <ComparisonItem>
-                  <ComparisonValue>{item.average}{item.unit}</ComparisonValue>
+                  <ComparisonValue>
+                    {item.average}
+                    {item.unit}
+                  </ComparisonValue>
                   <ComparisonLabel>{item.labelAvg}</ComparisonLabel>
                 </ComparisonItem>
               </ComparisonContainer>
@@ -725,18 +776,18 @@ const AdminDashboard = () => {
 
       <FeedbackSection>
         <FeedbackTitle>Feedback</FeedbackTitle>
-        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+        >
           <FeedbackSubTitle>유형별 발생 빈도</FeedbackSubTitle>
         </div>
-        <ChartContainer>
-          {chartComponent}
-        </ChartContainer>
+        <ChartContainer>{chartComponent}</ChartContainer>
         <TableContainer>
           <Table>
             <thead>
-              {table.getHeaderGroups().map(headerGroup => (
+              {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map(header => (
+                  {headerGroup.headers.map((header) => (
                     <Th key={header.id}>
                       {flexRender(
                         header.column.columnDef.header,
@@ -748,9 +799,9 @@ const AdminDashboard = () => {
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.map(row => (
+              {table.getRowModel().rows.map((row) => (
                 <Tr key={row.id}>
-                  {row.getVisibleCells().map(cell => (
+                  {row.getVisibleCells().map((cell) => (
                     <Td key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
