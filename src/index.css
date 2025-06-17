@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;500;700&display=swap');
+
+html, body, #root, * {
+  font-family: 'Rethink Sans', sans-serif;
+}
+
 @font-face {
   font-family: 'Rethink Sans';
   src: url('/fonts/RethinkSans-Regular.ttf') format('truetype');
@@ -26,7 +32,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Rethink Sans', sans-serif;
 }
 
 body {

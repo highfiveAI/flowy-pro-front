@@ -798,7 +798,6 @@ const StyledTextarea = styled.textarea`
   background-color: rgba(255, 255, 255, 0.9);
   color: #333;
   font-size: 1rem;
-  font-family: 'Rethink Sans', sans-serif; /* 폰트 변경 */
   box-sizing: border-box;
   min-height: 80px;
   resize: vertical;
