@@ -339,10 +339,20 @@ const AdminTemplate: React.FC = () => {
   const fetchTemplates = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/docs/`
+        `${import.meta.env.VITE_API_URL}/api/v1/docs/`,
+        {
+          credentials: 'include',
+        }
       );
       if (!response.ok) {
-        throw new Error('템플릿 목록 조회에 실패했습니다.');
+        // 에러 응답 detail 메시지 파싱 시도
+        let errorMsg = '템플릿 목록 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        throw new Error(errorMsg);
       }
       const data = await response.json();
       setTemplates(data);
@@ -369,6 +379,7 @@ const AdminTemplate: React.FC = () => {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/docs/`,
         {
+          credentials: 'include',
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -411,6 +422,7 @@ const AdminTemplate: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/api/v1/docs/${selectedTemplate.interdocs_id
         }`,
         {
+          credentials: 'include',
           method: 'PUT',
           headers: {
             Accept: 'application/json',
@@ -446,6 +458,7 @@ const AdminTemplate: React.FC = () => {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/v1/docs/${templateId}`,
           {
+            credentials: 'include',
             method: 'DELETE',
           }
         );
