@@ -345,7 +345,6 @@ const AdminTemplate: React.FC = () => {
         }
       );
       if (!response.ok) {
-        // 에러 응답 detail 메시지 파싱 시도
         let errorMsg = '템플릿 목록 조회에 실패했습니다.';
         try {
           const errorData = await response.json();
@@ -538,8 +537,8 @@ const AdminTemplate: React.FC = () => {
     <Container>
       <MainContent>
         <PageHeader>
-          <div style={{display:'flex',alignItems:'center'}}>
-          <h1>템플릿 관리</h1>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <h1>템플릿 관리</h1>
           </div>
           <div
             style={{
@@ -559,13 +558,13 @@ const AdminTemplate: React.FC = () => {
             </AddTemplateBtn>
             <FilterGroup>
               <FilterLabel htmlFor="order">정렬 기준</FilterLabel>
-          <FilterSelect
+              <FilterSelect
                 id="order"
-            value={selectedOrder}
-            onChange={(e) => setSelectedOrder(e.target.value)}
-          >
-            <option value="최신순">최신순</option>
-          </FilterSelect>
+                value={selectedOrder}
+                onChange={(e) => setSelectedOrder(e.target.value)}
+              >
+                <option value="최신순">최신순</option>
+              </FilterSelect>
             </FilterGroup>
           </div>
         </PageHeader>
