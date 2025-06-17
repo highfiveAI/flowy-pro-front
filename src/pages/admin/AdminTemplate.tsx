@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import EditTemplateModal from './popup/edittemp';
 import NewTemplateModal from './popup/newtemp';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -335,6 +336,8 @@ const AdminTemplate: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
+  const navigate = useNavigate();
+
   // 템플릿 목록 조회
   const fetchTemplates = async () => {
     try {
@@ -351,6 +354,7 @@ const AdminTemplate: React.FC = () => {
           if (errorData.detail) errorMsg = errorData.detail;
         } catch {}
         alert(errorMsg);
+        navigate('/')
         throw new Error(errorMsg);
       }
       const data = await response.json();

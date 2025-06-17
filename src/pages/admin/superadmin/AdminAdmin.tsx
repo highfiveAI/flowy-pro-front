@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -280,6 +281,8 @@ const AdminAdmin: React.FC = () => {
     direction: null,
   });
 
+  const navigate = useNavigate();
+
   // 관리자 목록 조회 (더미 데이터 사용, 실제 API 연결 시 아래 코드 사용)
   const fetchAdmins = async () => {
     try {
@@ -296,6 +299,7 @@ const AdminAdmin: React.FC = () => {
           if (errorData.detail) errorMsg = errorData.detail;
         } catch {}
         alert(errorMsg);
+        navigate('/')
         throw new Error(errorMsg);
       }
       const data = await response.json();
