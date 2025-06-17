@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { FiEdit2, FiTrash2, FiArrowRight } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { FiEdit2, FiTrash2, FiArrowRight } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import {
   deleteProject,
   fetchProject,
   updateProjectName,
-} from "../../api/fetchProject";
-import type { ProjectUser } from "../../types/project";
-import { checkAuth } from "../../api/fetchAuthCheck";
-import { useAuth } from "../../contexts/AuthContext";
-
+} from '../../api/fetchProject';
+import type { ProjectUser } from '../../types/project';
+import { checkAuth } from '../../api/fetchAuthCheck';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ProjectListPage: React.FC = () => {
   // const { user } = useAuth();
   // const [projects, setProjects] = React.useState<Project[]>([]);
-  
+
   // // user.id로 프로젝트 목록 불러오기
   // React.useEffect(() => {
   //   if (!user?.id) return;
@@ -41,7 +40,7 @@ const ProjectListPage: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
   const [projects, setProjects] = useState<ProjectUser[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
-  const [editName, setEditName] = useState<string>("");
+  const [editName, setEditName] = useState<string>('');
 
   useEffect(() => {
     if (user?.id) {
@@ -66,7 +65,7 @@ const ProjectListPage: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteProject(id);
-      alert("삭제 성공");
+      alert('삭제 성공');
       if (user?.id) {
         fetchProject(user?.id).then((data) => {
           if (data) {
@@ -77,7 +76,7 @@ const ProjectListPage: React.FC = () => {
 
       // 필요 시 상태 갱신 또는 리디렉션
     } catch (err) {
-      alert("삭제 실패");
+      alert('삭제 실패');
     }
   };
 
@@ -91,7 +90,7 @@ const ProjectListPage: React.FC = () => {
       // 여기에 실제 API 호출 함수 작성 (예시)
       // await updateProjectName(id, editName);
       await updateProjectName(id, editName);
-      alert("수정 완료");
+      alert('수정 완료');
       setEditId(null);
 
       // 데이터 새로고침
@@ -100,9 +99,8 @@ const ProjectListPage: React.FC = () => {
         if (data) setProjects(data);
       }
     } catch (err) {
-      alert("수정 실패");
+      alert('수정 실패');
     }
-
   };
 
   return (
@@ -128,9 +126,9 @@ const ProjectListPage: React.FC = () => {
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter")
+                        if (e.key === 'Enter')
                           handleEditSave(p.project.project_id);
-                        if (e.key === "Escape") setEditId(null);
+                        if (e.key === 'Escape') setEditId(null);
                       }}
                       autoFocus
                     />
@@ -140,14 +138,14 @@ const ProjectListPage: React.FC = () => {
                 </Td>
                 <Td>
                   {new Date(p.project.project_created_date)
-                    .toISOString()
-                    .replace("T", " ")
+                    .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
+                    .replace('T', ' ')
                     .slice(0, 16)}
                 </Td>
                 <Td>
                   {p.project.project_end_date
                     ? p.project.project_end_date
-                    : "미정"}
+                    : '미정'}
                 </Td>
                 <Td>
                   <IconGroup>
@@ -186,7 +184,6 @@ const ProjectListPage: React.FC = () => {
                         </ArrowBtn>
                       </>
                     )}
-
                   </IconGroup>
                 </Td>
               </Tr>
@@ -281,4 +278,3 @@ const IconGroup = styled.div`
 
   margin-left: 200px;
 `;
-

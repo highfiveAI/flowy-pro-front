@@ -374,7 +374,9 @@ const Select = styled.select`
 
 const AdminUser: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+
   const [companies/*, setCompanies*/] = useState<Company[]>([]);
+
   // const [positions, setPositions] = useState<Position[]>([]);
   const [companyPositions, setCompanyPositions] = useState<{
     [key: string]: Position[];
