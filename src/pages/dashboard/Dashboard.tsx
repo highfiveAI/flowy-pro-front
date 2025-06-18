@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import MailingDashboard from './popup/mailingDashboard';
+import PDFPopup from './popup/PDFPopup';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import { fetchMeetings, postAssignedTodos } from '../../api/fetchProject';
 import { useParams } from 'react-router-dom';
@@ -633,6 +634,7 @@ const Dashboard: React.FC = () => {
   // 작업 목록 수정 모드 state
   const [isEditingTasks, setIsEditingTasks] = useState(false);
   const [showMailPopup, setShowMailPopup] = useState(false);
+  const [showPDFPopup, setShowPDFPopup] = useState(false);
 
   // 회의 요약 state (여러 섹션, 리스트)
   const [summary, setSummary] = useState([
@@ -912,6 +914,14 @@ const Dashboard: React.FC = () => {
             }}
           >
             <img
+              src="/images/recommendfile.svg"
+              alt="PDF"
+              style={{ width: 22, height: 22, marginRight: 6 }}
+            />
+            <SpeechBubbleButton onClick={() => setShowPDFPopup(true)} style={{ marginLeft: 8 }}>
+              PDF 다운로드
+            </SpeechBubbleButton>
+            <img
               src="/images/sendmail.svg"
               alt="메일"
               style={{ width: 28, height: 28 }}
@@ -919,6 +929,7 @@ const Dashboard: React.FC = () => {
             <SpeechBubbleButton onClick={() => setShowMailPopup(true)}>
               클릭 한 번으로 메일 보내기
             </SpeechBubbleButton>
+
           </div>
         </MeetingAnalysisHeader>
 
@@ -931,7 +942,15 @@ const Dashboard: React.FC = () => {
             meetingInfo={mailMeetingInfo}
           />
         )}
-
+        {showPDFPopup && (
+          <PDFPopup
+            onClose={() => setShowPDFPopup(false)}
+            summary={summaryLog}
+            tasks={assignRole}
+            feedback={feedback}
+            meetingInfo={mailMeetingInfo}
+          />
+        )}
         <Section>
           <SectionHeader>
             <SectionTitle>회의 기본 정보</SectionTitle>
