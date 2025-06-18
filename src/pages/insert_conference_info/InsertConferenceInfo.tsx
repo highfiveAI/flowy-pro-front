@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import FileUpload from "./FileUpload";
 import styled from "styled-components";
 import AttendInfo from "./AttendInfo";
@@ -13,8 +13,9 @@ import NewMeetingIcon from "/images/newmeetingicon.svg"; // newmeetingicon.svg �
 import AddProjectIcon from "/images/addprojecticon.svg"; // addprojecticon.svg 임포트
 import NewProjectPopup from "./conference_popup/NewProjectPopup"; // Popup 컴포넌트 임포트
 import { useAuth } from "../../contexts/AuthContext";
-import { checkAuth } from "../../api/fetchAuthCheck";
+// import { checkAuth } from "../../api/fetchAuthCheck";
 import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup'; // 팝업 컴포넌트 임포트
+
 
 
 const StyledErrorMessage = styled.div`
@@ -160,6 +161,8 @@ const InsertConferenceInfo: React.FC = () => {
   >([]); // 프로젝트 참여자 목록 상태 추가
   const [hostId, setHostId] = React.useState("");
   const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] = React.useState(false);
+  const [hostEmail, setHostEmail] = useState('');
+  const [hostJobname, setHostJobname] = useState('');
 
 
   React.useEffect(() => {
@@ -244,8 +247,8 @@ const InsertConferenceInfo: React.FC = () => {
       // STT API용 FormData
       const hostUser = projectUsers.find((u) => u.user_id === hostId);
       const hostName = hostUser?.name || "";
-      const hostEmail = hostUser?.email || "";
-      const hostRole = hostUser?.user_jobname || "";
+      // const hostEmail = hostUser?.email || "";
+      // const hostJobname = hostUser?.user_jobname || "";
 
       // 참석자 정보(회의장 제외)
       const filteredAttendees = attendees.filter(
@@ -267,7 +270,7 @@ const InsertConferenceInfo: React.FC = () => {
       // host 정보
       sttFormData.append("host_name", hostName);
       sttFormData.append("host_email", hostEmail);
-      sttFormData.append("host_role", hostRole);
+      sttFormData.append("host_role", hostJobname);
       // 참석자 정보 (각각 여러 번 append)
       attendeesName.forEach((name) =>
         sttFormData.append("attendees_name", name)
@@ -291,7 +294,7 @@ const InsertConferenceInfo: React.FC = () => {
       // host 정보
       meetingFormData.append("host_name", hostName);
       meetingFormData.append("host_email", hostEmail);
-      meetingFormData.append("host_role", hostRole);
+      meetingFormData.append("host_role", hostJobname);
       // 참석자 정보
       attendeesName.forEach((name) =>
         meetingFormData.append("attendees_name", name)
@@ -307,7 +310,7 @@ const InsertConferenceInfo: React.FC = () => {
       console.log("hostId:", hostId);
       console.log("hostName:", hostName);
       console.log("hostEmail:", hostEmail);
-      console.log("hostRole:", hostRole);
+      console.log("hostJobname:", hostJobname);
       console.log("attendeesName:", attendeesName);
       console.log("attendeesEmail:", attendeesEmail);
       console.log("attendeesRole:", attendeesRole);
@@ -362,7 +365,7 @@ const InsertConferenceInfo: React.FC = () => {
           );
           analyzeFormData.append("host_name", hostName);
           analyzeFormData.append("host_email", hostEmail);
-          analyzeFormData.append("host_role", hostRole);
+          analyzeFormData.append("host_role", hostJobname);
 
           analyzeFormData.append("attendees_list", JSON.stringify(attendees));
           analyzeFormData.append("agenda", agenda);
@@ -399,6 +402,9 @@ const InsertConferenceInfo: React.FC = () => {
         setFile(null);
         setAgenda('');
         setMeetingDate(null);
+        setHostEmail('');
+        setHostJobname('');
+        setHostId('');
 
       } catch (error) {
         setError(
@@ -575,6 +581,10 @@ const InsertConferenceInfo: React.FC = () => {
                   projectUsers={projectUsers}
                   hostId={hostId}
                   setHostId={setHostId}
+                  hostEmail={hostEmail}
+                  setHostEmail={setHostEmail}
+                  hostJobname={hostJobname}
+                  setHostJobname={setHostJobname}
                 />
               </FormGroup>
 
