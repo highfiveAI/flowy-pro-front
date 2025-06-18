@@ -18,7 +18,7 @@ import {
   PopupOverlay,
   PopupTitle,
   ProjectIcon,
-  RoleSelect,
+  // RoleSelect,
   StyledInput,
   StyledLabel,
   StyledTextarea,
@@ -67,31 +67,32 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
     setSelectedProjectUsers(updatedUsers);
   };
 
-  const handleChangeUserRole = (userId: string, roleId: string) => {
-    if (roleId === poId) {
-      const existingPO = selectedProjectUsers.find(
-        (u) => u.role_id === poId && u.user_id !== userId
-      );
-      if (existingPO) {
-        // 기존 PO가 있을 경우 PP로 바꾸기
-        const updated = selectedProjectUsers.map((user) => {
-          if (user.user_id === userId) {
-            return { ...user, role_id: poId };
-          } else if (user.user_id === existingPO.user_id) {
-            return { ...user, role_id: ppId };
-          }
-          return user;
-        });
-        setSelectedProjectUsers(updated);
-        return;
-      }
-    }
+  // 사용자 역할을 변경해주는 함수
+  // const handleChangeUserRole = (userId: string, roleId: string) => {
+  //   if (roleId === poId) {
+  //     const existingPO = selectedProjectUsers.find(
+  //       (u) => u.role_id === poId && u.user_id !== userId
+  //     );
+  //     if (existingPO) {
+  //       // 기존 PO가 있을 경우 PP로 바꾸기
+  //       const updated = selectedProjectUsers.map((user) => {
+  //         if (user.user_id === userId) {
+  //           return { ...user, role_id: poId };
+  //         } else if (user.user_id === existingPO.user_id) {
+  //           return { ...user, role_id: ppId };
+  //         }
+  //         return user;
+  //       });
+  //       setSelectedProjectUsers(updated);
+  //       return;
+  //     }
+  //   }
 
-    const updated = selectedProjectUsers.map((user) =>
-      user.user_id === userId ? { ...user, role_id: roleId } : user
-    );
-    setSelectedProjectUsers(updated);
-  };
+  //   const updated = selectedProjectUsers.map((user) =>
+  //     user.user_id === userId ? { ...user, role_id: roleId } : user
+  //   );
+  //   setSelectedProjectUsers(updated);
+  // };
 
   const handleCreateProject = async () => {
     // 유효성 검사
@@ -233,7 +234,8 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
                 <div
                   style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
                 >
-                  <RoleSelect
+                  {/* 역할 선택은 사용자 편의성을 의해서 삭제 */}
+                  {/* <RoleSelect
                     value={us.role_id || ''}
                     onChange={(e) =>
                       handleChangeUserRole(us.user_id, e.target.value)
@@ -242,7 +244,7 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
                     <option value="">역할 선택</option>
                     <option value={poId}>PO</option>
                     <option value={ppId}>PP</option>
-                  </RoleSelect>
+                  </RoleSelect> */}
 
                   {us.user_id !== user?.id && (
                     <AddButton onClick={() => handleDeselectUser(us)}>

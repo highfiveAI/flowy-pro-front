@@ -473,10 +473,17 @@ interface SummaryLog {
   updated_summary_contents: Record<string, any>; // 어떤 키든 올 수 있는 JSON
 }
 
-interface Feedback {
+// interface Feedback {
+//   feedback_id: string;
+//   feedback_detail: Record<string, any>;
+// }
+type Feedback = {
+  feedbacktype_id: string;
+  meeting_id: string;
   feedback_id: string;
-  feedback_detail: Record<string, any>;
-}
+  feedback_detail: string | string[];
+  feedback_created_date: string;
+};
 
 interface meetingInfo {
   project: string;
@@ -498,11 +505,19 @@ const Dashboard: React.FC = () => {
   const [meeting, setMeeting] = useState<Meeting>();
   const [projectUser, setProjectUser] = useState<ProjectUser[]>([]);
   const [summaryLog, setSummaryLog] = useState<SummaryLog>();
-  const [feedback, setFeedback] = useState<Feedback>();
+  const [feedback, setFeedback] = useState<Feedback[]>();
   const [assignRole, setAssignRole] = useState<Record<string, Todo[]>>({});
   // const [groupedtasks, setGroupedTasks] = useState<GroupedTaskState>({});
   const { meetingId } = useParams<{ meetingId: string }>();
   const { user, setUser, setLoading } = useAuth();
+
+  const FEEDBACK_LABELS: Record<string, string> = {
+    'e508d0b2-1bfd-42a2-9687-1ae6cd36c648': '총평',
+    '6cb5e437-bc6b-4a37-a3c4-473d9c0bebe2': '불필요한 대화',
+    'ab5a65c6-31a4-493b-93ff-c47e00925d17': '논의되지 않은 안건',
+    '0a5a835d-53d0-43a6-b821-7c36f603a071': '회의 시간 분석',
+    '73c0624b-e1af-4a2b-8e54-c1f8f7dab827': '해결책',
+  };
 
   // function convertTodosToTaskState(
   //   groupedTodos: Record<string, Todo[]>
@@ -1255,107 +1270,37 @@ const Dashboard: React.FC = () => {
           </SectionHeader>
           <SectionBody>
             <SummaryContent>
-              {/* <SummarySection>
-                <SummarySectionHeader>[ 불필요한 대화 ]</SummarySectionHeader>
-                <SummaryList>
-                  <SummaryListItem>
-                    회의 중 <b>10:42~10:46</b> 사이, 참석자 간 점심 메뉴에 대한
-                    대화가 약 4분간 이어짐.
-                  </SummaryListItem>
-                  <SummaryListItem>
-                    회의 흐름에 큰 영향은 없었으나 집중력이 일시적으로 저하됨.
-                  </SummaryListItem>
-                </SummaryList>
-              </SummarySection>
-              <SummarySection>
-                <SummarySectionHeader>
-                  [ 누락된 논의 발생 ]
-                </SummarySectionHeader>
-                <SummaryList>
-                  <SummaryListItem>
-                    사용자 권한에 따른 UI/UX 차별화 여부에 대한 논의는 회의 시간
-                    부족으로 다루지 못함. 다음 회의에서 우선 논의할 필요 있음.
-                  </SummaryListItem>
-                </SummaryList>
-              </SummarySection>
-              <SummarySection>
-                <SummarySectionHeader>
-                  [ 작업 담당자 미정 ]
-                </SummarySectionHeader>
-                <SummaryList>
-                  <SummaryListItem>
-                    주요 기능에 대한 역할 분담은 대체로 완료되었으나, 디자인
-                    시각화 및 역할별 UI 설계 관련 작업은 담당자가 정해지지 않음.
-                  </SummaryListItem>
-                </SummaryList>
-              </SummarySection>
-              <SummarySection>
-                <SummarySectionHeader>[ 회의 시간 분석 ]</SummarySectionHeader>
-                <SummaryList>
-                  <SummaryListItem>
-                    회의는 약 1시간 진행되었으며, 실질적인 논의는 약 50분
-                    정도였음.
-                  </SummaryListItem>
-                  <SummaryListItem>
-                    일부 논의에서 발언 중복이 있었고, 후반으로 갈수록 집중도가
-                    낮아지는 경향이 나타남.
-                  </SummaryListItem>
-                </SummaryList>
-              </SummarySection> */}
-              {feedback && (
-                <div className="space-y-4">
-                  {/* 문자열로 바로 올 경우 */}
-                  {typeof feedback === 'string' ? (
-                    <p>{feedback}</p>
-                  ) : Array.isArray(feedback) ? (
-                    // feedback 자체가 배열일 경우
-                    <ul className="list-disc pl-5">
-                      {feedback.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  ) : typeof feedback === 'object' &&
-                    feedback.feedback_detail &&
-                    typeof feedback.feedback_detail === 'object' ? (
-                    Array.isArray(feedback.feedback_detail) ? (
-                      // feedback_detail이 배열일 경우
-                      <ul className="list-disc pl-5">
-                        {feedback.feedback_detail.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      // feedback_detail이 객체일 경우
-                      Object.entries(feedback.feedback_detail).map(
-                        ([key, value]) => (
-                          <div key={key}>
-                            <h3 className="text-lg font-semibold mb-1">
-                              {key}
-                            </h3>
-                            {Array.isArray(value) ? (
-                              <ul className="list-disc pl-5">
-                                {value.map((item, index) => (
-                                  <li key={index}>
-                                    {typeof item === 'object'
-                                      ? JSON.stringify(item)
-                                      : item}
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : typeof value === 'string' ? (
-                              <p>{value}</p>
-                            ) : (
-                              <pre className="bg-gray-100 p-2 rounded">
-                                {JSON.stringify(value, null, 2)}
-                              </pre>
-                            )}
-                          </div>
-                        )
-                      )
-                    )
-                  ) : null}
-                </div>
-              )}
+              <div>
+                {Object.entries(FEEDBACK_LABELS).map(([id, title]) => {
+                  const matchedItems =
+                    feedback?.filter((item) => item.feedbacktype_id === id) ||
+                    [];
+
+                  const allDetails = matchedItems.flatMap((item) => {
+                    const details = Array.isArray(item.feedback_detail)
+                      ? item.feedback_detail
+                      : [item.feedback_detail];
+                    return details.filter((d) => d && d.trim() !== ''); // 빈 문자열 제거
+                  });
+
+                  return (
+                    <div key={id} style={{ marginBottom: '1.5rem' }}>
+                      <h3>{title}</h3>
+                      {allDetails.length > 0 ? (
+                        <ul>
+                          {allDetails.map((detail, idx) => (
+                            <li key={`${id}-${idx}`}>{detail}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <ul>
+                          <li>내용이 없습니다.</li>
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </SummaryContent>
           </SectionBody>
         </Section>
