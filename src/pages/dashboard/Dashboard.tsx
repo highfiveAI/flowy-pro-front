@@ -9,6 +9,7 @@ import {
   fetchMeetings,
   postAssignedTodos,
   postSummaryLog,
+  fetchDraftLogs,
 } from '../../api/fetchProject';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -503,6 +504,7 @@ const Dashboard: React.FC = () => {
   // const [groupedtasks, setGroupedTasks] = useState<GroupedTaskState>({});
   const { meetingId } = useParams<{ meetingId: string }>();
   const { user, setUser, setLoading } = useAuth();
+  const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
 
   // function convertTodosToTaskState(
   //   groupedTodos: Record<string, Todo[]>
@@ -592,6 +594,10 @@ const Dashboard: React.FC = () => {
 
           console.log(data);
         }
+      });
+      // 추천문서 불러오기
+      fetchDraftLogs(meetingId).then((data) => {
+        if (data) setRecommendFiles(data);
       });
     }
   }, [user, meetingId]);
@@ -853,25 +859,6 @@ const Dashboard: React.FC = () => {
     }));
   };
 
-  // const parseDate = (dateStr: string): Date | null => {
-  //   if (!dateStr || dateStr === '미정') return null;
-  //   // YYYY-MM-DD 또는 YYYY-MM-DD HH:mm 등 형식만 파싱
-  //   const match = dateStr.match(/\d{4}-\d{2}-\d{2}( \d{2}:\d{2})?/);
-  //   if (match) {
-  //     return new Date(match[0]);
-  //   }
-  //   // ~6/9(월) 형식도 파싱 시도
-  //   const tildeMatch = dateStr.match(/~(\d{1,2})\/(\d{1,2})/);
-  //   if (tildeMatch) {
-  //     const now = new Date();
-  //     const year = now.getFullYear();
-  //     const month = parseInt(tildeMatch[1], 10) - 1;
-  //     const day = parseInt(tildeMatch[2], 10);
-  //     return new Date(year, month, day);
-  //   }
-  //   return null;
-  // };
-
   // 날짜에 유효한 데이터가 들어가는지
   const isValidDate = (dateStr: any): boolean => {
     if (!dateStr || typeof dateStr !== 'string') return false;
@@ -879,17 +866,6 @@ const Dashboard: React.FC = () => {
     return d instanceof Date && !isNaN(d.getTime());
   };
 
-  // 추천 문서 임시 데이터
-  const recommendFiles = [
-    {
-      name: '서비스 기획서.pdf',
-      url: 'https://example.com/service-plan.pdf',
-    },
-    {
-      name: 'API 명세 초안.pdf',
-      url: 'https://example.com/api-draft.pdf',
-    },
-  ];
   const getPostPayload = () => {
     const allTodos: Todo[] = assignRole ? Object.values(assignRole).flat() : [];
 
@@ -1366,27 +1342,31 @@ const Dashboard: React.FC = () => {
           </SectionHeader>
           <SectionBody>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {recommendFiles.map((file) => (
-                <RecommendFileItem key={file.name}>
-                  <img
-                    src="/images/recommendfile.svg"
-                    alt="추천문서"
-                    style={{ width: 20, height: 20, marginRight: 8 }}
-                  />
-                  <a
-                    href={file.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: '#351745',
-                      textDecoration: 'underline',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {file.name}
-                  </a>
-                </RecommendFileItem>
-              ))}
+              {recommendFiles.length === 0 ? (
+                <li style={{ color: '#888' }}>추천 문서가 없습니다.</li>
+              ) : (
+                recommendFiles.map((file: any) => (
+                  <RecommendFileItem key={file.draft_id}>
+                    <img
+                      src="/images/recommendfile.svg"
+                      alt="추천문서"
+                      style={{ width: 20, height: 20, marginRight: 8 }}
+                    />
+                    <a
+                      href={file.ref_interdoc_id}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: '#351745',
+                        textDecoration: 'underline',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {file.draft_title}
+                    </a>
+                  </RecommendFileItem>
+                ))
+              )}
             </ul>
           </SectionBody>
         </Section>
