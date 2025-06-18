@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiArrowRight } from 'react-icons/fi';
@@ -55,7 +54,7 @@ const ConferenceListPage: React.FC = () => {
                 <Td>{c.meeting_title}</Td>
                 <Td>
                   {new Date(c.meeting_date)
-                    .toISOString()
+                    .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
                     .replace('T', ' ')
                     .slice(0, 16)}
                 </Td>
