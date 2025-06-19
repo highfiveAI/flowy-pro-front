@@ -239,11 +239,38 @@ const Tr = styled.tr`
   &:not(:last-child) {
     border-bottom: 1px solid #f2f2f2;
   }
+  
+  /* 호버 효과 추가 */
+  transition: all 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #f8f5ff;
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+  }
+  
+  /* 선택된 상태 */
+  &.selected {
+    background-color: #e5e0ee;
+    border-left: 4px solid #4b2067;
+  }
+  
+  &.selected:hover {
+    background-color: #d4c7e8;
+  }
 `;
 const Td = styled.td`
   font-size: 1rem;
   color: #333;
   padding: 16px 0;
+  
+  /* 셀 호버 효과 */
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f3eef7;
+  }
 `;
 const IconBtn = styled.button`
   background: #f3eef7;
@@ -254,9 +281,16 @@ const IconBtn = styled.button`
   color: #7b5fa1;
   font-size: 1.1rem;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #e5e0ee;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.15);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `;
 const ArrowBtn = styled.button`
@@ -270,9 +304,16 @@ const ArrowBtn = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #4b2067;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(80, 0, 80, 0.3);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `;
 const IconGroup = styled.div`

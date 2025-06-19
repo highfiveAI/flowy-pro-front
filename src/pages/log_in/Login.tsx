@@ -50,6 +50,17 @@ const InputGroup = styled.div`
   background: transparent;
   padding: 0px 16px;
   height: 80px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: #480b6a;
+    box-shadow: 0 2px 8px rgba(72, 11, 106, 0.1);
+  }
+  
+  &:focus-within {
+    border-color: #480b6a;
+    box-shadow: 0 0 0 3px rgba(72, 11, 106, 0.1);
+  }
 `;
 
 const InputLabel = styled.label`
@@ -77,6 +88,11 @@ const InputField = styled.input`
   flex-grow: 1;
   height: 100%;
   outline: none;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+  }
 `;
 
 const ErrorMessage = styled.p`
@@ -107,10 +123,16 @@ const LoginButton = styled.button`
   cursor: pointer;
   margin-top: 30px;
   margin-bottom: 10px;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     background-color: #35084d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 11, 106, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -130,6 +152,17 @@ const GoogleLoginButton = styled.button`
   justify-content: center;
   gap: 10px;
   margin-bottom: 30px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f8f5ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 11, 106, 0.1);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
 
   img {
     width: 20px;
@@ -152,9 +185,12 @@ const LinkContainer = styled.div`
     font-weight: 500;
     line-height: 20px;
     text-decoration: none;
+    transition: all 0.2s ease;
 
     &:hover {
       text-decoration: underline;
+      color: #480b6a;
+      transform: translateY(-1px);
     }
   }
 `;

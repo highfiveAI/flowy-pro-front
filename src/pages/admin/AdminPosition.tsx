@@ -27,6 +27,7 @@ const Table = styled.table`
   background: #fff;
   margin-bottom: 2rem;
   font-size: 1.05rem;
+  
   th,
   td {
     padding: 1.2rem 0.5rem;
@@ -34,6 +35,7 @@ const Table = styled.table`
     border: none;
     font-size: 1.05rem;
   }
+  
   th {
     color: #5e5553;
     font-weight: 700;
@@ -41,11 +43,34 @@ const Table = styled.table`
     background: #fff;
     border-bottom: 2px solid #eee;
   }
+  
   td {
     color: #5e5553;
     border-bottom: 1.5px solid #eee;
     background: #fff;
   }
+  
+  tr {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: #f8f5ff;
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+    }
+    
+    /* 선택된 상태 */
+    &.selected {
+      background-color: #e5e0ee;
+      border-left: 4px solid #4b2067;
+    }
+    
+    &.selected:hover {
+      background-color: #d4c7e8;
+    }
+  }
+  
   tr:last-child td {
     border-bottom: none;
   }
@@ -139,9 +164,16 @@ const AddButton = styled.button`
   justify-content: center;
   box-shadow: 0 2px 8px rgba(80, 0, 80, 0.08);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #4b2067;
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(80, 0, 80, 0.2);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -165,9 +197,12 @@ const TableHeader = styled.th`
   cursor: pointer;
   user-select: none;
   position: relative;
+  transition: all 0.2s ease;
 
   &:hover {
     background-color: #f1f5f9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -484,7 +519,7 @@ const AdminPosition: React.FC = () => {
               <tr
                 key={position.position_id}
                 onClick={() => handleRowClick(position)}
-                style={{ cursor: 'pointer' }}
+                className={selectedPositionId === position.position_id ? 'selected' : ''}
               >
                 <td>{position.position_code}</td>
                 <td>{position.position_name}</td>
