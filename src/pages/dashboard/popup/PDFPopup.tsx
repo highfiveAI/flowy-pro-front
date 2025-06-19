@@ -234,7 +234,8 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
         </CheckboxGroup>
         <div style={{ flex: 1 }} />
         <DownloadButton
-          onClick={() =>
+          onClick={() => {
+            console.log('PDF로 넘기는 feedback 값:', feedback);
             generateMeetingPDF({
               checked,
               meetingInfo,
@@ -242,8 +243,8 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
               tasks,
               feedback,
               recommendFiles,
-            })
-          }
+            });
+          }}
         >
           PDF 다운로드
         </DownloadButton>

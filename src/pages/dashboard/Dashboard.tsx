@@ -549,6 +549,7 @@ const Dashboard: React.FC = () => {
   // 작업 목록 수정 모드 state
   const [isEditingTasks, setIsEditingTasks] = useState(false);
   const [showMailPopup, setShowMailPopup] = useState(false);
+  const [showPDFPopup, setShowPDFPopup] = useState(false);
   const [isEditingSummary, setIsEditingSummary] = useState(false);
   const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
 
@@ -558,7 +559,7 @@ const Dashboard: React.FC = () => {
     '6cb5e437-bc6b-4a37-a3c4-473d9c0bebe2': '불필요한 대화',
     'ab5a65c6-31a4-493b-93ff-c47e00925d17': '논의되지 않은 안건',
     '0a5a835d-53d0-43a6-b821-7c36f603a071': '회의 시간 분석',
-    '73c0624b-e1af-4a2b-8e54-c1f8f7dab827': '해결책',
+    '73c0624b-e1af-4a2b-8e54-c1f8f7dab827': '개선 가이드',
   };
 
   // function convertTodosToTaskState(
