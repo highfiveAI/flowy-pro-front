@@ -4,16 +4,19 @@ import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import MailingDashboard from './popup/mailingDashboard';
+import PDFPopup from './popup/PDFPopup';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import {
   fetchMeetings,
   postAssignedTodos,
   postSummaryLog,
+  fetchDraftLogs,
 } from '../../api/fetchProject';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { checkAuth } from '../../api/fetchAuthCheck';
 import type { Todo } from '../../types/project';
+import type { Feedback, SummaryLog } from './Dashboard.types';
 // const UNASSIGNED_LABEL = '미지정';
 
 // Main container for the whole page
@@ -427,6 +430,40 @@ const SpeechBubbleButton = styled.button`
   }
 `;
 
+const InputWrapper = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 0 24px;
+  width: 96%;
+`;
+
+const StyledInput = styled.input`
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+`;
+
+const AddButton = styled.button`
+  background-color: #3b82f6;
+  color: white;
+  padding: 12px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  &:hover {
+    background-color: #2563eb;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 // const RoleContainer = styled.div`
 //   display: grid;
 //   grid-template-columns: repeat(3, 1fr);
@@ -468,15 +505,10 @@ interface ProjectUser {
   user_name: string;
 }
 
-interface SummaryLog {
-  summary_log_id: string;
-  updated_summary_contents: Record<string, any>; // 어떤 키든 올 수 있는 JSON
-}
-
-interface Feedback {
-  feedback_id: string;
-  feedback_detail: Record<string, any>;
-}
+// interface Feedback {
+//   feedback_id: string;
+//   feedback_detail: Record<string, any>;
+// }
 
 interface meetingInfo {
   project: string;
@@ -497,12 +529,32 @@ const Dashboard: React.FC = () => {
   const [project, setProject] = useState<Project>();
   const [meeting, setMeeting] = useState<Meeting>();
   const [projectUser, setProjectUser] = useState<ProjectUser[]>([]);
-  const [summaryLog, setSummaryLog] = useState<SummaryLog>();
-  const [feedback, setFeedback] = useState<Feedback>();
+  const [summaryLog, setSummaryLog] = useState<SummaryLog | null>(null);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [assignRole, setAssignRole] = useState<Record<string, Todo[]>>({});
+  const [newTodoText, setNewTodoText] = useState('');
   // const [groupedtasks, setGroupedTasks] = useState<GroupedTaskState>({});
   const { meetingId } = useParams<{ meetingId: string }>();
   const { user, setUser, setLoading } = useAuth();
+  // 날짜 편집 상태 관리
+  const [editingDate, setEditingDate] = React.useState<{
+    col: string;
+    idx: number;
+  } | null>(null);
+  // 작업 목록 수정 모드 state
+  const [isEditingTasks, setIsEditingTasks] = useState(false);
+  const [showMailPopup, setShowMailPopup] = useState(false);
+  const [showPDFPopup, setShowPDFPopup] = useState(false);
+  const [isEditingSummary, setIsEditingSummary] = useState(false);
+  const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
+
+  const FEEDBACK_LABELS: Record<string, string> = {
+    'e508d0b2-1bfd-42a2-9687-1ae6cd36c648': '총평',
+    '6cb5e437-bc6b-4a37-a3c4-473d9c0bebe2': '불필요한 대화',
+    'ab5a65c6-31a4-493b-93ff-c47e00925d17': '논의되지 않은 안건',
+    '0a5a835d-53d0-43a6-b821-7c36f603a071': '회의 시간 분석',
+    '73c0624b-e1af-4a2b-8e54-c1f8f7dab827': '해결책',
+  };
 
   // function convertTodosToTaskState(
   //   groupedTodos: Record<string, Todo[]>
@@ -522,6 +574,25 @@ const Dashboard: React.FC = () => {
 
   //   return result;
   // }
+
+  const handleAddTodo = () => {
+    const trimmed = newTodoText.trim();
+    if (!trimmed) return;
+
+    const newTodo: Todo = {
+      action: trimmed,
+      context: '',
+      assignee: '미할당',
+      schedule: '미정',
+    };
+
+    setAssignRole((prev) => ({
+      ...prev,
+      ['미할당']: [...(prev['미할당'] ?? []), newTodo],
+    }));
+
+    setNewTodoText('');
+  };
 
   useEffect(() => {
     if (meetingId) {
@@ -544,54 +615,42 @@ const Dashboard: React.FC = () => {
               user_name: mu.user.user_name,
             })) ?? [];
 
-          setProjectUser(extractedUsers);
+          const userNames = extractedUsers.map((u: any) => u.user_name);
 
-          setSummaryLog(data.summary_log);
-          setFeedback(data.feedback);
+          setProjectUser(extractedUsers);
+          setSummaryLog(data.summary_log ?? null);
+          setFeedback(data.feedback ?? []);
+
+          // 항상 초기화
+          const grouped: Record<string, Todo[]> = {};
+          userNames.forEach((name: string) => {
+            grouped[name] = [];
+          });
+          grouped['미할당'] = [];
 
           if (data.task_assign_role) {
             const todos: Todo[] =
               data.task_assign_role.updated_task_assign_contents.assigned_todos;
 
-            // 여기서 바로 user_name 배열 추출 (projectUser state를 기다릴 필요 없음)
-            const userNames = extractedUsers.map((u: any) => u.user_name);
-
-            const grouped = todos.reduce<Record<string, Todo[]>>(
-              (acc, todo) => {
-                const assigneeName = todo.assignee;
-
-                const key =
-                  assigneeName && userNames.includes(assigneeName)
-                    ? assigneeName
-                    : '미할당';
-
-                if (!acc[key]) {
-                  acc[key] = [];
-                }
-
-                acc[key].push(todo);
-                return acc;
-              },
-              {}
-            );
-
-            // 참여자 이름 키 누락 방지
-            userNames.forEach((name: any) => {
-              if (!grouped[name]) {
-                grouped[name] = [];
-              }
+            todos.forEach((todo) => {
+              const assigneeName = todo.assignee;
+              const key =
+                assigneeName && userNames.includes(assigneeName)
+                  ? assigneeName
+                  : '미할당';
+              grouped[key].push(todo);
             });
-
-            // '미할당' 키 누락 방지
-            if (!grouped['미할당']) {
-              grouped['미할당'] = [];
-            }
-
-            setAssignRole(grouped);
           }
+
+          // 성공 여부와 관계없이 assignRole 설정
+          setAssignRole(grouped);
 
           console.log(data);
         }
+      });
+      // 추천문서 불러오기
+      fetchDraftLogs(meetingId).then((data) => {
+        if (data) setRecommendFiles(data);
       });
     }
   }, [user, meetingId]);
@@ -624,111 +683,38 @@ const Dashboard: React.FC = () => {
     })();
   }, []);
 
-  // const dummyTasks = {
-  //   unassigned: [
-  //     { description: '사용자 역할별 접근 제어 UI 설계', date: '미정' },
-  //     { description: '요약 결과 화면 시각 디자인', date: '~6/9(월)' },
-  //   ],
-  //   김다연: [
-  //     { description: '전체 서비스 구조도 및 PRD 초안 정리', date: '~6/5(목)' },
-  //   ],
-  //   김시훈: [{ description: 'API 구조 초안 설계', date: '~6/9(월)' }],
-  //   정다희: [
-  //     {
-  //       description: '회의 업로드/요약 결과 화면 와이어프레임',
-  //       date: '~6/9(월)',
-  //     },
-  //   ],
-  //   윤지환: [
-  //     { description: 'LLM 모델 연동 및 기술 제약 정리', date: '~6/5(목)' },
-  //   ],
-  //   박예빈: [],
-  // };
-
-  // const attendees = ['김다연', '김시훈', '정다희', '윤지환', '박예빈'];
-  // const attendees = React.useMemo(
-  //   () => Object.keys(groupedtasks).filter((k) => k !== '미할당'),
-  //   [groupedtasks]
-  // );
-  // const attendees = Object.keys(groupedtasks).filter(
-  //   (name) => name !== '미할당'
-  // );
-
-  // const [tasks, setTasks] = React.useState<typeof dummyTasks>(dummyTasks);
-  // 날짜 편집 상태 관리
-  const [editingDate, setEditingDate] = React.useState<{
-    col: string;
-    idx: number;
-  } | null>(null);
-  // 작업 목록 수정 모드 state
-  const [isEditingTasks, setIsEditingTasks] = useState(false);
-  const [showMailPopup, setShowMailPopup] = useState(false);
-
-  // 회의 요약 state (여러 섹션, 리스트)
-  const [summary, setSummary] = useState([
-    {
-      section: '[ 회의 내용 ]',
-      items: [
-        "전체 서비스 플로우를 설명하며 핵심 기능 흐름을 '회의 업로드 → 요약 → 업무 자동 추출 → 메일 공유'로 정리함",
-        'STT(음성 인식), 요약, 역할 할당 기능을 우선 개발',
-        'LLM 처리 속도와 GPU 사용 제한 등 기술적 제한사항을 간단히 공유함',
-        '사용자 여정에 따른 첫 화면 구성안, 요약 결과 시각화 방식 제안함',
-        '논의 안됨: 사용자별 역할/권한에 따른 UI 차별화 필요 여부 (시간 부족으로 다음 회의로 이월)',
-      ],
-    },
-    {
-      section: '[ 결정 사항 ]',
-      items: [
-        'MVP 범위: 회의 요약, 업무 추출, 메일 전송으로 한정',
-        "'피드백' 기능: 기능 정의만 하고, 구현은 2차 버전으로 미룸",
-        '사용자 역할 구분: 관리자 / 참석자 2단계로 단순화',
-      ],
-    },
-  ]);
-  const [isEditingSummary, setIsEditingSummary] = useState(false);
-  const [editSummaryText, setEditSummaryText] = useState('');
-
-  // summary 배열을 textarea용 문자열로 변환
-  const summaryToText = (summaryArr: typeof summary) => {
-    return summaryArr
-      .map(
-        (sec) =>
-          `${sec.section}\n${sec.items.map((item) => `- ${item}`).join('\n')}`
-      )
-      .join('\n\n');
-  };
   // textarea 문자열을 summary 배열로 파싱
-  const textToSummary = (text: string) => {
-    const lines = text.split(/\r?\n/);
-    const result: { section: string; items: string[] }[] = [];
+  // const textToSummary = (text: string) => {
+  //   const lines = text.split(/\r?\n/);
+  //   const result: { section: string; items: string[] }[] = [];
 
-    let currentSection: string | null = null;
-    let currentItems: string[] = [];
+  //   let currentSection: string | null = null;
+  //   let currentItems: string[] = [];
 
-    lines.forEach((line) => {
-      const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('[')) {
-        if (currentSection !== null) {
-          result.push({ section: currentSection, items: currentItems });
-        }
-        currentSection = trimmedLine;
-        currentItems = [];
-      } else if (trimmedLine.startsWith('- ')) {
-        currentItems.push(trimmedLine.slice(2));
-      } else if (trimmedLine === '') {
-        // 빈 줄은 무시
-      } else {
-        // 기타 텍스트 무시
-      }
-    });
+  //   lines.forEach((line) => {
+  //     const trimmedLine = line.trim();
+  //     if (trimmedLine.startsWith('[')) {
+  //       if (currentSection !== null) {
+  //         result.push({ section: currentSection, items: currentItems });
+  //       }
+  //       currentSection = trimmedLine;
+  //       currentItems = [];
+  //     } else if (trimmedLine.startsWith('- ')) {
+  //       currentItems.push(trimmedLine.slice(2));
+  //     } else if (trimmedLine === '') {
+  //       // 빈 줄은 무시
+  //     } else {
+  //       // 기타 텍스트 무시
+  //     }
+  //   });
 
-    // 마지막 섹션 저장
-    if (currentSection !== null) {
-      result.push({ section: currentSection, items: currentItems });
-    }
+  //   // 마지막 섹션 저장
+  //   if (currentSection !== null) {
+  //     result.push({ section: currentSection, items: currentItems });
+  //   }
 
-    return result;
-  };
+  //   return result;
+  // };
 
   // 날짜를 '~6/9(월)' 형식으로 변환
   // const formatDateToKR = (date: Date) => {
@@ -798,30 +784,6 @@ const Dashboard: React.FC = () => {
     });
   };
 
-  // 드래그 종료 시 처리
-  // const handleDragEnd = (event: any) => {
-  //   const { active, over } = event;
-  //   if (!over) return;
-  //   const [fromColumn, fromIdx] = active.id.split('__');
-  //   const [toColumn] = over.id.split('__');
-  //   if (fromColumn === toColumn && active.id === over.id) return;
-
-  //   // 이동할 task 정보
-  //   const movingTask =
-  //     tasks[fromColumn as keyof typeof tasks][parseInt(fromIdx, 10)];
-  //   // 원래 위치에서 제거
-  //   const newFrom = tasks[fromColumn as keyof typeof tasks].filter(
-  //     (_: any, idx: number) => idx !== parseInt(fromIdx, 10)
-  //   );
-  //   // 새 위치에 추가 (맨 뒤에)
-  //   const newTo = [...tasks[toColumn as keyof typeof tasks], movingTask];
-  //   setTasks({
-  //     ...tasks,
-  //     [fromColumn]: newFrom,
-  //     [toColumn]: newTo,
-  //   });
-  // };
-
   // 드래그 종료 시 처리 더미 x 버전
   const handleDragEndTwo = (event: any) => {
     const { active, over } = event;
@@ -880,16 +842,16 @@ const Dashboard: React.FC = () => {
   };
 
   // 추천 문서 임시 데이터
-  const recommendFiles = [
-    {
-      name: '서비스 기획서.pdf',
-      url: 'https://example.com/service-plan.pdf',
-    },
-    {
-      name: 'API 명세 초안.pdf',
-      url: 'https://example.com/api-draft.pdf',
-    },
-  ];
+  // const recommendFiles = [
+  //   {
+  //     name: '서비스 기획서.pdf',
+  //     url: 'https://example.com/service-plan.pdf',
+  //   },
+  //   {
+  //     name: 'API 명세 초안.pdf',
+  //     url: 'https://example.com/api-draft.pdf',
+  //   },
+  // ];
   const getPostPayload = () => {
     const allTodos: Todo[] = assignRole ? Object.values(assignRole).flat() : [];
 
@@ -902,12 +864,10 @@ const Dashboard: React.FC = () => {
 
   // 수정 버튼 클릭
   const handleEditSummary = () => {
-    setEditSummaryText(summaryToText(summary));
     setIsEditingSummary(true);
   };
   // 저장 버튼 클릭
   const handleSaveSummary = async () => {
-    setSummary(textToSummary(editSummaryText));
     setIsEditingSummary(false);
 
     if (!summaryLog || !summaryLog.updated_summary_contents) {
@@ -926,7 +886,7 @@ const Dashboard: React.FC = () => {
   // 작업 목록 저장 핸들러
   const handleSaveTasks = async () => {
     setIsEditingTasks(false);
-    const payload = getPostPayload(); // { updated_task_assign_contents: { assigned_todos: Todo[] } }
+    const payload = getPostPayload();
     console.log(payload);
     try {
       await postAssignedTodos(meetingId, payload.updated_task_assign_contents);
@@ -937,16 +897,16 @@ const Dashboard: React.FC = () => {
   };
 
   // 피드백 메일페이지로 넘길 떼 반환해주는 함수
-  const transformedFeedback = feedback?.feedback_detail
-    ? Object.entries(feedback.feedback_detail).map(([key, value]) => ({
-        section: key,
-        items: Array.isArray(value)
-          ? value
-          : typeof value === 'string'
-          ? [value]
-          : [JSON.stringify(value, null, 2)],
-      }))
-    : [];
+  // const transformedFeedback = feedback?.feedback_detail
+  //   ? Object.entries(feedback.feedback_detail).map(([key, value]) => ({
+  //       section: key,
+  //       items: Array.isArray(value)
+  //         ? value
+  //         : typeof value === 'string'
+  //         ? [value]
+  //         : [JSON.stringify(value, null, 2)],
+  //     }))
+  //   : [];
 
   return (
     <Container>
@@ -963,6 +923,17 @@ const Dashboard: React.FC = () => {
             }}
           >
             <img
+              src="/images/recommendfile.svg"
+              alt="PDF"
+              style={{ width: 22, height: 22, marginRight: 6 }}
+            />
+            <SpeechBubbleButton
+              onClick={() => setShowPDFPopup(true)}
+              style={{ marginLeft: 8 }}
+            >
+              PDF 다운로드
+            </SpeechBubbleButton>
+            <img
               src="/images/sendmail.svg"
               alt="메일"
               style={{ width: 28, height: 28 }}
@@ -976,15 +947,21 @@ const Dashboard: React.FC = () => {
         {showMailPopup && (
           <MailingDashboard
             onClose={() => setShowMailPopup(false)}
-            summary={
-              summaryLog?.updated_summary_contents?.structured_summary ?? []
-            }
+            summary={summaryLog}
             tasks={assignRole}
-            feedback={transformedFeedback}
+            feedback={feedback}
             meetingInfo={mailMeetingInfo}
           />
         )}
-
+        {showPDFPopup && (
+          <PDFPopup
+            onClose={() => setShowPDFPopup(false)}
+            summary={summaryLog}
+            tasks={assignRole}
+            feedback={feedback}
+            meetingInfo={mailMeetingInfo}
+          />
+        )}
         <Section>
           <SectionHeader>
             <SectionTitle>회의 기본 정보</SectionTitle>
@@ -1027,7 +1004,8 @@ const Dashboard: React.FC = () => {
             )}
           </SectionHeader>
           <SectionBody>
-            {summaryLog && (
+            {summaryLog &&
+            Object.keys(summaryLog.updated_summary_contents).length > 0 ? (
               <>
                 {isEditingSummary ? (
                   <div className="space-y-6">
@@ -1082,6 +1060,8 @@ const Dashboard: React.FC = () => {
                   </SummaryContent>
                 )}
               </>
+            ) : (
+              <p className="text-gray-500">요약된 내용이 없습니다.</p>
             )}
           </SectionBody>
         </Section>
@@ -1231,6 +1211,7 @@ const Dashboard: React.FC = () => {
                           {col === '미할당' ? '미할당 작업 목록' : col}
                         </TaskCardTitle>
                       </TaskCardHeader>
+
                       <TaskCardList>
                         {(assignRole[col] ?? []).map((todo, idx) => (
                           <TaskCardListItem key={`${col}__${idx}`}>
@@ -1246,6 +1227,22 @@ const Dashboard: React.FC = () => {
                 ))}
               </TaskGridContainer>
             )}
+            {isEditingTasks && (
+              <InputWrapper>
+                <StyledInput
+                  type="text"
+                  value={newTodoText}
+                  onChange={(e) => setNewTodoText(e.target.value)}
+                  placeholder="작업 내용을 입력하세요"
+                />
+                <AddButton
+                  onClick={handleAddTodo}
+                  disabled={!newTodoText.trim()}
+                >
+                  +
+                </AddButton>
+              </InputWrapper>
+            )}
           </SectionBody>
         </Section>
 
@@ -1255,107 +1252,37 @@ const Dashboard: React.FC = () => {
           </SectionHeader>
           <SectionBody>
             <SummaryContent>
-              {/* <SummarySection>
-                <SummarySectionHeader>[ 불필요한 대화 ]</SummarySectionHeader>
-                <SummaryList>
-                  <SummaryListItem>
-                    회의 중 <b>10:42~10:46</b> 사이, 참석자 간 점심 메뉴에 대한
-                    대화가 약 4분간 이어짐.
-                  </SummaryListItem>
-                  <SummaryListItem>
-                    회의 흐름에 큰 영향은 없었으나 집중력이 일시적으로 저하됨.
-                  </SummaryListItem>
-                </SummaryList>
-              </SummarySection>
-              <SummarySection>
-                <SummarySectionHeader>
-                  [ 누락된 논의 발생 ]
-                </SummarySectionHeader>
-                <SummaryList>
-                  <SummaryListItem>
-                    사용자 권한에 따른 UI/UX 차별화 여부에 대한 논의는 회의 시간
-                    부족으로 다루지 못함. 다음 회의에서 우선 논의할 필요 있음.
-                  </SummaryListItem>
-                </SummaryList>
-              </SummarySection>
-              <SummarySection>
-                <SummarySectionHeader>
-                  [ 작업 담당자 미정 ]
-                </SummarySectionHeader>
-                <SummaryList>
-                  <SummaryListItem>
-                    주요 기능에 대한 역할 분담은 대체로 완료되었으나, 디자인
-                    시각화 및 역할별 UI 설계 관련 작업은 담당자가 정해지지 않음.
-                  </SummaryListItem>
-                </SummaryList>
-              </SummarySection>
-              <SummarySection>
-                <SummarySectionHeader>[ 회의 시간 분석 ]</SummarySectionHeader>
-                <SummaryList>
-                  <SummaryListItem>
-                    회의는 약 1시간 진행되었으며, 실질적인 논의는 약 50분
-                    정도였음.
-                  </SummaryListItem>
-                  <SummaryListItem>
-                    일부 논의에서 발언 중복이 있었고, 후반으로 갈수록 집중도가
-                    낮아지는 경향이 나타남.
-                  </SummaryListItem>
-                </SummaryList>
-              </SummarySection> */}
-              {feedback && (
-                <div className="space-y-4">
-                  {/* 문자열로 바로 올 경우 */}
-                  {typeof feedback === 'string' ? (
-                    <p>{feedback}</p>
-                  ) : Array.isArray(feedback) ? (
-                    // feedback 자체가 배열일 경우
-                    <ul className="list-disc pl-5">
-                      {feedback.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  ) : typeof feedback === 'object' &&
-                    feedback.feedback_detail &&
-                    typeof feedback.feedback_detail === 'object' ? (
-                    Array.isArray(feedback.feedback_detail) ? (
-                      // feedback_detail이 배열일 경우
-                      <ul className="list-disc pl-5">
-                        {feedback.feedback_detail.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      // feedback_detail이 객체일 경우
-                      Object.entries(feedback.feedback_detail).map(
-                        ([key, value]) => (
-                          <div key={key}>
-                            <h3 className="text-lg font-semibold mb-1">
-                              {key}
-                            </h3>
-                            {Array.isArray(value) ? (
-                              <ul className="list-disc pl-5">
-                                {value.map((item, index) => (
-                                  <li key={index}>
-                                    {typeof item === 'object'
-                                      ? JSON.stringify(item)
-                                      : item}
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : typeof value === 'string' ? (
-                              <p>{value}</p>
-                            ) : (
-                              <pre className="bg-gray-100 p-2 rounded">
-                                {JSON.stringify(value, null, 2)}
-                              </pre>
-                            )}
-                          </div>
-                        )
-                      )
-                    )
-                  ) : null}
-                </div>
-              )}
+              <div>
+                {Object.entries(FEEDBACK_LABELS).map(([id, title]) => {
+                  const matchedItems =
+                    feedback?.filter((item) => item.feedbacktype_id === id) ||
+                    [];
+
+                  const allDetails = matchedItems.flatMap((item) => {
+                    const details = Array.isArray(item.feedback_detail)
+                      ? item.feedback_detail
+                      : [item.feedback_detail];
+                    return details.filter((d) => d && d.trim() !== ''); // 빈 문자열 제거
+                  });
+
+                  return (
+                    <div key={id} style={{ marginBottom: '1.5rem' }}>
+                      <h3>{title}</h3>
+                      {allDetails.length > 0 ? (
+                        <ul>
+                          {allDetails.map((detail, idx) => (
+                            <li key={`${id}-${idx}`}>{detail}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <ul>
+                          <li>내용이 없습니다.</li>
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </SummaryContent>
           </SectionBody>
         </Section>
@@ -1366,27 +1293,31 @@ const Dashboard: React.FC = () => {
           </SectionHeader>
           <SectionBody>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {recommendFiles.map((file) => (
-                <RecommendFileItem key={file.name}>
-                  <img
-                    src="/images/recommendfile.svg"
-                    alt="추천문서"
-                    style={{ width: 20, height: 20, marginRight: 8 }}
-                  />
-                  <a
-                    href={file.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: '#351745',
-                      textDecoration: 'underline',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {file.name}
-                  </a>
-                </RecommendFileItem>
-              ))}
+              {recommendFiles.length === 0 ? (
+                <li style={{ color: '#888' }}>추천 문서가 없습니다.</li>
+              ) : (
+                recommendFiles.map((file: any) => (
+                  <RecommendFileItem key={file.draft_id}>
+                    <img
+                      src="/images/recommendfile.svg"
+                      alt="추천문서"
+                      style={{ width: 20, height: 20, marginRight: 8 }}
+                    />
+                    <a
+                      href={file.ref_interdoc_id}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: '#351745',
+                        textDecoration: 'underline',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {file.draft_title}
+                    </a>
+                  </RecommendFileItem>
+                ))
+              )}
             </ul>
           </SectionBody>
         </Section>

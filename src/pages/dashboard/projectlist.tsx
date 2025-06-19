@@ -14,7 +14,6 @@ import { useAuth } from '../../contexts/AuthContext';
 const ProjectListPage: React.FC = () => {
   // const { user } = useAuth();
   // const [projects, setProjects] = React.useState<Project[]>([]);
-
   // // user.id로 프로젝트 목록 불러오기
   // React.useEffect(() => {
   //   if (!user?.id) return;
