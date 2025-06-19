@@ -499,6 +499,7 @@ const InsertConferenceInfo: React.FC = () => {
 
   const handleSortByLatest = () => {
     setIsSortedByLatest((prev) => !prev);
+    setExpandedIndex(null);
   };
 
   React.useEffect(() => {
@@ -596,12 +597,12 @@ const InsertConferenceInfo: React.FC = () => {
                           </span>
                         ))}
                       </div>
-                      <p>프로젝트 내용:</p>
-                      {proj.projectDetail ? (
+                      <p>프로젝트 내용:&nbsp;{proj.projectDetail ? (
                         <span>{proj.projectDetail}</span>
                       ) : (
                         <span>상세 내용이 없습니다.</span>
-                      )}
+                      )}</p>
+
                     </ExpandedArea>
                   )}
                 </div>
