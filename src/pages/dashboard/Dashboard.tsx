@@ -549,6 +549,7 @@ const Dashboard: React.FC = () => {
   // 작업 목록 수정 모드 state
   const [isEditingTasks, setIsEditingTasks] = useState(false);
   const [showMailPopup, setShowMailPopup] = useState(false);
+  const [showPDFPopup, setShowPDFPopup] = useState(false);
   const [isEditingSummary, setIsEditingSummary] = useState(false);
   const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
 
