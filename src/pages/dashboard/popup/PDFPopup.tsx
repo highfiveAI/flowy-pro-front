@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { generateMeetingPDF } from '../../../utils/pdfGenerator';
 
@@ -131,7 +131,26 @@ const PDF_ITEMS = [
   { key: 'recommend', label: '추천 문서' },
 ];
 
+// pdfMake 동적 로드 훅
+function usePdfMakeScript() {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.pdfMake) {
+      const script1 = document.createElement('script');
+      script1.src = '/libs/pdfmake.min.js';
+      script1.type = 'text/javascript';
+      script1.onload = () => {
+        const script2 = document.createElement('script');
+        script2.src = '/libs/vfs_fonts.js';
+        script2.type = 'text/javascript';
+        document.body.appendChild(script2);
+      };
+      document.body.appendChild(script1);
+    }
+  }, []);
+}
+
 const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, tasks, feedback, recommendFiles }) => {
+  usePdfMakeScript();
   const [checked, setChecked] = useState({
     all: false,
     info: false,
@@ -140,6 +159,22 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
     feedback: false,
     recommend: false,
   });
+
+  // pdfMake 상태 콘솔 출력
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.pdfMake) {
+        console.log('✅ window.pdfMake가 정상적으로 로드되었습니다.', window.pdfMake);
+        if (window.pdfMake.vfs) {
+          console.log('✅ window.pdfMake.vfs도 정상적으로 등록되어 있습니다.', window.pdfMake.vfs);
+        } else {
+          console.warn('⚠️ window.pdfMake는 있지만 vfs가 없습니다.');
+        }
+      } else {
+        console.error('❌ window.pdfMake가 undefined입니다. PDF 엔진이 로드되지 않았습니다.');
+      }
+    }
+  }, []);
 
   const handleCheck = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.checked;
