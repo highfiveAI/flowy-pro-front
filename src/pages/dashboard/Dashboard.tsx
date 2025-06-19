@@ -180,8 +180,7 @@ const EditButton = styled.button`
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
-  cursor: pointer;
-  font-size: 0.875rem;
+  margin-left: 16px;
   font-weight: 500;
   transition: background-color 0.2s;
 
@@ -404,7 +403,7 @@ const SpeechBubbleButton = styled.button`
   border: none;
   border-radius: 16px;
   padding: 8px 20px 8px 18px;
-  margin-left: 8px;
+  margin-left: 12px;
   font-weight: 500;
   color: #351745;
   font-size: 15px;
@@ -427,6 +426,26 @@ const SpeechBubbleButton = styled.button`
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
     border-right: 10px solid #f3eef8;
+  }
+`;
+
+// 네모(직사각형) 버튼 스타일 - 수정하기 전용
+const RectButton = styled.button`
+  background: #f3eef8;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 20px 8px 18px;
+  margin-left: 8px;
+  font-weight: 500;
+  color: #351745;
+  font-size: 15px;
+  box-shadow: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: box-shadow 0.15s;
+  &:hover {
+    box-shadow: 0 2px 8px rgba(53, 23, 69, 0.08);
   }
 `;
 
@@ -907,14 +926,9 @@ const Dashboard: React.FC = () => {
             <SpeechBubbleButton onClick={() => setShowPDFPopup(true)} style={{ marginLeft: 8 }}>
               PDF 다운로드
             </SpeechBubbleButton>
-            <img
-              src="/images/sendmail.svg"
-              alt="메일"
-              style={{ width: 28, height: 28 }}
-            />
-            <SpeechBubbleButton onClick={() => setShowMailPopup(true)}>
-              클릭 한 번으로 메일 보내기
-            </SpeechBubbleButton>
+            <EditButton onClick={() => setShowMailPopup(true)}>
+              수정하기
+            </EditButton>
 
           </div>
         </MeetingAnalysisHeader>

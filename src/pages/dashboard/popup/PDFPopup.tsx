@@ -115,6 +115,19 @@ const Checkbox = styled.input.attrs({ type: 'checkbox' })`
   }
 `;
 
+const ReceiverBox = styled.div`
+  width: 90%;
+  max-width: 340px;
+  margin: 0 auto;
+  background: #fff;
+  border: 2px solid #7c5ba6;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 interface PDFPopupProps {
   onClose: () => void;
   checkedData?: any; // 임시, 실제로는 상위에서 내려주는 데이터 타입에 맞게 수정
@@ -210,29 +223,32 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
           <PDFIcon src="/images/recommendfile.svg" alt="PDF" />
           <Title>회의 결과 PDF 다운로드</Title>
         </TopRow>
-        <SectionLabel>PDF에 포함할 항목 선택</SectionLabel>
-        <CheckboxGroup>
-          {PDF_ITEMS.map((item) => (
-            <CheckboxLabel key={item.key}>
-              <Checkbox
-                checked={
-                  item.key === 'info'
-                    ? true
-                    : checked[item.key as keyof typeof checked]
-                }
-                onChange={
-                  item.key === 'info'
-                    ? undefined
-                    : handleCheck(item.key)
-                }
-                readOnly={item.key === 'info'}
-                onClick={item.key === 'info' ? () => alert('회의 기본 정보는 필수 사항입니다.') : undefined}
-              />
-              {item.label}
-            </CheckboxLabel>
-          ))}
-        </CheckboxGroup>
-        <div style={{ flex: 1 }} />
+        <ReceiverBox>
+          <SectionLabel style={{ fontSize: '1.34rem', textAlign: 'center', marginTop: 0, marginBottom: 18 }}>
+            PDF에 포함할 항목 선택
+          </SectionLabel>
+          <CheckboxGroup style={{ marginTop: 24 }}>
+            {PDF_ITEMS.map((item) => (
+              <CheckboxLabel key={item.key}>
+                <Checkbox
+                  checked={
+                    item.key === 'info'
+                      ? true
+                      : checked[item.key as keyof typeof checked]
+                  }
+                  onChange={
+                    item.key === 'info'
+                      ? undefined
+                      : handleCheck(item.key)
+                  }
+                  readOnly={item.key === 'info'}
+                  onClick={item.key === 'info' ? () => alert('회의 기본 정보는 필수 사항입니다.') : undefined}
+                />
+                {item.label}
+              </CheckboxLabel>
+            ))}
+          </CheckboxGroup>
+        </ReceiverBox>
         <DownloadButton
           onClick={() => {
             console.log('PDF로 넘기는 feedback 값:', feedback);
