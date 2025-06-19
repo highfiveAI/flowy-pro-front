@@ -48,9 +48,16 @@ const AddTemplateBtn = styled.button`
   cursor: pointer;
   border-radius: 6px;
   padding: 0.6rem 1rem;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: rgb(231, 216, 243);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(75, 24, 100, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -93,6 +100,24 @@ const TemplateCard = styled.div`
   flex-direction: column;
   align-items: center;
   min-height: 210px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(75, 24, 100, 0.1);
+    background: #f8f5ff;
+  }
+  
+  /* 선택된 상태 */
+  &.selected {
+    background: #e5e0ee;
+    border: 2px solid #4b1864;
+  }
+  
+  &.selected:hover {
+    background: #d4c7e8;
+  }
 `;
 
 const CardActions = styled.div`
@@ -111,9 +136,16 @@ const ActionButton = styled.button`
   cursor: pointer;
   color: #4b1864;
   font-size: 1rem;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #e2d0ee;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(75, 24, 100, 0.15);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -127,6 +159,12 @@ const TemplatePreview = styled.div`
   justify-content: center;
   margin-bottom: 1rem;
   border: 1px solid #eee;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(75, 24, 100, 0.1);
+  }
 `;
 
 const TemplateInfo = styled.div`
@@ -195,8 +233,15 @@ const CloseButton = styled.button`
   font-size: 2rem;
   cursor: pointer;
   z-index: 10;
+  transition: all 0.2s ease;
+  
   &:hover {
     color: #351745;
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -574,7 +619,7 @@ const AdminTemplate: React.FC = () => {
         </PageHeader>
         <TemplateGrid>
           {templates.map((template) => (
-            <TemplateCard key={template.interdocs_id}>
+            <TemplateCard key={template.interdocs_id} onClick={() => setSelectedTemplate(template)}>
               <CardActions>
                 <ActionButton
                   title="수정"
