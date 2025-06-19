@@ -598,10 +598,7 @@ export default function CalendarPage() {
                         typeof m.start === 'string'
                           ? new Date(m.start)
                           : m.start;
-                      if (
-                        !isNaN(d.getTime()) &&
-                        (d.getHours() !== 0 || d.getMinutes() !== 0)
-                      ) {
+                      if (!isNaN(d.getTime())) {
                         timeStr = d.toTimeString().slice(0, 5) + ' ';
                       }
                     }

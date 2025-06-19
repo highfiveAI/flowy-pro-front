@@ -117,16 +117,15 @@ interface NewAdminProps {
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
   formData: {
-    admin_name: string;
-    admin_id: string;
-    admin_email: string;
-    admin_phone: string;
+    user_name: string;
+    user_id: string;
+    user_email: string;
+    user_phonenum: string;
     company_name: string;
   };
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formData, onChange }) => (
+const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formData }) => (
   <Modal $isOpen={visible}>
     <ModalContent>
       <CloseButton onClick={onClose}>×</CloseButton>
@@ -136,35 +135,35 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
       <form onSubmit={onSubmit}>
         <FormGroup>
           <InputBox>
-            <label htmlFor="admin_name">이름</label>
-            <input type="text" id="admin_name" name="admin_name" value={formData.admin_name} onChange={onChange} required />
+            <label htmlFor="user_name">이름</label>
+            <input type="text" id="user_name" name="user_name" value={formData.user_name} readOnly />
           </InputBox>
         </FormGroup>
         <FormGroup>
           <InputBox>
-            <label htmlFor="admin_id">ID</label>
-            <input type="text" id="admin_id" name="admin_id" value={formData.admin_id} onChange={onChange} required />
+            <label htmlFor="user_id">ID</label>
+            <input type="text" id="user_id" name="user_id" value={formData.user_id} readOnly />
           </InputBox>
         </FormGroup>
         <FormGroup>
           <InputBox>
-            <label htmlFor="admin_email">이메일주소</label>
-            <input type="email" id="admin_email" name="admin_email" value={formData.admin_email} onChange={onChange} required />
+            <label htmlFor="user_email">이메일주소</label>
+            <input type="email" id="user_email" name="user_email" value={formData.user_email} readOnly />
           </InputBox>
         </FormGroup>
         <FormGroup>
           <InputBox>
-            <label htmlFor="admin_phone">연락처</label>
-            <input type="text" id="admin_phone" name="admin_phone" value={formData.admin_phone} onChange={onChange} required />
+            <label htmlFor="user_phonenum">연락처</label>
+            <input type="text" id="user_phonenum" name="user_phonenum" value={formData.user_phonenum} readOnly />
           </InputBox>
         </FormGroup>
         <FormGroup>
           <InputBox>
             <label htmlFor="company_name">회사명</label>
-            <input type="text" id="company_name" name="company_name" value={formData.company_name} onChange={onChange} required />
+            <input type="text" id="company_name" name="company_name" value={formData.company_name} readOnly />
           </InputBox>
         </FormGroup>
-        <Button type="submit">등록</Button>
+        <Button type="submit">관리자로 등록</Button>
       </form>
     </ModalContent>
   </Modal>

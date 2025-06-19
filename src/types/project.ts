@@ -9,6 +9,15 @@ export interface Project {
   company_id: string;
 }
 
+export type ProjectResponse = {
+  userName: string;
+  projectName: string;
+  projectId: string;
+  projectDetail: string;
+  projectCreatedDate: string;
+  projectEndDate: string;
+};
+
 export interface ProjectUser {
   project_user_id: string;
   user_id: string;

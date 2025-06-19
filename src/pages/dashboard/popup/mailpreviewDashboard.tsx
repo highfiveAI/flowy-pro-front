@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import type { Feedback, SummaryLog } from '../Dashboard.types';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -164,39 +165,39 @@ const TaskDate = styled.span`
   white-space: nowrap;
 `;
 
-const FeedbackItem = styled.div`
-  margin-bottom: 4px;
-  color: #333;
-  line-height: 1.5;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+// const FeedbackItem = styled.div`
+//   margin-bottom: 4px;
+//   color: #333;
+//   line-height: 1.5;
+//   display: flex;
+//   align-items: flex-start;
+//   gap: 8px;
 
-  &::before {
-    content: '•';
-    color: #333;
-    display: inline-block;
-    width: 1em;
-    margin-left: 1em;
-  }
-`;
+//   &::before {
+//     content: '•';
+//     color: #333;
+//     display: inline-block;
+//     width: 1em;
+//     margin-left: 1em;
+//   }
+// `;
 
-const SummaryItem = styled.div`
-  margin-bottom: 4px;
-  color: #333;
-  line-height: 1.5;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+// const SummaryItem = styled.div`
+//   margin-bottom: 4px;
+//   color: #333;
+//   line-height: 1.5;
+//   display: flex;
+//   align-items: flex-start;
+//   gap: 8px;
 
-  &::before {
-    content: '•';
-    color: #333;
-    display: inline-block;
-    width: 1em;
-    margin-left: 1em;
-  }
-`;
+//   &::before {
+//     content: '•';
+//     color: #333;
+//     display: inline-block;
+//     width: 1em;
+//     margin-left: 1em;
+//   }
+// `;
 
 const SectionContent = styled.div`
   margin-bottom: 12px;
@@ -220,9 +221,9 @@ const TaskInfoBox = styled.div`
 interface MailPreviewProps {
   onClose: () => void;
   onSend: () => void;
-  summary: { section: string; items: string[] }[];
+  summary: SummaryLog | null;
   tasks: any;
-  feedback: { section: string; items: string[] }[];
+  feedback: Feedback[];
   mailItems: { summary: boolean; tasks: boolean; feedback: boolean };
   receivers: any;
   meetingInfo: {
@@ -244,8 +245,8 @@ const MailPreviewDashboard = ({
   receivers,
   meetingInfo,
 }: MailPreviewProps) => {
-  const mailPreview: { section: string; items: string[] }[] = [];
-  if (mailItems.summary && summary) mailPreview.push(...summary);
+  const mailPreview: {}[] = [];
+  if (mailItems.summary && summary) mailPreview.push(summary);
   if (mailItems.tasks && tasks) {
     Object.entries(tasks).forEach(([name, items]) => {
       const taskArr = items as any[];
@@ -296,9 +297,7 @@ const MailPreviewDashboard = ({
   const feedbackContent = mailItems.feedback ? feedback : [];
 
   const hasContent =
-    summaryContent.length > 0 ||
-    tasksContent.length > 0 ||
-    feedbackContent.length > 0;
+    summaryContent || tasksContent.length > 0 || feedbackContent.length > 0;
 
   const canSendMail = () => {
     if (mailPreview.length === 0) return false;
@@ -344,10 +343,10 @@ const MailPreviewDashboard = ({
               <div style={{ color: '#aaa' }}>선택된 항목이 없습니다.</div>
             ) : (
               <>
-                {summaryContent.length > 0 && (
+                {summaryContent && (
                   <ContentSection>
                     <ContentTitle>회의 요약</ContentTitle>
-                    {summaryContent.map((sec, i) => (
+                    {/* {summaryContent.map((sec, i) => (
                       <SectionContent key={i}>
                         <SectionTitle>{sec.section}</SectionTitle>
                         <div>
@@ -356,7 +355,7 @@ const MailPreviewDashboard = ({
                           ))}
                         </div>
                       </SectionContent>
-                    ))}
+                    ))} */}
                   </ContentSection>
                 )}
                 {tasksContent.length > 0 && (
@@ -383,7 +382,7 @@ const MailPreviewDashboard = ({
                 {feedbackContent.length > 0 && (
                   <ContentSection>
                     <ContentTitle>회의 피드백</ContentTitle>
-                    {feedbackContent.map((sec, i) => (
+                    {/* {feedbackContent.map((sec, i) => (
                       <SectionContent key={i}>
                         <SectionTitle>{sec.section}</SectionTitle>
                         <div>
@@ -392,7 +391,7 @@ const MailPreviewDashboard = ({
                           ))}
                         </div>
                       </SectionContent>
-                    ))}
+                    ))} */}
                   </ContentSection>
                 )}
               </>

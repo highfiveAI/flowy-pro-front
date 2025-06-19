@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import EditUsers from './popup/editusers';
 import ManageUsers from './popup/manageusers';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -416,14 +417,18 @@ const Select = styled.select`
 
 const AdminUser: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
+
+  const [companies/*, setCompanies*/] = useState<Company[]>([]);
+
+  // const [positions, setPositions] = useState<Position[]>([]);
   const [companyPositions, setCompanyPositions] = useState<{
     [key: string]: Position[];
   }>({});
   const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(
     null
   );
+
+  const navigate = useNavigate();
 
   // 모달 상태 관리
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -470,45 +475,56 @@ const AdminUser: React.FC = () => {
           credentials: 'include',
         }
       );
+      if (!response.ok) {
+        let errorMsg = '사용자 목록 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        navigate('/');
+        throw new Error(errorMsg);
+      }
       const data = await response.json();
       // console.log('API 응답 데이터:', data); // 데이터 확인용 로그
       setUsers(data);
     } catch (error) {
       console.error('사용자 목록 조회 실패:', error);
+      navigate('/');
     }
   };
 
-  // 회사, 직급, 역할 데이터 가져오기
-  const fetchCompanies = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
-        {
-          credentials: 'include',
-        }
-      );
-      const data = await response.json();
-      setCompanies(data);
-    } catch (error) {
-      console.error('회사 목록 조회 실패:', error);
-    }
-  };
+  // // 회사, 직급, 역할 데이터 가져오기
+  // const fetchCompanies = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
+  //       {
+  //         credentials: 'include',
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     setCompanies(data);
+  //   } catch (error) {
+  //     console.error('회사 목록 조회 실패:', error);
+  //   }
+  // };
 
-  const fetchPositions = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
-        {
-          credentials: 'include',
-        }
-      );
-      const data = await response.json();
-      setPositions(data);
-      console.log(positions);
-    } catch (error) {
-      console.error('직급 목록 조회 실패:', error);
-    }
-  };
+  // const fetchPositions = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
+  //       {
+  //         credentials: 'include',
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     setPositions(data);
+  //     console.log(positions);
+  //   } catch (error) {
+  //     console.error('직급 목록 조회 실패:', error);
+  //   }
+  // };
 
   // 회사별 직급 데이터 가져오기
   const fetchCompanyPositions = async (companyId: string) => {
@@ -521,6 +537,16 @@ const AdminUser: React.FC = () => {
           credentials: 'include',
         }
       );
+      if (!response.ok) {
+        let errorMsg = '회사별 직급 목록 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        navigate('/');
+        throw new Error(errorMsg);
+      }
       const data = await response.json();
       setCompanyPositions((prev) => ({
         ...prev,
@@ -528,6 +554,8 @@ const AdminUser: React.FC = () => {
       }));
     } catch (error) {
       console.error('회사별 직급 목록 조회 실패:', error);
+      alert('회사별 직급 목록 조회 중 오류가 발생했습니다.');
+      navigate('/');
     }
   };
 
@@ -541,28 +569,41 @@ const AdminUser: React.FC = () => {
         }
       );
       if (!response.ok) {
-        throw new Error('사용자 정보 조회에 실패했습니다.');
+        let errorMsg = '사용자 정보 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        navigate('/');
+        throw new Error(errorMsg);
       }
       const data = await response.json();
-      // 사용자의 회사 정보 설정
-      if (data.user_company_id) {
-        const company = companies.find(
-          (c) => c.company_id === data.user_company_id
-        );
-        setCurrentUserCompany(company || null);
-        // 회사의 직급 정보도 미리 가져오기
-        fetchCompanyPositions(data.user_company_id);
+      console.log("로그인 사용자 정보",data);
+
+      if (data.company_id) {
+        setCurrentUserCompany({
+          company_id: data.company_id,
+          company_name: data.company_name || ''
+        });
+        fetchCompanyPositions(data.company_id);
+        console.log('설정된 회사 정보:', {
+          company_id: data.company_id,
+          company_name: data.company_name
+        });
       }
     } catch (error) {
       console.error('현재 사용자 정보 조회 실패:', error);
+      alert('현재 사용자 정보 조회 중 오류가 발생했습니다.');
+      navigate('/');
     }
   };
 
   // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
     fetchUsers();
-    fetchCompanies();
-    fetchPositions();
+    // fetchCompanies();
+    // fetchPositions();
     fetchCurrentUser();
   }, []);
 
@@ -613,12 +654,24 @@ const AdminUser: React.FC = () => {
           body: JSON.stringify(formData),
         }
       );
+      if (!response.ok) {
+        let errorMsg = '사용자 생성에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        // navigate(-1); // 생성 실패 시 이전 페이지로 돌아가는 것이 적절하지 않을 수 있음
+        throw new Error(errorMsg);
+      }
       if (response.ok) {
         fetchUsers();
         setFormData(initialFormData);
       }
     } catch (error) {
       console.error('사용자 생성 실패:', error);
+      alert('사용자 생성 중 오류가 발생했습니다.');
+      // navigate(-1); // 생성 실패 시 이전 페이지로 돌아가는 것이 적절하지 않을 수 있음
     }
   };
 
@@ -635,12 +688,24 @@ const AdminUser: React.FC = () => {
           body: JSON.stringify(formData),
         }
       );
+      if (!response.ok) {
+        let errorMsg = '사용자 수정에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        // navigate(-1); // 수정 실패 시 이전 페이지로 돌아가는 것이 적절하지 않을 수 있음
+        throw new Error(errorMsg);
+      }
       if (response.ok) {
         fetchUsers();
         setSelectedUserId(null);
       }
     } catch (error) {
       console.error('사용자 수정 실패:', error);
+      alert('사용자 수정 중 오류가 발생했습니다.');
+      // navigate(-1); // 수정 실패 시 이전 페이지로 돌아가는 것이 적절하지 않을 수 있음
     }
   };
 
@@ -716,11 +781,24 @@ const AdminUser: React.FC = () => {
         }
       );
 
+      if (!response.ok) {
+        let errorMsg = '상태 변경에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        // navigate(-1); // 상태 변경 실패 시 이전 페이지로 돌아가는 것이 적절하지 않을 수 있음
+        throw new Error(errorMsg);
+      }
+
       if (response.ok) {
         fetchUsers(); // 목록 새로고침
       }
     } catch (error) {
       console.error('상태 변경 실패:', error);
+      alert('상태 변경 중 오류가 발생했습니다.');
+      // navigate(-1); // 상태 변경 실패 시 이전 페이지로 돌아가는 것이 적절하지 않을 수 있음
     }
     setActiveStatusDropdown(null); // 드롭다운 닫기
   };
@@ -924,7 +1002,7 @@ const AdminUser: React.FC = () => {
                           <StatusOption
                             $status="Rejected"
                             onClick={() =>
-                              handleStatusChange(user.user_id, 'Pending')
+                              handleStatusChange(user.user_id, 'Rejected')
                             }
                           >
                             반려

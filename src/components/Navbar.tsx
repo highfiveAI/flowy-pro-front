@@ -249,7 +249,7 @@ const Navbar: React.FC = () => {
   const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
 
   const systemMenuItems = [
-    { name: '문서 에이전트', path: '/docs_agent_test' },
+    // { name: '문서 에이전트', path: '/docs_agent_test' },
     { name: '사용자 관리', path: '/admin/user' },
     { name: '회사 관리', path: '/admin/company' },
     { name: '직책 관리', path: '/admin/position' },
