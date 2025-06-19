@@ -31,6 +31,7 @@ export interface LoginRequest {
 
 // 토큰 유저 인터페이스
 export interface TokenUser {
+  sub: string;
   id: string;
   name: string;
   email: string;

@@ -1,23 +1,21 @@
-
-import React, { useState } from "react";
-import FileUpload from "./FileUpload";
-import styled from "styled-components";
-import AttendInfo from "./AttendInfo";
-import Loading from "../../components/Loading";
-import RecordInfoUpload from "./RecordInfoUpload";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import ResultContents from "../result/ResultContents";
-import { useNavigate } from "react-router-dom";
-import AddUserIcon from "/images/adduser.svg"; // adduser.svg 임포트
-import NewMeetingIcon from "/images/newmeetingicon.svg"; // newmeetingicon.svg 임포트
-import AddProjectIcon from "/images/addprojecticon.svg"; // addprojecticon.svg 임포트
-import NewProjectPopup from "./conference_popup/NewProjectPopup"; // Popup 컴포넌트 임포트
-import { useAuth } from "../../contexts/AuthContext";
+import React, { useState } from 'react';
+import FileUpload from './FileUpload';
+import styled from 'styled-components';
+import AttendInfo from './AttendInfo';
+import Loading from '../../components/Loading';
+import RecordInfoUpload from './RecordInfoUpload';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import ResultContents from '../result/ResultContents';
+import { useNavigate } from 'react-router-dom';
+import AddUserIcon from '/images/adduser.svg'; // adduser.svg 임포트
+import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg 임포트
+import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
+import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
+import { useAuth } from '../../contexts/AuthContext';
 // import { checkAuth } from "../../api/fetchAuthCheck";
 import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup'; // 팝업 컴포넌트 임포트
 import type { ProjectResponse } from '../../types/project';
-
 
 const StyledErrorMessage = styled.div`
   color: #dc3545; /* 밝은 노란색에서 붉은색으로 변경 */
@@ -65,7 +63,7 @@ const ProjectListContainer = styled.div`
 const ExpandedArea = styled.div`
   padding: 10px 20px;
   background-color: #f9f9f9;
-  border-left: 4px solid #007bff;
+  border-left: 4px solid #8134a0;
   margin-bottom: 10px;
   font-size: 16px;
   color: #444;
@@ -210,8 +208,9 @@ const InsertConferenceInfo: React.FC = () => {
   const [projectUsers, setProjectUsers] = React.useState<
     { user_id: string; name: string; email: string; user_jobname: string }[]
   >([]); // 프로젝트 참여자 목록 상태 추가
-  const [hostId, setHostId] = React.useState("");
-  const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] = React.useState(false);
+  const [hostId, setHostId] = React.useState('');
+  const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
+    React.useState(false);
   const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
   const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
@@ -269,10 +268,9 @@ const InsertConferenceInfo: React.FC = () => {
     if (file) {
       // STT API용 FormData
       const hostUser = projectUsers.find((u) => u.user_id === hostId);
-      const hostName = hostUser?.name || "";
+      const hostName = hostUser?.name || '';
       // const hostEmail = hostUser?.email || "";
       // const hostJobname = hostUser?.user_jobname || "";
-
 
       // 참석자 정보(회의장 제외)
       const filteredAttendees = attendees.filter(
@@ -292,9 +290,9 @@ const InsertConferenceInfo: React.FC = () => {
       );
       sttFormData.append('project_name', projectName);
       // host 정보
-      sttFormData.append("host_name", hostName);
-      sttFormData.append("host_email", hostEmail);
-      sttFormData.append("host_role", hostJobname);
+      sttFormData.append('host_name', hostName);
+      sttFormData.append('host_email', hostEmail);
+      sttFormData.append('host_role', hostJobname);
       // 참석자 정보 (각각 여러 번 append)
       attendeesName.forEach((name) =>
         sttFormData.append('attendees_name', name)
@@ -316,9 +314,9 @@ const InsertConferenceInfo: React.FC = () => {
         meetingFormData.append('meeting_date', formatDateToKST(meetingDate));
       }
       // host 정보
-      meetingFormData.append("host_name", hostName);
-      meetingFormData.append("host_email", hostEmail);
-      meetingFormData.append("host_role", hostJobname);
+      meetingFormData.append('host_name', hostName);
+      meetingFormData.append('host_email', hostEmail);
+      meetingFormData.append('host_role', hostJobname);
       // 참석자 정보
       attendeesName.forEach((name) =>
         meetingFormData.append('attendees_name', name)
@@ -331,14 +329,13 @@ const InsertConferenceInfo: React.FC = () => {
       );
 
       // 콘솔로 값 확인
-      console.log("hostId:", hostId);
-      console.log("hostName:", hostName);
-      console.log("hostEmail:", hostEmail);
-      console.log("hostJobname:", hostJobname);
-      console.log("attendeesName:", attendeesName);
-      console.log("attendeesEmail:", attendeesEmail);
-      console.log("attendeesRole:", attendeesRole);
-
+      console.log('hostId:', hostId);
+      console.log('hostName:', hostName);
+      console.log('hostEmail:', hostEmail);
+      console.log('hostJobname:', hostJobname);
+      console.log('attendeesName:', attendeesName);
+      console.log('attendeesEmail:', attendeesEmail);
+      console.log('attendeesRole:', attendeesRole);
 
       try {
         // 1. STT API 호출
@@ -391,10 +388,9 @@ const InsertConferenceInfo: React.FC = () => {
             'chunks',
             JSON.stringify(sttResult.chunks || [])
           );
-          analyzeFormData.append("host_name", hostName);
-          analyzeFormData.append("host_email", hostEmail);
-          analyzeFormData.append("host_role", hostJobname);
-
+          analyzeFormData.append('host_name', hostName);
+          analyzeFormData.append('host_email', hostEmail);
+          analyzeFormData.append('host_role', hostJobname);
 
           analyzeFormData.append('attendees_list', JSON.stringify(attendees));
           analyzeFormData.append('agenda', agenda);
@@ -447,8 +443,6 @@ const InsertConferenceInfo: React.FC = () => {
         setHostEmail('');
         setHostJobname('');
         setHostId('');
-
-
       } catch (error) {
         setError(
           error instanceof Error
