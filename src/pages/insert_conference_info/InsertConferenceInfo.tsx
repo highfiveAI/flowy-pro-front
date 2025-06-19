@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FileUpload from "./FileUpload";
 import styled from "styled-components";
 import AttendInfo from "./AttendInfo";
@@ -215,6 +214,34 @@ const InsertConferenceInfo: React.FC = () => {
   const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
   const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'new' | 'load'>('new');
+  const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+  const [selectedMeetingId, setSelectedMeetingId] = useState<string>('');
+  const [projectDetail, setProjectDetail] = useState<string>('');
+  const [meetings, setMeetings] = useState<any[]>([]); // 회의 목록
+  const [meetingInfo, setMeetingInfo] = useState<any>(null); // 회의 상세 정보
+
+  // --- 더미 데이터 (테스트용) ---
+  const dummyMeetings = [
+    { meetingId: 'm1', meetingTitle: '여름 캠페인 킥오프', meetingDate: '2024-06-01' },
+    { meetingId: 'm2', meetingTitle: '중간 점검 회의', meetingDate: '2024-06-10' },
+    { meetingId: 'm3', meetingTitle: '최종 보고회', meetingDate: '2024-06-20' },
+  ];
+  const dummyMeetingInfo = {
+    meetingId: 'm1',
+    projectId: 'p1',
+    projectName: '여름 캠페인',
+    subject: '여름 캠페인 킥오프',
+    agenda: '캠페인 목표 공유 및 역할 분담',
+    meetingDate: '2024-06-01T10:00:00',
+    attendees: [
+      { user_id: 'u1', name: '홍길동', email: 'hong@test.com', user_jobname: 'PM' },
+      { user_id: 'u2', name: '김철수', email: 'kim@test.com', user_jobname: '디자이너' },
+    ],
+    hostId: 'u1',
+    hostEmail: 'hong@test.com',
+    hostJobname: 'PM',
+  };
 
   const toggleExpanded = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -461,40 +488,48 @@ const InsertConferenceInfo: React.FC = () => {
     }
   };
 
-  // 프로젝트 선택 핸들러 함수
-  const handleProjectSelect = async (
-    projectId: string,
-    projectName: string
-  ) => {
-    setProjectId(projectId);
-    setProjectName(projectName);
-    // 참여자 목록 불러오기
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/stt/project-users/${projectId}`,
-        {
-          credentials: 'include',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
-      const data = await res.json();
-      console.log('API 응답 데이터:', data); // 디버깅을 위한 로그
-      setProjectUsers(
-        data.users.map((u: any) => ({
-          user_id: u.user_id,
-          name: u.name,
-          email: u.email,
-          user_jobname: u.user_jobname,
-        }))
-      );
-      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]); // 항상 1개 이상 입력란 유지
-    } catch (e) {
-      console.error('프로젝트 사용자 정보를 가져오는데 실패했습니다:', e);
-      setProjectUsers([]);
-      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+  // 프로젝트 선택 시 참여자/상세 fetch (activeTab에 따라 분기)
+  const handleProjectSelect = async (projectId: string) => {
+    setSelectedProjectId(projectId);
+    setSelectedMeetingId('');
+    setMeetingInfo(null);
+    if (activeTab === 'new') {
+      // 기존 참여자 목록 fetch 코드 유지
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/v1/stt/project-users/${projectId}`,
+          {
+            credentials: 'include',
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+        const data = await res.json();
+        setProjectUsers(
+          data.users.map((u: any) => ({
+            user_id: u.user_id,
+            name: u.name,
+            email: u.email,
+            user_jobname: u.user_jobname,
+          }))
+        );
+        setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+      } catch (e) {
+        setProjectUsers([]);
+        setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+      }
+    } else if (activeTab === 'load') {
+      // 더미 회의 목록 사용
+      setMeetings(dummyMeetings);
     }
+  };
+
+  // 회의 선택 시 상세 fetch (load 탭)
+  const handleMeetingSelect = async (meetingId: string) => {
+    setSelectedMeetingId(meetingId);
+    // 더미 meetingInfo 사용
+    setMeetingInfo({ ...dummyMeetingInfo, meetingId });
   };
 
   React.useEffect(() => {
@@ -529,6 +564,39 @@ const InsertConferenceInfo: React.FC = () => {
       });
   }, [user?.id, showPopup]);
 
+  // 기존 회의 불러오기 탭에서 meetingInfo가 바뀔 때 폼 상태 자동 채우기
+  useEffect(() => {
+    if (activeTab === 'load' && meetingInfo) {
+      setProjectName(meetingInfo.projectName || '');
+      setProjectId(meetingInfo.projectId || '');
+      setSubject(meetingInfo.subject || meetingInfo.meetingTitle || '');
+      setAgenda(meetingInfo.agenda || '');
+      setMeetingDate(meetingInfo.meetingDate ? new Date(meetingInfo.meetingDate) : null);
+      setAttendees(meetingInfo.attendees || []);
+      setHostId(meetingInfo.hostId || '');
+      setHostEmail(meetingInfo.hostEmail || '');
+      setHostJobname(meetingInfo.hostJobname || '');
+      // 파일, result 등은 필요에 따라 추가
+    }
+  }, [activeTab, meetingInfo]);
+
+  // 새 회의 만들기 탭으로 전환 시 폼 상태 초기화
+  useEffect(() => {
+    if (activeTab === 'new') {
+      setProjectName('');
+      setProjectId('');
+      setSubject('');
+      setAgenda('');
+      setMeetingDate(null);
+      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+      setHostId('');
+      setHostEmail('');
+      setHostJobname('');
+      setFile(null);
+      setError('');
+    }
+  }, [activeTab]);
+
   return (
     <PageWrapper>
       <ContentWrapper>
@@ -549,14 +617,13 @@ const InsertConferenceInfo: React.FC = () => {
             <SortWrapper>
               <SortText>최신순 으로 정렬</SortText>
             </SortWrapper>
-            {/* db에서 불러오기 */}
             <ProjectList>
               {projects.length > 0 ? (
                 projects.map((proj, index) => (
                   <div key={index}>
                     <ProjectListItem
                       onClick={() => {
-                        handleProjectSelect(proj.projectId, proj.projectName);
+                        handleProjectSelect(proj.projectId);
                         toggleExpanded(index);
                       }}
                     >
@@ -573,19 +640,50 @@ const InsertConferenceInfo: React.FC = () => {
 
                     {expandedIndex === index && (
                       <ExpandedArea>
-                        <p>참여자:</p>
-                        <div className="user-list">
-                          {projectUsers.map((user) => (
-                            <span key={user.user_id} className="user-name">
-                              {user.name}
-                            </span>
-                          ))}
-                        </div>
-                        <p>프로젝트 내용:</p>
-                        {proj.projectDetail ? (
-                          <span>{proj.projectDetail}</span>
+                        {activeTab === 'new' ? (
+                          <>
+                            <p>참여자:</p>
+                            <div className="user-list">
+                              {projectUsers.map((user) => (
+                                <span key={user.user_id} className="user-name">
+                                  {user.name}
+                                </span>
+                              ))}
+                            </div>
+                            <p>프로젝트 내용:</p>
+                            {proj.projectDetail ? (
+                              <span>{proj.projectDetail}</span>
+                            ) : (
+                              <span>상세 내용이 없습니다.</span>
+                            )}
+                          </>
                         ) : (
-                          <span>상세 내용이 없습니다.</span>
+                          <>
+                            <p>회의 목록:</p>
+                            <ul style={{ paddingLeft: 0 }}>
+                              {meetings.length > 0 ? (
+                                meetings.map((meeting) => (
+                                  <li
+                                    key={meeting.meetingId}
+                                    style={{
+                                      cursor: 'pointer',
+                                      fontWeight: selectedMeetingId === meeting.meetingId ? 'bold' : 'normal',
+                                      color: selectedMeetingId === meeting.meetingId ? '#351745' : '#333',
+                                      background: selectedMeetingId === meeting.meetingId ? '#ede7f6' : 'transparent',
+                                      borderRadius: 8,
+                                      padding: '6px 12px',
+                                      marginBottom: 4,
+                                    }}
+                                    onClick={() => handleMeetingSelect(meeting.meetingId)}
+                                  >
+                                    {meeting.meetingTitle}
+                                  </li>
+                                ))
+                              ) : (
+                                <li>회의가 없습니다.</li>
+                              )}
+                            </ul>
+                          </>
                         )}
                       </ExpandedArea>
                     )}
@@ -598,134 +696,146 @@ const InsertConferenceInfo: React.FC = () => {
           </ProjectListContainer>
         </LeftPanel>
         <RightPanel>
-          <FormHeader>
-            <BackButton onClick={() => navigate(-1)}>
-              ← 메인 화면으로 돌아가기
-            </BackButton>
-          </FormHeader>
-          <PageTitle>
-            <img src={NewMeetingIcon} alt="새 회의" />새 회의 정보 입력하기
-          </PageTitle>
-          {isCompleted ? (
-            <ResultContents result={result} />
-          ) : isLoading ? (
-            <Loading />
-          ) : (
-            <>
-              <FormGroup>
-                <StyledLabel htmlFor="project-name">
-                  프로젝트명 <span>*</span>
-                </StyledLabel>
-                <StyledInput
-                  type="text"
-                  id="project-name"
-                  value={projectName}
-                  readOnly
-                  placeholder="프로젝트 목록에서 선택해주세요."
-                  onClick={() => alert('프로젝트 목록중에서 선택해주세요')}
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <StyledLabel htmlFor="meeting-subject">
-                  회의 제목 <span>*</span>
-                </StyledLabel>
-                <StyledInput
-                  type="text"
-                  id="meeting-subject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="회의 제목을 입력해주세요."
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <StyledLabel htmlFor="meeting-date">
-                  회의 일시 <span>*</span>
-                </StyledLabel>
-                <DatePickerWrapper>
-                  <DatePicker
-                    selected={meetingDate}
-                    onChange={(date: Date | null) => setMeetingDate(date)}
-                    showTimeSelect
-                    timeFormat="HH:mm"
-                    timeIntervals={15}
-                    dateFormat="yyyy-MM-dd HH:mm"
-                    placeholderText="회의 일시를 선택하세요."
-                    className="custom-datepicker"
-                  />
-                </DatePickerWrapper>
-              </FormGroup>
-
-              <FormGroup>
-                <StyledLabel htmlFor="meeting-agenda">회의 안건</StyledLabel>
-                <StyledTextarea
-                  id="meeting-agenda"
-                  value={agenda}
-                  onChange={(e) => setAgenda(e.target.value)}
-                  placeholder="회의 안건을 입력하세요."
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <LabelButtonWrapper>
-                  <StyledLabel>
-                    회의 참석자 <span>*</span>
-                  </StyledLabel>
-                  <StyledAddAttendeeButton
-                    type="button"
-                    onClick={handleAddAttendee}
-                  >
-                    <img src={AddUserIcon} alt="참석자 추가" />
-                  </StyledAddAttendeeButton>
-                </LabelButtonWrapper>
-                <AttendInfo
-                  attendees={attendees}
-                  setAttendees={setAttendees}
-                  projectUsers={projectUsers}
-                  hostId={hostId}
-                  setHostId={setHostId}
-                  hostEmail={hostEmail}
-                  setHostEmail={setHostEmail}
-                  hostJobname={hostJobname}
-                  setHostJobname={setHostJobname}
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <StyledLabel>
-                  회의 음성 <span>*</span>
-                </StyledLabel>
-                <StyledUploadSection>
-                  {file ? (
-                    <div
-                      style={{
-                        fontWeight: 'bold',
-                        marginBottom: '1rem',
-                        color: '#351745',
-                      }}
-                    >
-                      파일명: {file.name}
-                    </div>
+          <TabSectionWrapper>
+            <TabsWrapper>
+              <TabBtn active={activeTab === 'new'} onClick={() => setActiveTab('new')}>
+                새 회의 만들기
+              </TabBtn>
+              <TabBtn active={activeTab === 'load'} onClick={() => setActiveTab('load')}>
+                기존 회의 불러오기
+              </TabBtn>
+            </TabsWrapper>
+            <TabPanel>
+              {activeTab === 'new' || (activeTab === 'load' && meetingInfo) ? (
+                <>
+                  <PageTitle>
+                    <img src={NewMeetingIcon} alt="새 회의" />
+                    {activeTab === 'new' ? '새 회의 정보 입력하기' : '회의 정보 확인/음성 업로드'}
+                  </PageTitle>
+                  {isCompleted ? (
+                    <ResultContents result={result} />
+                  ) : isLoading ? (
+                    <Loading />
                   ) : (
                     <>
-                      <FileUploadWrapper>
-                        <FileUpload setFile={setFile} />
-                      </FileUploadWrapper>
-                      <RecordUploadWrapper>
-                        <RecordInfoUpload setFile={setFile} />
-                      </RecordUploadWrapper>
+                      <FormGroup>
+                        <StyledLabel htmlFor="project-name">
+                          프로젝트명 <span>*</span>
+                        </StyledLabel>
+                        <StyledInput
+                          type="text"
+                          id="project-name"
+                          value={projectName}
+                          readOnly
+                          placeholder="프로젝트 목록에서 선택해주세요."
+                          onClick={() => alert('프로젝트 목록중에서 선택해주세요')}
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <StyledLabel htmlFor="meeting-subject">
+                          회의 제목 <span>*</span>
+                        </StyledLabel>
+                        <StyledInput
+                          type="text"
+                          id="meeting-subject"
+                          value={subject}
+                          onChange={(e) => setSubject(e.target.value)}
+                          placeholder="회의 제목을 입력해주세요."
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <StyledLabel htmlFor="meeting-date">
+                          회의 일시 <span>*</span>
+                        </StyledLabel>
+                        <DatePickerWrapper>
+                          <DatePicker
+                            selected={meetingDate}
+                            onChange={(date: Date | null) => setMeetingDate(date)}
+                            showTimeSelect
+                            timeFormat="HH:mm"
+                            timeIntervals={15}
+                            dateFormat="yyyy-MM-dd HH:mm"
+                            placeholderText="회의 일시를 선택하세요."
+                            className="custom-datepicker"
+                          />
+                        </DatePickerWrapper>
+                      </FormGroup>
+                      <FormGroup>
+                        <StyledLabel htmlFor="meeting-agenda">회의 안건</StyledLabel>
+                        <StyledTextarea
+                          id="meeting-agenda"
+                          value={agenda}
+                          onChange={(e) => setAgenda(e.target.value)}
+                          placeholder="회의 안건을 입력하세요."
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <LabelButtonWrapper>
+                          <StyledLabel>
+                            회의 참석자 <span>*</span>
+                          </StyledLabel>
+                          <StyledAddAttendeeButton
+                            type="button"
+                            onClick={handleAddAttendee}
+                          >
+                            <img src={AddUserIcon} alt="참석자 추가" />
+                          </StyledAddAttendeeButton>
+                        </LabelButtonWrapper>
+                        <AttendInfo
+                          attendees={attendees}
+                          setAttendees={setAttendees}
+                          projectUsers={projectUsers}
+                          hostId={hostId}
+                          setHostId={setHostId}
+                          hostEmail={hostEmail}
+                          setHostEmail={setHostEmail}
+                          hostJobname={hostJobname}
+                          setHostJobname={setHostJobname}
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <StyledLabel>
+                          회의 음성 <span>*</span>
+                        </StyledLabel>
+                        <StyledUploadSection>
+                          {file ? (
+                            <div
+                              style={{
+                                fontWeight: 'bold',
+                                marginBottom: '1rem',
+                                color: '#351745',
+                              }}
+                            >
+                              파일명: {file.name}
+                            </div>
+                          ) : (
+                            <>
+                              <FileUploadWrapper>
+                                <FileUpload setFile={setFile} />
+                              </FileUploadWrapper>
+                              <RecordUploadWrapper>
+                                <RecordInfoUpload setFile={setFile} />
+                              </RecordUploadWrapper>
+                            </>
+                          )}
+                        </StyledUploadSection>
+                      </FormGroup>
+                      <StyledUploadButton onClick={handleUpload}>
+                        회의 분석하기
+                      </StyledUploadButton>
+                      {error && <StyledErrorMessage>{error}</StyledErrorMessage>}
                     </>
                   )}
-                </StyledUploadSection>
-              </FormGroup>
-
-              <StyledUploadButton onClick={handleUpload}>
-                회의 분석하기
-              </StyledUploadButton>
-              {error && <StyledErrorMessage>{error}</StyledErrorMessage>}
-            </>
-          )}
+                </>
+              ) : (
+                <div style={{ color: '#fff', marginTop: 40, fontSize: '1.1rem' }}>
+                  {activeTab === 'load'
+                    ? '회의를 선택하면 정보가 여기에 표시됩니다.'
+                    : '불러올 회의 리스트 또는 검색 UI가 들어갑니다.'}
+                </div>
+              )}
+            </TabPanel>
+          </TabSectionWrapper>
         </RightPanel>
       </ContentWrapper>
       {showPopup && <NewProjectPopup onClose={() => setShowPopup(false)} />}{' '}
@@ -774,8 +884,8 @@ const LabelButtonWrapper = styled.div`
 const PageWrapper = styled.div`
   display: flex;
   width: 100vw;
-  min-height: 100vh; /* height를 min-height로 변경하여 내용에 따라 확장 가능하게 함 */
-  /* overflow: hidden; */ /* 삼각형 테스트를 위해 제거 */
+  min-height: 100vh;
+  padding-top: 80px;
 `;
 
 const ContentWrapper = styled.div`
@@ -784,43 +894,27 @@ const ContentWrapper = styled.div`
 `;
 
 const LeftPanel = styled.div`
-  width: 940px; /* 좌측 패널 고정 너비 */
-  background-color: #f7f7f7; /* 좌측 패널 배경색 */
+  width: 940px;
+  background-color: #f7f7f7;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* 위에서부터 정렬 */
-  align-items: center; /* 자식 요소들을 가운데로 정렬 */
-  gap: 1rem; /* 간격 줄임 */
-  padding: 40px; /* 전체 패널 패딩 */
-  position: relative; /* 자식 요소의 절대 위치 지정을 위해 추가 */
-  /* height: 100%; */ /* 높이 고정 */
-  /* overflow-y: auto; */ /* 스크롤 활성화 */
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  padding: 40px;
+  position: relative;
 `;
 
 const RightPanel = styled.div`
-  width: 800px;
-  background-color: #351745; /* 우측 패널 배경색 */
-  padding: 40px;
+  width: 540px;
+  min-width: 420px;
+  background: #351745;
+  padding: 0;
   display: flex;
   flex-direction: column;
   color: white;
-  position: relative;
-  min-height: 110vh; /* 전체 높이를 차지하도록 설정 */
-  /* overflow-y: auto; */ /* 삼각형 테스트를 위해 제거 */
-
-  &::before {
-    content: '';
-    position: fixed; /* fixed 유지 */
-    left: 1000px; /* LeftPanel 너비에 맞춰 조정 */
-    top: 200px; /* 고정 위치에 맞게 상단 여백 조정 */
-    width: 0;
-    height: 0;
-    border-top: 30px solid transparent;
-    border-bottom: 30px solid transparent;
-    border-right: 30px solid #351745; /* RightPanel 배경색과 동일 */
-    /* margin-left: -30px; */ /* LeftPanel 쪽으로 돌출되는 margin 제거 */
-    z-index: 9999;
-  }
+  border-radius: 0 16px 16px 0;
+  box-shadow: 0 2px 16px rgba(53, 23, 69, 0.04);
 `;
 
 const FormHeader = styled.div`
@@ -861,98 +955,84 @@ const PageTitle = styled.h1`
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: 25px; /* 각 폼 그룹 간 간격 */
-  width: 100%;
+  margin-bottom: 22px;
 `;
 
 const StyledLabel = styled.label`
   display: block;
   margin-bottom: 8px;
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   color: #fff;
-
+  font-weight: 600;
   span {
-    color: #ed6e00; /* 필수 입력 표시를 위한 색상 변경 */
+    color: #ed6e00;
+    font-weight: 700;
   }
 `;
 
 const StyledInput = styled.input`
   width: 100%;
-  padding: 12px 15px;
+  padding: 13px 18px;
   border: none;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #333;
-  font-size: 1rem;
+  background: #f7f7f7;
+  color: #351745;
+  font-size: 1.05rem;
+  font-weight: 500;
   box-sizing: border-box;
-
+  margin-bottom: 2px;
   &::placeholder {
-    color: #999;
+    color: #bdbdbd;
+    font-weight: 400;
+    font-size: 1.02rem;
   }
 `;
 
 const StyledTextarea = styled.textarea`
   width: 100%;
-  padding: 12px 15px;
+  padding: 13px 18px;
   border: none;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #333;
-  font-size: 1rem;
+  background: #f7f7f7;
+  color: #351745;
+  font-size: 1.05rem;
+  font-weight: 500;
   box-sizing: border-box;
   min-height: 80px;
   resize: vertical;
-
   &::placeholder {
-    color: #999;
+    color: #bdbdbd;
+    font-weight: 400;
+    font-size: 1.02rem;
   }
 `;
-
-// const StyledSelect = styled.select`
-//   width: 100%;
-//   padding: 12px 15px;
-//   border: none;
-//   border-radius: 8px;
-//   background-color: rgba(255, 255, 255, 0.9);
-//   color: #333;
-//   font-size: 1rem;
-//   box-sizing: border-box;
-//   -webkit-appearance: none; /* 기본 select 스타일 제거 */
-//   -moz-appearance: none;
-//   appearance: none;
-//   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.1L146.2%20202.7%2018.5%2074.5a17.6%2017.6%200%200%200-25.1%2024.9l130.2%20129.8c6.8%206.7%2017.7%206.7%2024.5%200l130.2-129.8a17.6%2017.6%200%200%200-11.9-29.4z%22%2F%3E%3C%2Fsvg%3E"); /* 커스텀 화살표 */
-//   background-repeat: no-repeat;
-//   background-position: right 15px center;
-//   background-size: 12px;
-// `;
 
 const DatePickerWrapper = styled.div`
   .react-datepicker-wrapper {
     width: 100%;
   }
-
   .react-datepicker__input-container {
     width: 100%;
   }
-
   .custom-datepicker {
     width: 100%;
-    padding: 12px 15px;
+    padding: 13px 18px;
     border: none;
     border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #333;
-    font-size: 1rem;
+    background: #f7f7f7;
+    color: #351745;
+    font-size: 1.05rem;
+    font-weight: 500;
     box-sizing: border-box;
-
     &::placeholder {
-      color: #999;
+      color: #bdbdbd;
+      font-weight: 400;
+      font-size: 1.02rem;
     }
   }
 `;
 
-const StyledUploadSection = styled.div`
-  margin-top: 20px;
+const StyledUploadSection = styled.div`  margin-top: 20px;
   margin-bottom: 20px;
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.9);
@@ -979,23 +1059,67 @@ const RecordUploadWrapper = styled.div`
 `;
 
 const StyledUploadButton = styled.button`
-  padding: 15px 30px;
-  background-color: #00b4ba; /* 보라색 계열 */
+  padding: 15px 0;
+  background-color: #00b4ba;
   color: white;
   border: none;
-  border-radius: 50px;
-  font-size: 1.2rem;
+  border-radius: 8px;
+  font-size: 1.15rem;
+  font-weight: 700;
   cursor: pointer;
   width: 100%;
   margin-top: 30px;
-  margin-bottom: 40px; /* 하단 여백 추가 */
-
-  &:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
-
+  margin-bottom: 40px;
+  transition: background 0.2s;
   &:hover {
-    background-color: #00939a; /* hover 색상 조정 */
+    background-color: #00939a;
   }
 `;
+
+const TabsWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  height: 56px;
+  background: #351745;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  position: relative;
+`;
+const TabBtn = styled.button<{ active: boolean }>`
+  flex: 1;
+  height: 56px;
+  background: ${({ active }) => (active ? '#e5e0ee' : 'transparent')};
+  color: ${({ active }) => (active ? '#351745' : '#fff')};
+  border: none;
+  font-size: 1.18rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  border-top-left-radius: ${({ active }) => (active ? '16px' : '0')};
+  border-top-right-radius: ${({ active }) => (active ? '16px' : '0')};
+  margin-right: 2px;
+  outline: none;
+  letter-spacing: -0.5px;
+  z-index: ${({ active }) => (active ? 2 : 1)};
+  &:last-child { margin-right: 0; }
+`;
+const TabPanel = styled.div`
+  flex: 1;
+  background: #351745;
+  border-radius: 0 0 16px 16px;
+  padding: 36px 36px 32px 36px;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+`;
+
+const TabSectionWrapper = styled.div`
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  background: #351745;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+`;
+
