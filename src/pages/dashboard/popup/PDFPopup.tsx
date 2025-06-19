@@ -110,6 +110,9 @@ const Checkbox = styled.input.attrs({ type: 'checkbox' })`
   accent-color: #4b2067;
   width: 18px;
   height: 18px;
+  &[readonly] {
+    pointer-events: none;
+  }
 `;
 
 interface PDFPopupProps {
@@ -212,8 +215,18 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
           {PDF_ITEMS.map((item) => (
             <CheckboxLabel key={item.key}>
               <Checkbox
-                checked={checked[item.key as keyof typeof checked]}
-                onChange={handleCheck(item.key)}
+                checked={
+                  item.key === 'info'
+                    ? true
+                    : checked[item.key as keyof typeof checked]
+                }
+                onChange={
+                  item.key === 'info'
+                    ? undefined
+                    : handleCheck(item.key)
+                }
+                readOnly={item.key === 'info'}
+                onClick={item.key === 'info' ? () => alert('회의 기본 정보는 필수 사항입니다.') : undefined}
               />
               {item.label}
             </CheckboxLabel>

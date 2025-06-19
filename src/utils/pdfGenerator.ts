@@ -123,12 +123,12 @@ export function generateMeetingPDF({
 
     // [작업 목록]
     if (checked.tasks && tasks && typeof tasks === 'object') {
+      // console.log('[PDFGenerator] 전달받은 tasks:', tasks);
       const taskTableBody: any[] = [
         [
           { text: '작업 내용', style: 'tableHeader' },
           { text: '담당자', style: 'tableHeader' },
-          { text: '일정', style: 'tableHeader' },
-          { text: '비고', style: 'tableHeader' }
+          { text: '일정', style: 'tableHeader' }
         ]
       ];
       Object.entries(tasks).forEach(([status, arr]) => {
@@ -137,8 +137,7 @@ export function generateMeetingPDF({
           taskTableBody.push([
             task.action || '',
             task.assignee || '',
-            task.schedule || '',
-            status
+            task.schedule || ''
           ]);
         });
       });
@@ -148,7 +147,7 @@ export function generateMeetingPDF({
         {
           table: {
             headerRows: 1,
-            widths: ['*', '15%', '20%', '15%'],
+            widths: ['*', '15%', '20%'],
             body: taskTableBody
           },
           layout: {
