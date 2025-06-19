@@ -263,13 +263,13 @@ const AdminPosition: React.FC = () => {
       }
       const data = await response.json();
       console.log('받아온 사용자 데이터:', data);
-      if (data.user_company_id) {
+      if (data.company_id) {
         setCurrentUserCompany({
-          company_id: data.user_company_id,
+          company_id: data.company_id,
           company_name: data.company_name || ''
         });
         console.log('설정된 회사 정보:', {
-          company_id: data.user_company_id,
+          company_id: data.company_id,
           company_name: data.company_name
         });
       }

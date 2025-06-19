@@ -537,14 +537,18 @@ const AdminUser: React.FC = () => {
         throw new Error(errorMsg);
       }
       const data = await response.json();
-      // 사용자의 회사 정보 설정
-      if (data.user_company_id) {
-        const company = companies.find(
-          (c) => c.company_id === data.user_company_id
-        );
-        setCurrentUserCompany(company || null);
-        // 회사의 직급 정보도 미리 가져오기
-        fetchCompanyPositions(data.user_company_id);
+      console.log("로그인 사용자 정보",data);
+
+      if (data.company_id) {
+        setCurrentUserCompany({
+          company_id: data.company_id,
+          company_name: data.company_name || ''
+        });
+        fetchCompanyPositions(data.company_id);
+        console.log('설정된 회사 정보:', {
+          company_id: data.company_id,
+          company_name: data.company_name
+        });
       }
     } catch (error) {
       console.error('현재 사용자 정보 조회 실패:', error);
@@ -956,7 +960,7 @@ const AdminUser: React.FC = () => {
                           <StatusOption
                             $status="Rejected"
                             onClick={() =>
-                              handleStatusChange(user.user_id, 'Pending')
+                              handleStatusChange(user.user_id, 'Rejected')
                             }
                           >
                             반려
