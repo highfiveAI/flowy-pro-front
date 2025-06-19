@@ -53,6 +53,18 @@ const CloseButton = styled.button`
   color: #666;
   &:hover { color: #351745; }
 `;
+const Form = styled.form`
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  box-sizing: border-box;
+`;
 const InputBox = styled.div`
   display: flex;
   align-items: center;
@@ -86,6 +98,7 @@ const FormGroup = styled.div`
     font-size: 1.1rem;
     color: #351745;
     font-weight: 500;
+    font-family: 'Rethink Sans', sans-serif;
     height: 100%;
     padding: 0;
     margin: 0;
@@ -95,7 +108,7 @@ const FormGroup = styled.div`
     }
   }
 `;
-const Button = styled.button`
+const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
   width: 270px;
   height: 60px;
   border-radius: 2rem;
@@ -112,67 +125,68 @@ const Button = styled.button`
   &:hover { background: #0fa7a2; }
 `;
 
-interface EditAdminProps {
-  visible: boolean;
-  onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+interface NewPositionProps {
+  isOpen: boolean;
   formData: {
-    admin_name: string;
-    admin_id: string;
-    admin_email: string;
-    admin_phone: string;
-    company_name: string;
+    position_code: string;
+    position_name: string;
+    position_detail: string;
   };
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onClose: () => void;
 }
 
-const EditAdmin: React.FC<EditAdminProps> = ({ visible, onClose, onSubmit, formData, onChange }) => (
-  <Modal $isOpen={visible}>
-    <ModalContent>
-      <CloseButton onClick={onClose}>×</CloseButton>
-      <ModalHeader>
-        <h2>관리자 계정 정보 수정</h2>
-      </ModalHeader>
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          onSubmit(e);
-        }}
-      >
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="admin_name">이름</label>
-            <input type="text" id="admin_name" name="admin_name" value={formData.admin_name} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="admin_id">ID</label>
-            <input type="text" id="admin_id" name="admin_id" value={formData.admin_id} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="admin_email">이메일주소</label>
-            <input type="email" id="admin_email" name="admin_email" value={formData.admin_email} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="admin_phone">연락처</label>
-            <input type="text" id="admin_phone" name="admin_phone" value={formData.admin_phone} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="company_name">회사명</label>
-            <input type="text" id="company_name" name="company_name" value={formData.company_name} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <Button type="submit">수정</Button>
-      </form>
-    </ModalContent>
-  </Modal>
-);
+const NewPosition: React.FC<NewPositionProps> = ({ isOpen, formData, onChange, onSubmit, onClose }) => {
+  return (
+    <Modal $isOpen={isOpen}>
+      <ModalContent>
+        <CloseButton onClick={onClose}>×</CloseButton>
+        <ModalHeader>
+          <h2>새 직급 등록</h2>
+        </ModalHeader>
+        <Form onSubmit={onSubmit}>
+          <FormGroup>
+            <InputBox>
+              <label>직급 코드</label>
+              <input
+                type="text"
+                name="position_code"
+                value={formData.position_code}
+                onChange={onChange}
+                required
+              />
+            </InputBox>
+          </FormGroup>
+          <FormGroup>
+            <InputBox>
+              <label>직급명</label>
+              <input
+                type="text"
+                name="position_name"
+                value={formData.position_name}
+                onChange={onChange}
+                required
+              />
+            </InputBox>
+          </FormGroup>
+          <FormGroup>
+            <InputBox>
+              <label>레벨</label>
+              <input
+                type="text"
+                name="position_detail"
+                value={formData.position_detail}
+                onChange={onChange}
+                required
+              />
+            </InputBox>
+          </FormGroup>
+          <Button type="submit">등록</Button>
+        </Form>
+      </ModalContent>
+    </Modal>
+  );
+};
 
-export default EditAdmin; 
+export default NewPosition; 

@@ -1,4 +1,4 @@
-import type { ProjectRequestBody, Todo } from '../types/project';
+import type { ProjectRequestBody } from '../types/project';
 
 // 프로젝트 메타데이터
 export async function fetchProjectMetaData(): Promise<any | null> {
@@ -210,4 +210,63 @@ export async function postAssignedTodos(
     console.error('할당된 작업 목록 전송 중 오류:', error);
     throw error;
   }
+}
+
+export async function postSummaryLog(
+  meeting_id: string | undefined,
+  updatedSummaryContents: any
+): Promise<void> {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/projects/update_summary`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // 필요시 인증 토큰 추가
+          // Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          meeting_id: meeting_id,
+          updated_summary_contents: updatedSummaryContents,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || '회의 요약 전송에 실패했습니다.');
+    }
+
+    const result = await response.json();
+    console.log('회의 요약 전송 성공:', result);
+  } catch (error) {
+    console.log(meeting_id);
+    console.log(updatedSummaryContents);
+    console.error('회의 요약 전송 중 오류:', error);
+    throw error;
+  }
+}
+
+// 추천문서(DraftLog) 조회 함수
+export async function fetchDraftLogs(meeting_id: string): Promise<any[] | null> {
+    try {
+        const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/v1/docs/draft/${meeting_id}`,
+            {
+                method: 'GET',
+                credentials: 'include',
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data: any[] = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch draft logs:', error);
+        return null;
+    }
 }

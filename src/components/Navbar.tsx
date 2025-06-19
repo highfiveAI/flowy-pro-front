@@ -15,7 +15,6 @@ const NavbarContainer = styled.nav`
   align-items: center;
   padding: 20px 40px;
   background: white;
-  font-family: 'Rethink Sans', sans-serif;
 `;
 
 const Left = styled.div`
@@ -106,7 +105,6 @@ const ProfileIcon = styled.svg`
 
 const LogoutText = styled.span`
   color: #351745;
-  font-family: 'Rethink Sans', sans-serif;
   font-size: 15px;
   font-style: normal;
   font-weight: 500;
@@ -186,6 +184,10 @@ const Navbar: React.FC = () => {
           </MenuItem>
           <MenuItem onClick={() => navigate('/calendar')}>
             작업 관리
+            <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+          </MenuItem>
+          <MenuItem onClick={() => navigate('/admin/dashboard')}>
+            대시보드
             <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
           </MenuItem>
           <MenuItem

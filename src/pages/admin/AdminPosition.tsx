@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 // 스타일 컴포넌트 재사용
 const Container = styled.div`
@@ -244,6 +245,8 @@ const AdminPosition: React.FC = () => {
     direction: null,
   });
 
+  const navigate = useNavigate();
+
   // 현재 로그인한 사용자의 정보 가져오기
   const fetchCurrentUser = async () => {
     try {
@@ -286,6 +289,16 @@ const AdminPosition: React.FC = () => {
         }
       );
       console.log('직급 목록 응답:', response.status);
+      if (!response.ok) {
+        let errorMsg = '직급 목록 조회에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        navigate('/')
+        throw new Error(errorMsg);
+      }
       const data = await response.json();
       console.log('받아온 직급 데이터:', data);
       setPositions(data);
