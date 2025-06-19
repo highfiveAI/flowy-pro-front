@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import MailingDashboard from './popup/mailingDashboard';
+import PDFPopup from './popup/PDFPopup';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import {
   fetchMeetings,
@@ -687,6 +688,7 @@ const Dashboard: React.FC = () => {
     })();
   }, []);
 
+
   // textarea 문자열을 summary 배열로 파싱
   // const textToSummary = (text: string) => {
   //   const lines = text.split(/\r?\n/);
@@ -897,6 +899,14 @@ const Dashboard: React.FC = () => {
             }}
           >
             <img
+              src="/images/recommendfile.svg"
+              alt="PDF"
+              style={{ width: 22, height: 22, marginRight: 6 }}
+            />
+            <SpeechBubbleButton onClick={() => setShowPDFPopup(true)} style={{ marginLeft: 8 }}>
+              PDF 다운로드
+            </SpeechBubbleButton>
+            <img
               src="/images/sendmail.svg"
               alt="메일"
               style={{ width: 28, height: 28 }}
@@ -904,21 +914,29 @@ const Dashboard: React.FC = () => {
             <SpeechBubbleButton onClick={() => setShowMailPopup(true)}>
               클릭 한 번으로 메일 보내기
             </SpeechBubbleButton>
+
           </div>
         </MeetingAnalysisHeader>
 
         {showMailPopup && (
           <MailingDashboard
             onClose={() => setShowMailPopup(false)}
-            summary={
-              summaryLog?.updated_summary_contents?.structured_summary ?? []
-            }
+            summary={summaryLog}
             tasks={assignRole}
             feedback={feedback}
             meetingInfo={mailMeetingInfo}
           />
         )}
+        {showPDFPopup && (
+          <PDFPopup
+            onClose={() => setShowPDFPopup(false)}
+            summary={summaryLog}
+            tasks={assignRole}
+            feedback={feedback}
 
+            meetingInfo={mailMeetingInfo}
+          />
+        )}
         <Section>
           <SectionHeader>
             <SectionTitle>회의 기본 정보</SectionTitle>

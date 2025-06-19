@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import styled from 'styled-components';
 
@@ -23,6 +22,10 @@ interface AttendInfoProps {
   projectUsers: ProjectUser[];
   hostId: string;
   setHostId: (id: string) => void;
+  hostEmail: string;
+  setHostEmail: (email: string) => void;
+  hostJobname: string;
+  setHostJobname: (job: string) => void;
 }
 
 const AttendInfoWrapper = styled.div`
@@ -100,11 +103,7 @@ const StyledSelect = styled.select`
   }
 `;
 
-const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projectUsers = [], hostId, setHostId }) => {
-  const [hostEmail, setHostEmail] = useState('');
-  const [hostJobname, setHostJobname] = useState('');
-
-
+const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projectUsers = [], hostId, setHostId, hostEmail, setHostEmail, hostJobname, setHostJobname }) => {
   const handleAttendeeChange = (idx: number, field: string, value: string) => {
     const updated = [...attendees];
     updated[idx] = { ...updated[idx], [field]: value };
@@ -167,13 +166,13 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projec
           type="email"
           placeholder="이메일"
           value={hostEmail}
-          readOnly
+          onChange={e => setHostEmail(e.target.value)}
         />
         <RoleInput
           type="text"
           placeholder="역할"
           value={hostJobname}
-          readOnly
+          onChange={e => setHostJobname(e.target.value)}
         />
       </AttendeeInputGroup>
       {attendees.map((att, idx) => (
