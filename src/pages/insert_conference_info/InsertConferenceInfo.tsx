@@ -686,7 +686,7 @@ const InsertConferenceInfo: React.FC = () => {
     console.log('프로젝트 선택됨:', { projectId, projectName }); // 디버깅 로그
     setProjectId(projectId);
     setProjectName(projectName);
-
+    
     // 참여자 목록 불러오기
     try {
       const res = await fetch(
@@ -799,7 +799,7 @@ const InsertConferenceInfo: React.FC = () => {
     setMeetingDate(
       meeting.meeting_date ? new Date(meeting.meeting_date) : null
     );
-
+    
     // 참석자 정보 설정
     if (meeting.meeting_users && meeting.meeting_users.length > 0) {
       const attendeesData = meeting.meeting_users.map((mu: any) => ({
@@ -898,8 +898,8 @@ const InsertConferenceInfo: React.FC = () => {
                         </span>
                         <EditIcon
                           onClick={(e) => {
-                            e.stopPropagation(); // 이벤트 버블링 방지
-                            openEditPopup(proj);
+                          e.stopPropagation(); // 이벤트 버블링 방지
+                          openEditPopup(proj);
                           }}
                         />
                         <span className="date">
@@ -947,8 +947,8 @@ const InsertConferenceInfo: React.FC = () => {
                                 {projectMeetings.length > 0 ? (
                                   projectMeetings.map(
                                     (meeting, meetingIndex) => (
-                                      <div
-                                        key={meetingIndex}
+                                    <div 
+                                      key={meetingIndex} 
                                         className={`meeting-item ${
                                           selectedMeeting?.meeting_id ===
                                           meeting.meeting_id
@@ -958,27 +958,27 @@ const InsertConferenceInfo: React.FC = () => {
                                         onClick={() =>
                                           handleMeetingSelect(meeting)
                                         }
-                                      >
+                                    >
                                         <div className="meeting-title">
                                           {meeting.meeting_title}
                                         </div>
-                                        <div className="meeting-date">
-                                          {new Date(meeting.meeting_date)
+                                      <div className="meeting-date">
+                                        {new Date(meeting.meeting_date)
                                             .toLocaleString('sv-SE', {
                                               timeZone: 'Asia/Seoul',
                                             })
-                                            .replace('T', ' ')
-                                            .slice(0, 16)}
-                                        </div>
-                                        <div className="meeting-attendees">
+                                          .replace('T', ' ')
+                                          .slice(0, 16)}
+                                      </div>
+                                      <div className="meeting-attendees">
                                           참석자:{' '}
                                           {meeting.meeting_users
                                             ?.map(
                                               (mu: any) => mu.user.user_name
                                             )
                                             .join(', ') || '없음'}
-                                        </div>
                                       </div>
+                                    </div>
                                     )
                                   )
                                 ) : (
@@ -1102,151 +1102,151 @@ const InsertConferenceInfo: React.FC = () => {
                         textAlign: 'center',
                       }}
                     >
-                      좌측 프로젝트 목록에서 프로젝트를 선택해주세요.
-                    </div>
+                          좌측 프로젝트 목록에서 프로젝트를 선택해주세요.
+                        </div>
                   ) : isCompleted ? (
                     <ResultContents result={result} />
                   ) : isLoading ? (
                     <Loading />
                   ) : (
-                    <>
+                      <>
                       {/* 회의 등록 폼 */}
                       {/* 프로젝트명 */}
-                      <FormGroup>
-                        <StyledLabel htmlFor="project-name">
-                          프로젝트명 <span>*</span>
-                        </StyledLabel>
-                        <StyledInput
-                          type="text"
-                          id="project-name"
-                          value={projectName}
-                          readOnly
-                          placeholder="프로젝트 목록에서 선택해주세요."
+                        <FormGroup>
+                          <StyledLabel htmlFor="project-name">
+                            프로젝트명 <span>*</span>
+                          </StyledLabel>
+                          <StyledInput
+                            type="text"
+                            id="project-name"
+                            value={projectName}
+                            readOnly
+                            placeholder="프로젝트 목록에서 선택해주세요."
                           onClick={() =>
                             alert('프로젝트 목록중에서 선택해주세요')
                           }
-                        />
-                      </FormGroup>
+                          />
+                        </FormGroup>
 
                       {/* 회의 제목 */}
-                      <FormGroup>
-                        <StyledLabel htmlFor="meeting-subject">
-                          회의 제목 <span>*</span>
-                        </StyledLabel>
-                        <StyledInput
-                          type="text"
-                          id="meeting-subject"
-                          value={subject}
-                          onChange={(e) => setSubject(e.target.value)}
-                          placeholder="회의 제목을 입력해주세요."
-                        />
-                      </FormGroup>
+                        <FormGroup>
+                          <StyledLabel htmlFor="meeting-subject">
+                            회의 제목 <span>*</span>
+                          </StyledLabel>
+                          <StyledInput
+                            type="text"
+                            id="meeting-subject"
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
+                            placeholder="회의 제목을 입력해주세요."
+                          />
+                        </FormGroup>
 
                       {/* 회의 일시 */}
-                      <FormGroup>
-                        <StyledLabel htmlFor="meeting-date">
-                          회의 일시 <span>*</span>
-                        </StyledLabel>
-                        <DatePickerWrapper>
-                          <DatePicker
-                            selected={meetingDate}
+                        <FormGroup>
+                          <StyledLabel htmlFor="meeting-date">
+                            회의 일시 <span>*</span>
+                          </StyledLabel>
+                          <DatePickerWrapper>
+                            <DatePicker
+                              selected={meetingDate}
                             onChange={(date: Date | null) =>
                               setMeetingDate(date)
                             }
-                            showTimeSelect
-                            timeFormat="HH:mm"
-                            timeIntervals={15}
-                            dateFormat="yyyy-MM-dd HH:mm"
-                            placeholderText="회의 일시를 선택하세요."
-                            className="custom-datepicker"
-                          />
-                        </DatePickerWrapper>
-                      </FormGroup>
+                              showTimeSelect
+                              timeFormat="HH:mm"
+                              timeIntervals={15}
+                              dateFormat="yyyy-MM-dd HH:mm"
+                              placeholderText="회의 일시를 선택하세요."
+                              className="custom-datepicker"
+                            />
+                          </DatePickerWrapper>
+                        </FormGroup>
 
                       {/* 회의 안건 */}
-                      <FormGroup>
+                        <FormGroup>
                         <StyledLabel htmlFor="meeting-agenda">
                           회의 안건
                         </StyledLabel>
-                        <StyledTextarea
-                          id="meeting-agenda"
-                          value={agenda}
-                          onChange={(e) => setAgenda(e.target.value)}
-                          placeholder="회의 안건을 입력하세요."
-                        />
-                      </FormGroup>
+                          <StyledTextarea
+                            id="meeting-agenda"
+                            value={agenda}
+                            onChange={(e) => setAgenda(e.target.value)}
+                            placeholder="회의 안건을 입력하세요."
+                          />
+                        </FormGroup>
 
                       {/* 참석자 */}
-                      <FormGroup>
-                        <LabelButtonWrapper>
-                          <StyledLabel>
-                            회의 참석자 <span>*</span>
-                          </StyledLabel>
-                          <StyledAddAttendeeButton
-                            type="button"
-                            onClick={handleAddAttendee}
-                          >
-                            <img src={AddUserIcon} alt="참석자 추가" />
-                          </StyledAddAttendeeButton>
-                        </LabelButtonWrapper>
-                        <AttendInfo
-                          attendees={attendees}
-                          setAttendees={setAttendees}
-                          projectUsers={projectUsers}
-                          hostId={hostId}
-                          setHostId={setHostId}
-                          hostEmail={hostEmail}
-                          setHostEmail={setHostEmail}
-                          hostJobname={hostJobname}
-                          setHostJobname={setHostJobname}
-                        />
-                      </FormGroup>
+                        <FormGroup>
+                          <LabelButtonWrapper>
+                            <StyledLabel>
+                              회의 참석자 <span>*</span>
+                            </StyledLabel>
+                            <StyledAddAttendeeButton
+                              type="button"
+                              onClick={handleAddAttendee}
+                            >
+                              <img src={AddUserIcon} alt="참석자 추가" />
+                            </StyledAddAttendeeButton>
+                          </LabelButtonWrapper>
+                          <AttendInfo
+                            attendees={attendees}
+                            setAttendees={setAttendees}
+                            projectUsers={projectUsers}
+                            hostId={hostId}
+                            setHostId={setHostId}
+                            hostEmail={hostEmail}
+                            setHostEmail={setHostEmail}
+                            hostJobname={hostJobname}
+                            setHostJobname={setHostJobname}
+                          />
+                        </FormGroup>
 
                       {/* 파일 업로드 */}
-                      <FormGroup>
-                        <StyledLabel>
-                          회의 음성 <span>*</span>
-                        </StyledLabel>
-                        <StyledUploadSection
-                          onDragEnter={handleDragEnter}
-                          onDragLeave={handleDragLeave}
-                          onDragOver={handleDragOver}
-                          onDrop={handleDrop}
+                        <FormGroup>
+                          <StyledLabel>
+                            회의 음성 <span>*</span>
+                          </StyledLabel>
+                          <StyledUploadSection
+                            onDragEnter={handleDragEnter}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
                           $isDragging={isDragging}
-                        >
-                          {file ? (
-                            <FileInfoContainer>
-                              <FileInfo>
-                                <FileLabel>파일명:</FileLabel>
-                                <FileName>{file.name}</FileName>
-                              </FileInfo>
-                              <RemoveFileButton onClick={() => setFile(null)}>
-                                ✕
-                              </RemoveFileButton>
-                            </FileInfoContainer>
-                          ) : (
-                            <>
-                              <DropZoneMessage>
-                                이곳에 파일을 드래그하거나 아이콘을 클릭하세요.
-                              </DropZoneMessage>
-                              <FileUploadWrapper>
-                                <FileUpload setFile={setFile} />
-                              </FileUploadWrapper>
-                              <RecordUploadWrapper>
-                                <RecordInfoUpload setFile={setFile} />
-                              </RecordUploadWrapper>
-                            </>
-                          )}
-                        </StyledUploadSection>
-                      </FormGroup>
+                          >
+                            {file ? (
+                              <FileInfoContainer>
+                                <FileInfo>
+                                  <FileLabel>파일명:</FileLabel>
+                                  <FileName>{file.name}</FileName>
+                                </FileInfo>
+                                <RemoveFileButton onClick={() => setFile(null)}>
+                                  ✕
+                                </RemoveFileButton>
+                              </FileInfoContainer>
+                            ) : (
+                              <>
+                                <DropZoneMessage>
+                                  이곳에 파일을 드래그하거나 아이콘을 클릭하세요.
+                                </DropZoneMessage>
+                                <FileUploadWrapper>
+                                  <FileUpload setFile={setFile} />
+                                </FileUploadWrapper>
+                                <RecordUploadWrapper>
+                                  <RecordInfoUpload setFile={setFile} />
+                                </RecordUploadWrapper>
+                              </>
+                            )}
+                          </StyledUploadSection>
+                        </FormGroup>
 
-                      <StyledUploadButton onClick={handleUpload}>
-                        회의 분석하기
-                      </StyledUploadButton>
+                        <StyledUploadButton onClick={handleUpload}>
+                          회의 분석하기
+                        </StyledUploadButton>
                       {error && (
                         <StyledErrorMessage>{error}</StyledErrorMessage>
                       )}
-                    </>
+                      </>
                   )}
                 </>
               ) : activeTab === 'load' ? (
@@ -1433,7 +1433,7 @@ const InsertConferenceInfo: React.FC = () => {
   );
 };
 
-export default InsertConferenceInfo;
+  export default InsertConferenceInfo;
 
 const StyledAddAttendeeButton = styled.button`
   background-color: transparent; /* 배경색 투명하게 */

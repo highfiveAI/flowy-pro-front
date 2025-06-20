@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import MailPreviewDashboard from './mailpreviewDashboard';
 import type { Feedback, SummaryLog } from '../Dashboard.types';
 
 
