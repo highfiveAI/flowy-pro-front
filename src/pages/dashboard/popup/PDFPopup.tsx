@@ -27,7 +27,7 @@ const ModalBox = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const TopRow = styled.div`
@@ -45,17 +45,17 @@ const PDFIcon = styled.img`
 
 const Title = styled.h2`
   font-size: 1.8rem;
-  color: #4b2067;
-  font-weight: 700;
+  color: #351745;
+  font-weight: 600;
   margin: 0;
 `;
 
 const SectionLabel = styled.div`
   font-size: 1.15rem;
-  color: #4b2067;
-  font-weight: 700;
+  color: #333;
+  font-weight: 600;
   margin-bottom: 18px;
-  margin-top: 32px;
+  margin-top: 10px;
   text-align: left;
 `;
 
@@ -99,8 +99,8 @@ const CheckboxLabel = styled.label`
   display: flex;
   align-items: center;
   font-size: 1.13rem;
-  color: #4b2067;
-  font-weight: 700;
+  color: #333;
+  font-weight: 500;
   cursor: pointer;
   gap: 8px;
 `;
@@ -170,7 +170,7 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
       <ModalBox>
         <TopRow>
           <PDFIcon src="/images/recommendfile.svg" alt="PDF" />
-          <Title>회의 결과 PDF 다운로드</Title>
+          <Title>분석 결과 PDF 다운로드</Title>
         </TopRow>
         <SectionLabel>PDF에 포함할 항목 선택</SectionLabel>
         <CheckboxGroup>
@@ -197,7 +197,7 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
             })
           }
         >
-          PDF 다운로드
+          다운로드
         </DownloadButton>
         <CloseBtn onClick={onClose}>&times;</CloseBtn>
       </ModalBox>
