@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import FileUpload from './FileUpload';
 import styled from 'styled-components';
@@ -650,7 +649,6 @@ const InsertConferenceInfo: React.FC = () => {
           </NewProjectWrapper>
           <ProjectListContainer>
             <SortWrapper>
-
               정렬 기준:
               <SortText>
                 <StyledSelect
@@ -663,11 +661,9 @@ const InsertConferenceInfo: React.FC = () => {
                   <option value="latest">최신순</option>
                   <option value="oldest">오래된순</option>
                 </StyledSelect>
-
               </SortText>
             </SortWrapper>
             <ProjectList>
-
               {sortedProjects.length > 0 ? (
                 sortedProjects.map((proj, index) => (
                   <div key={index}>
@@ -699,18 +695,16 @@ const InsertConferenceInfo: React.FC = () => {
                           ))}
                         </div>
                         <p>프로젝트 내용:</p>
-
                         {proj.projectDetail ? (
                           <span>{proj.projectDetail}</span>
                         ) : (
                           <span>상세 내용이 없습니다.</span>
                         )}
-                      </p>
-                    </ExpandedArea>
-                  )}
-                </div>
-              ))}
-              {projects.length === 0 && (
+                      </ExpandedArea>
+                    )}
+                  </div>
+                ))
+              ) : (
                 <ProjectListItem>프로젝트가 없습니다.</ProjectListItem>
               )}
             </ProjectList>
@@ -1146,7 +1140,6 @@ const TabBtn = styled.button<{ active: boolean }>`
   }
 `;
 
-
 const StyledSelect = styled.select`
   padding: 6px 12px;
   margin-left: 0.5rem;
@@ -1166,5 +1159,24 @@ const StyledSelect = styled.select`
   &:focus {
     border-color: #5a2a84;
   }
+`;
 
+const TabPanel = styled.div`
+  flex: 1;
+  background: #351745;
+  border-radius: 0 0 16px 16px;
+  padding: 36px 36px 32px 36px;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+`;
+
+const TabSectionWrapper = styled.div`
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  background: #351745;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 `;
