@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FileUpload from './FileUpload';
 import styled from 'styled-components';
 import AttendInfo from './AttendInfo';
@@ -761,7 +761,7 @@ const InsertConferenceInfo: React.FC = () => {
         //   setUsername('알 수 없음');
         // }
       });
-  }, [user?.id, showPopup]);
+  }, [user?.id, showNewProjectPopup]);
 
   // 탭 변경 시 회의 목록 업데이트
   React.useEffect(() => {
@@ -860,6 +860,8 @@ const InsertConferenceInfo: React.FC = () => {
   const fetchProjects = async () => {
     // ... existing code ...
   };
+
+  useEffect(() => {}, [showPopup]);
 
   return (
     <PageWrapper>
