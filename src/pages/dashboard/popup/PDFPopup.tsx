@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { generateMeetingPDF } from '../../../utils/pdfGenerator';
 
@@ -110,6 +110,22 @@ const Checkbox = styled.input.attrs({ type: 'checkbox' })`
   accent-color: #4b2067;
   width: 18px;
   height: 18px;
+  &[readonly] {
+    pointer-events: none;
+  }
+`;
+
+const ReceiverBox = styled.div`
+  width: 90%;
+  max-width: 340px;
+  margin: 0 auto;
+  background: #fff;
+  border: 2px solid #7c5ba6;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 interface PDFPopupProps {
@@ -131,7 +147,26 @@ const PDF_ITEMS = [
   { key: 'recommend', label: '추천 문서' },
 ];
 
+// pdfMake 동적 로드 훅
+function usePdfMakeScript() {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.pdfMake) {
+      const script1 = document.createElement('script');
+      script1.src = '/libs/pdfmake.min.js';
+      script1.type = 'text/javascript';
+      script1.onload = () => {
+        const script2 = document.createElement('script');
+        script2.src = '/libs/vfs_fonts.js';
+        script2.type = 'text/javascript';
+        document.body.appendChild(script2);
+      };
+      document.body.appendChild(script1);
+    }
+  }, []);
+}
+
 const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, tasks, feedback, recommendFiles }) => {
+  usePdfMakeScript();
   const [checked, setChecked] = useState({
     all: false,
     info: false,
@@ -140,6 +175,22 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
     feedback: false,
     recommend: false,
   });
+
+  // pdfMake 상태 콘솔 출력
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.pdfMake) {
+        console.log('✅ window.pdfMake가 정상적으로 로드되었습니다.', window.pdfMake);
+        if (window.pdfMake.vfs) {
+          console.log('✅ window.pdfMake.vfs도 정상적으로 등록되어 있습니다.', window.pdfMake.vfs);
+        } else {
+          console.warn('⚠️ window.pdfMake는 있지만 vfs가 없습니다.');
+        }
+      } else {
+        console.error('❌ window.pdfMake가 undefined입니다. PDF 엔진이 로드되지 않았습니다.');
+      }
+    }
+  }, []);
 
   const handleCheck = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.checked;
@@ -172,21 +223,35 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
           <PDFIcon src="/images/recommendfile.svg" alt="PDF" />
           <Title>회의 결과 PDF 다운로드</Title>
         </TopRow>
-        <SectionLabel>PDF에 포함할 항목 선택</SectionLabel>
-        <CheckboxGroup>
-          {PDF_ITEMS.map((item) => (
-            <CheckboxLabel key={item.key}>
-              <Checkbox
-                checked={checked[item.key as keyof typeof checked]}
-                onChange={handleCheck(item.key)}
-              />
-              {item.label}
-            </CheckboxLabel>
-          ))}
-        </CheckboxGroup>
-        <div style={{ flex: 1 }} />
+        <ReceiverBox>
+          <SectionLabel style={{ fontSize: '1.34rem', textAlign: 'center', marginTop: 0, marginBottom: 18 }}>
+            PDF에 포함할 항목 선택
+          </SectionLabel>
+          <CheckboxGroup style={{ marginTop: 24 }}>
+            {PDF_ITEMS.map((item) => (
+              <CheckboxLabel key={item.key}>
+                <Checkbox
+                  checked={
+                    item.key === 'info'
+                      ? true
+                      : checked[item.key as keyof typeof checked]
+                  }
+                  onChange={
+                    item.key === 'info'
+                      ? undefined
+                      : handleCheck(item.key)
+                  }
+                  readOnly={item.key === 'info'}
+                  onClick={item.key === 'info' ? () => alert('회의 기본 정보는 필수 사항입니다.') : undefined}
+                />
+                {item.label}
+              </CheckboxLabel>
+            ))}
+          </CheckboxGroup>
+        </ReceiverBox>
         <DownloadButton
-          onClick={() =>
+          onClick={() => {
+            console.log('PDF로 넘기는 feedback 값:', feedback);
             generateMeetingPDF({
               checked,
               meetingInfo,
@@ -194,8 +259,8 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
               tasks,
               feedback,
               recommendFiles,
-            })
-          }
+            });
+          }}
         >
           PDF 다운로드
         </DownloadButton>

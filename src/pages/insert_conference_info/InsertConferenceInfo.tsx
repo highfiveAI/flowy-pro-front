@@ -1,3 +1,6 @@
+
+
+
 import React, { useState, useEffect } from "react";
 import FileUpload from "./FileUpload";
 import styled from "styled-components";
@@ -214,6 +217,9 @@ const InsertConferenceInfo: React.FC = () => {
   const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
   const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
+
+  const [isSortedByLatest, setIsSortedByLatest] = useState(false);
+
   const [activeTab, setActiveTab] = useState<'new' | 'load'>('new');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const [selectedMeetingId, setSelectedMeetingId] = useState<string>('');
@@ -242,6 +248,7 @@ const InsertConferenceInfo: React.FC = () => {
     hostEmail: 'hong@test.com',
     hostJobname: 'PM',
   };
+
 
   const toggleExpanded = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -525,11 +532,17 @@ const InsertConferenceInfo: React.FC = () => {
     }
   };
 
+
+  const handleSortByLatest = () => {
+    setIsSortedByLatest((prev) => !prev);
+    setExpandedIndex(null);
+
   // 회의 선택 시 상세 fetch (load 탭)
   const handleMeetingSelect = async (meetingId: string) => {
     setSelectedMeetingId(meetingId);
     // 더미 meetingInfo 사용
     setMeetingInfo({ ...dummyMeetingInfo, meetingId });
+
   };
 
   React.useEffect(() => {
@@ -615,81 +628,63 @@ const InsertConferenceInfo: React.FC = () => {
           </NewProjectWrapper>
           <ProjectListContainer>
             <SortWrapper>
-              <SortText>최신순 으로 정렬</SortText>
+              <SortText onClick={handleSortByLatest}>
+                {isSortedByLatest ? '원래대로 보기' : '최신순으로 정렬'}
+              </SortText>
             </SortWrapper>
             <ProjectList>
-              {projects.length > 0 ? (
-                projects.map((proj, index) => (
-                  <div key={index}>
-                    <ProjectListItem
-                      onClick={() => {
-                        handleProjectSelect(proj.projectId);
-                        toggleExpanded(index);
-                      }}
-                    >
-                      <span className="name">
-                        {index + 1}. {proj.projectName}
-                      </span>
-                      <span className="date">
-                        {new Date(proj.projectCreatedDate)
-                          .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
-                          .replace('T', ' ')
-                          .slice(0, 16)}
-                      </span>
-                    </ProjectListItem>
 
-                    {expandedIndex === index && (
-                      <ExpandedArea>
-                        {activeTab === 'new' ? (
-                          <>
-                            <p>참여자:</p>
-                            <div className="user-list">
-                              {projectUsers.map((user) => (
-                                <span key={user.user_id} className="user-name">
-                                  {user.name}
-                                </span>
-                              ))}
-                            </div>
-                            <p>프로젝트 내용:</p>
-                            {proj.projectDetail ? (
-                              <span>{proj.projectDetail}</span>
-                            ) : (
-                              <span>상세 내용이 없습니다.</span>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            <p>회의 목록:</p>
-                            <ul style={{ paddingLeft: 0 }}>
-                              {meetings.length > 0 ? (
-                                meetings.map((meeting) => (
-                                  <li
-                                    key={meeting.meetingId}
-                                    style={{
-                                      cursor: 'pointer',
-                                      fontWeight: selectedMeetingId === meeting.meetingId ? 'bold' : 'normal',
-                                      color: selectedMeetingId === meeting.meetingId ? '#351745' : '#333',
-                                      background: selectedMeetingId === meeting.meetingId ? '#ede7f6' : 'transparent',
-                                      borderRadius: 8,
-                                      padding: '6px 12px',
-                                      marginBottom: 4,
-                                    }}
-                                    onClick={() => handleMeetingSelect(meeting.meetingId)}
-                                  >
-                                    {meeting.meetingTitle}
-                                  </li>
-                                ))
-                              ) : (
-                                <li>회의가 없습니다.</li>
-                              )}
-                            </ul>
-                          </>
-                        )}
-                      </ExpandedArea>
-                    )}
-                  </div>
-                ))
-              ) : (
+              {(projects.length > 0
+                ? (isSortedByLatest
+                    ? [...projects].sort(
+                        (a, b) =>
+                          new Date(b.projectCreatedDate).getTime() -
+                          new Date(a.projectCreatedDate).getTime()
+                      )
+                    : projects
+                  )
+                : []
+              ).map((proj, index) => (
+                <div key={index}>
+                  <ProjectListItem
+                    onClick={() => {
+                      handleProjectSelect(proj.projectId, proj.projectName);
+                      toggleExpanded(index);
+                    }}
+                  >
+                    <span className="name">
+                      {index + 1}. {proj.projectName}
+                    </span>
+                    <span className="date">
+                      {new Date(proj.projectCreatedDate)
+                        .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
+                        .replace('T', ' ')
+                        .slice(0, 16)}
+                    </span>
+                  </ProjectListItem>
+
+                  {expandedIndex === index && (
+                    <ExpandedArea>
+                      <p>참여자:</p>
+                      <div className="user-list">
+                        {projectUsers.map((user) => (
+                          <span key={user.user_id} className="user-name">
+                            {user.name}
+                          </span>
+                        ))}
+                      </div>
+                      <p>프로젝트 내용:&nbsp;{proj.projectDetail ? (
+                        <span>{proj.projectDetail}</span>
+                      ) : (
+                        <span>상세 내용이 없습니다.</span>
+                      )}</p>
+
+                    </ExpandedArea>
+                  )}
+                </div>
+              ))}
+              {projects.length === 0 && (
+
                 <ProjectListItem>프로젝트가 없습니다.</ProjectListItem>
               )}
             </ProjectList>
