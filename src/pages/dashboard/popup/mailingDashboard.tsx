@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-// import MailPreviewDashboard from './mailpreviewDashboard'; // 삭제된 파일이므로 주석 처리 또는 삭제
+import MailPreviewDashboard from './mailpreviewDashboard';
+import type { Feedback, SummaryLog } from '../Dashboard.types';
+
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -187,9 +189,9 @@ const TooltipText = styled.div<{ $show?: boolean }>`
 
 interface MailingDashboardProps {
   onClose: () => void;
-  summary?: { section: string; items: string[] }[];
+  summary: SummaryLog | null;
   tasks: any;
-  feedback: { section: string; items: string[] }[];
+  feedback: Feedback[];
   meetingInfo: {
     project: string;
     title: string;
@@ -200,6 +202,14 @@ interface MailingDashboardProps {
     meeting_id: string;
   };
 }
+
+type MailSection =
+  | SummaryLog
+  | Feedback
+  | {
+      section: string;
+      items: string[];
+    };
 
 const MailingDashboard = ({
   onClose,
@@ -235,8 +245,8 @@ const MailingDashboard = ({
   const dropdownContainerRef = React.useRef<HTMLDivElement>(null);
 
   // 메일 미리보기용 데이터
-  const mailPreview: { section: string; items: string[] }[] = [];
-  if (mailItems.summary && summary) mailPreview.push(...summary);
+  const mailPreview: MailSection[] = [];
+  if (mailItems.summary && summary) mailPreview.push(summary);
   if (mailItems.tasks && tasks) {
     // tasks는 attendees별로 되어 있으니, 각 참석자별로 섹션화
     Object.entries(tasks).forEach(([name, items]) => {

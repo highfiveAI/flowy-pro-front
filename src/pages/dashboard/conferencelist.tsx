@@ -50,11 +50,11 @@ const ConferenceListPage: React.FC = () => {
           </thead>
           <tbody>
             {meetings.map((c, i) => (
-              <Tr key={i}>
+              <Tr key={i} onClick={() => navigate(`/dashboard/${c.meeting_id}`)}>
                 <Td>{c.meeting_title}</Td>
                 <Td>
                   {new Date(c.meeting_date)
-                    .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
+                    .toISOString()
                     .replace('T', ' ')
                     .slice(0, 16)}
                 </Td>
@@ -65,9 +65,7 @@ const ConferenceListPage: React.FC = () => {
                     .join(', ')}
                 </Td>
                 <Td>
-                  <IconBtn
-                    onClick={() => navigate(`/dashboard/${c.meeting_id}`)}
-                  >
+                  <IconBtn>
                     <FiArrowRight />
                   </IconBtn>
                 </Td>
@@ -121,11 +119,38 @@ const Tr = styled.tr`
   &:not(:last-child) {
     border-bottom: 1px solid #f2f2f2;
   }
+  
+  /* 호버 효과 추가 */
+  transition: all 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #f8f5ff;
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+  }
+  
+  /* 선택된 상태 */
+  &.selected {
+    background-color: #e5e0ee;
+    border-left: 4px solid #4b2067;
+  }
+  
+  &.selected:hover {
+    background-color: #d4c7e8;
+  }
 `;
 const Td = styled.td`
   font-size: 1rem;
   color: #333;
   padding: 16px 0;
+  
+  /* 셀 호버 효과 */
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f3eef7;
+  }
 `;
 const IconBtn = styled.button`
   background: #351745;
@@ -138,8 +163,15 @@ const IconBtn = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #4b2067;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(80, 0, 80, 0.3);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `;

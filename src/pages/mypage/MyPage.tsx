@@ -52,6 +52,17 @@ const InputGroup = styled.div`
   box-sizing: border-box;
   background-color: white;
   margin-bottom: 30px; /* 간격 증가 */
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: #480b6a;
+    box-shadow: 0 2px 8px rgba(72, 11, 106, 0.1);
+  }
+  
+  &:focus-within {
+    border-color: #480b6a;
+    box-shadow: 0 0 0 3px rgba(72, 11, 106, 0.1);
+  }
 `;
 
 const Label = styled.label`
@@ -68,6 +79,11 @@ const Input = styled.input`
   flex-grow: 1;
   padding: 0;
   outline: none;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+  }
 `;
 
 const Button = styled.button`
@@ -81,9 +97,16 @@ const Button = styled.button`
   width: 100%;
   max-width: 300px;
   margin-top: 20px;
+  transition: all 0.2s ease;
 
   &:hover {
     background-color: #351745;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 11, 106, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
