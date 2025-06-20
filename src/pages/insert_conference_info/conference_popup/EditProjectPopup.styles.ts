@@ -251,63 +251,70 @@ export const UserPanel = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  height: 250px;
+  height: 250px; /* 고정 높이 */
 `;
 
 export const StyledLabel = styled.label`
   display: block;
-  margin-bottom: 8px;
-  font-size: 1.1rem;
+  margin-bottom: 10px; /* 레이블과 입력 필드 간 간격 */
+  font-size: 1rem; /* 폰트 사이즈 조정 */
   color: #333;
   font-weight: 500;
 `;
 
 export const StyledInput = styled.input`
   width: 100%;
-  padding: 12px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: #f0f0f0; /* 배경색 변경 */
-  color: #333;
-  font-size: 1rem;
+  padding: 12px 18px; /* 패딩 조정 */
+  border: 1px solid #ddd;
+  border-radius: 8px; /* border-radius 조정 */
+  font-size: 1rem; /* 폰트 사이즈 조정 */
+  background-color: #f8f9fa; /* 배경색 변경 */
   box-sizing: border-box;
+  transition: all 0.2s;
 
-  &::placeholder {
-    color: #999;
+  &:focus {
+    outline: none;
+    border-color: #00b4ba; /* 포커스 색상 변경 */
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(0, 180, 186, 0.1);
   }
 `;
 
 export const StyledTextarea = styled.textarea`
   width: 100%;
-  padding: 12px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: #f0f0f0; /* 배경색 변경 */
-  color: #333;
-  font-size: 1rem;
+  padding: 12px 18px; /* 패딩 조정 */
+  border: 1px solid #ddd;
+  border-radius: 8px; /* border-radius 조정 */
+  font-size: 1rem; /* 폰트 사이즈 조정 */
   font-family: 'Rethink Sans', sans-serif;
   box-sizing: border-box;
-  height: 120px; /* 고정 높이 설정 */
-  resize: none; /* 사이즈 조정 비활성화 */
+  height: 120px;
+  resize: none;
+  background-color: #f8f9fa; /* 배경색 변경 */
+  transition: all 0.2s;
 
-  &::placeholder {
-    color: #999;
+  &:focus {
+    outline: none;
+    border-color: #00b4ba; /* 포커스 색상 변경 */
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(0, 180, 186, 0.1);
   }
 `;
 
 export const CreateProjectButton = styled.button`
-  padding: 15px 30px;
-  background-color: #00b4ba; /* 보라색 계열 */
+  padding: 15px 0;
+  background-color: #00b4ba; /* 버튼 색상 변경 */
   color: white;
   border: none;
-  border-radius: 50px; /* 둥근 버튼 */
-  font-size: 1.2rem;
+  border-radius: 8px;
+  font-size: 1.1rem; /* 폰트 사이즈 조정 */
+  font-weight: 600;
   cursor: pointer;
   width: 100%;
-  margin-top: 20px; /* 상단 여백 조정 */
+  margin-top: 15px; /* 버튼 위 간격 추가 */
+  transition: background 0.2s;
 
   &:hover {
-    background-color: #00939a; /* hover 색상 조정 */
+    background-color: #00939a;
   }
-`;
+`; 
