@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from 'react';
 import styled from 'styled-components';
-
 
 type Attendee = {
   user_id: string;
@@ -103,7 +102,17 @@ const StyledSelect = styled.select`
   }
 `;
 
-const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projectUsers = [], hostId, setHostId, hostEmail, setHostEmail, hostJobname, setHostJobname }) => {
+const AttendInfo: React.FC<AttendInfoProps> = ({
+  attendees,
+  setAttendees,
+  projectUsers = [],
+  hostId,
+  setHostId,
+  hostEmail,
+  setHostEmail,
+  hostJobname,
+  setHostJobname,
+}) => {
   const handleAttendeeChange = (idx: number, field: string, value: string) => {
     const updated = [...attendees];
     updated[idx] = { ...updated[idx], [field]: value };
@@ -121,18 +130,18 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projec
       updated[idx] = {
         user_id: selectedUser.user_id,
         name: selectedUser.name,
-        email: selectedUser.email || "",
-        user_jobname: selectedUser.user_jobname || "",
+        email: selectedUser.email || '',
+        user_jobname: selectedUser.user_jobname || '',
       };
       setAttendees(updated);
     } else {
       // 사용자가 선택되지 않은 경우 빈 값으로 초기화
       const updated = [...attendees];
       updated[idx] = {
-        user_id: "",
-        name: "",
-        email: "",
-        user_jobname: "",
+        user_id: '',
+        name: '',
+        email: '',
+        user_jobname: '',
       };
       setAttendees(updated);
     }
@@ -140,7 +149,7 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projec
 
   const handleHostSelect = (user_id: string) => {
     setHostId(user_id);
-    const selectedUser = projectUsers.find(u => u.user_id === user_id);
+    const selectedUser = projectUsers.find((u) => u.user_id === user_id);
     if (selectedUser) {
       setHostEmail(selectedUser.email || '');
       setHostJobname(selectedUser.user_jobname || '');
@@ -155,24 +164,26 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projec
       <AttendeeInputGroup>
         <StyledSelect
           value={hostId}
-          onChange={e => handleHostSelect(e.target.value)}
+          onChange={(e) => handleHostSelect(e.target.value)}
         >
           <option value="">회의장 선택</option>
-          {projectUsers.map(user => (
-            <option key={user.user_id} value={user.user_id}>{user.name}</option>
+          {projectUsers.map((user) => (
+            <option key={user.user_id} value={user.user_id}>
+              {user.name}
+            </option>
           ))}
         </StyledSelect>
         <EmailInput
           type="email"
           placeholder="이메일"
           value={hostEmail}
-          onChange={e => setHostEmail(e.target.value)}
+          onChange={(e) => setHostEmail(e.target.value)}
         />
         <RoleInput
           type="text"
           placeholder="역할"
           value={hostJobname}
-          onChange={e => setHostJobname(e.target.value)}
+          onChange={(e) => setHostJobname(e.target.value)}
         />
       </AttendeeInputGroup>
       {attendees.map((att, idx) => (
@@ -184,24 +195,25 @@ const AttendInfo: React.FC<AttendInfoProps> = ({ attendees, setAttendees, projec
             <option value="">참석자 선택</option>
 
             {projectUsers
-              .filter(user => user.user_id !== hostId)
-              .map(user => (
-                <option key={user.user_id} value={user.user_id}>{user.name}</option>
+              .filter((user) => user.user_id !== hostId)
+              .map((user) => (
+                <option key={user.user_id} value={user.user_id}>
+                  {user.name}
+                </option>
               ))}
-
           </StyledSelect>
           <EmailInput
             type="email"
             placeholder="이메일"
             value={att.email}
-            onChange={(e) => handleAttendeeChange(idx, "email", e.target.value)}
+            onChange={(e) => handleAttendeeChange(idx, 'email', e.target.value)}
           />
           <RoleInput
             type="text"
             placeholder="역할"
             value={att.user_jobname}
             onChange={(e) =>
-              handleAttendeeChange(idx, "user_jobname", e.target.value)
+              handleAttendeeChange(idx, 'user_jobname', e.target.value)
             }
           />
           {attendees.length > 1 && (

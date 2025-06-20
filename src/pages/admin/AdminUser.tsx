@@ -57,8 +57,25 @@ const UserTable = styled.table`
     letter-spacing: -0.5px;
   }
 
-  tbody tr:hover {
-    background: #f8f5ff;
+  tbody tr {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    
+    &:hover {
+      background: #f8f5ff;
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+    }
+    
+    /* 선택된 상태 */
+    &.selected {
+      background-color: #e5e0ee;
+      border-left: 4px solid #4b2067;
+    }
+    
+    &.selected:hover {
+      background-color: #d4c7e8;
+    }
   }
 `;
 
@@ -73,6 +90,12 @@ const StatusBadge = styled.div<{ $status: string }>`
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
 
   ${(props) => {
     switch (props.$status) {
@@ -130,18 +153,29 @@ const StatusDropdown = styled.div`
   left: 0;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   min-width: 150px;
   margin-top: 4px;
+  border: 1px solid #e5e0ee;
 `;
 
 const StatusOption = styled.div<{ $status: string }>`
   padding: 8px 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
 
   &:hover {
-    background-color: #f8fafc;
+    background-color: #f8f5ff;
+    transform: translateX(2px);
+  }
+
+  &:first-child {
+    border-radius: 8px 8px 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 8px 8px;
   }
 
   ${(props) => {
@@ -198,9 +232,17 @@ const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
   background-color: ${(props) =>
     props.variant === 'danger' ? '#dc3545' : '#007bff'};
   color: white;
-
+  transition: all 0.2s ease;
+  
   &:hover {
-    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background-color: ${(props) =>
+      props.variant === 'danger' ? '#c82333' : '#0056b3'};
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -537,14 +579,18 @@ const AdminUser: React.FC = () => {
         throw new Error(errorMsg);
       }
       const data = await response.json();
-      // 사용자의 회사 정보 설정
-      if (data.user_company_id) {
-        const company = companies.find(
-          (c) => c.company_id === data.user_company_id
-        );
-        setCurrentUserCompany(company || null);
-        // 회사의 직급 정보도 미리 가져오기
-        fetchCompanyPositions(data.user_company_id);
+      console.log("로그인 사용자 정보",data);
+
+      if (data.company_id) {
+        setCurrentUserCompany({
+          company_id: data.company_id,
+          company_name: data.company_name || ''
+        });
+        fetchCompanyPositions(data.company_id);
+        console.log('설정된 회사 정보:', {
+          company_id: data.company_id,
+          company_name: data.company_name
+        });
       }
     } catch (error) {
       console.error('현재 사용자 정보 조회 실패:', error);
@@ -956,7 +1002,7 @@ const AdminUser: React.FC = () => {
                           <StatusOption
                             $status="Rejected"
                             onClick={() =>
-                              handleStatusChange(user.user_id, 'Pending')
+                              handleStatusChange(user.user_id, 'Rejected')
                             }
                           >
                             반려

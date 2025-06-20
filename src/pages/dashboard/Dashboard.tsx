@@ -15,7 +15,9 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { checkAuth } from '../../api/fetchAuthCheck';
 import type { Todo } from '../../types/project';
-import type { Feedback } from './Dashboard.types';
+
+import type { Feedback, SummaryLog } from './Dashboard.types';
+// const UNASSIGNED_LABEL = '미지정';
 
 const Container = styled.div`
   display: flex;
@@ -410,10 +412,17 @@ interface ProjectUser {
   user_name: string;
 }
 
-interface SummaryLog {
-  summary_log_id: string;
-  updated_summary_contents: Record<string, any>;
-}
+
+// interface SummaryLog {
+//   summary_log_id: string;
+//   updated_summary_contents: Record<string, any>;
+// }
+
+// interface Feedback {
+//   feedback_id: string;
+//   feedback_detail: Record<string, any>;
+// }
+
 
 interface meetingInfo {
   project: string;
@@ -443,7 +452,6 @@ const Dashboard: React.FC = () => {
   const [showPDFPopup, setShowPDFPopup] = useState(false);
   const [isEditingSummary, setIsEditingSummary] = useState(false);
   const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
-
 
   const FEEDBACK_LABELS: Record<string, string> = {
     'e508d0b2-1bfd-42a2-9687-1ae6cd36c648': '총평',
@@ -556,6 +564,7 @@ const Dashboard: React.FC = () => {
     })();
   }, []);
 
+
   const handleEditSummaryItem = (
     section: string,
     index: number,
@@ -612,6 +621,17 @@ const Dashboard: React.FC = () => {
     return d instanceof Date && !isNaN(d.getTime());
   };
 
+  // 추천 문서 임시 데이터
+  // const recommendFiles = [
+  //   {
+  //     name: '서비스 기획서.pdf',
+  //     url: 'https://example.com/service-plan.pdf',
+  //   },
+  //   {
+  //     name: 'API 명세 초안.pdf',
+  //     url: 'https://example.com/api-draft.pdf',
+  //   },
+  // ];
   const getPostPayload = () => {
     const allTodos: Todo[] = assignRole ? Object.values(assignRole).flat() : [];
 
@@ -672,12 +692,17 @@ const Dashboard: React.FC = () => {
               alt="PDF"
               style={{ width: 22, height: 22, marginRight: 6 }}
             />
-            <SpeechBubbleButton onClick={() => setShowPDFPopup(true)} style={{ marginLeft: 8 }}>
+            <SpeechBubbleButton
+              onClick={() => setShowPDFPopup(true)}
+              style={{ marginLeft: 8 }}
+            >
               PDF 다운로드
             </SpeechBubbleButton>
+
             <EditButton onClick={() => setShowMailPopup(true)}>
               수정하기
             </EditButton>
+
 
           </div>
         </MeetingAnalysisHeader>
@@ -697,7 +722,6 @@ const Dashboard: React.FC = () => {
             summary={summaryLog}
             tasks={assignRole}
             feedback={feedback}
-
             meetingInfo={mailMeetingInfo}
           />
         )}

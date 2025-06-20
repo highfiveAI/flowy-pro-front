@@ -51,6 +51,17 @@ const CalendarWrapper = styled.div`
     border-radius: 0;
     box-shadow: none;
     position: relative;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .react-calendar__tile:hover {
+    background: #f8f5ff !important;
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+    z-index: 1;
+  }
+  .react-calendar__tile:active {
+    transform: scale(0.98);
   }
   .react-calendar__tile abbr {
     display: none !important;
@@ -163,9 +174,16 @@ const NavButton = styled.button`
   justify-content: center;
   font-size: 1.3rem;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #f3e6ff;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.15);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `;
 const MonthText = styled.span`
@@ -218,9 +236,16 @@ const ApplyButton = styled.button`
   padding: 0 32px;
   cursor: pointer;
   margin-left: 8px;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #4b2067;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(80, 0, 80, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 const TodayButton = styled.button`
@@ -234,9 +259,16 @@ const TodayButton = styled.button`
   padding: 0 32px;
   cursor: pointer;
   margin-left: 0;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #f3e6ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(80, 0, 80, 0.1);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -566,10 +598,7 @@ export default function CalendarPage() {
                         typeof m.start === 'string'
                           ? new Date(m.start)
                           : m.start;
-                      if (
-                        !isNaN(d.getTime()) &&
-                        (d.getHours() !== 0 || d.getMinutes() !== 0)
-                      ) {
+                      if (!isNaN(d.getTime())) {
                         timeStr = d.toTimeString().slice(0, 5) + ' ';
                       }
                     }
