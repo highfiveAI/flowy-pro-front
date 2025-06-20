@@ -174,6 +174,35 @@ export async function updateProjectName(
   }
 }
 
+export const updateProject = async (
+  projectId: string,
+  body: ProjectRequestBody
+): Promise<Response> => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/projects/${projectId}`,
+      {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || '프로젝트 수정 실패');
+    }
+
+    return response;
+  } catch (error) {
+    console.error('프로젝트 수정 중 에러:', error);
+    throw error;
+  }
+};
+
 export async function postAssignedTodos(
   meeting_id: string | undefined,
   assignedTodos: any

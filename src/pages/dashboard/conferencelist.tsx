@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { FiArrowRight } from 'react-icons/fi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { checkAuth } from '../../api/fetchAuthCheck';
 import { useAuth } from '../../contexts/AuthContext';
@@ -9,9 +8,15 @@ import { fetchMeetingsWithUsers } from '../../api/fetchProject';
 const ConferenceListPage: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
   const [meetings, setMeetings] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   const { projectId } = useParams<{ projectId: string }>();
+
+  // 검색어에 따른 회의 필터링
+  const filteredMeetings = meetings.filter((meeting) =>
+    meeting.meeting_title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     if (projectId) {
@@ -37,19 +42,33 @@ const ConferenceListPage: React.FC = () => {
   return (
     <Container>
       <Title>회의 관리</Title>
-      <Breadcrumb>프로젝트 목록 {'>'} 회의 목록</Breadcrumb>
+      <SectionTitle>
+        <SectionTitleLink onClick={() => navigate('/projectlist')}>
+          프로젝트 목록
+        </SectionTitleLink>
+        {' > '}회의 목록
+      </SectionTitle>
       <TableWrapper>
+        <TableHeader>
+          <SearchContainer>
+            <SearchInput
+              type="text"
+              placeholder="회의명으로 검색..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </SearchContainer>
+        </TableHeader>
         <Table>
           <thead>
             <tr>
               <Th>회의명</Th>
               <Th>회의 일시</Th>
               <Th>참석자</Th>
-              <Th style={{ width: 60 }}></Th>
             </tr>
           </thead>
           <tbody>
-            {meetings.map((c, i) => (
+            {filteredMeetings.map((c, i) => (
               <Tr key={i} onClick={() => navigate(`/dashboard/${c.meeting_id}`)}>
                 <Td>{c.meeting_title}</Td>
                 <Td>
@@ -64,15 +83,13 @@ const ConferenceListPage: React.FC = () => {
                     .map((mu: any) => mu.user.user_name)
                     .join(', ')}
                 </Td>
-                <Td>
-                  <IconBtn>
-                    <FiArrowRight />
-                  </IconBtn>
-                </Td>
               </Tr>
             ))}
           </tbody>
         </Table>
+        {filteredMeetings.length === 0 && searchTerm && (
+          <NoResultsMessage>검색 결과가 없습니다.</NoResultsMessage>
+        )}
       </TableWrapper>
     </Container>
   );
@@ -85,24 +102,84 @@ const Container = styled.div`
   margin: 0 auto;
   padding: 60px 0 0 0;
 `;
+
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
   color: #4b2067;
-  margin-bottom: 40px;
-`;
-const Breadcrumb = styled.div`
-  font-size: 1.1rem;
-  color: #333;
-  font-weight: 500;
   margin-bottom: 24px;
 `;
+
+const SectionTitle = styled.h2`
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 18px;
+`;
+
+const SectionTitleLink = styled.span`
+  color: inherit;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f3eef7;
+  }
+`;
+
 const TableWrapper = styled.div`
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(80, 0, 80, 0.04);
-  padding: 32px 24px 24px 24px;
+  padding: 24px 24px 24px 24px;
+  position: relative;
 `;
+
+const TableHeader = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+`;
+
+const SearchContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const SearchInput = styled.input`
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #333;
+  background-color: #fff;
+  min-width: 200px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: #351745;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #351745;
+    box-shadow: 0 0 0 2px rgba(53, 23, 69, 0.1);
+  }
+
+  &::placeholder {
+    color: #999;
+  }
+`;
+
+const NoResultsMessage = styled.div`
+  text-align: center;
+  color: #666;
+  padding: 40px;
+  font-size: 0.9375rem;
+`;
+
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
@@ -150,28 +227,5 @@ const Td = styled.td`
   
   &:hover {
     background-color: #f3eef7;
-  }
-`;
-const IconBtn = styled.button`
-  background: #351745;
-  border: none;
-  border-radius: 50%;
-  padding: 6px 8px;
-  color: #fff;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: #4b2067;
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(80, 0, 80, 0.3);
-  }
-  
-  &:active {
-    transform: scale(0.95);
   }
 `;

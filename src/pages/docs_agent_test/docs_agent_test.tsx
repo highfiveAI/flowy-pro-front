@@ -4,10 +4,9 @@ import styled from "styled-components";
 
 
 interface Document {
-    id: string;
     title: string;
-    similarity: number;
-    preview: string;
+    similarity_score: number;
+    relevance_reason: string;
     download_url?: string;
 }
 
@@ -155,12 +154,13 @@ const DocumentRecommend: React.FC = () => {
         setError(null);
 
         try {
-            const response = await axios.post<RecommendResponse>(
+            const response = await axios.post<any>(
                 `${import.meta.env.VITE_API_URL}/api/v1/docs/recommend`,
-                { query }
+                { query },
+                { withCredentials: true }
             );
 
-            if (response.data.success) {
+            if (response.data && Array.isArray(response.data.documents)) {
                 setDocuments(response.data.documents);
             } else {
                 setError(response.data.message || '문서 검색 중 오류가 발생했습니다.');
@@ -194,12 +194,12 @@ const DocumentRecommend: React.FC = () => {
 
                     <DocumentsGrid>
                         {documents.map((doc) => (
-                            <DocumentCard key={doc.id}>
+                            <DocumentCard>
                                 <h2>{doc.title}</h2>
                                 <div className="similarity">
-                                    유사도: {(doc.similarity * 100).toFixed(1)}%
+                                    유사도: {(doc.similarity_score * 100).toFixed(1)}%
                                 </div>
-                                <p className="preview">{doc.preview}</p>
+                                <p className="preview">{doc.relevance_reason}</p>
                                 {doc.download_url && (
                                     <a
                                         href={doc.download_url}
