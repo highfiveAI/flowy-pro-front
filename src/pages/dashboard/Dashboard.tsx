@@ -25,7 +25,6 @@ import type {
   SummaryLog,
 } from './Dashboard.types';
 
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -47,20 +46,20 @@ const MainContent = styled.div`
   }
 `;
 
-const PageTitle = styled.h1`
-  color: #351745;
-  font-size: 2rem;
-  font-weight: 600;
-  position: absolute;
-  top: 24px;
-  left: 40px;
-  margin: 0;
-  padding: 0;
-  @media (max-width: 768px) {
-    font-size: 2rem;
-    left: 24px;
-  }
-`;
+// const PageTitle = styled.h1`
+//   color: #351745;
+//   font-size: 2rem;
+//   font-weight: 600;
+//   position: absolute;
+//   top: 24px;
+//   left: 40px;
+//   margin: 0;
+//   padding: 0;
+//   @media (max-width: 768px) {
+//     font-size: 2rem;
+//     left: 24px;
+//   }
+// `;
 
 const MeetingAnalysisHeader = styled.div`
   display: flex;
@@ -348,24 +347,24 @@ const SpeechBubbleButton = styled.button`
   }
 `;
 
-const RectButton = styled.button`
-  background: #f3eef8;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 20px 8px 18px;
-  margin-left: 8px;
-  font-weight: 500;
-  color: #351745;
-  font-size: 15px;
-  box-shadow: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: box-shadow 0.15s;
-  &:hover {
-    box-shadow: 0 2px 8px rgba(53, 23, 69, 0.08);
-  }
-`;
+// const RectButton = styled.button`
+//   background: #f3eef8;
+//   border: none;
+//   border-radius: 4px;
+//   padding: 8px 20px 8px 18px;
+//   margin-left: 8px;
+//   font-weight: 500;
+//   color: #351745;
+//   font-size: 15px;
+//   box-shadow: none;
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   transition: box-shadow 0.15s;
+//   &:hover {
+//     box-shadow: 0 2px 8px rgba(53, 23, 69, 0.08);
+//   }
+// `;
 
 const InputWrapper = styled.div`
   display: flex;
@@ -400,7 +399,6 @@ const AddButton = styled.button`
     cursor: not-allowed;
   }
 `;
-
 
 // const RoleContainer = styled.div`
 //   display: grid;
@@ -539,12 +537,19 @@ const Dashboard: React.FC = () => {
       user_name: user.user_name,
     })),
     agenda: meeting?.meeting_agenda || '',
-    project_users:
-    project?.project_users?.map((pUser: any) => ({
+    project_users: (
+      (project?.project_users ?? []) as {
+        user: {
+          user_id: string;
+          user_name: string;
+          user_email: string;
+        };
+      }[]
+    ).map((pUser) => ({
       user_id: pUser.user.user_id,
       user_name: pUser.user.user_name,
       user_email: pUser.user.user_email,
-    })) || [],
+    })),
   };
 
   useEffect(() => {
@@ -556,7 +561,6 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     })();
   }, []);
-
 
   const handleEditSummaryItem = (
     section: string,
@@ -682,8 +686,6 @@ const Dashboard: React.FC = () => {
             <EditButton onClick={() => setShowMailPopup(true)}>
               수정하기
             </EditButton>
-
-
           </div>
         </MeetingAnalysisHeader>
 

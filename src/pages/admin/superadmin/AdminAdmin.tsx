@@ -2,7 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import NewAdmin from './popup/newAdmin';
-import { fetchSignupInfos, fetchUsersByCompany, putAdminUser } from '../../../api/fetchSignupInfos';
+import {
+  fetchSignupInfos,
+  fetchUsersByCompany,
+  putAdminUser,
+} from '../../../api/fetchSignupInfos';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -64,7 +68,6 @@ const Table = styled.table`
 //     opacity: 0.9;
 //   }
 // `;
-
 
 const PageHeader = styled.div`
   display: flex;
@@ -279,8 +282,12 @@ const PopupButton = styled.button`
   border: none;
   transition: background 0.18s;
   cursor: pointer;
-  &:last-child { margin-right: 0; }
-  &:hover { background: #0fa7a2; }
+  &:last-child {
+    margin-right: 0;
+  }
+  &:hover {
+    background: #0fa7a2;
+  }
 `;
 
 const UserListItem = styled.li`
@@ -298,19 +305,19 @@ const UserListItem = styled.li`
 
 const AdminAdmin: React.FC = () => {
   const [admins, setAdmins] = useState<User[]>([]);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  // const [, isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   // const [selectedAdminId, setSelectedAdminId] = useState<string | null>(
   //   null
   // );
-  const [formData, setFormData] = useState({
-    user_id: '',
-    user_name: '',
-    user_email: '',
-    user_phonenum: '',
-    company_name: '',
-    is_active: true,
-  });
+  // const [formData, setFormData] = useState({
+  //   user_id: '',
+  //   user_name: '',
+  //   user_email: '',
+  //   user_phonenum: '',
+  //   company_name: '',
+  //   is_active: true,
+  // });
   const [sortState, setSortState] = useState<SortState>({
     field: '',
     direction: null,
@@ -345,7 +352,7 @@ const AdminAdmin: React.FC = () => {
           if (errorData.detail) errorMsg = errorData.detail;
         } catch {}
         alert(errorMsg);
-        navigate('/')
+        navigate('/');
         throw new Error(errorMsg);
       }
       const data = await response.json();
@@ -367,44 +374,44 @@ const AdminAdmin: React.FC = () => {
   }, []);
 
   // 입력 폼 핸들러
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value, type, checked } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: type === 'checkbox' ? checked : value,
+  //   }));
+  // };
 
   // 관리자 생성
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-      if (response.ok) {
-        // fetchAdmins();
-        setFormData({
-          user_id: '',
-          user_name: '',
-          user_email: '',
-          user_phonenum: '',
-          company_name: '',
-          is_active: true,
-        });
-        setIsCreateModalOpen(false);
-      }
-    } catch (error) {
-      console.error('관리자 생성 실패:', error);
-    }
-  };
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/`,
+  //       {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(formData),
+  //       }
+  //     );
+  //     if (response.ok) {
+  //       // fetchAdmins();
+  //       setFormData({
+  //         user_id: '',
+  //         user_name: '',
+  //         user_email: '',
+  //         user_phonenum: '',
+  //         company_name: '',
+  //         is_active: true,
+  //       });
+  //       setIsCreateModalOpen(false);
+  //     }
+  //   } catch (error) {
+  //     console.error('관리자 생성 실패:', error);
+  //   }
+  // };
 
   // 관리자 수정
   // const handleUpdate = async (adminId: string) => {
@@ -573,7 +580,12 @@ const AdminAdmin: React.FC = () => {
       setSelectedUser(null);
       fetchAdmins(); // 관리자 목록 새로고침
     } else if (result.already_admin) {
-      if (window.confirm(result.message || '이미 관리자가 있습니다. 해당 사용자를 관리자로 변경하시겠습니까?')) {
+      if (
+        window.confirm(
+          result.message ||
+            '이미 관리자가 있습니다. 해당 사용자를 관리자로 변경하시겠습니까?'
+        )
+      ) {
         // 강제 변경
         await handleAdminSubmit(e, true);
       }
@@ -587,9 +599,7 @@ const AdminAdmin: React.FC = () => {
       <MainContent>
         <PageHeader>
           <h1>관리자 계정 관리</h1>
-          <AddButton onClick={handleCreateClick}>
-            +
-          </AddButton>
+          <AddButton onClick={handleCreateClick}>+</AddButton>
         </PageHeader>
 
         {/* 회사 선택 모달 */}
@@ -597,16 +607,46 @@ const AdminAdmin: React.FC = () => {
           <ModalBg>
             <ModalBox>
               <h2>회사 선택</h2>
-              <ul style={{ maxHeight: 300, overflowY: 'auto', margin: 0, padding: 0 }}>
+              <ul
+                style={{
+                  maxHeight: 300,
+                  overflowY: 'auto',
+                  margin: 0,
+                  padding: 0,
+                }}
+              >
                 {companyList.map((c) => (
-                  <li key={c.company_id} style={{ padding: 12, borderBottom: '1px solid #eee', cursor: 'pointer' }}
-                    onClick={() => handleCompanySelect(c)}>
+                  <li
+                    key={c.company_id}
+                    style={{
+                      padding: 12,
+                      borderBottom: '1px solid #eee',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => handleCompanySelect(c)}
+                  >
                     {c.company_name}
                   </li>
                 ))}
               </ul>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-                <PopupButton type="button" onClick={() => setIsCompanyModalOpen(false)} style={{ background: '#eee', color: '#351745', fontWeight: 600 }}>닫기</PopupButton>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: 16,
+                }}
+              >
+                <PopupButton
+                  type="button"
+                  onClick={() => setIsCompanyModalOpen(false)}
+                  style={{
+                    background: '#eee',
+                    color: '#351745',
+                    fontWeight: 600,
+                  }}
+                >
+                  닫기
+                </PopupButton>
               </div>
             </ModalBox>
           </ModalBg>
@@ -622,23 +662,75 @@ const AdminAdmin: React.FC = () => {
                   type="text"
                   placeholder="이름, 전화번호, 이메일로 검색"
                   value={userSearchInput}
-                  onChange={e => setUserSearchInput(e.target.value)}
+                  onChange={(e) => setUserSearchInput(e.target.value)}
                   onKeyDown={handleInputKeyDown}
-                  style={{ flex: 1, padding: 8, fontSize: 16, borderRadius: 8, border: '1.5px solid #ccc' }}
+                  style={{
+                    flex: 1,
+                    padding: 8,
+                    fontSize: 16,
+                    borderRadius: 8,
+                    border: '1.5px solid #ccc',
+                  }}
                 />
-                <PopupButton type="button" onClick={handleSearch}>검색</PopupButton>
+                <PopupButton type="button" onClick={handleSearch}>
+                  검색
+                </PopupButton>
               </div>
-              <ul style={{ maxHeight: 300, overflowY: 'auto', margin: 0, padding: 0 }}>
-                {filteredUsers.length === 0 && <li style={{ color: '#888' }}>검색 결과가 없습니다.</li>}
+              <ul
+                style={{
+                  maxHeight: 300,
+                  overflowY: 'auto',
+                  margin: 0,
+                  padding: 0,
+                }}
+              >
+                {filteredUsers.length === 0 && (
+                  <li style={{ color: '#888' }}>검색 결과가 없습니다.</li>
+                )}
                 {filteredUsers.map((u: any) => (
-                  <UserListItem onClick={() => handleAdminRegister(u)} key={u.user_id}>
-                    <span>{u.user_name} ({u.user_email}, {u.user_phonenum})</span>
+                  <UserListItem
+                    onClick={() => handleAdminRegister(u)}
+                    key={u.user_id}
+                  >
+                    <span>
+                      {u.user_name} ({u.user_email}, {u.user_phonenum})
+                    </span>
                   </UserListItem>
                 ))}
               </ul>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
-                <PopupButton type="button" onClick={() => setSelectedCompany(null)} style={{ background: '#eee', color: '#351745', fontWeight: 600 }}>뒤로가기</PopupButton>
-                <PopupButton type="button" onClick={() => { setSelectedCompany(null); setIsCompanyModalOpen(false); }} style={{ background: '#eee', color: '#351745', fontWeight: 600 }}>닫기</PopupButton>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 8,
+                  marginTop: 16,
+                }}
+              >
+                <PopupButton
+                  type="button"
+                  onClick={() => setSelectedCompany(null)}
+                  style={{
+                    background: '#eee',
+                    color: '#351745',
+                    fontWeight: 600,
+                  }}
+                >
+                  뒤로가기
+                </PopupButton>
+                <PopupButton
+                  type="button"
+                  onClick={() => {
+                    setSelectedCompany(null);
+                    setIsCompanyModalOpen(false);
+                  }}
+                  style={{
+                    background: '#eee',
+                    color: '#351745',
+                    fontWeight: 600,
+                  }}
+                >
+                  닫기
+                </PopupButton>
               </div>
             </ModalBox>
           </ModalBg>
@@ -648,7 +740,10 @@ const AdminAdmin: React.FC = () => {
         {isAdminModalOpen && selectedUser && (
           <NewAdmin
             visible={isAdminModalOpen}
-            onClose={() => { setIsAdminModalOpen(false); setSelectedUser(null); }}
+            onClose={() => {
+              setIsAdminModalOpen(false);
+              setSelectedUser(null);
+            }}
             onSubmit={handleAdminSubmit}
             formData={{
               user_id: selectedUser.user_id,
@@ -714,10 +809,7 @@ const AdminAdmin: React.FC = () => {
           </thead>
           <tbody>
             {sortedAdmins.map((admin) => (
-              <tr
-                key={admin.user_id}
-                style={{ cursor: 'pointer' }}
-              >
+              <tr key={admin.user_id} style={{ cursor: 'pointer' }}>
                 <td>{admin.user_id}</td>
                 <td>{admin.user_name}</td>
                 <td>{admin.user_email}</td>
@@ -739,7 +831,7 @@ const ModalBg = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   z-index: 2000;
   display: flex;
   align-items: center;

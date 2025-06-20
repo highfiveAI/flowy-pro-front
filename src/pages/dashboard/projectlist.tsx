@@ -45,7 +45,9 @@ const ProjectListPage: React.FC = () => {
 
   // 프로젝트 수정 팝업 상태
   const [showEditProjectPopup, setShowEditProjectPopup] = useState(false);
-  const [editingProject, setEditingProject] = useState<ProjectResponse | null>(null);
+  const [editingProject, setEditingProject] = useState<ProjectResponse | null>(
+    null
+  );
 
   // 새 프로젝트 생성 팝업 상태
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
@@ -164,7 +166,12 @@ const ProjectListPage: React.FC = () => {
           </thead>
           <tbody>
             {projects.map((p, i) => (
-              <Tr key={i} onClick={() => navigate(`/conferencelist/${p.project.project_id}`)}>
+              <Tr
+                key={i}
+                onClick={() =>
+                  navigate(`/conferencelist/${p.project.project_id}`)
+                }
+              >
                 <Td>
                   {editId === p.project.project_id ? (
                     <input
@@ -207,10 +214,14 @@ const ProjectListPage: React.FC = () => {
                         >
                           저장
                         </IconBtn>
-                        <IconBtn onClick={(e) => {
-                          e.stopPropagation();
-                          setEditId(null);
-                        }}>취소</IconBtn>
+                        <IconBtn
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditId(null);
+                          }}
+                        >
+                          취소
+                        </IconBtn>
                       </>
                     ) : (
                       <>
@@ -260,12 +271,12 @@ const Container = styled.div`
   padding: 60px 0 0 0;
 `;
 
-const HeaderContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
-`;
+// const HeaderContainer = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: 40px;
+// `;
 
 const SectionHeader = styled.div`
   display: flex;
@@ -288,13 +299,13 @@ const AddButton = styled.button`
   justify-content: center;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(80, 0, 80, 0.2);
-  
+
   &:hover {
     background: #4b2067;
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(80, 0, 80, 0.3);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
@@ -334,23 +345,23 @@ const Tr = styled.tr`
   &:not(:last-child) {
     border-bottom: 1px solid #f2f2f2;
   }
-  
+
   /* 호버 효과 추가 */
   transition: all 0.2s ease;
   cursor: pointer;
-  
+
   &:hover {
     background-color: #f8f5ff;
     transform: scale(1.01);
     box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
   }
-  
+
   /* 선택된 상태 */
   &.selected {
     background-color: #e5e0ee;
     border-left: 4px solid #4b2067;
   }
-  
+
   &.selected:hover {
     background-color: #d4c7e8;
   }
@@ -359,10 +370,10 @@ const Td = styled.td`
   font-size: 1rem;
   color: #333;
   padding: 16px 0;
-  
+
   /* 셀 호버 효과 */
   transition: background-color 0.2s ease;
-  
+
   &:hover {
     background-color: #f3eef7;
   }
@@ -377,13 +388,13 @@ const IconBtn = styled.button`
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: #e5e0ee;
     transform: scale(1.1);
     box-shadow: 0 2px 8px rgba(80, 0, 80, 0.15);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }

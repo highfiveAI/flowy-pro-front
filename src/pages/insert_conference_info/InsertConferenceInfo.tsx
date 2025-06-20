@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import FileUpload from './FileUpload';
 import styled from 'styled-components';
 import AttendInfo from './AttendInfo';
@@ -31,13 +31,13 @@ const EditIcon = styled.div`
   margin-left: auto;
 `;
 
-const ProjectHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  position: relative;
-`;
+// const ProjectHeader = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: 20px;
+//   position: relative;
+// `;
 
 const StyledErrorMessage = styled.div`
   background-color: #ffe6e6;
@@ -64,13 +64,13 @@ const SortWrapper = styled.div`
   padding-bottom: 20px;
 `;
 
-const ContainerHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  width: 100%;
-`;
+// const ContainerHeader = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: 20px;
+//   width: 100%;
+// `;
 
 const SortText = styled.span`
   font-size: 0.9rem;
@@ -423,7 +423,7 @@ const InsertConferenceInfo: React.FC = () => {
     return sortOrder === 'latest' ? dateB - dateA : dateA - dateB;
   });
 
-  const [isSortedByLatest, setIsSortedByLatest] = useState(false);
+  // const [isSortedByLatest, setIsSortedByLatest] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'new' | 'load'>('new');
   const [isDragging, setIsDragging] = useState(false); // 드래그 상태 추가
@@ -432,9 +432,9 @@ const InsertConferenceInfo: React.FC = () => {
   );
 
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
+  // const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+  //   null
+  // );
 
   const [showEditProjectPopup, setShowEditProjectPopup] = useState(false);
 
@@ -740,9 +740,9 @@ const InsertConferenceInfo: React.FC = () => {
     if (!user?.id) return;
     fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/projects/${user.id}`, {
       credentials: 'include',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      // headers: {
+      //   Authorization: `Bearer ${localStorage.getItem('token')}`,
+      // },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -881,11 +881,23 @@ const InsertConferenceInfo: React.FC = () => {
             </NewProjectWrapper>
             <ProjectListContainer>
               <SortWrapper>
-                <SortText>최신순 으로 정렬</SortText>
+                정렬 기준:
+                <SortText>
+                  <StyledSelect
+                    value={sortOrder}
+                    onChange={(e) =>
+                      setSortOrder(e.target.value as 'latest' | 'oldest')
+                    }
+                    style={{ marginLeft: '0.5rem' }}
+                  >
+                    <option value="latest">최신순</option>
+                    <option value="oldest">오래된순</option>
+                  </StyledSelect>
+                </SortText>
               </SortWrapper>
               <ProjectList>
-                {projects.length > 0 ? (
-                  projects.map((proj, index) => (
+                {sortedProjects.length > 0 ? (
+                  sortedProjects.map((proj, index) => (
                     <div key={index}>
                       <ProjectListItem
                         onClick={() => {
@@ -1007,68 +1019,6 @@ const InsertConferenceInfo: React.FC = () => {
               </NewProjectTextBottom>
             </NewProjectTextsContainer>
           </NewProjectWrapper>
-          {/* <ProjectListContainer>
-            <SortWrapper>
-              정렬 기준:
-              <SortText>
-                <StyledSelect
-                  value={sortOrder}
-                  onChange={(e) =>
-                    setSortOrder(e.target.value as 'latest' | 'oldest')
-                  }
-                  style={{ marginLeft: '0.5rem' }}
-                >
-                  <option value="latest">최신순</option>
-                  <option value="oldest">오래된순</option>
-                </StyledSelect>
-              </SortText>
-            </SortWrapper>
-            <ProjectList>
-              {sortedProjects.length > 0 ? (
-                sortedProjects.map((proj, index) => (
-                  <div key={index}>
-                    <ProjectListItem
-                      onClick={() => {
-                        handleProjectSelect(proj.projectId, proj.projectName);
-                        toggleExpanded(index);
-                      }}
-                    >
-                      <span className="name">
-                        {index + 1}. {proj.projectName}
-                      </span>
-                      <span className="date">
-                        {new Date(proj.projectCreatedDate)
-                          .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
-                          .replace('T', ' ')
-                          .slice(0, 16)}
-                      </span>
-                    </ProjectListItem>
-
-                    {expandedIndex === index && (
-                      <ExpandedArea>
-                        <p>참여자:</p>
-                        <div className="user-list">
-                          {projectUsers.map((user) => (
-                            <span key={user.user_id} className="user-name">
-                              {user.name}
-                            </span>
-                          ))}
-                        </div>
-                        <p>프로젝트 내용:</p>
-                        {proj.projectDetail ? (
-                          <span>{proj.projectDetail}</span>
-                        ) : (
-                          <span>상세 내용이 없습니다.</span>
-                        )}
-                      </ExpandedArea>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <ProjectListItem>프로젝트가 없습니다.</ProjectListItem>
-              )}
-            </ProjectList>
-          </ProjectListContainer> */}
         </LeftPanel>
         <RightPanel>
           <TabSectionWrapper>

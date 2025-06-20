@@ -67,16 +67,16 @@ const SectionLabel = styled.div`
   text-align: center;
   align-self: center;
 `;
-const InfoBox = styled.div`
-  background: #ededed;
-  border-radius: 16px;
-  padding: 20px 16px;
-  min-height: 40px;
-  max-height: 120px;
-  margin-bottom: 24px;
-  overflow-y: auto;
-  color: #333;
-`;
+// const InfoBox = styled.div`
+//   background: #ededed;
+//   border-radius: 16px;
+//   padding: 20px 16px;
+//   min-height: 40px;
+//   max-height: 120px;
+//   margin-bottom: 24px;
+//   overflow-y: auto;
+//   color: #333;
+// `;
 const CheckboxGroup = styled.div`
   display: flex;
   flex-direction: column;
@@ -222,7 +222,7 @@ const MailingDashboard = ({
   meetingInfo,
 }: MailingDashboardProps) => {
   console.log('meetingInfo:', meetingInfo);
-  const [mailItems, setMailItems] = useState({
+  const [mailItems /*, setMailItems*/] = useState({
     summary: false,
     tasks: false,
     feedback: false,
@@ -233,7 +233,11 @@ const MailingDashboard = ({
     custom: boolean;
     customValue: string;
     selectedAttendees: string[];
-    selectedCustom: { user_id: string; user_name: string; user_email: string }[];
+    selectedCustom: {
+      user_id: string;
+      user_name: string;
+      user_email: string;
+    }[];
   }>({
     allProject: false,
     allAttendees: false,
@@ -273,22 +277,25 @@ const MailingDashboard = ({
   // 회의 참석자 또는 프로젝트 참여자 전체 수신 시 자동 할당
   useEffect(() => {
     if (receivers.allProject) {
-      setReceivers((r) => ({ ...r, selectedCustom: meetingInfo.project_users }));
+      setReceivers((r) => ({
+        ...r,
+        selectedCustom: meetingInfo.project_users,
+      }));
     } else if (receivers.allAttendees) {
       const attendeeUsers = meetingInfo.attendees
         .map((attendee) =>
           meetingInfo.project_users.find(
-            (pUser) => pUser.user_id === attendee.user_id,
-          ),
+            (pUser) => pUser.user_id === attendee.user_id
+          )
         )
         .filter(
           (
-            user,
+            user
           ): user is {
             user_id: string;
             user_name: string;
             user_email: string;
-          } => Boolean(user),
+          } => Boolean(user)
         );
       setReceivers((r) => ({ ...r, selectedCustom: attendeeUsers }));
     } else if (!receivers.custom) {
@@ -322,7 +329,7 @@ const MailingDashboard = ({
     setReceivers((r) => ({
       ...r,
       selectedCustom: r.selectedCustom.filter(
-        (user) => user.user_id !== userIdToRemove,
+        (user) => user.user_id !== userIdToRemove
       ),
     }));
   };
@@ -330,15 +337,15 @@ const MailingDashboard = ({
   const potentialCandidates = meetingInfo.project_users.filter(
     (user) =>
       !receivers.selectedCustom.some(
-        (selected) => selected.user_id === user.user_id,
-      ),
+        (selected) => selected.user_id === user.user_id
+      )
   );
 
   const filteredCandidates = receivers.customValue
     ? potentialCandidates.filter((user) =>
         user.user_name
           .toLowerCase()
-          .includes(receivers.customValue.toLowerCase()),
+          .includes(receivers.customValue.toLowerCase())
       )
     : potentialCandidates;
 
