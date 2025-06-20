@@ -657,8 +657,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container>
-      <PageTitle>회의 관리</PageTitle>
-
       <MainContent>
         <MeetingAnalysisHeader>
           <MeetingAnalysisTitle>회의 분석 결과 조회</MeetingAnalysisTitle>
