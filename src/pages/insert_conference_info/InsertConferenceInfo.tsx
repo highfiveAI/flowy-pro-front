@@ -38,6 +38,7 @@ const SortWrapper = styled.div`
   justify-content: flex-end; /* 우측 정렬 */
   width: 100%; /* 부모 너비에 맞춤 */
   padding-right: 20px; /* 스크롤바 공간 확보 */
+  padding-bottom: 20px;
 `;
 
 const SortText = styled.span`
@@ -214,6 +215,14 @@ const InsertConferenceInfo: React.FC = () => {
   const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
   const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
+  const [sortOrder, setSortOrder] = useState<'latest' | 'oldest'>('latest');
+
+  // 정렬 함수
+  const sortedProjects = [...projects].sort((a, b) => {
+    const dateA = new Date(a.projectCreatedDate).getTime();
+    const dateB = new Date(b.projectCreatedDate).getTime();
+    return sortOrder === 'latest' ? dateB - dateA : dateA - dateB;
+  });
 
   const toggleExpanded = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -541,12 +550,24 @@ const InsertConferenceInfo: React.FC = () => {
           </NewProjectWrapper>
           <ProjectListContainer>
             <SortWrapper>
-              <SortText>최신순 으로 정렬</SortText>
+              정렬 기준:
+              <SortText>
+                <StyledSelect
+                  value={sortOrder}
+                  onChange={(e) =>
+                    setSortOrder(e.target.value as 'latest' | 'oldest')
+                  }
+                  style={{ marginLeft: '0.5rem' }}
+                >
+                  <option value="latest">최신순</option>
+                  <option value="oldest">오래된순</option>
+                </StyledSelect>
+              </SortText>
             </SortWrapper>
             {/* db에서 불러오기 */}
             <ProjectList>
-              {projects.length > 0 ? (
-                projects.map((proj, index) => (
+              {sortedProjects.length > 0 ? (
+                sortedProjects.map((proj, index) => (
                   <div key={index}>
                     <ProjectListItem
                       onClick={() => {
@@ -902,24 +923,6 @@ const StyledTextarea = styled.textarea`
   }
 `;
 
-// const StyledSelect = styled.select`
-//   width: 100%;
-//   padding: 12px 15px;
-//   border: none;
-//   border-radius: 8px;
-//   background-color: rgba(255, 255, 255, 0.9);
-//   color: #333;
-//   font-size: 1rem;
-//   box-sizing: border-box;
-//   -webkit-appearance: none; /* 기본 select 스타일 제거 */
-//   -moz-appearance: none;
-//   appearance: none;
-//   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.1L146.2%20202.7%2018.5%2074.5a17.6%2017.6%200%200%200-25.1%2024.9l130.2%20129.8c6.8%206.7%2017.7%206.7%2024.5%200l130.2-129.8a17.6%2017.6%200%200%200-11.9-29.4z%22%2F%3E%3C%2Fsvg%3E"); /* 커스텀 화살표 */
-//   background-repeat: no-repeat;
-//   background-position: right 15px center;
-//   background-size: 12px;
-// `;
-
 const DatePickerWrapper = styled.div`
   .react-datepicker-wrapper {
     width: 100%;
@@ -991,5 +994,26 @@ const StyledUploadButton = styled.button`
 
   &:hover {
     background-color: #00939a; /* hover 색상 조정 */
+  }
+`;
+
+const StyledSelect = styled.select`
+  padding: 6px 12px;
+  margin-left: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: #888;
+  }
+
+  &:focus {
+    border-color: #5a2a84;
   }
 `;

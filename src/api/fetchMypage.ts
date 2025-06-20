@@ -58,3 +58,29 @@ export const postLogin = async (
     return null;
   }
 };
+
+export async function fetchUserData() {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/users/one`,
+      {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! 상태: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('📦 받은 데이터:', data);
+    return data;
+  } catch (error) {
+    console.error('🚨 사용자 정보 요청 에러:', error);
+    throw error;
+  }
+}

@@ -14,7 +14,7 @@ import AdminTemplate from './pages/admin/AdminTemplate';
 import Login from './pages/log_in/Login';
 import ChooseMethod from './pages/sign_up_choose/choose_method';
 import MyPage from './pages/mypage/MyPage';
-import AlterInfo from './pages/mypage/alterInfo';
+
 import Calendar from './pages/calendar/Calendar';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -22,6 +22,7 @@ import ProjectListPage from './pages/dashboard/projectlist';
 import ConferenceListPage from './pages/dashboard/conferencelist';
 import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AlterInfo from './pages/mypage_alter/alterInfo';
 
 function App() {
   return (
