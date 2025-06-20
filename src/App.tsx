@@ -5,7 +5,6 @@ import Layout from './components/Layout';
 import InsertConferenceInfo from './pages/insert_conference_info/InsertConferenceInfo';
 import Result from './pages/result/Result';
 import SignUp from './pages/sign_up/SignUp';
-import SignIn from './sign_in/SignIn';
 import SocialSignUp from './pages/social_sign_up/SocialSignUp';
 import DocsAgentTest from './pages/docs_agent_test/docs_agent_test';
 import AdminUser from './pages/admin/AdminUser';
@@ -13,9 +12,9 @@ import AdminCompany from './pages/admin/superadmin/AdminCompany';
 import AdminPosition from './pages/admin/AdminPosition';
 import AdminTemplate from './pages/admin/AdminTemplate';
 import Login from './pages/log_in/Login';
-import ChooseMethod from './pages/sign_up/choose_method';
+import ChooseMethod from './pages/sign_up_choose/choose_method';
 import MyPage from './pages/mypage/MyPage';
-import AlterInfo from './pages/mypage/alterInfo';
+
 import Calendar from './pages/calendar/Calendar';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -23,8 +22,7 @@ import ProjectListPage from './pages/dashboard/projectlist';
 import ConferenceListPage from './pages/dashboard/conferencelist';
 import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
 import AdminDashboard from './pages/admin/AdminDashboard';
-
-
+import AlterInfo from './pages/mypage_alter/alterInfo';
 
 function App() {
   return (
@@ -36,7 +34,6 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/sign_up" element={<ChooseMethod />} />
           <Route path="/sign_up/form" element={<SignUp />} />
-          <Route path="/sign_in" element={<SignIn />} />
           <Route path="/social_sign_up" element={<SocialSignUp />} />
           <Route path="/result" element={<Result />} />
 

@@ -1,18 +1,19 @@
-import React, { useState } from "react";
-import FileUpload from "./FileUpload";
-import styled from "styled-components";
-import AttendInfo from "./AttendInfo";
-import Loading from "../../components/Loading";
-import RecordInfoUpload from "./RecordInfoUpload";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import ResultContents from "../result/ResultContents";
-import { useNavigate } from "react-router-dom";
-import AddUserIcon from "/images/adduser.svg"; // adduser.svg 임포트
-import NewMeetingIcon from "/images/newmeetingicon.svg"; // newmeetingicon.svg 임포트
-import AddProjectIcon from "/images/addprojecticon.svg"; // addprojecticon.svg 임포트
-import NewProjectPopup from "./conference_popup/NewProjectPopup.tsx"; // Popup 컴포넌트 임포트
-import { useAuth } from "../../contexts/AuthContext";
+import React, { useState, useEffect } from 'react';
+import FileUpload from './FileUpload';
+import styled from 'styled-components';
+import AttendInfo from './AttendInfo';
+import Loading from '../../components/Loading';
+import RecordInfoUpload from './RecordInfoUpload';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import ResultContents from '../result/ResultContents';
+import { useNavigate } from 'react-router-dom';
+import AddUserIcon from '/images/adduser.svg'; // adduser.svg 임포트
+import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg 임포트
+import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
+import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
+import { useAuth } from '../../contexts/AuthContext';
+
 // import { checkAuth } from "../../api/fetchAuthCheck";
 import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup'; // 팝업 컴포넌트 임포트
 import type { ProjectResponse } from '../../types/project';
@@ -38,6 +39,7 @@ const ProjectHeader = styled.div`
   position: relative;
 `;
 
+
 const StyledErrorMessage = styled.div`
   background-color: #ffe6e6;
   color: #cc0000;
@@ -60,6 +62,7 @@ const SortWrapper = styled.div`
   justify-content: flex-end; /* 우측 정렬 */
   width: 100%; /* 부모 너비에 맞춤 */
   padding-right: 20px; /* 스크롤바 공간 확보 */
+  padding-bottom: 20px;
 `;
 
 const ContainerHeader = styled.div`
@@ -110,6 +113,7 @@ const ExpandedArea = styled.div`
   margin: 0 0 10px 10px;
   font-size: 15px;
   color: #555;
+
   animation: fadeIn 0.3s ease;
   max-height: 250px;
   overflow-y: auto;
@@ -402,16 +406,30 @@ const InsertConferenceInfo: React.FC = () => {
   const [projectUsers, setProjectUsers] = React.useState<
     { user_id: string; name: string; email: string; user_jobname: string }[]
   >([]); // 프로젝트 참여자 목록 상태 추가
+
   const [projectMeetings, setProjectMeetings] = React.useState<any[]>([]); // 프로젝트 회의 목록 상태 추가
   const [selectedMeeting, setSelectedMeeting] = React.useState<any>(null); // 선택된 회의 상태 추가
   const [hostId, setHostId] = React.useState("");
   const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] = React.useState(false);
+
   const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
   const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
+  const [sortOrder, setSortOrder] = useState<'latest' | 'oldest'>('latest');
+
+  // 정렬 함수
+  const sortedProjects = [...projects].sort((a, b) => {
+    const dateA = new Date(a.projectCreatedDate).getTime();
+    const dateB = new Date(b.projectCreatedDate).getTime();
+    return sortOrder === 'latest' ? dateB - dateA : dateA - dateB;
+  });
+
+  const [isSortedByLatest, setIsSortedByLatest] = useState(false);
+
   const [activeTab, setActiveTab] = useState<'new' | 'load'>('new');
   const [isDragging, setIsDragging] = useState(false); // 드래그 상태 추가
   const [editingProject, setEditingProject] = useState<ProjectResponse | null>(null);
+
 
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
@@ -419,6 +437,7 @@ const InsertConferenceInfo: React.FC = () => {
   );
 
   const [showEditProjectPopup, setShowEditProjectPopup] = useState(false);
+
 
   const toggleExpanded = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -473,10 +492,9 @@ const InsertConferenceInfo: React.FC = () => {
     if (file) {
       // STT API용 FormData
       const hostUser = projectUsers.find((u) => u.user_id === hostId);
-      const hostName = hostUser?.name || "";
+      const hostName = hostUser?.name || '';
       // const hostEmail = hostUser?.email || "";
       // const hostJobname = hostUser?.user_jobname || "";
-
 
       // 참석자 정보(회의장 제외)
       const filteredAttendees = attendees.filter(
@@ -496,9 +514,9 @@ const InsertConferenceInfo: React.FC = () => {
       );
       sttFormData.append('project_name', projectName);
       // host 정보
-      sttFormData.append("host_name", hostName);
-      sttFormData.append("host_email", hostEmail);
-      sttFormData.append("host_role", hostJobname);
+      sttFormData.append('host_name', hostName);
+      sttFormData.append('host_email', hostEmail);
+      sttFormData.append('host_role', hostJobname);
       // 참석자 정보 (각각 여러 번 append)
       attendeesName.forEach((name) =>
         sttFormData.append('attendees_name', name)
@@ -520,9 +538,9 @@ const InsertConferenceInfo: React.FC = () => {
         meetingFormData.append('meeting_date', formatDateToKST(meetingDate));
       }
       // host 정보
-      meetingFormData.append("host_name", hostName);
-      meetingFormData.append("host_email", hostEmail);
-      meetingFormData.append("host_role", hostJobname);
+      meetingFormData.append('host_name', hostName);
+      meetingFormData.append('host_email', hostEmail);
+      meetingFormData.append('host_role', hostJobname);
       // 참석자 정보
       attendeesName.forEach((name) =>
         meetingFormData.append('attendees_name', name)
@@ -535,14 +553,13 @@ const InsertConferenceInfo: React.FC = () => {
       );
 
       // 콘솔로 값 확인
-      console.log("hostId:", hostId);
-      console.log("hostName:", hostName);
-      console.log("hostEmail:", hostEmail);
-      console.log("hostJobname:", hostJobname);
-      console.log("attendeesName:", attendeesName);
-      console.log("attendeesEmail:", attendeesEmail);
-      console.log("attendeesRole:", attendeesRole);
-
+      console.log('hostId:', hostId);
+      console.log('hostName:', hostName);
+      console.log('hostEmail:', hostEmail);
+      console.log('hostJobname:', hostJobname);
+      console.log('attendeesName:', attendeesName);
+      console.log('attendeesEmail:', attendeesEmail);
+      console.log('attendeesRole:', attendeesRole);
 
       try {
         // 1. STT API 호출
@@ -595,10 +612,9 @@ const InsertConferenceInfo: React.FC = () => {
             'chunks',
             JSON.stringify(sttResult.chunks || [])
           );
-          analyzeFormData.append("host_name", hostName);
-          analyzeFormData.append("host_email", hostEmail);
-          analyzeFormData.append("host_role", hostJobname);
-
+          analyzeFormData.append('host_name', hostName);
+          analyzeFormData.append('host_email', hostEmail);
+          analyzeFormData.append('host_role', hostJobname);
 
           analyzeFormData.append('attendees_list', JSON.stringify(attendees));
           analyzeFormData.append('agenda', agenda);
@@ -651,8 +667,6 @@ const InsertConferenceInfo: React.FC = () => {
         setHostEmail('');
         setHostJobname('');
         setHostId('');
-
-
       } catch (error) {
         setError(
           error instanceof Error
@@ -664,6 +678,7 @@ const InsertConferenceInfo: React.FC = () => {
       }
     }
   };
+
 
   // 프로젝트 선택 핸들러 함수
   const handleProjectSelect = async (
@@ -702,6 +717,7 @@ const InsertConferenceInfo: React.FC = () => {
       setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
     }
 
+
     // 기존 회의 불러오기 탭일 때 회의 목록도 불러오기
     if (activeTab === 'load') {
       try {
@@ -716,6 +732,7 @@ const InsertConferenceInfo: React.FC = () => {
         setProjectMeetings([]);
       }
     }
+
   };
 
   React.useEffect(() => {
@@ -853,6 +870,7 @@ const InsertConferenceInfo: React.FC = () => {
           <ProjectListTitle>
             [ {username} ] 님이 참여 중인 프로젝트 목록
           </ProjectListTitle>
+
           <ContainerWrapper>
             <NewProjectWrapper onClick={() => setShowNewProjectPopup(true)}>
               <img src={AddProjectIcon} alt="신규 프로젝트 추가" />
@@ -954,14 +972,93 @@ const InsertConferenceInfo: React.FC = () => {
               </ProjectList>
             </ProjectListContainer>
           </ContainerWrapper>
+
+          <NewProjectWrapper onClick={() => setShowPopup(true)}>
+            <img src={AddProjectIcon} alt="신규 프로젝트 추가" />
+            <NewProjectTextsContainer>
+              <NewProjectTextTop>찾는 프로젝트가 없나요?</NewProjectTextTop>
+              <NewProjectTextBottom>
+                신규 프로젝트 추가하기
+              </NewProjectTextBottom>
+            </NewProjectTextsContainer>
+          </NewProjectWrapper>
+          {/* <ProjectListContainer>
+            <SortWrapper>
+              정렬 기준:
+              <SortText>
+                <StyledSelect
+                  value={sortOrder}
+                  onChange={(e) =>
+                    setSortOrder(e.target.value as 'latest' | 'oldest')
+                  }
+                  style={{ marginLeft: '0.5rem' }}
+                >
+                  <option value="latest">최신순</option>
+                  <option value="oldest">오래된순</option>
+                </StyledSelect>
+              </SortText>
+            </SortWrapper>
+            <ProjectList>
+              {sortedProjects.length > 0 ? (
+                sortedProjects.map((proj, index) => (
+                  <div key={index}>
+                    <ProjectListItem
+                      onClick={() => {
+                        handleProjectSelect(proj.projectId, proj.projectName);
+                        toggleExpanded(index);
+                      }}
+                    >
+                      <span className="name">
+                        {index + 1}. {proj.projectName}
+                      </span>
+                      <span className="date">
+                        {new Date(proj.projectCreatedDate)
+                          .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
+                          .replace('T', ' ')
+                          .slice(0, 16)}
+                      </span>
+                    </ProjectListItem>
+
+                    {expandedIndex === index && (
+                      <ExpandedArea>
+                        <p>참여자:</p>
+                        <div className="user-list">
+                          {projectUsers.map((user) => (
+                            <span key={user.user_id} className="user-name">
+                              {user.name}
+                            </span>
+                          ))}
+                        </div>
+                        <p>프로젝트 내용:</p>
+                        {proj.projectDetail ? (
+                          <span>{proj.projectDetail}</span>
+                        ) : (
+                          <span>상세 내용이 없습니다.</span>
+                        )}
+                      </ExpandedArea>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <ProjectListItem>프로젝트가 없습니다.</ProjectListItem>
+              )}
+            </ProjectList>
+          </ProjectListContainer> */}
+
         </LeftPanel>
         <RightPanel>
           <TabSectionWrapper>
             <TabsWrapper>
-              <TabBtn active={activeTab === 'new'} onClick={() => setActiveTab('new')}>
+              <TabBtn
+                active={activeTab === 'new'}
+                onClick={() => setActiveTab('new')}
+              >
                 새 회의 만들기
               </TabBtn>
-              <TabBtn active={activeTab === 'load'} onClick={() => setActiveTab('load')}>
+              <TabBtn
+                active={activeTab === 'load'}
+                onClick={() => setActiveTab('load')}
+              >
                 기존 회의 불러오기
               </TabBtn>
             </TabsWrapper>
@@ -969,7 +1066,12 @@ const InsertConferenceInfo: React.FC = () => {
               {activeTab === 'new' ? (
                 <>
                   <PageTitle>
-                    <img src={NewMeetingIcon} alt="새 회의" />새 회의 정보 입력하기
+
+                    <img src={NewMeetingIcon} alt="새 회의" />
+                    {activeTab === 'new'
+                      ? '새 회의 정보 입력하기'
+                      : '회의 정보 확인/음성 업로드'}
+
                   </PageTitle>
                   {(() => {
                     console.log('새 회의 만들기 탭 - projectId:', projectId); // 디버깅 로그
@@ -1072,7 +1174,7 @@ const InsertConferenceInfo: React.FC = () => {
                             onDragLeave={handleDragLeave}
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
-                            isDragging={isDragging}
+                            // isDragging={isDragging}
                           >
                             {file ? (
                               <FileInfoContainer>
@@ -1132,7 +1234,9 @@ const InsertConferenceInfo: React.FC = () => {
                           value={projectName}
                           readOnly
                           placeholder="프로젝트 목록에서 선택해주세요."
-                          onClick={() => alert('프로젝트 목록중에서 선택해주세요')}
+                          onClick={() =>
+                            alert('프로젝트 목록중에서 선택해주세요')
+                          }
                         />
                       </FormGroup>
                       <FormGroup>
@@ -1154,7 +1258,9 @@ const InsertConferenceInfo: React.FC = () => {
                         <DatePickerWrapper>
                           <DatePicker
                             selected={meetingDate}
-                            onChange={(date: Date | null) => setMeetingDate(date)}
+                            onChange={(date: Date | null) =>
+                              setMeetingDate(date)
+                            }
                             showTimeSelect
                             timeFormat="HH:mm"
                             timeIntervals={15}
@@ -1165,7 +1271,9 @@ const InsertConferenceInfo: React.FC = () => {
                         </DatePickerWrapper>
                       </FormGroup>
                       <FormGroup>
-                        <StyledLabel htmlFor="meeting-agenda">회의 안건</StyledLabel>
+                        <StyledLabel htmlFor="meeting-agenda">
+                          회의 안건
+                        </StyledLabel>
                         <StyledTextarea
                           id="meeting-agenda"
                           value={agenda}
@@ -1236,10 +1344,22 @@ const InsertConferenceInfo: React.FC = () => {
                       <StyledUploadButton onClick={handleUpload}>
                         회의 분석하기
                       </StyledUploadButton>
-                      {error && <StyledErrorMessage>{error}</StyledErrorMessage>}
+                      {error && (
+                        <StyledErrorMessage>{error}</StyledErrorMessage>
+                      )}
                     </>
                   )}
                 </>
+
+              ) : (
+                <div
+                  style={{ color: '#fff', marginTop: 40, fontSize: '1.1rem' }}
+                >
+                  {activeTab === 'load'
+                    ? '회의를 선택하면 정보가 여기에 표시됩니다.'
+                    : '불러올 회의 리스트 또는 검색 UI가 들어갑니다.'}
+                </div>
+
               )}
             </TabPanel>
           </TabSectionWrapper>
@@ -1389,7 +1509,8 @@ const DatePickerWrapper = styled.div`
   }
 `;
 
-const StyledUploadSection = styled.div<{ isDragging?: boolean }>`
+
+const StyledUploadSection = styled.div`
   margin-top: 20px;
   margin-bottom: 20px;
   border-radius: 8px;
@@ -1483,3 +1604,67 @@ const ContainerWrapper = styled.div`
   position: relative;
   margin-top: 60px; /* ProjectListTitle과 버튼 사이 간격 추가 */
 `;
+
+
+const TabBtn = styled.button<{ active: boolean }>`
+  flex: 1;
+  height: 56px;
+  background: ${({ active }) => (active ? '#e5e0ee' : 'transparent')};
+  color: ${({ active }) => (active ? '#351745' : '#fff')};
+  border: none;
+  font-size: 1.18rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  border-top-left-radius: ${({ active }) => (active ? '16px' : '0')};
+  border-top-right-radius: ${({ active }) => (active ? '16px' : '0')};
+  margin-right: 2px;
+  outline: none;
+  letter-spacing: -0.5px;
+  z-index: ${({ active }) => (active ? 2 : 1)};
+  &:last-child {
+    margin-right: 0;
+  }
+`;
+
+const StyledSelect = styled.select`
+  padding: 6px 12px;
+  margin-left: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: #888;
+  }
+
+  &:focus {
+    border-color: #5a2a84;
+  }
+`;
+
+const TabPanel = styled.div`
+  flex: 1;
+  background: #351745;
+  border-radius: 0 0 16px 16px;
+  padding: 36px 36px 32px 36px;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+`;
+
+const TabSectionWrapper = styled.div`
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  background: #351745;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+`;
+

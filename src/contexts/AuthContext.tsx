@@ -1,17 +1,11 @@
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { checkAuth } from '../api/fetchAuthCheck';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  login_id: string;
-}
+import type { TokenUser } from '../types/user';
 
 interface AuthContextType {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  user: TokenUser | null;
+  setUser: React.Dispatch<React.SetStateAction<TokenUser | null>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -24,7 +18,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<TokenUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
