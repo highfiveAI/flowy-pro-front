@@ -40,11 +40,39 @@ const MenuItem = styled.li`
   align-items: center;
   gap: 5px;
   position: relative;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #f8f5ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  /* 선택된 상태 */
+  &.selected {
+    background-color: #e5e0ee;
+    border-left: 3px solid #4b2067;
+  }
+  
+  &.selected:hover {
+    background-color: #d4c7e8;
+  }
 `;
 
 const MenuIcon = styled.img`
   width: 20px;
   height: 20px;
+  transition: transform 0.2s ease;
+  
+  ${MenuItem}:hover & {
+    transform: rotate(180deg);
+  }
 `;
 
 const TextButton = styled.button`
@@ -57,6 +85,19 @@ const TextButton = styled.button`
   line-height: 20px;
   text-align: center;
   cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #f8f5ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
 const FilledButton = styled.button`
@@ -71,6 +112,17 @@ const FilledButton = styled.button`
   text-align: center;
   padding: 0.5rem 1rem;
   cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #351745;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 11, 106, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
 const LogoImg = styled.img`
@@ -78,6 +130,16 @@ const LogoImg = styled.img`
   height: 44.591px;
   margin-right: 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+  
+  &:active {
+    transform: scale(1.02);
+  }
 `;
 
 const ProfileSection = styled.div`
@@ -85,6 +147,19 @@ const ProfileSection = styled.div`
   align-items: center;
   gap: 1.5rem;
   cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #f8f5ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
 const ProfileIconCircle = styled.div`
@@ -95,12 +170,23 @@ const ProfileIconCircle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.2s ease;
+  
+  ${ProfileSection}:hover & {
+    background-color: #e5e0ee;
+    transform: scale(1.1);
+  }
 `;
 
 const ProfileIcon = styled.svg`
   width: 20px;
   height: 20px;
   fill: #351745;
+  transition: all 0.2s ease;
+  
+  ${ProfileSection}:hover & {
+    fill: #4b2067;
+  }
 `;
 
 const LogoutText = styled.span`
@@ -109,6 +195,12 @@ const LogoutText = styled.span`
   font-style: normal;
   font-weight: 500;
   line-height: 20px;
+  transition: all 0.2s ease;
+  
+  ${ProfileSection}:hover & {
+    color: #4b2067;
+    font-weight: 600;
+  }
 `;
 
 const DropdownMenu = styled.div<{ $isOpen: boolean }>`
@@ -117,22 +209,37 @@ const DropdownMenu = styled.div<{ $isOpen: boolean }>`
   left: 0;
   background: white;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   display: ${(props) => (props.$isOpen ? 'block' : 'none')};
   min-width: 150px;
   z-index: 1000;
+  margin-top: 4px;
+  overflow: hidden;
 `;
 
 const DropdownItem = styled.div`
-  padding: 10px 15px;
+  padding: 12px 16px;
   cursor: pointer;
   color: #351745;
   font-size: 14px;
   white-space: nowrap;
-
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
   &:hover {
-    background-color: #f5f5f5;
+    background-color: #f8f5ff;
+    color: #4b2067;
+    transform: translateX(4px);
+    font-weight: 600;
+  }
+  
+  &:active {
+    background-color: #e5e0ee;
   }
 `;
 
@@ -142,7 +249,7 @@ const Navbar: React.FC = () => {
   const [isSystemMenuOpen, setIsSystemMenuOpen] = useState(false);
 
   const systemMenuItems = [
-    { name: '문서 에이전트', path: '/docs_agent_test' },
+    // { name: '문서 에이전트', path: '/docs_agent_test' },
     { name: '사용자 관리', path: '/admin/user' },
     { name: '회사 관리', path: '/admin/company' },
     { name: '직책 관리', path: '/admin/position' },

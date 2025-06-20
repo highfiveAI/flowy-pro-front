@@ -143,10 +143,7 @@ const CalendarPop: React.FC<CalendarPopProps> = ({
               if (m.start) {
                 const d =
                   typeof m.start === 'string' ? new Date(m.start) : m.start;
-                if (
-                  !isNaN(d.getTime()) &&
-                  (d.getHours() !== 0 || d.getMinutes() !== 0)
-                ) {
+                if (!isNaN(d.getTime())) {
                   const h = d.getHours();
                   const min = d.getMinutes();
                   const ampm = h < 12 ? '오전' : '오후';

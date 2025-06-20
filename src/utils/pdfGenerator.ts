@@ -123,12 +123,12 @@ export function generateMeetingPDF({
 
     // [작업 목록]
     if (checked.tasks && tasks && typeof tasks === 'object') {
+      // console.log('[PDFGenerator] 전달받은 tasks:', tasks);
       const taskTableBody: any[] = [
         [
           { text: '작업 내용', style: 'tableHeader' },
           { text: '담당자', style: 'tableHeader' },
-          { text: '일정', style: 'tableHeader' },
-          { text: '비고', style: 'tableHeader' }
+          { text: '일정', style: 'tableHeader' }
         ]
       ];
       Object.entries(tasks).forEach(([status, arr]) => {
@@ -137,8 +137,7 @@ export function generateMeetingPDF({
           taskTableBody.push([
             task.action || '',
             task.assignee || '',
-            task.schedule || '',
-            status
+            task.schedule || ''
           ]);
         });
       });
@@ -148,7 +147,7 @@ export function generateMeetingPDF({
         {
           table: {
             headerRows: 1,
-            widths: ['*', '15%', '20%', '15%'],
+            widths: ['*', '15%', '20%'],
             body: taskTableBody
           },
           layout: {
@@ -160,25 +159,50 @@ export function generateMeetingPDF({
     }
 
     // [회의 피드백]
+    const FEEDBACK_LABELS: Record<string, string> = {
+      'e508d0b2-1bfd-42a2-9687-1ae6cd36c648': '총평',
+      '6cb5e437-bc6b-4a37-a3c4-473d9c0bebe2': '불필요한 대화',
+      'ab5a65c6-31a4-493b-93ff-c47e00925d17': '논의되지 않은 안건',
+      '0a5a835d-53d0-43a6-b821-7c36f603a071': '회의 시간 분석',
+      '73c0624b-e1af-4a2b-8e54-c1f8f7dab827': '',
+    };
+    // 피드백 라벨 스타일 추가
+    const feedbackLabelStyle = {
+      fontSize: 13, // 기존 body가 12라면 약 8% 증가
+      bold: true,
+      margin: [0, 8, 0, 2] as [number, number, number, number],
+    };
     if (checked.feedback && Array.isArray(feedback)) {
       content.push(
         { text: '[ 회의 피드백 ]', style: 'sectionTitle' },
         { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, lineColor: '#aaa' }] }
       );
-      let feedbackCount = 1;
+      let hasFeedback = false;
       feedback.forEach((fbObj: any) => {
+        const label = FEEDBACK_LABELS[fbObj.feedbacktype_id] || '기타';
         const details = fbObj.feedback_detail;
+        const isGuide = fbObj.feedbacktype_id === '73c0624b-e1af-4a2b-8e54-c1f8f7dab827';
         if (Array.isArray(details)) {
           details.forEach((fbDetail: string) => {
-            content.push({ text: `${feedbackCount}. ${fbDetail}`, style: 'body' });
-            feedbackCount++;
+            if (!isGuide) {
+              content.push({ text: label, ...feedbackLabelStyle });
+              content.push({ text: fbDetail, style: 'body', margin: [16, 0, 0, 8] });
+            } else {
+              content.push({ text: fbDetail, style: 'body' });
+            }
+            hasFeedback = true;
           });
         } else if (typeof details === 'string') {
-          content.push({ text: `${feedbackCount}. ${details}`, style: 'body' });
-          feedbackCount++;
+          if (!isGuide) {
+            content.push({ text: label, ...feedbackLabelStyle });
+            content.push({ text: details, style: 'body', margin: [16, 0, 0, 8] });
+          } else {
+            content.push({ text: details, style: 'body' });
+          }
+          hasFeedback = true;
         }
       });
-      if (feedbackCount === 1) {
+      if (!hasFeedback) {
         content.push({ text: '피드백이 없습니다.', style: 'body' });
       }
       content.push({ text: '', margin: [0, 0, 0, 10] as [number, number, number, number] });

@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import NewAdmin from './popup/newAdmin';
+import { fetchSignupInfos, fetchUsersByCompany, putAdminUser } from '../../../api/fetchSignupInfos';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -62,6 +64,7 @@ const Table = styled.table`
 //     opacity: 0.9;
 //   }
 // `;
+
 
 const PageHeader = styled.div`
   display: flex;
@@ -261,27 +264,70 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
   }
 `;
 
+// Button 스타일 popup에서 복사
+const PopupButton = styled.button`
+  width: 140px;
+  height: 48px;
+  border-radius: 2rem;
+  background: #13c7c1;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0.5rem 0 0;
+  display: inline-block;
+  box-shadow: 0 6px 18px #13c7c133;
+  border: none;
+  transition: background 0.18s;
+  cursor: pointer;
+  &:last-child { margin-right: 0; }
+  &:hover { background: #0fa7a2; }
+`;
+
+const UserListItem = styled.li`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+
+  &:hover {
+    background-color: #f1f5f9;
+  }
+`;
+
 const AdminAdmin: React.FC = () => {
   const [admins, setAdmins] = useState<User[]>([]);
-  // const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   // const [selectedAdminId, setSelectedAdminId] = useState<string | null>(
   //   null
   // );
-  // const [formData, setFormData] = useState({
-  //   user_id: '',
-  //   user_name: '',
-  //   user_email: '',
-  //   user_phonenum: '',
-  //   company_name: '',
-  //   is_active: true,
-  // });
+  const [formData, setFormData] = useState({
+    user_id: '',
+    user_name: '',
+    user_email: '',
+    user_phonenum: '',
+    company_name: '',
+    is_active: true,
+  });
   const [sortState, setSortState] = useState<SortState>({
     field: '',
     direction: null,
   });
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [companyList, setCompanyList] = useState<any[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<any | null>(null);
+  const [userList, setUserList] = useState<any[]>([]);
+  const [userSearch, setUserSearch] = useState('');
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  // 검색어 입력값과 실제 검색 결과 분리
+  const [userSearchInput, setUserSearchInput] = useState('');
+  const [searchTriggered, setSearchTriggered] = useState(false);
 
   // 관리자 목록 조회 (더미 데이터 사용, 실제 API 연결 시 아래 코드 사용)
   const fetchAdmins = async () => {
@@ -321,44 +367,44 @@ const AdminAdmin: React.FC = () => {
   }, []);
 
   // 입력 폼 핸들러
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value, type, checked } = e.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: type === 'checkbox' ? checked : value,
-  //   }));
-  // };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
 
   // 관리자 생성
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   try {
-  //     const response = await fetch(
-  //       `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/`,
-  //       {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify(formData),
-  //       }
-  //     );
-  //     if (response.ok) {
-  //       // fetchAdmins();
-  //       setFormData({
-  //         admin_id: '',
-  //         admin_name: '',
-  //         admin_email: '',
-  //         admin_phone: '',
-  //         company_name: '',
-  //         is_active: true,
-  //       });
-  //       setIsCreateModalOpen(false);
-  //     }
-  //   } catch (error) {
-  //     console.error('관리자 생성 실패:', error);
-  //   }
-  // };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/accounts/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+      if (response.ok) {
+        // fetchAdmins();
+        setFormData({
+          user_id: '',
+          user_name: '',
+          user_email: '',
+          user_phonenum: '',
+          company_name: '',
+          is_active: true,
+        });
+        setIsCreateModalOpen(false);
+      }
+    } catch (error) {
+      console.error('관리자 생성 실패:', error);
+    }
+  };
 
   // 관리자 수정
   // const handleUpdate = async (adminId: string) => {
@@ -423,17 +469,14 @@ const AdminAdmin: React.FC = () => {
   //   setIsEditModalOpen(true);
   // };
 
-  // const handleCreateClick = () => {
-  //   setFormData({
-  //     admin_id: '',
-  //     admin_name: '',
-  //     admin_email: '',
-  //     admin_phone: '',
-  //     company_name: '',
-  //     is_active: true,
-  //   });
-  //   setIsCreateModalOpen(true);
-  // };
+  const handleCreateClick = () => {
+    setSelectedCompany(null);
+    setUserList([]);
+    setUserSearch('');
+    setSelectedUser(null);
+    setIsCompanyModalOpen(true);
+    loadCompanyList();
+  };
 
   // 정렬 핸들러
   const handleSort = (field: string) => {
@@ -467,24 +510,162 @@ const AdminAdmin: React.FC = () => {
     return sorted;
   }, [admins, sortState]);
 
+  // 회사 목록 불러오기
+  const loadCompanyList = async () => {
+    const { companies } = await fetchSignupInfos();
+    setCompanyList(companies);
+  };
+
+  // 회사별 사용자 목록 불러오기
+  const loadUserList = async (company_id: string) => {
+    const users = await fetchUsersByCompany(company_id);
+    setUserList(users);
+  };
+
+  // 회사 선택 시 사용자 목록/검색 UI로 전환
+  const handleCompanySelect = (company: any) => {
+    setSelectedCompany(company);
+    setUserSearch('');
+    setSelectedUser(null);
+    setIsCompanyModalOpen(false);
+    loadUserList(company.company_id);
+  };
+
+  // 검색 버튼 클릭 시만 검색
+  const handleSearch = () => {
+    setUserSearch(userSearchInput);
+    setSearchTriggered(true);
+  };
+
+  // 검색 input 엔터 시에도 검색
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
+  // 검색 결과 필터
+  const filteredUsers = userList.filter((u: any) => {
+    if (!searchTriggered || !userSearch.trim()) return true;
+    const q = userSearch.trim().toLowerCase();
+    return (
+      (u.user_name && u.user_name.toLowerCase().includes(q)) ||
+      (u.user_phonenum && u.user_phonenum.includes(q)) ||
+      (u.user_email && u.user_email.toLowerCase().includes(q))
+    );
+  });
+
+  // 관리자로 등록 버튼 클릭 시
+  const handleAdminRegister = (user: any) => {
+    setSelectedUser(user);
+    setIsAdminModalOpen(true);
+  };
+
+  // 실제 관리자 등록 API 호출
+  const handleAdminSubmit = async (e: React.FormEvent, force = false) => {
+    e.preventDefault();
+    if (!selectedUser) return;
+    const result = await putAdminUser(selectedUser.user_id, force);
+    if (result.success) {
+      alert('관리자로 등록되었습니다.');
+      setIsAdminModalOpen(false);
+      setSelectedUser(null);
+      fetchAdmins(); // 관리자 목록 새로고침
+    } else if (result.already_admin) {
+      if (window.confirm(result.message || '이미 관리자가 있습니다. 해당 사용자를 관리자로 변경하시겠습니까?')) {
+        // 강제 변경
+        await handleAdminSubmit(e, true);
+      }
+    } else {
+      alert(result.message || '관리자 등록에 실패했습니다.');
+    }
+  };
+
   return (
     <Container>
       <MainContent>
         <PageHeader>
           <h1>관리자 계정 관리</h1>
-          <AddButton onClick={/*handleCreateClick*/ () => console.log('dummy')}>
+          <AddButton onClick={handleCreateClick}>
             +
           </AddButton>
         </PageHeader>
 
+        {/* 회사 선택 모달 */}
+        {isCompanyModalOpen && (
+          <ModalBg>
+            <ModalBox>
+              <h2>회사 선택</h2>
+              <ul style={{ maxHeight: 300, overflowY: 'auto', margin: 0, padding: 0 }}>
+                {companyList.map((c) => (
+                  <li key={c.company_id} style={{ padding: 12, borderBottom: '1px solid #eee', cursor: 'pointer' }}
+                    onClick={() => handleCompanySelect(c)}>
+                    {c.company_name}
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                <PopupButton type="button" onClick={() => setIsCompanyModalOpen(false)} style={{ background: '#eee', color: '#351745', fontWeight: 600 }}>닫기</PopupButton>
+              </div>
+            </ModalBox>
+          </ModalBg>
+        )}
+
+        {/* 사용자 목록/검색 UI */}
+        {selectedCompany && !isAdminModalOpen && (
+          <ModalBg>
+            <ModalBox>
+              <h2>사용자 선택 - {selectedCompany.company_name}</h2>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <input
+                  type="text"
+                  placeholder="이름, 전화번호, 이메일로 검색"
+                  value={userSearchInput}
+                  onChange={e => setUserSearchInput(e.target.value)}
+                  onKeyDown={handleInputKeyDown}
+                  style={{ flex: 1, padding: 8, fontSize: 16, borderRadius: 8, border: '1.5px solid #ccc' }}
+                />
+                <PopupButton type="button" onClick={handleSearch}>검색</PopupButton>
+              </div>
+              <ul style={{ maxHeight: 300, overflowY: 'auto', margin: 0, padding: 0 }}>
+                {filteredUsers.length === 0 && <li style={{ color: '#888' }}>검색 결과가 없습니다.</li>}
+                {filteredUsers.map((u: any) => (
+                  <UserListItem onClick={() => handleAdminRegister(u)} key={u.user_id}>
+                    <span>{u.user_name} ({u.user_email}, {u.user_phonenum})</span>
+                  </UserListItem>
+                ))}
+              </ul>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+                <PopupButton type="button" onClick={() => setSelectedCompany(null)} style={{ background: '#eee', color: '#351745', fontWeight: 600 }}>뒤로가기</PopupButton>
+                <PopupButton type="button" onClick={() => { setSelectedCompany(null); setIsCompanyModalOpen(false); }} style={{ background: '#eee', color: '#351745', fontWeight: 600 }}>닫기</PopupButton>
+              </div>
+            </ModalBox>
+          </ModalBg>
+        )}
+
+        {/* 관리자 등록 모달 */}
+        {isAdminModalOpen && selectedUser && (
+          <NewAdmin
+            visible={isAdminModalOpen}
+            onClose={() => { setIsAdminModalOpen(false); setSelectedUser(null); }}
+            onSubmit={handleAdminSubmit}
+            formData={{
+              user_id: selectedUser.user_id,
+              user_name: selectedUser.user_name,
+              user_email: selectedUser.user_email,
+              user_phonenum: selectedUser.user_phonenum,
+              company_name: selectedCompany?.company_name || '',
+            }}
+          />
+        )}
+
+        {/* 기존 관리자 목록 테이블 */}
         <Table>
           <thead>
             <tr>
               <TableHeader onClick={() => handleSort('user_id')}>
                 USER ID
-                {/* <SortIcon
-                  $direction={
-                     sortState.field === 'admin_id' ? sortState.direction : null */}
                 <SortIcon
                   $direction={
                     sortState.field === 'user_id' ? sortState.direction : null
@@ -493,12 +674,6 @@ const AdminAdmin: React.FC = () => {
               </TableHeader>
               <TableHeader onClick={() => handleSort('user_name')}>
                 이름
-                {/* <SortIcon
-                   $direction={
-                     sortState.field === 'admin_name'
-                       ? sortState.direction
-                       : null
-                   } */}
                 <SortIcon
                   $direction={
                     sortState.field === 'user_name' ? sortState.direction : null
@@ -507,13 +682,6 @@ const AdminAdmin: React.FC = () => {
               </TableHeader>
               <TableHeader onClick={() => handleSort('user_email')}>
                 이메일 주소
-                {/* <SortIcon
-                  $direction={
-                     sortState.field === 'admin_email'
-                       ? sortState.direction
-                       : null
-                   }
-                 /> */}
                 <SortIcon
                   $direction={
                     sortState.field === 'user_email'
@@ -524,13 +692,6 @@ const AdminAdmin: React.FC = () => {
               </TableHeader>
               <TableHeader onClick={() => handleSort('user_phonenum')}>
                 연락처
-                {/* <SortIcon
-                  $direction={
-                    sortState.field === 'admin_phone'
-                      ? sortState.direction
-                      : null
-                  }
-                /> */}
                 <SortIcon
                   $direction={
                     sortState.field === 'user_phonenum'
@@ -553,59 +714,48 @@ const AdminAdmin: React.FC = () => {
           </thead>
           <tbody>
             {sortedAdmins.map((admin) => (
-              //               <tr
-              //                 key={admin.admin_id}
-              //                 onClick={() => handleRowClick(admin)}
-              //                 style={{ cursor: 'pointer' }}
-              //               >
-              //                 <td>{admin.admin_id}</td>
-              //                 <td>{admin.admin_name}</td>
-              //                 <td>{admin.admin_email}</td>
-              //                 <td>{admin.admin_phone}</td>
-
               <tr
                 key={admin.user_id}
-                onClick={() => /*handleRowClick(admin)*/ console.log('dummy')}
                 style={{ cursor: 'pointer' }}
               >
                 <td>{admin.user_id}</td>
                 <td>{admin.user_name}</td>
                 <td>{admin.user_email}</td>
                 <td>{admin.user_phonenum}</td>
-
                 <td>{admin.company_name}</td>
               </tr>
             ))}
           </tbody>
         </Table>
-
-        {/* 생성 모달
-        <NewAdmin
-          visible={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onSubmit={handleSubmit}
-          formData={formData}
-          onChange={handleInputChange}
-        /> */}
-
-        {/* 수정 모달
-        <EditAdmin
-          visible={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSubmit={
-            selectedAdminId
-              ? async (e) => {
-                  e.preventDefault();
-                  await handleUpdate(selectedAdminId);
-                }
-              : () => {}
-          }
-          formData={formData}
-          onChange={handleInputChange}
-        /> */}
       </MainContent>
     </Container>
   );
 };
+
+// 모달 스타일
+const ModalBg = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.3);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+const ModalBox = styled.div`
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(80, 0, 80, 0.12);
+  padding: 36px 32px 28px 32px;
+  min-width: 340px;
+  max-width: 420px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+`;
 
 export default AdminAdmin;
