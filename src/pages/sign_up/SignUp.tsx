@@ -9,6 +9,9 @@ import {
 } from '../../api/fetchSignupInfos';
 
 export const SignUpWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
   background: radial-gradient(
       100% 100% at 50% 0%,

@@ -33,4 +33,125 @@ body {
 
 .fc .fc-toolbar {
   margin-bottom: 1.5em;
+}
+
+/* 전역 호버 및 선택 상태 스타일 */
+.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 테이블 행 호버 효과 */
+.table-row-hover {
+  transition: background-color 0.2s ease;
+}
+
+.table-row-hover:hover {
+  background-color: #f8f5ff !important;
+  transform: scale(1.01);
+}
+
+/* 버튼 호버 효과 */
+.button-hover {
+  transition: all 0.2s ease;
+}
+
+.button-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 카드 호버 효과 */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* 선택된 상태 표시 */
+.selected {
+  background-color: #e5e0ee !important;
+  border-left: 4px solid #4b2067 !important;
+}
+
+.selected:hover {
+  background-color: #d4c7e8 !important;
+}
+
+/* 활성 상태 표시 */
+.active {
+  background-color: #4b2067 !important;
+  color: white !important;
+}
+
+.active:hover {
+  background-color: #351745 !important;
+}
+
+/* 포커스 상태 */
+.focus-visible {
+  outline: 2px solid #4b2067;
+  outline-offset: 2px;
+}
+
+/* 인터랙티브 요소 기본 스타일 */
+.interactive {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.interactive:hover {
+  transform: translateY(-1px);
+}
+
+.interactive:active {
+  transform: translateY(0);
+}
+
+/* 테이블 셀 호버 */
+.table-cell-hover {
+  transition: background-color 0.2s ease;
+}
+
+.table-cell-hover:hover {
+  background-color: #f3eef7;
+}
+
+/* 아이콘 버튼 호버 */
+.icon-button-hover {
+  transition: all 0.2s ease;
+}
+
+.icon-button-hover:hover {
+  transform: scale(1.1);
+  background-color: #e5e0ee;
+}
+
+/* 드롭다운 호버 */
+.dropdown-option-hover {
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-option-hover:hover {
+  background-color: #f8f5ff;
+}
+
+/* 입력 필드 포커스 */
+.input-focus {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-focus:focus {
+  border-color: #4b2067;
+  box-shadow: 0 0 0 3px rgba(75, 32, 103, 0.1);
+  outline: none;
 } 

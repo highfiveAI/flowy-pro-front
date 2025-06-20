@@ -18,9 +18,11 @@ export interface User {
 
 // 마이페이지 수정 인터페이스
 export interface UserUpdateRequest {
+  user_name?: string;
   user_team_name?: string;
   user_dept_name?: string;
   user_phonenum?: string;
+  user_password?: string;
 }
 
 // 마이페이지 인증 인터페이스
@@ -31,6 +33,7 @@ export interface LoginRequest {
 
 // 토큰 유저 인터페이스
 export interface TokenUser {
+  sub: string;
   id: string;
   name: string;
   email: string;
