@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import MailPreviewDashboard from './mailpreviewDashboard';
+// import MailPreviewDashboard from './mailpreviewDashboard'; // 삭제된 파일이므로 주석 처리 또는 삭제
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -156,9 +156,9 @@ const TooltipWrapper = styled.div`
   width: 100%;
   justify-content: center;
 `;
-const TooltipText = styled.div`
-  visibility: hidden;
-  opacity: 0;
+const TooltipText = styled.div<{ $show?: boolean }>`
+  visibility: ${(props) => (props.$show ? 'visible' : 'hidden')};
+  opacity: ${(props) => (props.$show ? 1 : 0)};
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -183,11 +183,6 @@ const TooltipText = styled.div`
     border-style: solid;
     border-color: rgba(78, 42, 132, 0.5) transparent transparent transparent;
   }
-
-  ${TooltipWrapper}:hover & {
-    visibility: visible;
-    opacity: 1;
-  }
 `;
 
 interface MailingDashboardProps {
@@ -202,6 +197,7 @@ interface MailingDashboardProps {
     attendees: { user_id: string; user_name: string }[];
     agenda: string;
     project_users: { user_id: string; user_name: string; user_email: string }[];
+    meeting_id: string;
   };
 }
 
@@ -213,6 +209,7 @@ const MailingDashboard = ({
   meetingInfo,
 }: MailingDashboardProps) => {
   console.log('meetingInfo:', meetingInfo);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [mailItems, setMailItems] = useState({
     summary: false,
     tasks: false,
@@ -260,6 +257,12 @@ const MailingDashboard = ({
     });
   }
   if (mailItems.feedback && feedback) mailPreview.push(...feedback);
+
+  const isRecipientMissing =
+    (!receivers.allProject &&
+      !receivers.allAttendees &&
+      !receivers.custom) ||
+    (receivers.custom && receivers.selectedCustom.length === 0);
 
   // 회의 참석자 또는 프로젝트 참여자 전체 수신 시 자동 할당
   useEffect(() => {
@@ -349,6 +352,86 @@ const MailingDashboard = ({
     }
   };
 
+  // meeting_info 데이터 구조 생성 함수
+  const makeMeetingInfoForMail = () => {
+    return {
+      info_n: receivers.selectedCustom.map(user => ({
+        name: user.user_name,
+        email: user.user_email,
+      })),
+      dt: meetingInfo.date,
+      subj: meetingInfo.title,
+      update_dt: new Date().toISOString(),
+      meeting_id: meetingInfo.meeting_id, // meetingInfo에 meeting_id가 반드시 있어야 함
+    };
+  };
+
+  // db update용 함수(구현 예정)
+  const handleDbUpdate = () => {
+    // db에 update 기능 구현 예정
+  };
+
+  // 메일 발송 및 조건 분기 함수
+  const handleSendMail = async () => {
+    // 1) 아무것도 체크 안 한 경우
+    if (!receivers.allProject && !receivers.allAttendees && !receivers.custom) {
+      const mailList = meetingInfo.project_users.map(user => ({
+        name: user.user_name,
+        email: user.user_email,
+      }));
+      const now = new Date().toISOString(); // update_dt
+      const payload = {
+        info_n: mailList,
+        dt: meetingInfo.date,
+        subj: meetingInfo.title,
+        update_dt: now,
+        meeting_id: meetingInfo.meeting_id,
+      };
+      console.log('백엔드로 보낼 payload:', payload);
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        onClose(); // 성공 시 팝업 닫기
+      } catch (e) {
+        alert('메일 발송에 실패했습니다.');
+      }
+      return;
+    }
+    // 2) 개별 수신자 지정만 체크하고 아무도 선택 안 한 경우
+    if (receivers.custom && receivers.selectedCustom.length === 0) {
+      handleDbUpdate();
+      onClose();
+      return;
+    }
+    // (기타: 개별 수신자 지정 등)
+    const mailList = receivers.selectedCustom.map(user => ({
+      name: user.user_name,
+      email: user.user_email,
+    }));
+    const now = new Date().toISOString();
+    const payload = {
+      info_n: mailList,
+      dt: meetingInfo.date,
+      subj: meetingInfo.title,
+      update_dt: now,
+      meeting_id: meetingInfo.meeting_id,
+    };
+    console.log('백엔드로 보낼 payload:', payload);
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      onClose();
+    } catch (e) {
+      alert('메일 발송에 실패했습니다.');
+    }
+  };
+
   return (
     <ModalOverlay>
       <ModalBox>
@@ -433,9 +516,7 @@ const MailingDashboard = ({
             <CheckboxLabel>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
-                  checked={
-                    receivers.custom || receivers.selectedCustom.length > 0
-                  }
+                  checked={receivers.custom}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     if (e.target.checked) {
                       setReceivers((prev) => ({
@@ -455,7 +536,7 @@ const MailingDashboard = ({
                 />
                 개별 수신자 지정
               </div>
-              {(receivers.custom || receivers.selectedCustom.length > 0) && (
+              {receivers.custom && (
                 <div
                   style={{
                     display: 'flex',
@@ -523,7 +604,7 @@ const MailingDashboard = ({
                       <SelectedReceiver key={user.user_id}>
                         {user.user_name}
                         <RemoveButton
-                          onClick={() => removeReceiver(user.user_id)}
+                          onMouseDown={() => removeReceiver(user.user_id)}
                         >
                           ×
                         </RemoveButton>
@@ -535,36 +616,19 @@ const MailingDashboard = ({
             </CheckboxLabel>
           </CheckboxGroup>
         </ReceiverBox>
-        <TooltipWrapper>
-          <BottomButton onClick={() => setShowPreview(true)}>
+        <TooltipWrapper
+          onMouseEnter={() => isRecipientMissing && setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          <BottomButton
+            onClick={handleSendMail}
+          >
             수정하고 메일 보내기
           </BottomButton>
-          <TooltipText>
+          <TooltipText $show={showTooltip}>
             수신 대상자를 선택하지 않으면 메일은 전송되지 않아요
           </TooltipText>
         </TooltipWrapper>
-        {showPreview && (
-          <MailPreviewDashboard
-            onClose={() => setShowPreview(false)}
-            onSend={() => {
-              // TODO: 실제 메일 발송 로직 구현
-              alert('메일이 발송되었습니다.');
-              setShowPreview(false);
-              onClose();
-            }}
-            summary={summary ?? []}
-            tasks={tasks}
-            feedback={feedback}
-            mailItems={mailItems}
-            receivers={receivers}
-            meetingInfo={{
-              ...meetingInfo,
-              agenda: Array.isArray(meetingInfo.agenda)
-                ? meetingInfo.agenda
-                : [meetingInfo.agenda], // string이면 배열로 감싸기
-            }}
-          />
-        )}
         <button
           onClick={onClose}
           style={{

@@ -422,6 +422,7 @@ interface meetingInfo {
   attendees: { user_id: string; user_name: string }[];
   agenda: string;
   project_users: { user_id: string; user_name: string; user_email: string }[];
+  meeting_id: string;
 }
 
 const Dashboard: React.FC = () => {
@@ -544,6 +545,7 @@ const Dashboard: React.FC = () => {
       user_name: pUser.user.user_name,
       user_email: pUser.user.user_email,
     })) || [],
+    meeting_id: meeting?.meeting_id || '',
   };
 
   useEffect(() => {
