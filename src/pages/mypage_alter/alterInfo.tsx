@@ -135,42 +135,44 @@ const AlterInfo: React.FC = () => {
     setEditedData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // async function fetchData() {
-  //   try {
-  //     const response = await fetch(
-  //       `${import.meta.env.VITE_API_URL}/api/v1/users/one`,
-  //       {
-  //         method: "GET",
-  //         credentials: "include",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
+  async function fetchData() {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/users/one`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! 상태: ${response.status}`);
-  //     }
+      if (!response.ok) {
+        throw new Error(`HTTP error! 상태: ${response.status}`);
+      }
 
-  //     const data = await response.json();
-  //     console.log("📦 받은 데이터:", data);
-  //     setMypageUser(data);
-  //     setEditedData({
-  //       user_name: data.user_name || '',
-  //       user_phonenum: data.user_phonenum || '',
-  //       user_password: ''
-  //     });
-  //     return data;
-  //   } catch (error) {
-  //     console.error("🚨 에러 발생:", error);
-  //     throw error;
-  //   }
-  // }
+      const data = await response.json();
+      console.log('📦 받은 데이터:', data);
+      setMypageUser(data);
+      setEditedData({
+        user_name: data.user_name || '',
+        user_phonenum: data.user_phonenum || '',
+        user_password: '',
+      });
+      return data;
+    } catch (error) {
+      console.error('🚨 에러 발생:', error);
+      throw error;
+    }
+  }
 
-  // const handleButtonClick = async () => {
-  //   if (!isEditing) {
-  //     // 편집 모드로 전환
-  //     setIsEditing(true);
+  const handleButtonClick = async () => {
+    if (!isEditing) {
+      // 편집 모드로 전환
+      setIsEditing(true);
+    }
+  };
 
   const runUpdate = async <K extends keyof UserUpdateRequest>(
     fieldKey: K,
