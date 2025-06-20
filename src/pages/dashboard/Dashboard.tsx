@@ -16,8 +16,15 @@ import { useAuth } from '../../contexts/AuthContext';
 import { checkAuth } from '../../api/fetchAuthCheck';
 import type { Todo } from '../../types/project';
 
-import type { Feedback, SummaryLog } from './Dashboard.types';
-// const UNASSIGNED_LABEL = '미지정';
+import type {
+  Feedback,
+  Meeting,
+  meetingInfo,
+  Project,
+  ProjectUser,
+  SummaryLog,
+} from './Dashboard.types';
+
 
 const Container = styled.div`
   display: flex;
@@ -223,12 +230,12 @@ const TaskGridContainer = styled.div`
   }
 `;
 
-const TaskCard = styled.div<{ isUnassigned?: boolean }>`
+const TaskCard = styled.div<{ $isUnassigned?: boolean }>`
   border-radius: 12px;
   border: 1px solid
-    ${(props) => (props.isUnassigned ? 'rgba(210, 0, 0, 0.3)' : '#e0e0e0')};
+    ${(props) => (props.$isUnassigned ? 'rgba(210, 0, 0, 0.3)' : '#e0e0e0')};
   background: ${(props) =>
-    props.isUnassigned ? 'rgba(210, 0, 0, 0.02)' : '#fff'};
+    props.$isUnassigned ? 'rgba(210, 0, 0, 0.02)' : '#fff'};
   padding: 20px;
   min-height: 200px;
   display: flex;
@@ -250,10 +257,10 @@ const TaskCardHeader = styled.div`
   border-bottom: 1px solid #e0e0e0;
 `;
 
-const TaskCardTitle = styled.h4<{ isUnassigned?: boolean }>`
+const TaskCardTitle = styled.h4<{ $isUnassigned?: boolean }>`
   font-size: 1.125rem;
   margin: 0;
-  color: ${(props) => (props.isUnassigned ? '#d20000' : '#351745')};
+  color: ${(props) => (props.$isUnassigned ? '#d20000' : '#351745')};
   font-weight: 600;
 `;
 
@@ -394,44 +401,30 @@ const AddButton = styled.button`
   }
 `;
 
-interface Project {
-  project_name: string;
-  project_id: string;
-  project_users?: any[];
-}
 
-interface Meeting {
-  meeting_agenda: string;
-  meeting_date: string;
-  meeting_id: string;
-  meeting_title: string;
-}
+// const RoleContainer = styled.div`
+//   display: grid;
+//   grid-template-columns: repeat(3, 1fr);
+//   gap: 16px;
+//   padding: 16px;
+// `;
 
-interface ProjectUser {
-  user_id: string;
-  user_name: string;
-}
+// const Card = styled.div<{ highlight?: boolean }>`
+//   border: 1px solid ${({ highlight }) => (highlight ? 'red' : '#ccc')};
+//   padding: 16px;
+//   border-radius: 8px;
+//   background-color: ${({ highlight }) => (highlight ? '#fff6f6' : '#fff')};
+// `;
 
+// const Title = styled.h3`
+//   font-size: 16px;
+//   font-weight: bold;
+// `;
 
-// interface SummaryLog {
-//   summary_log_id: string;
-//   updated_summary_contents: Record<string, any>;
-// }
-
-// interface Feedback {
-//   feedback_id: string;
-//   feedback_detail: Record<string, any>;
-// }
-
-
-interface meetingInfo {
-  project: string;
-  title: string;
-  date: string;
-  attendees: { user_id: string; user_name: string }[];
-  agenda: string;
-  project_users: { user_id: string; user_name: string; user_email: string }[];
-}
+// const TaskItem = styled.div`
+//   margin-top: 8px;
+//   font-size: 14px;
+// `;
 
 const Dashboard: React.FC = () => {
   const [project, setProject] = useState<Project>();
@@ -621,17 +614,6 @@ const Dashboard: React.FC = () => {
     return d instanceof Date && !isNaN(d.getTime());
   };
 
-  // 추천 문서 임시 데이터
-  // const recommendFiles = [
-  //   {
-  //     name: '서비스 기획서.pdf',
-  //     url: 'https://example.com/service-plan.pdf',
-  //   },
-  //   {
-  //     name: 'API 명세 초안.pdf',
-  //     url: 'https://example.com/api-draft.pdf',
-  //   },
-  // ];
   const getPostPayload = () => {
     const allTodos: Todo[] = assignRole ? Object.values(assignRole).flat() : [];
 
@@ -855,7 +837,7 @@ const Dashboard: React.FC = () => {
                   ].map((col) => (
                     <div key={col} style={{ height: '100%' }}>
                       <TaskCard
-                        isUnassigned={col === '미할당'}
+                        $isUnassigned={col === '미할당'}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => {
                           const from = e.dataTransfer.getData('text/plain');
@@ -885,7 +867,7 @@ const Dashboard: React.FC = () => {
                         }}
                       >
                         <TaskCardHeader>
-                          <TaskCardTitle isUnassigned={col === '미할당'}>
+                          <TaskCardTitle $isUnassigned={col === '미할당'}>
                             {col === '미할당' ? '미할당 작업 목록' : col}
                           </TaskCardTitle>
                         </TaskCardHeader>
@@ -968,9 +950,9 @@ const Dashboard: React.FC = () => {
                   ),
                 ].map((col) => (
                   <div key={col} style={{ height: '100%' }}>
-                    <TaskCard isUnassigned={col === '미할당'}>
+                    <TaskCard $isUnassigned={col === '미할당'}>
                       <TaskCardHeader>
-                        <TaskCardTitle isUnassigned={col === '미할당'}>
+                        <TaskCardTitle $isUnassigned={col === '미할당'}>
                           {col === '미할당' ? '미할당 작업 목록' : col}
                         </TaskCardTitle>
                       </TaskCardHeader>

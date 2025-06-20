@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import FileUpload from './FileUpload';
 import styled from 'styled-components';
@@ -38,6 +39,7 @@ const SortWrapper = styled.div`
   justify-content: flex-end; /* 우측 정렬 */
   width: 100%; /* 부모 너비에 맞춤 */
   padding-right: 20px; /* 스크롤바 공간 확보 */
+  padding-bottom: 20px;
 `;
 
 const SortText = styled.span`
@@ -63,7 +65,7 @@ const ProjectListContainer = styled.div`
 const ExpandedArea = styled.div`
   padding: 10px 20px;
   background-color: #f9f9f9;
-  border-left: 4px solid #007bff;
+  border-left: 4px solid #8134a0;
   margin-bottom: 10px;
   font-size: 16px;
   color: #444;
@@ -214,6 +216,14 @@ const InsertConferenceInfo: React.FC = () => {
   const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
   const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
+  const [sortOrder, setSortOrder] = useState<'latest' | 'oldest'>('latest');
+
+  // 정렬 함수
+  const sortedProjects = [...projects].sort((a, b) => {
+    const dateA = new Date(a.projectCreatedDate).getTime();
+    const dateB = new Date(b.projectCreatedDate).getTime();
+    return sortOrder === 'latest' ? dateB - dateA : dateA - dateB;
+  });
 
   const [isSortedByLatest, setIsSortedByLatest] = useState(false);
 
@@ -640,51 +650,56 @@ const InsertConferenceInfo: React.FC = () => {
           </NewProjectWrapper>
           <ProjectListContainer>
             <SortWrapper>
-              <SortText onClick={handleSortByLatest}>
-                {isSortedByLatest ? '원래대로 보기' : '최신순으로 정렬'}
+
+              정렬 기준:
+              <SortText>
+                <StyledSelect
+                  value={sortOrder}
+                  onChange={(e) =>
+                    setSortOrder(e.target.value as 'latest' | 'oldest')
+                  }
+                  style={{ marginLeft: '0.5rem' }}
+                >
+                  <option value="latest">최신순</option>
+                  <option value="oldest">오래된순</option>
+                </StyledSelect>
+
               </SortText>
             </SortWrapper>
             <ProjectList>
-              {(projects.length > 0
-                ? isSortedByLatest
-                  ? [...projects].sort(
-                      (a, b) =>
-                        new Date(b.projectCreatedDate).getTime() -
-                        new Date(a.projectCreatedDate).getTime()
-                    )
-                  : projects
-                : []
-              ).map((proj, index) => (
-                <div key={index}>
-                  <ProjectListItem
-                    onClick={() => {
-                      handleProjectSelect(proj.projectId, proj.projectName);
-                      toggleExpanded(index);
-                    }}
-                  >
-                    <span className="name">
-                      {index + 1}. {proj.projectName}
-                    </span>
-                    <span className="date">
-                      {new Date(proj.projectCreatedDate)
-                        .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
-                        .replace('T', ' ')
-                        .slice(0, 16)}
-                    </span>
-                  </ProjectListItem>
 
-                  {expandedIndex === index && (
-                    <ExpandedArea>
-                      <p>참여자:</p>
-                      <div className="user-list">
-                        {projectUsers.map((user) => (
-                          <span key={user.user_id} className="user-name">
-                            {user.name}
-                          </span>
-                        ))}
-                      </div>
-                      <p>
-                        프로젝트 내용:&nbsp;
+              {sortedProjects.length > 0 ? (
+                sortedProjects.map((proj, index) => (
+                  <div key={index}>
+                    <ProjectListItem
+                      onClick={() => {
+                        handleProjectSelect(proj.projectId, proj.projectName);
+                        toggleExpanded(index);
+                      }}
+                    >
+                      <span className="name">
+                        {index + 1}. {proj.projectName}
+                      </span>
+                      <span className="date">
+                        {new Date(proj.projectCreatedDate)
+                          .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
+                          .replace('T', ' ')
+                          .slice(0, 16)}
+                      </span>
+                    </ProjectListItem>
+
+                    {expandedIndex === index && (
+                      <ExpandedArea>
+                        <p>참여자:</p>
+                        <div className="user-list">
+                          {projectUsers.map((user) => (
+                            <span key={user.user_id} className="user-name">
+                              {user.name}
+                            </span>
+                          ))}
+                        </div>
+                        <p>프로젝트 내용:</p>
+
                         {proj.projectDetail ? (
                           <span>{proj.projectDetail}</span>
                         ) : (
@@ -1130,22 +1145,26 @@ const TabBtn = styled.button<{ active: boolean }>`
     margin-right: 0;
   }
 `;
-const TabPanel = styled.div`
-  flex: 1;
-  background: #351745;
-  border-radius: 0 0 16px 16px;
-  padding: 36px 36px 32px 36px;
-  min-height: 600px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-`;
 
-const TabSectionWrapper = styled.div`
-  border-radius: 16px 16px 0 0;
-  overflow: hidden;
-  background: #351745;
-  width: 100%;
-  position: relative;
-  z-index: 1;
+
+const StyledSelect = styled.select`
+  padding: 6px 12px;
+  margin-left: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: #888;
+  }
+
+  &:focus {
+    border-color: #5a2a84;
+  }
+
 `;
