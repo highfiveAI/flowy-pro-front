@@ -156,7 +156,8 @@ const DocumentRecommend: React.FC = () => {
         try {
             const response = await axios.post<any>(
                 `${import.meta.env.VITE_API_URL}/api/v1/docs/recommend`,
-                { query }
+                { query },
+                { withCredentials: true }
             );
 
             if (response.data && Array.isArray(response.data.documents)) {
