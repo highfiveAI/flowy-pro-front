@@ -2,285 +2,34 @@
 // 설치 명령: npm install react-big-calendar moment
 // 타입: npm install --save-dev @types/react-big-calendar @types/moment
 
-import { useState, useEffect } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import styled from 'styled-components';
-import type { CalendarEvent } from './event-utils';
-import { isSameDay } from 'date-fns';
-import { FaRegFileAlt } from 'react-icons/fa';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import CalendarPop from './popup/calendarPop';
-
-const CalendarWrapper = styled.div`
-  max-width: 1100px;
-  margin: 40px auto 0 auto;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(80, 0, 80, 0.06);
-  padding: 40px 32px 32px 32px;
-
-  .react-calendar {
-    width: 100% !important;
-    min-width: 900px;
-    max-width: 100%;
-    font-size: 1.1rem;
-    border: none;
-    background: #fff;
-  }
-  .react-calendar__navigation {
-    display: none;
-  }
-  .react-calendar__month-view__days {
-    display: grid !important;
-    grid-template-rows: repeat(6, 1fr);
-    grid-template-columns: repeat(7, 1fr);
-    min-height: 800px;
-    height: 800px;
-  }
-  .react-calendar__tile {
-    height: auto !important;
-    min-height: 0;
-    vertical-align: top;
-    white-space: normal;
-    word-break: keep-all;
-    padding: 8px 6px 4px 6px;
-    text-align: left;
-    background: #fff;
-    border: 1px solid #c7b8d9;
-    border-radius: 0;
-    box-shadow: none;
-    position: relative;
-    transition: all 0.2s ease;
-    cursor: pointer;
-  }
-  .react-calendar__tile:hover {
-    background: #f8f5ff !important;
-    transform: scale(1.02);
-    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
-    z-index: 1;
-  }
-  .react-calendar__tile:active {
-    transform: scale(0.98);
-  }
-  .react-calendar__tile abbr {
-    display: none !important;
-  }
-
-  .react-calendar__month-view__days__day--neighboringMonth {
-    color: #bbb !important;
-    background: rgb(224, 224, 224) !important;
-    opacity: 0.7;
-  }
-
-  .calendar-event,
-  .calendar-todo {
-    font-size: 0.8rem;
-
-    margin-top: 0;
-  }
-  .calendar-event {
-    background: rgba(190, 32, 116, 0.14);
-    color: #5e5553;
-    border-radius: 3px;
-    font-weight: 600;
-    padding: 4px 8px;
-    margin-bottom: 4px;
-    display: inline-block;
-    font-size: 0.8rem;
-    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.04);
-  }
-  .calendar-todo {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-bottom: 2px;
-    font-weight: 600;
-    color: #5e5553;
-  }
-  .react-calendar__month-view__weekdays {
-    font-weight: bold;
-    font-size: 1.1rem;
-    background: #f8f6fa;
-  }
-  .react-calendar__month-view__weekdays__weekday {
-    color: #5e5553;
-    padding: 8px 0;
-    border: 1px solid #c7b8d9;
-    border-bottom: none;
-    background: #f8f6fa;
-  }
-  .react-calendar__month-view__weekdays__weekday:first-child {
-    color: #c00f0cb2;
-  }
-  .react-calendar__month-view__weekdays__weekday:last-child {
-    color: #283990;
-  }
-  .react-calendar__tile--now {
-    background: #f3e6ff !important;
-    border-radius: 8px;
-  }
-  .react-calendar__tile--active {
-    background: #fff !important;
-  }
-
-  .react-calendar__month-view__weekNumbers {
-    color: #351745;
-    font-weight: 600;
-    background: #f8f6fa;
-  }
-  .react-calendar__tile--weekNumber {
-    color: #351745;
-    font-weight: 600;
-    background: #f8f6fa;
-  }
-  .calendar-sunday {
-    color: #c00f0cb2 !important;
-  }
-  .calendar-saturday {
-    color: #283990 !important;
-  }
-`;
-
-const HeaderBar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #4b2067;
-  margin: 0 0 16px 0;
-`;
-const MonthNav = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 8px;
-`;
-const NavButton = styled.button`
-  border: 1.5px solid #c7b8d9;
-  background: #fff;
-  color: #351745;
-  border-radius: 6px;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: #f3e6ff;
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(80, 0, 80, 0.15);
-  }
-  
-  &:active {
-    transform: scale(0.95);
-  }
-`;
-const MonthText = styled.span`
-  font-size: 2rem;
-  font-weight: 600;
-  color: #333;
-  min-width: 120px;
-  text-align: center;
-  user-select: none;
-`;
-const RightBox = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-`;
-const FilterArea = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-const FilterSelectBox = styled.div`
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border: 1.5px solid #e3d6f2;
-  border-radius: 8px;
-  padding: 0 18px 0 14px;
-  height: 48px;
-  min-width: 220px;
-  font-size: 1.08rem;
-  color: #351745;
-  gap: 10px;
-`;
-const FilterSelect = styled.select`
-  border: none;
-  background: transparent;
-  font-size: 1.08rem;
-  color: #351745;
-  outline: none;
-  padding: 0 8px;
-`;
-const ApplyButton = styled.button`
-  background: #351745;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.08rem;
-  font-weight: 600;
-  height: 48px;
-  padding: 0 32px;
-  cursor: pointer;
-  margin-left: 8px;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: #4b2067;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(80, 0, 80, 0.2);
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-`;
-const TodayButton = styled.button`
-  background: white;
-  color: #351745;
-  border: 1.5px solid #351745;
-  border-radius: 8px;
-  font-size: 1.08rem;
-  font-weight: 600;
-  height: 48px;
-  padding: 0 32px;
-  cursor: pointer;
-  margin-left: 0;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: #f3e6ff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(80, 0, 80, 0.1);
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const CalendarCheckbox = styled.input.attrs({ type: 'checkbox' })`
-  cursor: pointer;
-  accent-color: #351745;
-`;
+import { useState, useEffect } from "react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import type { CalendarEvent } from "./event-utils";
+import { isSameDay } from "date-fns";
+import { FaRegFileAlt } from "react-icons/fa";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import CalendarPop from "./popup/calendarPop";
+import {
+  ApplyButton,
+  CalendarCheckbox,
+  CalendarWrapper,
+  FilterArea,
+  FilterSelect,
+  FilterSelectBox,
+  HeaderBar,
+  MonthNav,
+  MonthText,
+  NavButton,
+  RightBox,
+  Title,
+  TodayButton,
+} from "./Calendar.styles";
 
 function formatYearMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
     2,
-    '0'
+    "0"
   )}`;
 }
 
@@ -298,24 +47,24 @@ function YearMonthPicker({
   return (
     <div
       style={{
-        position: 'absolute',
+        position: "absolute",
         top: 60,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        background: '#fff',
-        border: '1.5px solid #C7B8D9',
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: "#fff",
+        border: "1.5px solid #C7B8D9",
         borderRadius: 8,
         padding: 16,
         zIndex: 100,
-        boxShadow: '0 2px 12px rgba(80,0,80,0.08)',
+        boxShadow: "0 2px 12px rgba(80,0,80,0.08)",
         width: 270,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+      <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
         <select
           value={year}
           onChange={(e) => setYear(Number(e.target.value))}
-          style={{ fontSize: '1rem', marginRight: 8 }}
+          style={{ fontSize: "1rem", marginRight: 8 }}
         >
           {Array.from({ length: 20 }, (_, i) => 2015 + i).map((y) => (
             <option key={y} value={y}>
@@ -326,7 +75,7 @@ function YearMonthPicker({
         <select
           value={month}
           onChange={(e) => setMonth(Number(e.target.value))}
-          style={{ fontSize: '1rem', marginRight: 16 }}
+          style={{ fontSize: "1rem", marginRight: 16 }}
         >
           {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
             <option key={m} value={m}>
@@ -337,9 +86,9 @@ function YearMonthPicker({
         <ApplyButton
           onClick={() => onChange(year, month)}
           style={{
-            padding: '0 18px',
+            padding: "0 18px",
             height: 36,
-            fontSize: '0.8rem',
+            fontSize: "0.8rem",
             marginLeft: 0,
           }}
         >
@@ -349,12 +98,12 @@ function YearMonthPicker({
           onClick={onClose}
           style={{
             marginLeft: 8,
-            background: 'none',
-            border: 'none',
-            color: '#351745',
+            background: "none",
+            border: "none",
+            color: "#351745",
             fontWeight: 600,
-            fontSize: '0.8rem',
-            cursor: 'pointer',
+            fontSize: "0.8rem",
+            cursor: "pointer",
           }}
         >
           닫기
@@ -380,21 +129,21 @@ export default function CalendarPage() {
   // 1. 로그인한 사용자의 user_id를 먼저 가져온다
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/one`, {
-      credentials: 'include',
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
         if (data.user_id) setUserId(data.user_id);
       })
       .catch((err) => {
-        console.error('유저 정보 불러오기 실패:', err);
+        console.error("유저 정보 불러오기 실패:", err);
       });
   }, []);
 
   useEffect(() => {
     if (!userId) return;
     fetch(`${import.meta.env.VITE_API_URL}/api/v1/projects/user_id/${userId}`, {
-      credentials: 'include',
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
@@ -416,7 +165,7 @@ export default function CalendarPage() {
         import.meta.env.VITE_API_URL
       }/api/v1/calendar/${userId}/${selectedProjectId}`,
       {
-        credentials: 'include',
+        credentials: "include",
       }
     )
       .then((res) => res.json())
@@ -470,9 +219,9 @@ export default function CalendarPage() {
   // completed만 수정하는 간단한 핸들러
   const handleEditCompleted = (id: string, completed: boolean) => {
     fetch(`${import.meta.env.VITE_API_URL}/api/v1/calendar/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         calendar_id: id,
         completed: completed,
@@ -499,7 +248,7 @@ export default function CalendarPage() {
   return (
     <CalendarWrapper>
       <HeaderBar>
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: "relative" }}>
           <Title>작업 관리</Title>
           <MonthNav>
             <NavButton onClick={handlePrevMonth}>
@@ -507,7 +256,7 @@ export default function CalendarPage() {
             </NavButton>
             <MonthText
               onClick={handleYearMonthClick}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: "pointer" }}
             >
               {formatYearMonth(value)}
             </MonthText>
@@ -527,9 +276,9 @@ export default function CalendarPage() {
         <RightBox>
           <FilterArea>
             <FilterSelectBox>
-              <FaRegFileAlt style={{ fontSize: '1.2rem', opacity: 0.7 }} />
+              <FaRegFileAlt style={{ fontSize: "1.2rem", opacity: 0.7 }} />
               <FilterSelect
-                value={selectedProjectId || ''}
+                value={selectedProjectId || ""}
                 onChange={(e) => setSelectedProjectId(e.target.value)}
               >
                 {projects.map((proj) => (
@@ -548,29 +297,29 @@ export default function CalendarPage() {
         onChange={(v) => setValue(v as Date)}
         tileContent={({ date, view }) => {
           if (!date) return null;
-          if (view === 'month') {
-            const day = date.getDate().toString().padStart(2, '0');
+          if (view === "month") {
+            const day = date.getDate().toString().padStart(2, "0");
             const dayTodos = events.filter(
-              (ev) => ev.type === 'todo' && isSameDay(new Date(ev.start), date)
+              (ev) => ev.type === "todo" && isSameDay(new Date(ev.start), date)
             );
             const dayMeetings = events.filter(
               (ev) =>
-                ev.type === 'meeting' && isSameDay(new Date(ev.start), date)
+                ev.type === "meeting" && isSameDay(new Date(ev.start), date)
             );
             const dayOfWeek = date.getDay(); // 0: 일, 6: 토
             const isCurrentMonth = date.getMonth() === value.getMonth();
-            let dayClass = '';
+            let dayClass = "";
             if (isCurrentMonth) {
-              if (dayOfWeek === 0) dayClass = 'calendar-sunday';
-              if (dayOfWeek === 6) dayClass = 'calendar-saturday';
+              if (dayOfWeek === 0) dayClass = "calendar-sunday";
+              if (dayOfWeek === 6) dayClass = "calendar-saturday";
             }
             return (
               <div
                 style={{
-                  position: 'relative',
-                  width: '100%',
-                  height: '100%',
-                  cursor: 'pointer',
+                  position: "relative",
+                  width: "100%",
+                  height: "100%",
+                  cursor: "pointer",
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -580,26 +329,26 @@ export default function CalendarPage() {
                 <span
                   className={dayClass}
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 8,
                     right: 10,
-                    fontSize: '1.05rem',
+                    fontSize: "1.05rem",
                     fontWeight: 500,
                     zIndex: 2,
                   }}
                 >
                   {day}
                 </span>
-                <div style={{ width: '100%', paddingTop: 35 }}>
+                <div style={{ width: "100%", paddingTop: 35 }}>
                   {dayMeetings.map((m) => {
-                    let timeStr = '';
+                    let timeStr = "";
                     if (m.start) {
                       const d =
-                        typeof m.start === 'string'
+                        typeof m.start === "string"
                           ? new Date(m.start)
                           : m.start;
                       if (!isNaN(d.getTime())) {
-                        timeStr = d.toTimeString().slice(0, 5) + ' ';
+                        timeStr = d.toTimeString().slice(0, 5) + " ";
                       }
                     }
                     return (
@@ -620,7 +369,7 @@ export default function CalendarPage() {
                       />
                       <span
                         style={{
-                          textDecoration: t.completed ? 'line-through' : 'none',
+                          textDecoration: t.completed ? "line-through" : "none",
                         }}
                       >
                         {t.title}
@@ -633,7 +382,7 @@ export default function CalendarPage() {
           }
           return null;
         }}
-        formatDay={(_, date) => date.getDate().toString().padStart(2, '0')}
+        formatDay={(_, date) => date.getDate().toString().padStart(2, "0")}
         locale="ko-KR"
         calendarType="gregory"
       />
@@ -642,11 +391,11 @@ export default function CalendarPage() {
           date={popupDate}
           todos={events.filter(
             (ev) =>
-              ev.type === 'todo' && isSameDay(new Date(ev.start), popupDate)
+              ev.type === "todo" && isSameDay(new Date(ev.start), popupDate)
           )}
           meetings={events.filter(
             (ev) =>
-              ev.type === 'meeting' && isSameDay(new Date(ev.start), popupDate)
+              ev.type === "meeting" && isSameDay(new Date(ev.start), popupDate)
           )}
           onClose={handleClosePopup}
           onEdit={handleEditCompleted}
