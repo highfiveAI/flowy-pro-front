@@ -13,17 +13,30 @@ import {
   CreateProjectButton,
   ErrorMessageBox,
   FormGroup,
+  NoResultsMessage,
   PopupContent,
   PopupHeader,
   PopupOverlay,
   PopupTitle,
   ProjectIcon,
+  RemoveButton,
+  SearchContainer,
+  SearchInput,
+  SearchResultItem,
+  SearchResultsContainer,
+  SelectedUserItem,
+  SelectedUsersContainer,
+  SelectedUsersTitle,
+  TagsContainer,
   // RoleSelect,
   StyledInput,
   StyledLabel,
   StyledTextarea,
   UserItem,
   UserListBox,
+  UserManagementContainer,
+  UserName,
+  UserPanel,
 } from './NewProjectPopup.styles';
 import { useAuth } from '../../../contexts/AuthContext';
 import { checkAuth } from '../../../api/fetchAuthCheck';
@@ -45,8 +58,26 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [poId, setPoId] = useState<string>('');
   const [ppId, setPpId] = useState<string>('');
+  
+  // 검색 관련 상태
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filteredUsers, setFilteredUsers] = useState<ProjectUserIdName[]>([]);
 
   const { user, setUser, setLoading } = useAuth();
+
+  // 검색어에 따른 사용자 필터링
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredUsers(projectUsers);
+    } else {
+      const filtered = projectUsers.filter(
+        (user) =>
+          user.user_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          !selectedProjectUsers.some((selected) => selected.user_id === user.user_id)
+      );
+      setFilteredUsers(filtered);
+    }
+  }, [searchTerm, projectUsers, selectedProjectUsers]);
 
   const handleSelectUser = (user: ProjectUserIdName) => {
     const alreadySelected = selectedProjectUsers.some(
@@ -57,6 +88,8 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
         ...selectedProjectUsers,
         { ...user, role_id: ppId },
       ]);
+      // 검색어 초기화
+      setSearchTerm('');
     }
   };
 
@@ -208,53 +241,79 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
           <StyledLabel htmlFor="project-attendees">
             프로젝트 참여자 선택
           </StyledLabel>
-          <UserListBox>
-            {projectUsers.map((user) => {
-              const alreadySelected = selectedProjectUsers.some(
-                (u) => u.user_id === user.user_id
-              );
-              return (
-                <UserItem key={user.user_id}>
-                  <span>{user.user_name}</span>
-                  {!alreadySelected && (
-                    <AddButton onClick={() => handleSelectUser(user)}>
-                      +
-                    </AddButton>
-                  )}
-                </UserItem>
-              );
-            })}
-          </UserListBox>
+          <UserManagementContainer>
+            <UserPanel>
+              <SearchContainer>
+                <SearchInput
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="사용자 검색"
+                />
+              </SearchContainer>
 
-          {/* 선택된 유저 목록 */}
-          <UserListBox>
-            {selectedProjectUsers.map((us) => (
-              <UserItem key={us.user_id}>
-                <span>{us.user_name}</span>
-                <div
-                  style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
-                >
-                  {/* 역할 선택은 사용자 편의성을 의해서 삭제 */}
-                  {/* <RoleSelect
-                    value={us.role_id || ''}
-                    onChange={(e) =>
-                      handleChangeUserRole(us.user_id, e.target.value)
-                    }
-                  >
-                    <option value="">역할 선택</option>
-                    <option value={poId}>PO</option>
-                    <option value={ppId}>PP</option>
-                  </RoleSelect> */}
-
-                  {us.user_id !== user?.id && (
-                    <AddButton onClick={() => handleDeselectUser(us)}>
-                      -
-                    </AddButton>
+              {searchTerm.trim() ? (
+                <SearchResultsContainer>
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <SearchResultItem
+                        key={user.user_id}
+                        onClick={() => handleSelectUser(user)}
+                      >
+                        <UserName>{user.user_name}</UserName>
+                        <AddButton>+</AddButton>
+                      </SearchResultItem>
+                    ))
+                  ) : (
+                    <NoResultsMessage>검색 결과가 없습니다.</NoResultsMessage>
                   )}
-                </div>
-              </UserItem>
-            ))}
-          </UserListBox>
+                </SearchResultsContainer>
+              ) : (
+                <UserListBox>
+                  {projectUsers
+                    .filter(
+                      (user) =>
+                        !selectedProjectUsers.some(
+                          (selected) => selected.user_id === user.user_id
+                        )
+                    )
+                    .map((user) => (
+                      <UserItem key={user.user_id}>
+                        <span>{user.user_name}</span>
+                        <AddButton onClick={() => handleSelectUser(user)}>
+                          +
+                        </AddButton>
+                      </UserItem>
+                    ))}
+                </UserListBox>
+              )}
+            </UserPanel>
+            <UserPanel>
+              <SelectedUsersContainer>
+                <SelectedUsersTitle>
+                  선택된 참여자 ({selectedProjectUsers.length}명)
+                </SelectedUsersTitle>
+                <TagsContainer>
+                  {selectedProjectUsers.length > 0 ? (
+                    selectedProjectUsers.map((selectedUser) => (
+                      <SelectedUserItem key={selectedUser.user_id}>
+                        <UserName>{selectedUser.user_name}</UserName>
+                        {selectedUser.user_id !== user?.id && (
+                          <RemoveButton
+                            onClick={() => handleDeselectUser(selectedUser)}
+                          >
+                            ×
+                          </RemoveButton>
+                        )}
+                      </SelectedUserItem>
+                    ))
+                  ) : (
+                    <NoResultsMessage>참여자를 추가해주세요.</NoResultsMessage>
+                  )}
+                </TagsContainer>
+              </SelectedUsersContainer>
+            </UserPanel>
+          </UserManagementContainer>
         </FormGroup>
         <FormGroup>
           <StyledLabel htmlFor="project-details">프로젝트 설명</StyledLabel>

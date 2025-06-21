@@ -54,14 +54,21 @@ export const Label = styled.label`
   margin-right: 20px; /* 레이블과 입력 필드 사이 간격 */
 `;
 
-export const Input = styled.input`
-  border: none; /* 테두리 제거 */
+export const Input = styled.input<{ isEditing?: boolean }>`
+  border: none;
   padding: 10px 15px;
   font-size: 1rem;
   outline: none;
-  background: rgba(217, 217, 217, 0.3);
-  width: 480px; /* 모든 입력란의 가로폭을 동일하게 통일 */
-  flex-shrink: 0; /* 입력란이 줄어들지 않도록 */
+  background: ${(props) =>
+    props.isEditing ? '#f3eef7' : 'rgba(217, 217, 217, 0.3)'};
+  width: 480px;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+
+  &:focus {
+    background: ${(props) =>
+      props.isEditing ? '#e5e0ee' : 'rgba(217, 217, 217, 0.3)'};
+  }
 `;
 
 export const Button = styled.button`
