@@ -556,8 +556,6 @@ const InsertConferenceInfo: React.FC = () => {
     // ... existing code ...
   };
 
-  useEffect(() => {}, [showPopup]);
-
   return (
     <PageWrapper>
       <ContentWrapper>
