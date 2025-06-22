@@ -52,6 +52,17 @@ export interface ProjectRequestBody {
   }[];
 }
 
+export type ProjectUpdateRequestBody = {
+  project_id: string;
+  project_name: string;
+  project_detail: string;
+  // project_status: boolean;
+  project_users: {
+    user_id: string;
+    role_id: string;
+  }[];
+};
+
 export interface Todo {
   action: string;
   assignee: string;
