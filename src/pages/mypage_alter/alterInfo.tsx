@@ -1,32 +1,3 @@
-// const AlterInfoWrapper = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   background-color: #ffffff;
-//   min-height: 100vh;
-//   width: 100%;
-//   position: relative;
-// `;
-
-// const PageTitle = styled.h1`
-//   color: #351745;
-//   font-size: 2rem;
-//   position: absolute;
-//   top: 30px;
-//   left: 40px;
-//   margin: 0;
-//   padding: 0;
-// `;
-
-// const FormArea = styled.div`
-//   flex-grow: 1;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-//   width: 100%;
-//   padding-top: 80px;
-// `;
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -36,46 +7,6 @@ const Container = styled.div`
   max-width: 800px;
   margin: 0 auto;
 `;
-
-// const FormContainer = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   gap: 15px;
-//   width: 100%;
-//   padding: 20px;
-//   box-sizing: border-box;
-//   align-items: center;
-// `;
-
-// const InputGroup = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: flex-start;
-//   width: 100%;
-// `;
-
-// const Label = styled.label`
-//   color: #555;
-//   font-weight: normal;
-//   flex-shrink: 0;
-//   width: 150px;
-//   margin-right: 20px;
-// `;
-
-// const Input = styled.input<{ isEditing?: boolean }>`
-//   border: none;
-//   padding: 10px 15px;
-//   font-size: 1rem;
-//   outline: none;
-//   background: ${props => props.isEditing ? '#f3eef7' : 'rgba(217, 217, 217, 0.3)'};
-//   width: 480px;
-//   flex-shrink: 0;
-//   transition: background-color 0.2s;
-
-//   &:focus {
-//     background: ${props => props.isEditing ? '#e5e0ee' : 'rgba(217, 217, 217, 0.3)'};
-//   }
-// `;
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -101,12 +32,11 @@ const ChangeButton = styled.button`
 `;
 
 import React, { useEffect, useState } from 'react';
-import type { User, UserUpdateRequest } from '../../types/user';
-import { fetchUserData, updateMypageUser } from '../../api/fetchMypage';
+import type { User /*, UserUpdateRequest*/ } from '../../types/user';
+import { fetchUserData /*, updateMypageUser*/ } from '../../api/fetchMypage';
 import InfoChangeModal from './mypage_popup/InfoChangeModal';
 import {
   AlterInfoWrapper,
-  Button,
   FormArea,
   FormContainer,
   Input,
@@ -140,10 +70,10 @@ const AlterInfo: React.FC = () => {
   //     const response = await fetch(
   //       `${import.meta.env.VITE_API_URL}/api/v1/users/one`,
   //       {
-  //         method: "GET",
-  //         credentials: "include",
+  //         method: 'GET',
+  //         credentials: 'include',
   //         headers: {
-  //           "Content-Type": "application/json",
+  //           'Content-Type': 'application/json',
   //         },
   //       }
   //     );
@@ -153,62 +83,89 @@ const AlterInfo: React.FC = () => {
   //     }
 
   //     const data = await response.json();
-  //     console.log("📦 받은 데이터:", data);
+  //     console.log('📦 받은 데이터:', data);
   //     setMypageUser(data);
   //     setEditedData({
   //       user_name: data.user_name || '',
   //       user_phonenum: data.user_phonenum || '',
-  //       user_password: ''
+  //       user_password: '',
   //     });
   //     return data;
   //   } catch (error) {
-  //     console.error("🚨 에러 발생:", error);
+  //     console.error('🚨 에러 발생:', error);
   //     throw error;
   //   }
   // }
 
-  // const handleButtonClick = async () => {
-  //   if (!isEditing) {
-  //     // 편집 모드로 전환
-  //     setIsEditing(true);
+  // 변경내용 저장
+  const handleButtonClick = async () => {
+    if (!isEditing) {
+      // 편집 모드로만 전환하고, 함수 종료!
+      setIsEditing(true);
+      return;
+    }
 
-  const runUpdate = async <K extends keyof UserUpdateRequest>(
-    fieldKey: K,
-    fieldValue: UserUpdateRequest[K]
-  ) => {
-    const updateData: UserUpdateRequest = {
-      [fieldKey]: fieldValue,
-    };
-
-    const result = await updateMypageUser(updateData);
-
-    if (result) {
-      console.log(`✅ ${fieldKey} 업데이트 성공:`, result);
-    } else {
-      // 저장 모드 - DB에 저장
-      try {
-        const updateData: UserUpdateRequest = {
-          user_name: editedData.user_name,
-          user_phonenum: editedData.user_phonenum,
-          user_password: editedData.user_password,
-        };
-
-        const result = await updateMypageUser(updateData);
-
-        if (result) {
-          console.log('✅ 정보 변경 성공:', result);
-          setShowChangeModal(true);
-          setIsEditing(false);
-          // 데이터 새로고침
-          await fetchData();
-        } else {
-          console.log('❌ 정보 변경 실패');
-        }
-      } catch (error) {
-        console.error('정보 변경 중 오류:', error);
+    // 편집 모드일 때만 API 호출
+    try {
+      const result = await updateMypageUser(editedData); // 이 API에서 모든 처리
+      // user 객체에서 user_id, user_name, user_phonenum만 추출해서 새 객체로 출력
+      const filteredUser = result && result.user ? {
+        user_id: result.user.user_id,
+        user_name: result.user.user_name,
+        user_phonenum: result.user.user_phonenum,
+      } : null;
+      console.log('updateMypageUser 응답:', {
+        message: result?.message,
+        user: filteredUser
+      });
+      if (result && result.user) {
+        alert('정보 변경 완료');
+        // 모달 닫기 등
+      } else {
+        alert('정보 변경에 실패했습니다');
       }
+    } catch (e) {
+      alert('서버 오류가 발생했습니다');
     }
   };
+
+  // const runUpdate = async <K extends keyof UserUpdateRequest>(
+  //   fieldKey: K,
+  //   fieldValue: UserUpdateRequest[K]
+  // ) => {
+  //   const updateData: UserUpdateRequest = {
+  //     [fieldKey]: fieldValue,
+  //   };
+
+  //   const result = await updateMypageUser(updateData);
+
+  //   if (result) {
+  //     console.log(`✅ ${fieldKey} 업데이트 성공:`, result);
+  //   } else {
+  //     // 저장 모드 - DB에 저장
+  //     try {
+  //       const updateData: UserUpdateRequest = {
+  //         user_name: editedData.user_name,
+  //         user_phonenum: editedData.user_phonenum,
+  //         user_password: editedData.user_password,
+  //       };
+
+  //       const result = await updateMypageUser(updateData);
+
+  //       if (result) {
+  //         console.log('✅ 정보 변경 성공:', result);
+  //         setShowChangeModal(true);
+  //         setIsEditing(false);
+  //         // 데이터 새로고침
+  //         await fetchData();
+  //       } else {
+  //         console.log('❌ 정보 변경 실패');
+  //       }
+  //     } catch (error) {
+  //       console.error('정보 변경 중 오류:', error);
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     const getUser = async () => {

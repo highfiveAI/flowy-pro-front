@@ -14,6 +14,13 @@ export type SummaryLog = {
 export type Project = {
   project_name: string;
   project_id: string;
+  project_users?: {
+    user: {
+      user_id: string;
+      user_name: string;
+      user_email: string;
+    };
+  };
 };
 
 export type Meeting = {
@@ -28,10 +35,19 @@ export type ProjectUser = {
   user_name: string;
 };
 
-export type meetingInfo = {
+export interface meetingInfo {
   project: string;
   title: string;
   date: string;
-  attendees: { user_id: string; user_name: string }[];
+  attendees: {
+    user_id: string;
+    user_name: string;
+  }[];
   agenda: string;
-};
+  project_users: {
+    user_id: string;
+    user_name: string;
+    user_email: string;
+  }[];
+  meeting_id: string;
+}

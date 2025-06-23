@@ -1167,8 +1167,7 @@ const AdminUser: React.FC = () => {
               isOpen={isEditModalOpen}
               user={formData}
               onApprove={() => {
-                if (selectedUserId)
-                  handleStatusChange(selectedUserId, 'Approved');
+                if (selectedUserId) handleUpdate(selectedUserId);
                 setIsEditModalOpen(false);
               }}
               onReject={() => {
@@ -1177,6 +1176,7 @@ const AdminUser: React.FC = () => {
                 setIsEditModalOpen(false);
               }}
               onClose={() => setIsEditModalOpen(false)}
+              onChange={handleManageInputChange}
             />
           </Modal>
         )}

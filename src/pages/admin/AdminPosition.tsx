@@ -37,34 +37,33 @@ const Table = styled.table`
     font-weight: 600;
   }
 
-  
   td {
     color: #5e5553;
     border-bottom: 1.5px solid #eee;
     background: #fff;
   }
-  
+
   tr {
     transition: all 0.2s ease;
     cursor: pointer;
-    
+
     &:hover {
       background-color: #f8f5ff;
       transform: scale(1.01);
       box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
     }
-    
+
     /* 선택된 상태 */
     &.selected {
       background-color: #e5e0ee;
       border-left: 4px solid #4b2067;
     }
-    
+
     &.selected:hover {
       background-color: #d4c7e8;
     }
   }
-  
+
   tr:last-child td {
     border-bottom: none;
   }
@@ -185,16 +184,15 @@ const CloseButton = styled.button`
   cursor: pointer;
 
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: #4b2067;
     transform: scale(1.1);
     box-shadow: 0 4px 16px rgba(80, 0, 80, 0.2);
   }
-  
+
   &:active {
     transform: scale(0.95);
-
   }
 `;
 
@@ -256,13 +254,16 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
 
 const AdminPosition: React.FC = () => {
   const [positions, setPositions] = useState<Position[]>([]);
-  const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(null);
+  const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(
+    null
+  );
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPositionId, setSelectedPositionId] = useState<string | null>(
     null
   );
   const [formData, setFormData] = useState({
+    position_company_id: '',
     position_code: '',
     position_name: '',
     position_detail: '',
@@ -295,11 +296,11 @@ const AdminPosition: React.FC = () => {
       if (data.company_id) {
         setCurrentUserCompany({
           company_id: data.company_id,
-          company_name: data.company_name || ''
+          company_name: data.company_name || '',
         });
         console.log('설정된 회사 정보:', {
           company_id: data.company_id,
-          company_name: data.company_name
+          company_name: data.company_name,
         });
       }
     } catch (error) {
@@ -325,7 +326,7 @@ const AdminPosition: React.FC = () => {
           if (errorData.detail) errorMsg = errorData.detail;
         } catch {}
         alert(errorMsg);
-        navigate('/')
+        navigate('/');
         throw new Error(errorMsg);
       }
       const data = await response.json();
@@ -361,9 +362,10 @@ const AdminPosition: React.FC = () => {
     try {
       const positionData = {
         ...formData,
-        position_company_id: currentUserCompany.company_id
+        position_company_id: currentUserCompany.company_id,
       };
       console.log('생성할 직급 데이터:', positionData);
+      console.log('현재 회사 정보:', currentUserCompany.company_id);
 
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
@@ -379,6 +381,7 @@ const AdminPosition: React.FC = () => {
       if (response.ok) {
         fetchPositions();
         setFormData({
+          position_company_id: '',
           position_code: '',
           position_name: '',
           position_detail: '',
@@ -400,7 +403,7 @@ const AdminPosition: React.FC = () => {
     try {
       const positionData = {
         ...formData,
-        position_company_id: currentUserCompany.company_id
+        position_company_id: currentUserCompany.company_id,
       };
       console.log('수정할 직급 데이터:', positionData);
 
@@ -430,7 +433,9 @@ const AdminPosition: React.FC = () => {
     if (window.confirm('정말로 이 직급을 삭제하시겠습니까?')) {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/v1/admin/positions/${positionId}`,
           {
             method: 'DELETE',
             credentials: 'include',
@@ -448,6 +453,7 @@ const AdminPosition: React.FC = () => {
   const handleRowClick = (position: Position) => {
     setSelectedPositionId(position.position_id);
     setFormData({
+      position_company_id: '',
       position_code: position.position_code,
       position_name: position.position_name,
       position_detail: position.position_detail,
@@ -478,13 +484,11 @@ const AdminPosition: React.FC = () => {
 
     // 현재 사용자의 회사에 속한 직급만 필터링
     if (currentUserCompany) {
-      sorted = sorted.filter(
-        (position) => {
-          console.log('직급의 회사 ID:', position.position_company_id);
-          console.log('현재 회사 ID:', currentUserCompany.company_id);
-          return position.position_company_id === currentUserCompany.company_id;
-        }
-      );
+      sorted = sorted.filter((position) => {
+        console.log('직급의 회사 ID:', position.position_company_id);
+        console.log('현재 회사 ID:', currentUserCompany.company_id);
+        return position.position_company_id === currentUserCompany.company_id;
+      });
     }
     console.log('필터링 후 직급:', sorted);
 
@@ -492,7 +496,7 @@ const AdminPosition: React.FC = () => {
       sorted.sort((a, b) => {
         const aValue = String(a[sortState.field as keyof Position] || '');
         const bValue = String(b[sortState.field as keyof Position] || '');
-        
+
         return sortState.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
@@ -519,7 +523,9 @@ const AdminPosition: React.FC = () => {
                 직급 코드
                 <SortIcon
                   $direction={
-                    sortState.field === 'position_code' ? sortState.direction : null
+                    sortState.field === 'position_code'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -527,7 +533,9 @@ const AdminPosition: React.FC = () => {
                 직급명
                 <SortIcon
                   $direction={
-                    sortState.field === 'position_name' ? sortState.direction : null
+                    sortState.field === 'position_name'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -535,7 +543,9 @@ const AdminPosition: React.FC = () => {
                 레벨
                 <SortIcon
                   $direction={
-                    sortState.field === 'position_detail' ? sortState.direction : null
+                    sortState.field === 'position_detail'
+                      ? sortState.direction
+                      : null
                   }
                 />
               </TableHeader>
@@ -546,7 +556,9 @@ const AdminPosition: React.FC = () => {
               <tr
                 key={position.position_id}
                 onClick={() => handleRowClick(position)}
-                className={selectedPositionId === position.position_id ? 'selected' : ''}
+                className={
+                  selectedPositionId === position.position_id ? 'selected' : ''
+                }
               >
                 <td>{position.position_code}</td>
                 <td>{position.position_name}</td>
@@ -690,3 +702,17 @@ const AdminPosition: React.FC = () => {
 };
 
 export default AdminPosition;
+
+const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  background-color: ${(props) =>
+    props.variant === 'danger' ? '#dc3545' : '#007bff'};
+  color: white;
+  &:hover {
+    opacity: 0.9;
+  }
+`;

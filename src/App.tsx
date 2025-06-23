@@ -18,11 +18,13 @@ import MyPage from './pages/mypage/MyPage';
 import Calendar from './pages/calendar/Calendar';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import ProjectListPage from './pages/dashboard/projectlist';
-import ConferenceListPage from './pages/dashboard/conferencelist';
+import ProjectListPage from './pages/project_list/projectlist';
+
 import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AlterInfo from './pages/mypage_alter/alterInfo';
+import ConferenceListPage from './pages/conference_list/conferencelist';
+import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
 
 function App() {
   return (
@@ -31,16 +33,44 @@ function App() {
         <Route element={<Layout />}>
           {/* 공개 라우트 */}
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/sign_up" element={<ChooseMethod />} />
-          <Route path="/sign_up/form" element={<SignUp />} />
-          <Route path="/social_sign_up" element={<SocialSignUp />} />
+          <Route
+            path="/login"
+            element={
+              <RedirectIfAuthenticated>
+                <Login />
+              </RedirectIfAuthenticated>
+            }
+          />
+          <Route
+            path="/sign_up"
+            element={
+              <RedirectIfAuthenticated>
+                <ChooseMethod />
+              </RedirectIfAuthenticated>
+            }
+          />
+          <Route
+            path="/sign_up/form"
+            element={
+              <RedirectIfAuthenticated>
+                <SignUp />
+              </RedirectIfAuthenticated>
+            }
+          />
+          <Route
+            path="/social_sign_up"
+            element={
+              <RedirectIfAuthenticated>
+                <SocialSignUp />
+              </RedirectIfAuthenticated>
+            }
+          />
           <Route path="/result" element={<Result />} />
 
           <Route
             path="/dashboard/:meetingId"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -48,7 +78,7 @@ function App() {
           <Route
             path="/insert_info"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <InsertConferenceInfo />
               </ProtectedRoute>
             }
@@ -56,7 +86,7 @@ function App() {
           <Route
             path="/docs_agent_test"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['companyAdmin']}>
                 <DocsAgentTest />
               </ProtectedRoute>
             }
@@ -64,7 +94,7 @@ function App() {
           <Route
             path="/admin/user"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['companyAdmin', 'superAdmin']}>
                 <AdminUser />
               </ProtectedRoute>
             }
@@ -72,7 +102,7 @@ function App() {
           <Route
             path="/admin/company"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['superAdmin']}>
                 <AdminCompany />
               </ProtectedRoute>
             }
@@ -80,7 +110,7 @@ function App() {
           <Route
             path="/admin/position"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['companyAdmin']}>
                 <AdminPosition />
               </ProtectedRoute>
             }
@@ -88,7 +118,7 @@ function App() {
           <Route
             path="/admin/template"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['companyAdmin']}>
                 <AdminTemplate />
               </ProtectedRoute>
             }
@@ -96,7 +126,7 @@ function App() {
           <Route
             path="/admin/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['companyAdmin']}>
                 <AdminDashboard />
               </ProtectedRoute>
             }
@@ -104,7 +134,7 @@ function App() {
           <Route
             path="/admin/admin"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['superAdmin']}>
                 <AdminAdmin />
               </ProtectedRoute>
             }
@@ -112,7 +142,7 @@ function App() {
           <Route
             path="/mypage"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <MyPage />
               </ProtectedRoute>
             }
@@ -120,7 +150,7 @@ function App() {
           <Route
             path="/mypage/alterInfo"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <AlterInfo />
               </ProtectedRoute>
             }
@@ -128,7 +158,7 @@ function App() {
           <Route
             path="/calendar"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <Calendar />
               </ProtectedRoute>
             }
@@ -136,7 +166,7 @@ function App() {
           <Route
             path="/projectlist"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <ProjectListPage />
               </ProtectedRoute>
             }
@@ -144,7 +174,7 @@ function App() {
           <Route
             path="/conferencelist/:projectId"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <ConferenceListPage />
               </ProtectedRoute>
             }

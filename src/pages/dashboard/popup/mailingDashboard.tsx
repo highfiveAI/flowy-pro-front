@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import MailPreviewDashboard from './mailpreviewDashboard';
+
 import type { Feedback, SummaryLog } from '../Dashboard.types';
+import type { Todo } from '../../../types/project';
+import { postSummaryTask } from '../../../api/fetchProject';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -67,16 +69,16 @@ const SectionLabel = styled.div`
   text-align: center;
   align-self: center;
 `;
-const InfoBox = styled.div`
-  background: #ededed;
-  border-radius: 16px;
-  padding: 20px 16px;
-  min-height: 40px;
-  max-height: 120px;
-  margin-bottom: 24px;
-  overflow-y: auto;
-  color: #333;
-`;
+// const InfoBox = styled.div`
+//   background: #ededed;
+//   border-radius: 16px;
+//   padding: 20px 16px;
+//   min-height: 40px;
+//   max-height: 120px;
+//   margin-bottom: 24px;
+//   overflow-y: auto;
+//   color: #333;
+// `;
 const CheckboxGroup = styled.div`
   display: flex;
   flex-direction: column;
@@ -149,6 +151,12 @@ const BottomButton = styled.button`
     background: #009999;
   }
 `;
+const NoticeText = styled.span`
+  display: block; /* 간격 주려면 block 또는 margin-top */
+  margin-top: 0.5rem; /* 위 간격 */
+  color: #007bff; /* 파란색 (Bootstrap 기준 파랑) */
+  font-size: 0.875rem; /* 선택적으로 글씨 조금 작게 */
+`;
 
 // Tooltip 스타일 추가
 const TooltipWrapper = styled.div`
@@ -157,9 +165,9 @@ const TooltipWrapper = styled.div`
   width: 100%;
   justify-content: center;
 `;
-const TooltipText = styled.div`
-  visibility: hidden;
-  opacity: 0;
+const TooltipText = styled.div<{ $show?: boolean }>`
+  visibility: ${(props) => (props.$show ? 'visible' : 'hidden')};
+  opacity: ${(props) => (props.$show ? 1 : 0)};
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -184,14 +192,10 @@ const TooltipText = styled.div`
     border-style: solid;
     border-color: rgba(78, 42, 132, 0.5) transparent transparent transparent;
   }
-
-  ${TooltipWrapper}:hover & {
-    visibility: visible;
-    opacity: 1;
-  }
 `;
 
 interface MailingDashboardProps {
+  offModify: () => void;
   onClose: () => void;
   summary: SummaryLog | null;
   tasks: any;
@@ -203,7 +207,9 @@ interface MailingDashboardProps {
     attendees: { user_id: string; user_name: string }[];
     agenda: string;
     project_users: { user_id: string; user_name: string; user_email: string }[];
+    meeting_id: string;
   };
+  meetingId: string | undefined;
 }
 
 type MailSection =
@@ -215,13 +221,16 @@ type MailSection =
     };
 
 const MailingDashboard = ({
+  offModify,
   onClose,
   summary,
   tasks,
   feedback,
   meetingInfo,
+  meetingId,
 }: MailingDashboardProps) => {
   console.log('meetingInfo:', meetingInfo);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [mailItems, setMailItems] = useState({
     summary: false,
     tasks: false,
@@ -233,7 +242,11 @@ const MailingDashboard = ({
     custom: boolean;
     customValue: string;
     selectedAttendees: string[];
-    selectedCustom: { user_id: string; user_name: string; user_email: string }[];
+    selectedCustom: {
+      user_id: string;
+      user_name: string;
+      user_email: string;
+    }[];
   }>({
     allProject: false,
     allAttendees: false,
@@ -242,7 +255,7 @@ const MailingDashboard = ({
     selectedAttendees: [],
     selectedCustom: [],
   });
-  const [showPreview, setShowPreview] = useState(false);
+  // const [showPreview, setShowPreview] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -270,25 +283,32 @@ const MailingDashboard = ({
   }
   if (mailItems.feedback && feedback) mailPreview.push(...feedback);
 
+  const isRecipientMissing =
+    (!receivers.allProject && !receivers.allAttendees && !receivers.custom) ||
+    (receivers.custom && receivers.selectedCustom.length === 0);
+
   // 회의 참석자 또는 프로젝트 참여자 전체 수신 시 자동 할당
   useEffect(() => {
     if (receivers.allProject) {
-      setReceivers((r) => ({ ...r, selectedCustom: meetingInfo.project_users }));
+      setReceivers((r) => ({
+        ...r,
+        selectedCustom: meetingInfo.project_users,
+      }));
     } else if (receivers.allAttendees) {
       const attendeeUsers = meetingInfo.attendees
         .map((attendee) =>
           meetingInfo.project_users.find(
-            (pUser) => pUser.user_id === attendee.user_id,
-          ),
+            (pUser) => pUser.user_id === attendee.user_id
+          )
         )
         .filter(
           (
-            user,
+            user
           ): user is {
             user_id: string;
             user_name: string;
             user_email: string;
-          } => Boolean(user),
+          } => Boolean(user)
         );
       setReceivers((r) => ({ ...r, selectedCustom: attendeeUsers }));
     } else if (!receivers.custom) {
@@ -322,7 +342,7 @@ const MailingDashboard = ({
     setReceivers((r) => ({
       ...r,
       selectedCustom: r.selectedCustom.filter(
-        (user) => user.user_id !== userIdToRemove,
+        (user) => user.user_id !== userIdToRemove
       ),
     }));
   };
@@ -330,15 +350,15 @@ const MailingDashboard = ({
   const potentialCandidates = meetingInfo.project_users.filter(
     (user) =>
       !receivers.selectedCustom.some(
-        (selected) => selected.user_id === user.user_id,
-      ),
+        (selected) => selected.user_id === user.user_id
+      )
   );
 
   const filteredCandidates = receivers.customValue
     ? potentialCandidates.filter((user) =>
         user.user_name
           .toLowerCase()
-          .includes(receivers.customValue.toLowerCase()),
+          .includes(receivers.customValue.toLowerCase())
       )
     : potentialCandidates;
 
@@ -358,6 +378,136 @@ const MailingDashboard = ({
     }
   };
 
+  // meeting_info 데이터 구조 생성 함수
+  const makeMeetingInfoForMail = () => {
+    return {
+      info_n: receivers.selectedCustom.map((user) => ({
+        name: user.user_name,
+        email: user.user_email,
+      })),
+      dt: meetingInfo.date,
+      subj: meetingInfo.title,
+      update_dt: new Date().toISOString(),
+      meeting_id: meetingInfo.meeting_id, // meetingInfo에 meeting_id가 반드시 있어야 함
+    };
+  };
+
+  // db update용 함수(구현 예정)
+  const handleDbUpdate = () => {
+    // db에 update 기능 구현 예정
+  };
+
+  // 메일 발송 및 조건 분기 함수
+  const handleSendMail = async () => {
+    // 1) 아무것도 체크 안 한 경우
+    if (!receivers.allProject && !receivers.allAttendees && !receivers.custom) {
+      const mailList = meetingInfo.project_users.map((user) => ({
+        name: user.user_name,
+        email: user.user_email,
+      }));
+      const now = new Date().toISOString(); // update_dt
+      const payload = {
+        info_n: mailList,
+        dt: meetingInfo.date,
+        subj: meetingInfo.title,
+        update_dt: now,
+        meeting_id: meetingInfo.meeting_id,
+      };
+      console.log('백엔드로 보낼 payload:', payload);
+      try {
+        await fetch(
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/v1/stt/meeting/send-update-email`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }
+        );
+        onClose(); // 성공 시 팝업 닫기
+      } catch (e) {
+        alert('메일 발송에 실패했습니다.');
+      }
+      return;
+    }
+    // 2) 개별 수신자 지정만 체크하고 아무도 선택 안 한 경우
+    if (receivers.custom && receivers.selectedCustom.length === 0) {
+      handleDbUpdate();
+      onClose();
+      return;
+    }
+    // (기타: 개별 수신자 지정 등)
+    const mailList = receivers.selectedCustom.map((user) => ({
+      name: user.user_name,
+      email: user.user_email,
+    }));
+    const now = new Date().toISOString();
+    const payload = {
+      info_n: mailList,
+      dt: meetingInfo.date,
+      subj: meetingInfo.title,
+      update_dt: now,
+      meeting_id: meetingInfo.meeting_id,
+    };
+    console.log('백엔드로 보낼 payload:', payload);
+    try {
+      await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      onClose();
+    } catch (e) {
+      alert('메일 발송에 실패했습니다.');
+    }
+  };
+
+  // 받아온 assignRole(할 일 목록) insert할 때 정형화 된 형태로 변경
+  const getPostPayload = () => {
+    const allTodos: Todo[] = tasks
+      ? (Object.values(tasks).flat() as Todo[])
+      : [];
+
+    return {
+      updated_task_assign_contents: {
+        assigned_todos: allTodos,
+      },
+    };
+  };
+
+  // 데이터 fetch 함수
+  const handleSaveSummaryTasks = async () => {
+    // setIsEditingSummary(false);
+    if (!summary || !summary.updated_summary_contents) {
+      console.error('summaryLog가 정의되지 않았습니다.');
+      return;
+    }
+
+    const payload = getPostPayload();
+
+    if (!payload?.updated_task_assign_contents) {
+      console.error('작업 할당 내용이 없습니다.');
+      return;
+    }
+
+    try {
+      await postSummaryTask(
+        meetingId,
+        summary.updated_summary_contents,
+        payload.updated_task_assign_contents
+      );
+      console.log('저장 완료');
+      // 예: showToast('요약 및 작업이 성공적으로 저장되었습니다.');
+    } catch (error) {
+      console.error('저장 실패:', error);
+      // 예: showToast('저장에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
   return (
     <ModalOverlay>
       <ModalBox>
@@ -365,14 +515,16 @@ const MailingDashboard = ({
           <MailIcon src="/images/sendmail.svg" alt="메일" />
           <Title>회의 결과 수정 및 메일 발송</Title>
         </TopRow>
+
         <ReceiverBox>
           <SectionLabel>수신 대상자 선택</SectionLabel>
           <CheckboxGroup>
+            {/* 프로젝트 참여자 전체 */}
             <CheckboxLabel>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
                   checked={receivers.allProject}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  onChange={(e) => {
                     if (e.target.checked) {
                       setReceivers((prev) => ({
                         ...prev,
@@ -381,7 +533,10 @@ const MailingDashboard = ({
                         custom: false,
                       }));
                     } else {
-                      setReceivers((prev) => ({ ...prev, allProject: false }));
+                      setReceivers((prev) => ({
+                        ...prev,
+                        allProject: false,
+                      }));
                     }
                   }}
                 />
@@ -403,11 +558,13 @@ const MailingDashboard = ({
                 </div>
               )}
             </CheckboxLabel>
+
+            {/* 회의 참석자 전체 */}
             <CheckboxLabel>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
                   checked={receivers.allAttendees}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  onChange={(e) => {
                     if (e.target.checked) {
                       setReceivers((prev) => ({
                         ...prev,
@@ -439,13 +596,13 @@ const MailingDashboard = ({
                 </div>
               )}
             </CheckboxLabel>
+
+            {/* 개별 수신자 지정 */}
             <CheckboxLabel>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
-                  checked={
-                    receivers.custom || receivers.selectedCustom.length > 0
-                  }
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  checked={receivers.custom}
+                  onChange={(e) => {
                     if (e.target.checked) {
                       setReceivers((prev) => ({
                         ...prev,
@@ -464,7 +621,7 @@ const MailingDashboard = ({
                 />
                 개별 수신자 지정
               </div>
-              {(receivers.custom || receivers.selectedCustom.length > 0) && (
+              {receivers.custom && (
                 <div
                   style={{
                     display: 'flex',
@@ -478,7 +635,7 @@ const MailingDashboard = ({
                   <ReceiverInput
                     placeholder="이름 검색"
                     value={receivers.customValue}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       setReceivers((prev) => ({
                         ...prev,
                         customValue: e.target.value,
@@ -532,7 +689,7 @@ const MailingDashboard = ({
                       <SelectedReceiver key={user.user_id}>
                         {user.user_name}
                         <RemoveButton
-                          onClick={() => removeReceiver(user.user_id)}
+                          onMouseDown={() => removeReceiver(user.user_id)}
                         >
                           ×
                         </RemoveButton>
@@ -544,36 +701,31 @@ const MailingDashboard = ({
             </CheckboxLabel>
           </CheckboxGroup>
         </ReceiverBox>
-        <TooltipWrapper>
-          <BottomButton onClick={() => setShowPreview(true)}>
+
+        {/* 안내 문구 */}
+        <NoticeText>
+          *수신 대상자를 선택하지 않으면 메일은 전송되지 않아요*
+        </NoticeText>
+
+        {/* 버튼 + 툴팁 */}
+        <TooltipWrapper
+          onMouseEnter={() => isRecipientMissing && setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          <BottomButton
+            onClick={() => {
+              onClose();
+              offModify();
+              handleSaveSummaryTasks();
+              handleSendMail();
+            }}
+          >
             수정하고 메일 보내기
           </BottomButton>
-          <TooltipText>
-            수신 대상자를 선택하지 않으면 메일은 전송되지 않아요
-          </TooltipText>
+          <TooltipText $show={showTooltip} />
         </TooltipWrapper>
-        {showPreview && (
-          <MailPreviewDashboard
-            onClose={() => setShowPreview(false)}
-            onSend={() => {
-              // TODO: 실제 메일 발송 로직 구현
-              alert('메일이 발송되었습니다.');
-              setShowPreview(false);
-              onClose();
-            }}
-            summary={summary ?? null}
-            tasks={tasks}
-            feedback={feedback}
-            mailItems={mailItems}
-            receivers={receivers}
-            meetingInfo={{
-              ...meetingInfo,
-              agenda: Array.isArray(meetingInfo.agenda)
-                ? meetingInfo.agenda
-                : [meetingInfo.agenda], // string이면 배열로 감싸기
-            }}
-          />
-        )}
+
+        {/* 닫기 버튼 */}
         <button
           onClick={onClose}
           style={{
