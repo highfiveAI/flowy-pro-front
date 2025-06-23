@@ -300,7 +300,10 @@ export default function CalendarPage() {
           if (view === "month") {
             const day = date.getDate().toString().padStart(2, "0");
             const dayTodos = events.filter(
-              (ev) => ev.type === "todo" && isSameDay(new Date(ev.start), date)
+              (ev) =>
+                ev.type === "todo" &&
+                ev.end &&
+                isSameDay(new Date(ev.end), date)
             );
             const dayMeetings = events.filter(
               (ev) =>
