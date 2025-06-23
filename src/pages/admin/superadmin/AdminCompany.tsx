@@ -374,6 +374,7 @@ const AdminCompany: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -403,6 +404,7 @@ const AdminCompany: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`,
         {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -426,6 +428,7 @@ const AdminCompany: React.FC = () => {
           `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`,
           {
             method: 'DELETE',
+            credentials: 'include',
           }
         );
         if (response.ok) {
@@ -450,6 +453,7 @@ const AdminCompany: React.FC = () => {
         }/api/v1/admin/companies/${companyId}/status`,
         {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
