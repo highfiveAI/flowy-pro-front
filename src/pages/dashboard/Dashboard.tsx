@@ -23,7 +23,9 @@ import type {
   Project,
   ProjectUser,
   SummaryLog,
+
 } from './Dashboard.types';
+
 import {
   AddButton,
   BasicInfoGrid,
@@ -182,7 +184,9 @@ const Dashboard: React.FC = () => {
       user_id: pUser.user.user_id,
       user_name: pUser.user.user_name,
       user_email: pUser.user.user_email,
-    })),
+    })) || [],
+    meeting_id: meeting?.meeting_id || '',
+
   };
 
   useEffect(() => {
