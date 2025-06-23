@@ -6,10 +6,8 @@ import PDFPopup from './popup/PDFPopup';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import {
   fetchMeetings,
-  postAssignedTodos,
-  postSummaryLog,
+  // postSummaryLog,
   fetchDraftLogs,
-  postSummaryTask,
 } from '../../api/fetchProject';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -23,7 +21,6 @@ import type {
   Project,
   ProjectUser,
   SummaryLog,
-
 } from './Dashboard.types';
 
 import {
@@ -73,7 +70,6 @@ const Dashboard: React.FC = () => {
     col: string;
     idx: number;
   } | null>(null);
-  const [isEditingTasks, setIsEditingTasks] = useState(false);
   const [showMailPopup, setShowMailPopup] = useState(false);
   const [showPDFPopup, setShowPDFPopup] = useState(false);
   const [isEditingSummary, setIsEditingSummary] = useState(false);
@@ -172,21 +168,21 @@ const Dashboard: React.FC = () => {
       user_name: user.user_name,
     })),
     agenda: meeting?.meeting_agenda || '',
-    project_users: (
-      (project?.project_users ?? []) as {
-        user: {
-          user_id: string;
-          user_name: string;
-          user_email: string;
-        };
-      }[]
-    ).map((pUser) => ({
-      user_id: pUser.user.user_id,
-      user_name: pUser.user.user_name,
-      user_email: pUser.user.user_email,
-    })) || [],
+    project_users:
+      (
+        (project?.project_users ?? []) as {
+          user: {
+            user_id: string;
+            user_name: string;
+            user_email: string;
+          };
+        }[]
+      ).map((pUser) => ({
+        user_id: pUser.user.user_id,
+        user_name: pUser.user.user_name,
+        user_email: pUser.user.user_email,
+      })) || [],
     meeting_id: meeting?.meeting_id || '',
-
   };
 
   useEffect(() => {
@@ -269,21 +265,21 @@ const Dashboard: React.FC = () => {
   const handleEditSummary = () => {
     setIsEditingSummary(true);
   };
-  const handleSaveSummary = async () => {
-    setIsEditingSummary(false);
+  // const handleSaveSummary = async () => {
+  //   setIsEditingSummary(false);
 
-    if (!summaryLog || !summaryLog.updated_summary_contents) {
-      console.error('summaryLog가 정의되지 않았습니다.');
-      return;
-    }
+  //   if (!summaryLog || !summaryLog.updated_summary_contents) {
+  //     console.error('summaryLog가 정의되지 않았습니다.');
+  //     return;
+  //   }
 
-    try {
-      await postSummaryLog(meetingId, summaryLog.updated_summary_contents);
-      console.log('저장 완료');
-    } catch (error) {
-      console.error('저장 실패:', error);
-    }
-  };
+  //   try {
+  //     await postSummaryLog(meetingId, summaryLog.updated_summary_contents);
+  //     console.log('저장 완료');
+  //   } catch (error) {
+  //     console.error('저장 실패:', error);
+  //   }
+  // };
 
   // const handleSaveTasks = async () => {
   //   setIsEditingTasks(false);

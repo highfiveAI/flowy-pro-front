@@ -4,7 +4,6 @@ import {
   Link,
   useLocation,
   useNavigate,
-  useParams,
   useSearchParams,
 } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -141,7 +140,7 @@ const Login: React.FC = () => {
         </GoogleLoginButton>
 
         <LinkContainer>
-          <Link to="/find-id">아이디 찾기</Link>
+          <Link to="/find_id">아이디 찾기</Link>
           <span>|</span>
           <Link to="/find-password">비밀번호 찾기</Link>
           <span>|</span>

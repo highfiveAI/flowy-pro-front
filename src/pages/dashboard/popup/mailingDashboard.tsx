@@ -231,7 +231,7 @@ const MailingDashboard = ({
 }: MailingDashboardProps) => {
   console.log('meetingInfo:', meetingInfo);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [mailItems, setMailItems] = useState({
+  const [mailItems /*, setMailItems*/] = useState({
     summary: false,
     tasks: false,
     feedback: false,
@@ -379,18 +379,18 @@ const MailingDashboard = ({
   };
 
   // meeting_info 데이터 구조 생성 함수
-  const makeMeetingInfoForMail = () => {
-    return {
-      info_n: receivers.selectedCustom.map((user) => ({
-        name: user.user_name,
-        email: user.user_email,
-      })),
-      dt: meetingInfo.date,
-      subj: meetingInfo.title,
-      update_dt: new Date().toISOString(),
-      meeting_id: meetingInfo.meeting_id, // meetingInfo에 meeting_id가 반드시 있어야 함
-    };
-  };
+  // const makeMeetingInfoForMail = () => {
+  //   return {
+  //     info_n: receivers.selectedCustom.map((user) => ({
+  //       name: user.user_name,
+  //       email: user.user_email,
+  //     })),
+  //     dt: meetingInfo.date,
+  //     subj: meetingInfo.title,
+  //     update_dt: new Date().toISOString(),
+  //     meeting_id: meetingInfo.meeting_id, // meetingInfo에 meeting_id가 반드시 있어야 함
+  //   };
+  // };
 
   // db update용 함수(구현 예정)
   const handleDbUpdate = () => {

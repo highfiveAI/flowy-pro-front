@@ -86,3 +86,35 @@ export const Button = styled.button`
     background-color: #351745;
   }
 `;
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 40px;
+`;
+
+export const ChangeButton = styled.button`
+  background-color: #480b6a;
+  color: #fff;
+  padding: 15px 40px;
+  border: none;
+  border-radius: 48px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #351745;
+  }
+`;
