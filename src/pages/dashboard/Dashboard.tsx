@@ -59,6 +59,18 @@ import {
   TaskGridContainer,
 } from './Dashboard.styles';
 
+function formatDateWithDay(dateString: string) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  const week = ['일', '월', '화', '수', '목', '금', '토'];
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const day = week[date.getDay()];
+  return `${yyyy}.${mm}.${dd}(${day})`;
+}
+
 const Dashboard: React.FC = () => {
   const [project, setProject] = useState<Project>();
   const [meeting, setMeeting] = useState<Meeting>();
@@ -607,7 +619,7 @@ const Dashboard: React.FC = () => {
                                         placeholderText="날짜 선택"
                                       />
                                     ) : todo.schedule ? (
-                                      todo.schedule
+                                      formatDateWithDay(todo.schedule)
                                     ) : (
                                       '미정'
                                     )}
@@ -642,7 +654,7 @@ const Dashboard: React.FC = () => {
                             <TaskCardListItem key={`${col}__${idx}`}>
                               {todo.action}
                               <TaskCardDate>
-                                {todo.schedule ?? '미정'}
+                                {todo.schedule ? formatDateWithDay(todo.schedule) : '미정'}
                               </TaskCardDate>
                             </TaskCardListItem>
                           ))}

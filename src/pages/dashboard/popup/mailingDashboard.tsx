@@ -378,12 +378,16 @@ const MailingDashboard = ({
     }
   };
 
-  // meeting_info 데이터 구조 생성 함수
+  // meeting_info 데이터 구조 생성 함수 (roles 추가)
   const makeMeetingInfoForMail = () => {
     return {
       info_n: receivers.selectedCustom.map((user) => ({
         name: user.user_name,
         email: user.user_email,
+        roles: (tasks && tasks[user.user_name] ? tasks[user.user_name] : []).map((todo: any) => ({
+          action: todo.action,
+          schedule: todo.schedule ?? null,
+        })),
       })),
       dt: meetingInfo.date,
       subj: meetingInfo.title,
@@ -404,6 +408,10 @@ const MailingDashboard = ({
       const mailList = meetingInfo.project_users.map((user) => ({
         name: user.user_name,
         email: user.user_email,
+        roles: (tasks && tasks[user.user_name] ? tasks[user.user_name] : []).map((todo: any) => ({
+          action: todo.action,
+          schedule: todo.schedule ?? null,
+        })),
       }));
       const now = new Date().toISOString(); // update_dt
       const payload = {
@@ -438,18 +446,7 @@ const MailingDashboard = ({
       return;
     }
     // (기타: 개별 수신자 지정 등)
-    const mailList = receivers.selectedCustom.map((user) => ({
-      name: user.user_name,
-      email: user.user_email,
-    }));
-    const now = new Date().toISOString();
-    const payload = {
-      info_n: mailList,
-      dt: meetingInfo.date,
-      subj: meetingInfo.title,
-      update_dt: now,
-      meeting_id: meetingInfo.meeting_id,
-    };
+    const payload = makeMeetingInfoForMail();
     console.log('백엔드로 보낼 payload:', payload);
     try {
       await fetch(
@@ -714,6 +711,9 @@ const MailingDashboard = ({
         >
           <BottomButton
             onClick={() => {
+              const payload = makeMeetingInfoForMail();
+              console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
+              console.log(JSON.stringify(payload, null, 2));
               onClose();
               offModify();
               handleSaveSummaryTasks();
