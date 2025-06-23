@@ -5,7 +5,6 @@ import type { Feedback, SummaryLog } from '../Dashboard.types';
 import type { Todo } from '../../../types/project';
 import { postSummaryTask } from '../../../api/fetchProject';
 
-
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -233,7 +232,6 @@ const MailingDashboard = ({
   console.log('meetingInfo:', meetingInfo);
   const [showTooltip, setShowTooltip] = useState(false);
   const [mailItems, setMailItems] = useState({
-
     summary: false,
     tasks: false,
     feedback: false,
@@ -286,9 +284,7 @@ const MailingDashboard = ({
   if (mailItems.feedback && feedback) mailPreview.push(...feedback);
 
   const isRecipientMissing =
-    (!receivers.allProject &&
-      !receivers.allAttendees &&
-      !receivers.custom) ||
+    (!receivers.allProject && !receivers.allAttendees && !receivers.custom) ||
     (receivers.custom && receivers.selectedCustom.length === 0);
 
   // 회의 참석자 또는 프로젝트 참여자 전체 수신 시 자동 할당
@@ -385,7 +381,7 @@ const MailingDashboard = ({
   // meeting_info 데이터 구조 생성 함수
   const makeMeetingInfoForMail = () => {
     return {
-      info_n: receivers.selectedCustom.map(user => ({
+      info_n: receivers.selectedCustom.map((user) => ({
         name: user.user_name,
         email: user.user_email,
       })),
@@ -405,7 +401,7 @@ const MailingDashboard = ({
   const handleSendMail = async () => {
     // 1) 아무것도 체크 안 한 경우
     if (!receivers.allProject && !receivers.allAttendees && !receivers.custom) {
-      const mailList = meetingInfo.project_users.map(user => ({
+      const mailList = meetingInfo.project_users.map((user) => ({
         name: user.user_name,
         email: user.user_email,
       }));
@@ -419,11 +415,16 @@ const MailingDashboard = ({
       };
       console.log('백엔드로 보낼 payload:', payload);
       try {
-        await fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        await fetch(
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/v1/stt/meeting/send-update-email`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }
+        );
         onClose(); // 성공 시 팝업 닫기
       } catch (e) {
         alert('메일 발송에 실패했습니다.');
@@ -437,7 +438,7 @@ const MailingDashboard = ({
       return;
     }
     // (기타: 개별 수신자 지정 등)
-    const mailList = receivers.selectedCustom.map(user => ({
+    const mailList = receivers.selectedCustom.map((user) => ({
       name: user.user_name,
       email: user.user_email,
     }));
@@ -451,14 +452,19 @@ const MailingDashboard = ({
     };
     console.log('백엔드로 보낼 payload:', payload);
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
       onClose();
     } catch (e) {
       alert('메일 발송에 실패했습니다.');
+    }
+  };
 
   // 받아온 assignRole(할 일 목록) insert할 때 정형화 된 형태로 변경
   const getPostPayload = () => {
@@ -509,14 +515,16 @@ const MailingDashboard = ({
           <MailIcon src="/images/sendmail.svg" alt="메일" />
           <Title>회의 결과 수정 및 메일 발송</Title>
         </TopRow>
+
         <ReceiverBox>
           <SectionLabel>수신 대상자 선택</SectionLabel>
           <CheckboxGroup>
+            {/* 프로젝트 참여자 전체 */}
             <CheckboxLabel>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
                   checked={receivers.allProject}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  onChange={(e) => {
                     if (e.target.checked) {
                       setReceivers((prev) => ({
                         ...prev,
@@ -525,7 +533,10 @@ const MailingDashboard = ({
                         custom: false,
                       }));
                     } else {
-                      setReceivers((prev) => ({ ...prev, allProject: false }));
+                      setReceivers((prev) => ({
+                        ...prev,
+                        allProject: false,
+                      }));
                     }
                   }}
                 />
@@ -547,11 +558,13 @@ const MailingDashboard = ({
                 </div>
               )}
             </CheckboxLabel>
+
+            {/* 회의 참석자 전체 */}
             <CheckboxLabel>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
                   checked={receivers.allAttendees}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  onChange={(e) => {
                     if (e.target.checked) {
                       setReceivers((prev) => ({
                         ...prev,
@@ -583,11 +596,13 @@ const MailingDashboard = ({
                 </div>
               )}
             </CheckboxLabel>
+
+            {/* 개별 수신자 지정 */}
             <CheckboxLabel>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
                   checked={receivers.custom}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  onChange={(e) => {
                     if (e.target.checked) {
                       setReceivers((prev) => ({
                         ...prev,
@@ -620,7 +635,7 @@ const MailingDashboard = ({
                   <ReceiverInput
                     placeholder="이름 검색"
                     value={receivers.customValue}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       setReceivers((prev) => ({
                         ...prev,
                         customValue: e.target.value,
@@ -686,26 +701,31 @@ const MailingDashboard = ({
             </CheckboxLabel>
           </CheckboxGroup>
         </ReceiverBox>
+
+        {/* 안내 문구 */}
         <NoticeText>
           *수신 대상자를 선택하지 않으면 메일은 전송되지 않아요*
         </NoticeText>
 
-         <TooltipWrapper
-           onMouseEnter={() => isRecipientMissing && setShowTooltip(true)}
-           onMouseLeave={() => setShowTooltip(false)}
-         >
-           <BottomButton
-              onClick={() => {
-                onClose();
-                offModify();
-                handleSaveSummaryTasks();
-                handleSendMail()
-              }}
-           >
-             수정하고 메일 보내기
-           </BottomButton>
-           <TooltipText $show={showTooltip}>
+        {/* 버튼 + 툴팁 */}
+        <TooltipWrapper
+          onMouseEnter={() => isRecipientMissing && setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          <BottomButton
+            onClick={() => {
+              onClose();
+              offModify();
+              handleSaveSummaryTasks();
+              handleSendMail();
+            }}
+          >
+            수정하고 메일 보내기
+          </BottomButton>
+          <TooltipText $show={showTooltip} />
+        </TooltipWrapper>
 
+        {/* 닫기 버튼 */}
         <button
           onClick={onClose}
           style={{
