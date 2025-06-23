@@ -49,4 +49,5 @@ export interface meetingInfo {
     user_name: string;
     user_email: string;
   }[];
+  meeting_id: string;
 }
