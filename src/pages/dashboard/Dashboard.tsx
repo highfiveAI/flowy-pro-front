@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import MailingDashboard from './popup/mailingDashboard';
-import PDFPopup from './popup/PDFPopup';
-import { closestCenter, DndContext } from '@dnd-kit/core';
+import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import MailingDashboard from "./popup/mailingDashboard";
+import PDFPopup from "./popup/PDFPopup";
+import { closestCenter, DndContext } from "@dnd-kit/core";
 import {
   fetchMeetings,
   postAssignedTodos,
   postSummaryLog,
   fetchDraftLogs,
-} from '../../api/fetchProject';
-import { useParams } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { checkAuth } from '../../api/fetchAuthCheck';
-import type { Todo } from '../../types/project';
+} from "../../api/fetchProject";
+import { useParams } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { checkAuth } from "../../api/fetchAuthCheck";
+import type { Todo } from "../../types/project";
 
 import type {
   Feedback,
@@ -23,414 +22,39 @@ import type {
   Project,
   ProjectUser,
   SummaryLog,
-} from './Dashboard.types';
 
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  position: relative;
-  background-color: #f8f9fa;
-`;
-
-const MainContent = styled.div`
-  flex: 1;
-  padding: 24px;
-  padding-top: 100px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-  @media (max-width: 768px) {
-    padding: 16px;
-    padding-top: 80px;
-  }
-`;
-
-const PageTitle = styled.h1`
-  color: #351745;
-  font-size: 2rem;
-  font-weight: 600;
-  position: absolute;
-  top: 24px;
-  left: 40px;
-  margin: 0;
-  padding: 0;
-  @media (max-width: 768px) {
-    font-size: 2rem;
-    left: 24px;
-  }
-`;
-
-const MeetingAnalysisHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
-  }
-`;
-
-const MeetingAnalysisTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #351745;
-  margin: 0;
-  font-weight: 600;
-`;
-
-const Section = styled.div`
-  background: #fff;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-`;
-
-const SectionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f8f9fa;
-  padding: 16px 24px;
-  border-bottom: 1px solid #e0e0e0;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 1.25rem;
-  color: #351745;
-  margin: 0;
-  font-weight: 600;
-`;
-
-const SectionBody = styled.div`
-  padding: 24px;
-  overflow-y: auto;
-  max-height: none;
-  @media (max-width: 768px) {
-    padding: 16px;
-  }
-`;
-
-const EditButton = styled.button`
-  background-color: #351745;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  margin-left: 16px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #480b6a;
-  }
-`;
-
-const BasicInfoGrid = styled.div`
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 16px;
-  @media (max-width: 768px) {
-    grid-template-columns: 100px 1fr;
-    gap: 12px;
-  }
-`;
-
-const InfoLabel = styled.div`
-  font-weight: 600;
-  color: #351745;
-  font-size: 0.9375rem;
-`;
-
-const InfoContent = styled.div`
-  color: #333;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-`;
-
-const SummaryContent = styled.div`
-  padding: 0;
-`;
-
-const SummarySection = styled.div`
-  margin-bottom: 24px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const SummarySectionHeader = styled.h4`
-  color: #351745;
-  font-size: 1.125rem;
-  margin-bottom: 12px;
-  font-weight: 600;
-`;
-
-const SummaryList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-`;
-
-const SummaryListItem = styled.li`
-  margin-bottom: 12px;
-  color: #333;
-  line-height: 1.6;
-  font-size: 0.9375rem;
-  padding-left: 20px;
-  position: relative;
-
-  &:before {
-    content: '•';
-    color: #351745;
-    position: absolute;
-    left: 0;
-    font-size: 1.2em;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const TaskGridContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-height: 600px;
-  overflow-y: auto;
-  padding: 20px;
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-  @media (max-width: 992px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 576px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const TaskCard = styled.div<{ $isUnassigned?: boolean }>`
-  border-radius: 12px;
-  border: 1px solid
-    ${(props) => (props.$isUnassigned ? 'rgba(210, 0, 0, 0.3)' : '#e0e0e0')};
-  background: ${(props) =>
-    props.$isUnassigned ? 'rgba(210, 0, 0, 0.02)' : '#fff'};
-  padding: 20px;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const TaskCardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #e0e0e0;
-`;
-
-const TaskCardTitle = styled.h4<{ $isUnassigned?: boolean }>`
-  font-size: 1.125rem;
-  margin: 0;
-  color: ${(props) => (props.$isUnassigned ? '#d20000' : '#351745')};
-  font-weight: 600;
-`;
-
-const TaskCardList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  flex-grow: 1;
-`;
-
-const TaskCardListItem = styled.li`
-  margin-bottom: 12px;
-  color: #333;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  line-height: 1.5;
-  font-size: 0.9375rem;
-  padding-left: 20px;
-  position: relative;
-
-  &:before {
-    content: '•';
-    color: #351745;
-    position: absolute;
-    left: 0;
-    font-size: 1.2em;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const TaskCardDate = styled.span`
-  color: #666;
-  font-size: 0.875rem;
-  margin-left: 12px;
-  white-space: nowrap;
-  padding: 2px 8px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #e9ecef;
-  }
-`;
-
-const RecommendFileItem = styled.li`
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-`;
-
-const SpeechBubbleButton = styled.button`
-  position: relative;
-  background: #f3eef8;
-  border: none;
-  border-radius: 16px;
-  padding: 8px 20px 8px 18px;
-  margin-left: 12px;
-  font-weight: 500;
-  color: #351745;
-  font-size: 15px;
-  box-shadow: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: box-shadow 0.15s;
-  &:hover {
-    box-shadow: 0 2px 8px rgba(53, 23, 69, 0.08);
-  }
-  &::before {
-    content: '';
-    position: absolute;
-    left: -10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-right: 10px solid #f3eef8;
-  }
-`;
-
-const RectButton = styled.button`
-  background: #f3eef8;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 20px 8px 18px;
-  margin-left: 8px;
-  font-weight: 500;
-  color: #351745;
-  font-size: 15px;
-  box-shadow: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: box-shadow 0.15s;
-  &:hover {
-    box-shadow: 0 2px 8px rgba(53, 23, 69, 0.08);
-  }
-`;
-
-const InputWrapper = styled.div`
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-  padding: 0 24px;
-  width: 96%;
-`;
-
-const StyledInput = styled.input`
-  flex: 1;
-  padding: 12px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 16px;
-`;
-
-const AddButton = styled.button`
-  background-color: #3b82f6;
-  color: white;
-  padding: 12px 20px;
-  font-size: 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  &:hover {
-    background-color: #2563eb;
-  }
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-
-// const RoleContainer = styled.div`
-//   display: grid;
-//   grid-template-columns: repeat(3, 1fr);
-//   gap: 16px;
-//   padding: 16px;
-// `;
-
-// const Card = styled.div<{ highlight?: boolean }>`
-//   border: 1px solid ${({ highlight }) => (highlight ? 'red' : '#ccc')};
-//   padding: 16px;
-//   border-radius: 8px;
-//   background-color: ${({ highlight }) => (highlight ? '#fff6f6' : '#fff')};
-// `;
-
-// const Title = styled.h3`
-//   font-size: 16px;
-//   font-weight: bold;
-// `;
-
-interface meetingInfo {
-  project: string;
-  title: string;
-  date: string;
-  attendees: { user_id: string; user_name: string }[];
-  agenda: string;
-  project_users: { user_id: string; user_name: string; user_email: string }[];
-  meeting_id: string;
-}
-
+} from "./Dashboard.types";
+import {
+  AddButton,
+  BasicInfoGrid,
+  Container,
+  EditButton,
+  InfoContent,
+  InfoLabel,
+  InputWrapper,
+  MainContent,
+  MeetingAnalysisHeader,
+  MeetingAnalysisTitle,
+  RecommendFileItem,
+  Section,
+  SectionBody,
+  SectionHeader,
+  SectionTitle,
+  SpeechBubbleButton,
+  StyledInput,
+  SummaryContent,
+  SummaryList,
+  SummaryListItem,
+  SummarySection,
+  SummarySectionHeader,
+  TaskCard,
+  TaskCardDate,
+  TaskCardHeader,
+  TaskCardList,
+  TaskCardListItem,
+  TaskCardTitle,
+  TaskGridContainer,
+} from "./Dashboard.styles";
 
 const Dashboard: React.FC = () => {
   const [project, setProject] = useState<Project>();
@@ -439,7 +63,7 @@ const Dashboard: React.FC = () => {
   const [summaryLog, setSummaryLog] = useState<SummaryLog | null>(null);
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [assignRole, setAssignRole] = useState<Record<string, Todo[]>>({});
-  const [newTodoText, setNewTodoText] = useState('');
+  const [newTodoText, setNewTodoText] = useState("");
   const { meetingId } = useParams<{ meetingId: string }>();
   const { user, setUser, setLoading } = useAuth();
   const [editingDate, setEditingDate] = React.useState<{
@@ -453,11 +77,11 @@ const Dashboard: React.FC = () => {
   const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
 
   const FEEDBACK_LABELS: Record<string, string> = {
-    'e508d0b2-1bfd-42a2-9687-1ae6cd36c648': '총평',
-    '6cb5e437-bc6b-4a37-a3c4-473d9c0bebe2': '불필요한 대화',
-    'ab5a65c6-31a4-493b-93ff-c47e00925d17': '논의되지 않은 안건',
-    '0a5a835d-53d0-43a6-b821-7c36f603a071': '회의 시간 분석',
-    '73c0624b-e1af-4a2b-8e54-c1f8f7dab827': '개선 가이드',
+    "e508d0b2-1bfd-42a2-9687-1ae6cd36c648": "총평",
+    "6cb5e437-bc6b-4a37-a3c4-473d9c0bebe2": "불필요한 대화",
+    "ab5a65c6-31a4-493b-93ff-c47e00925d17": "논의되지 않은 안건",
+    "0a5a835d-53d0-43a6-b821-7c36f603a071": "회의 시간 분석",
+    "73c0624b-e1af-4a2b-8e54-c1f8f7dab827": "개선 가이드",
   };
 
   const handleAddTodo = () => {
@@ -466,17 +90,17 @@ const Dashboard: React.FC = () => {
 
     const newTodo: Todo = {
       action: trimmed,
-      context: '',
-      assignee: '미할당',
-      schedule: '미정',
+      context: "",
+      assignee: "미할당",
+      schedule: "미정",
     };
 
     setAssignRole((prev) => ({
       ...prev,
-      ['미할당']: [...(prev['미할당'] ?? []), newTodo],
+      ["미할당"]: [...(prev["미할당"] ?? []), newTodo],
     }));
 
-    setNewTodoText('');
+    setNewTodoText("");
   };
 
   useEffect(() => {
@@ -509,7 +133,7 @@ const Dashboard: React.FC = () => {
           userNames.forEach((name: string) => {
             grouped[name] = [];
           });
-          grouped['미할당'] = [];
+          grouped["미할당"] = [];
 
           if (data.task_assign_role) {
             const todos: Todo[] =
@@ -520,7 +144,7 @@ const Dashboard: React.FC = () => {
               const key =
                 assigneeName && userNames.includes(assigneeName)
                   ? assigneeName
-                  : '미할당';
+                  : "미할당";
               grouped[key].push(todo);
             });
           }
@@ -537,21 +161,29 @@ const Dashboard: React.FC = () => {
   }, [user, meetingId]);
 
   const mailMeetingInfo: meetingInfo = {
-    project: project?.project_name || '',
-    title: meeting?.meeting_title || '',
-    date: meeting?.meeting_date || '',
+    project: project?.project_name || "",
+    title: meeting?.meeting_title || "",
+    date: meeting?.meeting_date || "",
     attendees: projectUser.map((user) => ({
       user_id: user.user_id,
       user_name: user.user_name,
     })),
-    agenda: meeting?.meeting_agenda || '',
-    project_users:
-    project?.project_users?.map((pUser: any) => ({
+    agenda: meeting?.meeting_agenda || "",
+    project_users: (
+      (project?.project_users ?? []) as {
+        user: {
+          user_id: string;
+          user_name: string;
+          user_email: string;
+        };
+      }[]
+    ).map((pUser) => ({
       user_id: pUser.user.user_id,
       user_name: pUser.user.user_name,
       user_email: pUser.user.user_email,
     })) || [],
     meeting_id: meeting?.meeting_id || '',
+
   };
 
   useEffect(() => {
@@ -563,7 +195,6 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     })();
   }, []);
-
 
   const handleEditSummaryItem = (
     section: string,
@@ -590,8 +221,8 @@ const Dashboard: React.FC = () => {
     const { active, over } = event;
     if (!over || !active.id) return;
 
-    const [fromCol, fromIdxStr] = active.id.split('__');
-    const toCol = over.id.split('__')[0];
+    const [fromCol, fromIdxStr] = active.id.split("__");
+    const toCol = over.id.split("__")[0];
 
     if (fromCol === toCol && active.id === over.id) return;
 
@@ -616,7 +247,7 @@ const Dashboard: React.FC = () => {
   };
 
   const isValidDate = (dateStr: any): boolean => {
-    if (!dateStr || typeof dateStr !== 'string') return false;
+    if (!dateStr || typeof dateStr !== "string") return false;
     const d = new Date(dateStr);
     return d instanceof Date && !isNaN(d.getTime());
   };
@@ -638,15 +269,15 @@ const Dashboard: React.FC = () => {
     setIsEditingSummary(false);
 
     if (!summaryLog || !summaryLog.updated_summary_contents) {
-      console.error('summaryLog가 정의되지 않았습니다.');
+      console.error("summaryLog가 정의되지 않았습니다.");
       return;
     }
 
     try {
       await postSummaryLog(meetingId, summaryLog.updated_summary_contents);
-      console.log('저장 완료');
+      console.log("저장 완료");
     } catch (error) {
-      console.error('저장 실패:', error);
+      console.error("저장 실패:", error);
     }
   };
 
@@ -656,9 +287,9 @@ const Dashboard: React.FC = () => {
     console.log(payload);
     try {
       await postAssignedTodos(meetingId, payload.updated_task_assign_contents);
-      console.log('저장 완료');
+      console.log("저장 완료");
     } catch (error) {
-      console.error('저장 실패:', error);
+      console.error("저장 실패:", error);
     }
   };
 
@@ -669,9 +300,9 @@ const Dashboard: React.FC = () => {
           <MeetingAnalysisTitle>회의 분석 결과 조회</MeetingAnalysisTitle>
           <div
             style={{
-              marginLeft: 'auto',
-              display: 'flex',
-              alignItems: 'center',
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
             }}
           >
             <img
@@ -689,8 +320,6 @@ const Dashboard: React.FC = () => {
             <EditButton onClick={() => setShowMailPopup(true)}>
               수정하기
             </EditButton>
-
-
           </div>
         </MeetingAnalysisHeader>
 
@@ -726,16 +355,16 @@ const Dashboard: React.FC = () => {
               <InfoContent>
                 {meeting?.meeting_date
                   ? new Date(meeting.meeting_date)
-                      .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
-                      .replace('T', ' ')
+                      .toLocaleString("sv-SE", { timeZone: "Asia/Seoul" })
+                      .replace("T", " ")
                       .slice(0, 16)
-                  : '날짜 없음'}
+                  : "날짜 없음"}
               </InfoContent>
               <InfoLabel>회의 참석자</InfoLabel>
               <InfoContent>
                 {projectUser.length > 0
-                  ? projectUser.map((user) => user.user_name).join(', ')
-                  : '참석자 없음'}
+                  ? projectUser.map((user) => user.user_name).join(", ")
+                  : "참석자 없음"}
               </InfoContent>
 
               <InfoLabel>회의 안건</InfoLabel>
@@ -835,20 +464,20 @@ const Dashboard: React.FC = () => {
               >
                 <TaskGridContainer>
                   {[
-                    '미할당',
+                    "미할당",
                     ...Object.keys(assignRole ?? {}).filter(
-                      (key) => key !== '미할당'
+                      (key) => key !== "미할당"
                     ),
                   ].map((col) => (
-                    <div key={col} style={{ height: '100%' }}>
+                    <div key={col} style={{ height: "100%" }}>
                       <TaskCard
-                        $isUnassigned={col === '미할당'}
+                        $isUnassigned={col === "미할당"}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => {
-                          const from = e.dataTransfer.getData('text/plain');
+                          const from = e.dataTransfer.getData("text/plain");
                           if (!from) return;
 
-                          const [fromCol, fromIdx] = from.split('__');
+                          const [fromCol, fromIdx] = from.split("__");
                           if (fromCol === col) return;
                           if (!assignRole[fromCol] || !assignRole[col]) return;
 
@@ -872,8 +501,8 @@ const Dashboard: React.FC = () => {
                         }}
                       >
                         <TaskCardHeader>
-                          <TaskCardTitle $isUnassigned={col === '미할당'}>
-                            {col === '미할당' ? '미할당 작업 목록' : col}
+                          <TaskCardTitle $isUnassigned={col === "미할당"}>
+                            {col === "미할당" ? "미할당 작업 목록" : col}
                           </TaskCardTitle>
                         </TaskCardHeader>
                         <TaskCardList>
@@ -881,11 +510,11 @@ const Dashboard: React.FC = () => {
                             <div
                               key={`${col}__${idx}`}
                               id={`${col}__${idx}`}
-                              style={{ cursor: 'grab' }}
+                              style={{ cursor: "grab" }}
                               draggable
                               onDragStart={(e) => {
                                 e.dataTransfer.setData(
-                                  'text/plain',
+                                  "text/plain",
                                   `${col}__${idx}`
                                 );
                               }}
@@ -893,7 +522,7 @@ const Dashboard: React.FC = () => {
                               <TaskCardListItem>
                                 {todo.action}
                                 <TaskCardDate
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: "pointer" }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setEditingDate({ col, idx });
@@ -915,7 +544,7 @@ const Dashboard: React.FC = () => {
                                           ...updatedTodos[idx],
                                           schedule: date
                                             ?.toISOString()
-                                            .split('T')[0],
+                                            .split("T")[0],
                                         };
                                         setAssignRole((prev) => ({
                                           ...prev,
@@ -934,7 +563,7 @@ const Dashboard: React.FC = () => {
                                   ) : todo.schedule ? (
                                     todo.schedule
                                   ) : (
-                                    '미정'
+                                    "미정"
                                   )}
                                 </TaskCardDate>
                               </TaskCardListItem>
@@ -949,16 +578,16 @@ const Dashboard: React.FC = () => {
             ) : (
               <TaskGridContainer>
                 {[
-                  '미할당',
+                  "미할당",
                   ...Object.keys(assignRole ?? {}).filter(
-                    (key) => key !== '미할당'
+                    (key) => key !== "미할당"
                   ),
                 ].map((col) => (
-                  <div key={col} style={{ height: '100%' }}>
-                    <TaskCard $isUnassigned={col === '미할당'}>
+                  <div key={col} style={{ height: "100%" }}>
+                    <TaskCard $isUnassigned={col === "미할당"}>
                       <TaskCardHeader>
-                        <TaskCardTitle $isUnassigned={col === '미할당'}>
-                          {col === '미할당' ? '미할당 작업 목록' : col}
+                        <TaskCardTitle $isUnassigned={col === "미할당"}>
+                          {col === "미할당" ? "미할당 작업 목록" : col}
                         </TaskCardTitle>
                       </TaskCardHeader>
 
@@ -967,7 +596,7 @@ const Dashboard: React.FC = () => {
                           <TaskCardListItem key={`${col}__${idx}`}>
                             {todo.action}
                             <TaskCardDate>
-                              {todo.schedule ?? '미정'}
+                              {todo.schedule ?? "미정"}
                             </TaskCardDate>
                           </TaskCardListItem>
                         ))}
@@ -1012,11 +641,11 @@ const Dashboard: React.FC = () => {
                     const details = Array.isArray(item.feedback_detail)
                       ? item.feedback_detail
                       : [item.feedback_detail];
-                    return details.filter((d) => d && d.trim() !== '');
+                    return details.filter((d) => d && d.trim() !== "");
                   });
 
                   return (
-                    <div key={id} style={{ marginBottom: '1.5rem' }}>
+                    <div key={id} style={{ marginBottom: "1.5rem" }}>
                       <h3>{title}</h3>
                       {allDetails.length > 0 ? (
                         <ul>
@@ -1042,9 +671,9 @@ const Dashboard: React.FC = () => {
             <SectionTitle>추천 문서</SectionTitle>
           </SectionHeader>
           <SectionBody>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {recommendFiles.length === 0 ? (
-                <li style={{ color: '#888' }}>추천 문서가 없습니다.</li>
+                <li style={{ color: "#888" }}>추천 문서가 없습니다.</li>
               ) : (
                 recommendFiles.map((file: any) => (
                   <RecommendFileItem key={file.draft_id}>
@@ -1058,8 +687,8 @@ const Dashboard: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        color: '#351745',
-                        textDecoration: 'underline',
+                        color: "#351745",
+                        textDecoration: "underline",
                         fontWeight: 500,
                       }}
                     >

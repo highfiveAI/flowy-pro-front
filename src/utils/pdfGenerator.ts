@@ -43,7 +43,7 @@ export function generateMeetingPDF({
 
     pdfMake.fonts['NanumHuman'] = {
       normal: 'NanumHumanRegular.ttf',
-      bold: 'NanumHumanBold.ttf'
+      bold: 'NanumHumanBold.ttf',
     };
 
     // 파일명 동적 생성
@@ -65,7 +65,10 @@ export function generateMeetingPDF({
       .filter((v, i, arr) => arr.indexOf(v) === i);
     const allItems = ['기본정보', '요약', '작업목록', '피드백', '추천문서'];
     let includedStr = included.join('_');
-    if (included.length === allItems.length && allItems.every(item => included.includes(item))) {
+    if (
+      included.length === allItems.length &&
+      allItems.every((item) => included.includes(item))
+    ) {
       includedStr = '전체';
     }
     const fileName = `${projectName}_${meetingTitle}_${meetingDate}_${includedStr}.pdf`;
@@ -77,16 +80,48 @@ export function generateMeetingPDF({
     if (checked.info && meetingInfo) {
       const infoSection: any[] = [
         { text: '[ 회의 기본 정보 ]', style: 'sectionTitle' },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, lineColor: '#aaa' }] },
+        {
+          canvas: [
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 520,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: '#aaa',
+            },
+          ],
+        },
         { text: `프로젝트: ${meetingInfo.project || ''}`, style: 'body' },
         { text: `회의 제목: ${meetingInfo.title || ''}`, style: 'body' },
-        { text: `일시: ${meetingInfo.date ? formatDateTime(meetingInfo.date) : ''}`, style: 'body' },
-        { text: `참석자: ${(Array.isArray(meetingInfo.attendees) ? meetingInfo.attendees.map((a: any) => a.user_name || a.name || a.toString()).join(', ') : '')}`, style: 'body' }
+        {
+          text: `일시: ${
+            meetingInfo.date ? formatDateTime(meetingInfo.date) : ''
+          }`,
+          style: 'body',
+        },
+        {
+          text: `참석자: ${
+            Array.isArray(meetingInfo.attendees)
+              ? meetingInfo.attendees
+                  .map((a: any) => a.user_name || a.name || a.toString())
+                  .join(', ')
+              : ''
+          }`,
+          style: 'body',
+        },
       ];
       if (meetingInfo.agenda) {
-        infoSection.push({ text: `안건: ${meetingInfo.agenda}`, style: 'body' });
+        infoSection.push({
+          text: `안건: ${meetingInfo.agenda}`,
+          style: 'body',
+        });
       }
-      infoSection.push({ text: '', margin: [0, 0, 0, 10] as [number, number, number, number] });
+      infoSection.push({
+        text: '',
+        margin: [0, 0, 0, 10] as [number, number, number, number],
+      });
       content.push(...infoSection);
     }
 
@@ -95,28 +130,43 @@ export function generateMeetingPDF({
       const summaryTableBody: any[] = [
         [
           { text: '항목', style: 'tableHeader' },
-          { text: '내용', style: 'tableHeader' }
-        ]
+          { text: '내용', style: 'tableHeader' },
+        ],
       ];
-      Object.entries(summary.updated_summary_contents).forEach(([section, arr]) => {
-        summaryTableBody.push([
-          section,
-          Array.isArray(arr) ? arr.join('\n') : arr
-        ]);
-      });
+      Object.entries(summary.updated_summary_contents).forEach(
+        ([section, arr]) => {
+          summaryTableBody.push([
+            section,
+            Array.isArray(arr) ? arr.join('\n') : arr,
+          ]);
+        }
+      );
       content.push(
         { text: '[ 회의 요약 ]', style: 'sectionTitle' },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, lineColor: '#aaa' }] },
+        {
+          canvas: [
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 520,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: '#aaa',
+            },
+          ],
+        },
         {
           table: {
             headerRows: 1,
             widths: ['25%', '*'],
-            body: summaryTableBody
+            body: summaryTableBody,
           },
           layout: {
-            fillColor: (rowIndex: number) => rowIndex === 0 ? '#e6e6fa' : null
+            fillColor: (rowIndex: number) =>
+              rowIndex === 0 ? '#e6e6fa' : null,
           },
-          margin: [0, 6, 0, 10] as [number, number, number, number]
+          margin: [0, 6, 0, 10] as [number, number, number, number],
         }
       );
     }
@@ -128,32 +178,45 @@ export function generateMeetingPDF({
         [
           { text: '작업 내용', style: 'tableHeader' },
           { text: '담당자', style: 'tableHeader' },
-          { text: '일정', style: 'tableHeader' }
-        ]
+          { text: '일정', style: 'tableHeader' },
+        ],
       ];
-      Object.entries(tasks).forEach(([status, arr]) => {
+      Object.entries(tasks).forEach(([/*status,*/ arr]) => {
         if (!Array.isArray(arr) || arr.length === 0) return;
         arr.forEach((task: any) => {
           taskTableBody.push([
             task.action || '',
             task.assignee || '',
-            task.schedule || ''
+            task.schedule || '',
           ]);
         });
       });
       content.push(
         { text: '[ 작업 목록 ]', style: 'sectionTitle' },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, lineColor: '#aaa' }] },
+        {
+          canvas: [
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 520,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: '#aaa',
+            },
+          ],
+        },
         {
           table: {
             headerRows: 1,
             widths: ['*', '15%', '20%'],
-            body: taskTableBody
+            body: taskTableBody,
           },
           layout: {
-            fillColor: (rowIndex: number) => rowIndex === 0 ? '#e6e6fa' : null
+            fillColor: (rowIndex: number) =>
+              rowIndex === 0 ? '#e6e6fa' : null,
           },
-          margin: [0, 6, 0, 10] as [number, number, number, number]
+          margin: [0, 6, 0, 10] as [number, number, number, number],
         }
       );
     }
@@ -175,18 +238,35 @@ export function generateMeetingPDF({
     if (checked.feedback && Array.isArray(feedback)) {
       content.push(
         { text: '[ 회의 피드백 ]', style: 'sectionTitle' },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, lineColor: '#aaa' }] }
+        {
+          canvas: [
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 520,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: '#aaa',
+            },
+          ],
+        }
       );
       let hasFeedback = false;
       feedback.forEach((fbObj: any) => {
         const label = FEEDBACK_LABELS[fbObj.feedbacktype_id] || '기타';
         const details = fbObj.feedback_detail;
-        const isGuide = fbObj.feedbacktype_id === '73c0624b-e1af-4a2b-8e54-c1f8f7dab827';
+        const isGuide =
+          fbObj.feedbacktype_id === '73c0624b-e1af-4a2b-8e54-c1f8f7dab827';
         if (Array.isArray(details)) {
           details.forEach((fbDetail: string) => {
             if (!isGuide) {
               content.push({ text: label, ...feedbackLabelStyle });
-              content.push({ text: fbDetail, style: 'body', margin: [16, 0, 0, 8] });
+              content.push({
+                text: fbDetail,
+                style: 'body',
+                margin: [16, 0, 0, 8],
+              });
             } else {
               content.push({ text: fbDetail, style: 'body' });
             }
@@ -195,7 +275,11 @@ export function generateMeetingPDF({
         } else if (typeof details === 'string') {
           if (!isGuide) {
             content.push({ text: label, ...feedbackLabelStyle });
-            content.push({ text: details, style: 'body', margin: [16, 0, 0, 8] });
+            content.push({
+              text: details,
+              style: 'body',
+              margin: [16, 0, 0, 8],
+            });
           } else {
             content.push({ text: details, style: 'body' });
           }
@@ -205,35 +289,62 @@ export function generateMeetingPDF({
       if (!hasFeedback) {
         content.push({ text: '피드백이 없습니다.', style: 'body' });
       }
-      content.push({ text: '', margin: [0, 0, 0, 10] as [number, number, number, number] });
+      content.push({
+        text: '',
+        margin: [0, 0, 0, 10] as [number, number, number, number],
+      });
     }
 
     // [추천 문서]
-    if ((checked.recommend || checked.recommendFiles)) {
+    if (checked.recommend || checked.recommendFiles) {
       content.push(
         { text: '[ 추천 문서 ]', style: 'sectionTitle' },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 520, y2: 0, lineWidth: 1, lineColor: '#aaa' }] }
+        {
+          canvas: [
+            {
+              type: 'line',
+              x1: 0,
+              y1: 0,
+              x2: 520,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: '#aaa',
+            },
+          ],
+        }
       );
       if (!Array.isArray(recommendFiles) || recommendFiles.length === 0) {
         content.push({ text: '추천된 문서가 없습니다.', style: 'body' });
       } else {
         recommendFiles.forEach((file: any, idx: number) => {
-          const fileName = typeof file === 'string' ? file : file.file_name || file.toString();
+          const fileName =
+            typeof file === 'string' ? file : file.file_name || file.toString();
           content.push({ text: `${idx + 1}. ${fileName}`, style: 'body' });
         });
       }
-      content.push({ text: '', margin: [0, 0, 0, 10] as [number, number, number, number] });
+      content.push({
+        text: '',
+        margin: [0, 0, 0, 10] as [number, number, number, number],
+      });
     }
 
     // pdfMake 문서 정의
     const docDefinition = {
       content,
       styles: {
-        sectionTitle: { fontSize: 16, bold: true, color: '#000080', margin: [0, 10, 0, 6] as [number, number, number, number] },
+        sectionTitle: {
+          fontSize: 16,
+          bold: true,
+          color: '#000080',
+          margin: [0, 10, 0, 6] as [number, number, number, number],
+        },
         tableHeader: { fillColor: '#e6e6fa', bold: true, color: '#000080' },
-        body: { fontSize: 12, margin: [0, 2, 0, 2] as [number, number, number, number] }
+        body: {
+          fontSize: 12,
+          margin: [0, 2, 0, 2] as [number, number, number, number],
+        },
       },
-      defaultStyle: { font: 'NanumHuman' }
+      defaultStyle: { font: 'NanumHuman' },
     };
 
     pdfMake.createPdf(docDefinition).download(fileName);
@@ -253,4 +364,4 @@ function formatDateTime(dateString: string) {
   const hh = String(d.getHours()).padStart(2, '0');
   const min = String(d.getMinutes()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
-} 
+}

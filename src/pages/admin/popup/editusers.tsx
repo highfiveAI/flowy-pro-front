@@ -148,6 +148,7 @@ interface EditUsersProps {
   onApprove: () => void;
   onReject: () => void;
   onClose: () => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const EditUsers: React.FC<EditUsersProps> = ({
@@ -155,6 +156,7 @@ const EditUsers: React.FC<EditUsersProps> = ({
   user,
   onApprove,
   /*onReject,*/ onClose,
+  onChange,
 }) => {
   if (!isOpen) return null;
   return (
@@ -200,6 +202,7 @@ const EditUsers: React.FC<EditUsersProps> = ({
                 type="text"
                 name="user_dept_name"
                 value={user.user_dept_name || ''}
+                onChange={onChange}
               />
             </InputBox>
           </FormGroup>
@@ -210,6 +213,7 @@ const EditUsers: React.FC<EditUsersProps> = ({
                 type="text"
                 name="user_team_name"
                 value={user.user_team_name || ''}
+                onChange={onChange}
               />
             </InputBox>
           </FormGroup>
@@ -220,6 +224,7 @@ const EditUsers: React.FC<EditUsersProps> = ({
                 type="text"
                 name="user_jobname"
                 value={user.user_jobname || ''}
+                onChange={onChange}
               />
             </InputBox>
           </FormGroup>
