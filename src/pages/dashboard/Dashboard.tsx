@@ -23,7 +23,9 @@ import type {
   Project,
   ProjectUser,
   SummaryLog,
+
 } from './Dashboard.types';
+
 import {
   AddButton,
   BasicInfoGrid,
@@ -182,7 +184,9 @@ const Dashboard: React.FC = () => {
       user_id: pUser.user.user_id,
       user_name: pUser.user.user_name,
       user_email: pUser.user.user_email,
-    })),
+    })) || [],
+    meeting_id: meeting?.meeting_id || '',
+
   };
 
   useEffect(() => {
@@ -281,45 +285,46 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleSaveTasks = async () => {
-    setIsEditingTasks(false);
-    const payload = getPostPayload();
-    console.log(payload);
-    try {
-      await postAssignedTodos(meetingId, payload.updated_task_assign_contents);
-      console.log('저장 완료');
-    } catch (error) {
-      console.error('저장 실패:', error);
-    }
-  };
+  // const handleSaveTasks = async () => {
+  //   setIsEditingTasks(false);
+  //   const payload = getPostPayload();
+  //   console.log(payload);
+  //   try {
+  //     await postAssignedTodos(meetingId, payload.updated_task_assign_contents);
+  //     console.log('저장 완료');
+  //   } catch (error) {
+  //     console.error('저장 실패:', error);
+  //   }
+  // };
 
-  const handleSaveSummaryTasks = async () => {
-    setIsEditingSummary(false);
-    if (!summaryLog || !summaryLog.updated_summary_contents) {
-      console.error('summaryLog가 정의되지 않았습니다.');
-      return;
-    }
+  // 메일로 이전
+  // const handleSaveSummaryTasks = async () => {
+  //   setIsEditingSummary(false);
+  //   if (!summaryLog || !summaryLog.updated_summary_contents) {
+  //     console.error('summaryLog가 정의되지 않았습니다.');
+  //     return;
+  //   }
 
-    const payload = getPostPayload();
+  //   const payload = getPostPayload();
 
-    if (!payload?.updated_task_assign_contents) {
-      console.error('작업 할당 내용이 없습니다.');
-      return;
-    }
+  //   if (!payload?.updated_task_assign_contents) {
+  //     console.error('작업 할당 내용이 없습니다.');
+  //     return;
+  //   }
 
-    try {
-      await postSummaryTask(
-        meetingId,
-        summaryLog.updated_summary_contents,
-        payload.updated_task_assign_contents
-      );
-      console.log('저장 완료');
-      // 예: showToast('요약 및 작업이 성공적으로 저장되었습니다.');
-    } catch (error) {
-      console.error('저장 실패:', error);
-      // 예: showToast('저장에 실패했습니다. 다시 시도해주세요.');
-    }
-  };
+  //   try {
+  //     await postSummaryTask(
+  //       meetingId,
+  //       summaryLog.updated_summary_contents,
+  //       payload.updated_task_assign_contents
+  //     );
+  //     console.log('저장 완료');
+  //     // 예: showToast('요약 및 작업이 성공적으로 저장되었습니다.');
+  //   } catch (error) {
+  //     console.error('저장 실패:', error);
+  //     // 예: showToast('저장에 실패했습니다. 다시 시도해주세요.');
+  //   }
+  // };
 
   return (
     <Container>

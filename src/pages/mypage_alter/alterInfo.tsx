@@ -97,10 +97,35 @@ const AlterInfo: React.FC = () => {
   //   }
   // }
 
+  // 변경내용 저장
   const handleButtonClick = async () => {
     if (!isEditing) {
-      // 편집 모드로 전환
+      // 편집 모드로만 전환하고, 함수 종료!
       setIsEditing(true);
+      return;
+    }
+
+    // 편집 모드일 때만 API 호출
+    try {
+      const result = await updateMypageUser(editedData); // 이 API에서 모든 처리
+      // user 객체에서 user_id, user_name, user_phonenum만 추출해서 새 객체로 출력
+      const filteredUser = result && result.user ? {
+        user_id: result.user.user_id,
+        user_name: result.user.user_name,
+        user_phonenum: result.user.user_phonenum,
+      } : null;
+      console.log('updateMypageUser 응답:', {
+        message: result?.message,
+        user: filteredUser
+      });
+      if (result && result.user) {
+        alert('정보 변경 완료');
+        // 모달 닫기 등
+      } else {
+        alert('정보 변경에 실패했습니다');
+      }
+    } catch (e) {
+      alert('서버 오류가 발생했습니다');
     }
   };
 
