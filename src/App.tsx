@@ -1,30 +1,30 @@
-import { Route, Routes } from "react-router-dom";
-import Home from "./pages/home/Home";
-import Dashboard from "./pages/dashboard/Dashboard";
-import Layout from "./components/Layout";
-import InsertConferenceInfo from "./pages/insert_conference_info/InsertConferenceInfo";
-import Result from "./pages/result/Result";
-import SignUp from "./pages/sign_up/SignUp";
-import SocialSignUp from "./pages/social_sign_up/SocialSignUp";
-import DocsAgentTest from "./pages/docs_agent_test/docs_agent_test";
-import AdminUser from "./pages/admin/AdminUser";
-import AdminCompany from "./pages/admin/superadmin/AdminCompany";
-import AdminPosition from "./pages/admin/AdminPosition";
-import AdminTemplate from "./pages/admin/AdminTemplate";
-import Login from "./pages/log_in/Login";
-import ChooseMethod from "./pages/sign_up_choose/choose_method";
-import MyPage from "./pages/mypage/MyPage";
+import { Route, Routes } from 'react-router-dom';
+import Home from './pages/home/Home';
+import Dashboard from './pages/dashboard/Dashboard';
+import Layout from './components/Layout';
+import InsertConferenceInfo from './pages/insert_conference_info/InsertConferenceInfo';
+import Result from './pages/result/Result';
+import SignUp from './pages/sign_up/SignUp';
+import SocialSignUp from './pages/social_sign_up/SocialSignUp';
+import DocsAgentTest from './pages/docs_agent_test/docs_agent_test';
+import AdminUser from './pages/admin/AdminUser';
+import AdminCompany from './pages/admin/superadmin/AdminCompany';
+import AdminPosition from './pages/admin/AdminPosition';
+import AdminTemplate from './pages/admin/AdminTemplate';
+import Login from './pages/log_in/Login';
+import ChooseMethod from './pages/sign_up_choose/choose_method';
+import MyPage from './pages/mypage/MyPage';
 
-import Calendar from "./pages/calendar/Calendar";
-import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ProjectListPage from "./pages/project_list/projectlist";
+import Calendar from './pages/calendar/Calendar';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import ProjectListPage from './pages/project_list/projectlist';
 
-import AdminAdmin from "./pages/admin/superadmin/AdminAdmin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AlterInfo from "./pages/mypage_alter/alterInfo";
-import ConferenceListPage from "./pages/conference_list/conferencelist";
-import RedirectIfAuthenticated from "./components/RedirectIfAuthenticated";
+import AdminAdmin from './pages/admin/superadmin/AdminAdmin';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AlterInfo from './pages/mypage_alter/alterInfo';
+import ConferenceListPage from './pages/conference_list/conferencelist';
+import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
 
 function App() {
   return (
@@ -70,7 +70,7 @@ function App() {
           <Route
             path="/dashboard/:meetingId"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={['user']}>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -78,7 +78,7 @@ function App() {
           <Route
             path="/insert_info"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={['user']}>
                 <InsertConferenceInfo />
               </ProtectedRoute>
             }
@@ -86,7 +86,7 @@ function App() {
           <Route
             path="/docs_agent_test"
             element={
-              <ProtectedRoute allowedRoles={["companyAdmin"]}>
+              <ProtectedRoute allowedRoles={['companyAdmin']}>
                 <DocsAgentTest />
               </ProtectedRoute>
             }
@@ -94,7 +94,7 @@ function App() {
           <Route
             path="/admin/user"
             element={
-              <ProtectedRoute allowedRoles={["companyAdmin"]}>
+              <ProtectedRoute allowedRoles={['companyAdmin', 'superAdmin']}>
                 <AdminUser />
               </ProtectedRoute>
             }
@@ -102,7 +102,7 @@ function App() {
           <Route
             path="/admin/company"
             element={
-              <ProtectedRoute allowedRoles={["superAdmin"]}>
+              <ProtectedRoute allowedRoles={['superAdmin']}>
                 <AdminCompany />
               </ProtectedRoute>
             }
@@ -110,7 +110,7 @@ function App() {
           <Route
             path="/admin/position"
             element={
-              <ProtectedRoute allowedRoles={["companyAdmin"]}>
+              <ProtectedRoute allowedRoles={['companyAdmin']}>
                 <AdminPosition />
               </ProtectedRoute>
             }
@@ -118,7 +118,7 @@ function App() {
           <Route
             path="/admin/template"
             element={
-              <ProtectedRoute allowedRoles={["companyAdmin"]}>
+              <ProtectedRoute allowedRoles={['companyAdmin']}>
                 <AdminTemplate />
               </ProtectedRoute>
             }
@@ -126,7 +126,7 @@ function App() {
           <Route
             path="/admin/dashboard"
             element={
-              <ProtectedRoute allowedRoles={["companyAdmin"]}>
+              <ProtectedRoute allowedRoles={['companyAdmin']}>
                 <AdminDashboard />
               </ProtectedRoute>
             }
@@ -134,7 +134,7 @@ function App() {
           <Route
             path="/admin/admin"
             element={
-              <ProtectedRoute allowedRoles={["superAdmin"]}>
+              <ProtectedRoute allowedRoles={['superAdmin']}>
                 <AdminAdmin />
               </ProtectedRoute>
             }
@@ -142,7 +142,7 @@ function App() {
           <Route
             path="/mypage"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={['user']}>
                 <MyPage />
               </ProtectedRoute>
             }
@@ -150,7 +150,7 @@ function App() {
           <Route
             path="/mypage/alterInfo"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={['user']}>
                 <AlterInfo />
               </ProtectedRoute>
             }
@@ -158,7 +158,7 @@ function App() {
           <Route
             path="/calendar"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={['user']}>
                 <Calendar />
               </ProtectedRoute>
             }
@@ -166,7 +166,7 @@ function App() {
           <Route
             path="/projectlist"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={['user']}>
                 <ProjectListPage />
               </ProtectedRoute>
             }
@@ -174,7 +174,7 @@ function App() {
           <Route
             path="/conferencelist/:projectId"
             element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              <ProtectedRoute allowedRoles={['user']}>
                 <ConferenceListPage />
               </ProtectedRoute>
             }

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css, keyframes } from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
@@ -148,7 +148,7 @@ export const SummaryListItem = styled.li`
   position: relative;
 
   &:before {
-    content: "•";
+    content: '•';
     color: #351745;
     position: absolute;
     left: 0;
@@ -192,9 +192,9 @@ export const TaskGridContainer = styled.div`
 export const TaskCard = styled.div<{ $isUnassigned?: boolean }>`
   border-radius: 12px;
   border: 1px solid
-    ${(props) => (props.$isUnassigned ? "rgba(210, 0, 0, 0.3)" : "#e0e0e0")};
+    ${(props) => (props.$isUnassigned ? 'rgba(210, 0, 0, 0.3)' : '#e0e0e0')};
   background: ${(props) =>
-    props.$isUnassigned ? "rgba(210, 0, 0, 0.02)" : "#fff"};
+    props.$isUnassigned ? 'rgba(210, 0, 0, 0.02)' : '#fff'};
   padding: 20px;
   min-height: 200px;
   display: flex;
@@ -219,7 +219,7 @@ export const TaskCardHeader = styled.div`
 export const TaskCardTitle = styled.h4<{ $isUnassigned?: boolean }>`
   font-size: 1.125rem;
   margin: 0;
-  color: ${(props) => (props.$isUnassigned ? "#d20000" : "#351745")};
+  color: ${(props) => (props.$isUnassigned ? '#d20000' : '#351745')};
   font-weight: 600;
 `;
 
@@ -242,7 +242,7 @@ export const TaskCardListItem = styled.li`
   position: relative;
 
   &:before {
-    content: "•";
+    content: '•';
     color: #351745;
     position: absolute;
     left: 0;
@@ -294,7 +294,7 @@ export const SpeechBubbleButton = styled.button`
     box-shadow: 0 2px 8px rgba(53, 23, 69, 0.08);
   }
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     left: -10px;
     top: 50%;
@@ -383,3 +383,52 @@ export const AddButton = styled.button`
 //   margin-top: 8px;
 //   font-size: 14px;
 // `;
+
+const moveDash = keyframes`
+  0% {
+    background-position: 0 0, 0 0, 0 100%, 100% 0;
+  }
+  100% {
+    background-position: 40px 0, 0 40px, -40px 100%, 100% -40px;
+  }
+`;
+
+export const RedSection = styled.div<{ isEditing?: boolean }>`
+  padding: 1rem;
+  border-radius: 0.5rem;
+  position: relative;
+  z-index: 1;
+
+  ${({ isEditing }) =>
+    isEditing &&
+    css`
+      &::before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        border-radius: 0.75rem;
+        z-index: -1;
+
+        background-image: repeating-linear-gradient(
+            90deg,
+            red 0 10px,
+            transparent 10px 20px
+          ),
+          repeating-linear-gradient(180deg, red 0 10px, transparent 10px 20px),
+          repeating-linear-gradient(270deg, red 0 10px, transparent 10px 20px),
+          repeating-linear-gradient(0deg, red 0 10px, transparent 10px 20px);
+
+        background-size: 100% 2px, 2px 100%, 100% 2px, 2px 100%;
+        background-repeat: no-repeat;
+        background-position: top left, top right, bottom right, bottom left;
+
+        animation: ${moveDash} 2s linear infinite;
+        mask-image: linear-gradient(#000, #000); /* 깔끔한 mask fallback */
+        mask-composite: intersect;
+        pointer-events: none;
+      }
+    `}
+`;
