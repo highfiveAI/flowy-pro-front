@@ -264,3 +264,77 @@ export const CalendarCheckbox = styled.input.attrs({ type: "checkbox" })`
   cursor: pointer;
   accent-color: #351745;
 `;
+
+export const CalendarLayout = styled.div`
+  position: relative;
+  width: 100vw;
+  min-height: 120vh;
+  background: #f5f5f5;
+`;
+
+export const CalendarFixedBox = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 1100px;
+  min-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+`;
+
+export const UnscheduledPanel = styled.div<{ $open: boolean }>`
+  position: fixed;
+  top: 200px;
+  right: 50px;
+  width: 250px;
+  background: #f8f5ff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(80, 0, 80, 0.06);
+  padding: 24px;
+  overflow: hidden;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+export const TaskList = styled.div`
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 8px;
+`;
+
+export const TaskItem = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(199, 184, 217, 0.1);
+  }
+`;
+
+export const TaskCheckbox = styled.input.attrs({ type: "checkbox" })`
+  margin-right: 10px;
+  accent-color: #351745;
+  width: 18px;
+  height: 18px;
+`;
+
+export const TaskTitle = styled.span<{ completed?: boolean }>`
+  font-size: 1.05rem;
+  color: ${(props) => (props.completed ? "#b0a3c2" : "#351745")};
+  text-decoration: ${(props) => (props.completed ? "line-through" : "none")};
+  font-weight: 500;
+  transition: color 0.18s;
+  border-bottom: 1.5px solid transparent;
+  ${TaskItem}:hover & {
+    border-bottom: 1.5px solid #a48be0;
+  }
+`;
