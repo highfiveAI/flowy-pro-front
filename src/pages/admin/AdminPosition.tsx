@@ -263,6 +263,7 @@ const AdminPosition: React.FC = () => {
     null
   );
   const [formData, setFormData] = useState({
+    position_company_id: '',
     position_code: '',
     position_name: '',
     position_detail: '',
@@ -364,6 +365,7 @@ const AdminPosition: React.FC = () => {
         position_company_id: currentUserCompany.company_id,
       };
       console.log('생성할 직급 데이터:', positionData);
+      console.log('현재 회사 정보:', currentUserCompany.company_id);
 
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
@@ -379,6 +381,7 @@ const AdminPosition: React.FC = () => {
       if (response.ok) {
         fetchPositions();
         setFormData({
+          position_company_id: '',
           position_code: '',
           position_name: '',
           position_detail: '',
@@ -450,6 +453,7 @@ const AdminPosition: React.FC = () => {
   const handleRowClick = (position: Position) => {
     setSelectedPositionId(position.position_id);
     setFormData({
+      position_company_id: '',
       position_code: position.position_code,
       position_name: position.position_name,
       position_detail: position.position_detail,
