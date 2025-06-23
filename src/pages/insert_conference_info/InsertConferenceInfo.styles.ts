@@ -570,19 +570,19 @@ export const ContainerWrapper = styled.div`
 export const TabBtn = styled.button<{ active: boolean }>`
   flex: 1;
   height: 56px;
-  background: ${({ active }) => (active ? "#e5e0ee" : "transparent")};
-  color: ${({ active }) => (active ? "#351745" : "#fff")};
+  background: ${({ active }) => (active ? "transparent" : "#e5e0ee")};
+  color: ${({ active }) => (active ? "#fff" : "#351745")};
   border: none;
   font-size: 1.18rem;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
-  border-top-left-radius: ${({ active }) => (active ? "16px" : "0")};
-  border-top-right-radius: ${({ active }) => (active ? "16px" : "0")};
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
   margin-right: 2px;
   outline: none;
   letter-spacing: -0.5px;
-  z-index: ${({ active }) => (active ? 2 : 1)};
+  z-index: ${({ active }) => (active ? 1 : 2)};
   &:last-child {
     margin-right: 0;
   }
@@ -621,7 +621,7 @@ export const TabPanel = styled.div`
 `;
 
 export const TabSectionWrapper = styled.div`
-  border-radius: 16px 16px 0 0;
+  border-radius: 0;
   overflow: hidden;
   background: #351745;
   width: 100%;
