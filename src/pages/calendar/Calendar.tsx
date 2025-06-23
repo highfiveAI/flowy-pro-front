@@ -404,7 +404,11 @@ export default function CalendarPage() {
             locale="ko-KR"
             calendarType="gregory"
           />
-          {popupDate && (
+
+        </CalendarWrapper>
+      </CalendarFixedBox>
+
+      {popupDate && (
             <CalendarPop
               date={popupDate}
               todos={events.filter(
@@ -419,8 +423,7 @@ export default function CalendarPage() {
               onEdit={handleEditCompleted}
             />
           )}
-        </CalendarWrapper>
-      </CalendarFixedBox>
+
       {/* 오른쪽 패널 */}
       <UnscheduledPanel $open={true}>
         <div style={{ width: "100%" }}>
