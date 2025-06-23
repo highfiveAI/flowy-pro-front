@@ -38,4 +38,5 @@ export interface TokenUser {
   name: string;
   email: string;
   login_id: string;
+  sysrole: string;
 }

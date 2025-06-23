@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   ErrorMessage,
@@ -16,7 +21,6 @@ import {
 
 // import Navbar from '../../components/Navbar';
 
-
 interface FormData {
   username: string;
   password: string;
@@ -26,6 +30,8 @@ const Login: React.FC = () => {
   const { setUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const errorParam = searchParams.get('error');
   const from = location.state?.from?.pathname || '/';
 
   const [formData, setFormData] = useState<FormData>({
@@ -63,6 +69,8 @@ const Login: React.FC = () => {
       if (!response.ok) {
         if (response.status === 401) {
           setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+        } else if (response.status === 403) {
+          setError('승인 되지 않은 계정입니다.');
         } else {
           setError('서버 오류가 발생했습니다. 다시 시도해주세요.');
         }
@@ -89,6 +97,16 @@ const Login: React.FC = () => {
     }/api/v1/users/auth/google/login`;
   };
 
+  useEffect(() => {
+    if (errorParam === 'not_allowed') {
+      setError('승인되지 않은 아이디입니다.');
+    } else if (errorParam === 'not_found') {
+      setError('존재하지 않는 계정입니다.');
+    }
+    const newUrl = location.pathname;
+    navigate(newUrl, { replace: true });
+  }, [errorParam]);
+
   return (
     <LoginContainer>
       <LoginFormContainer onSubmit={handleSubmit}>
@@ -112,9 +130,8 @@ const Login: React.FC = () => {
             value={formData.password}
             onChange={handleChange}
           />
-          {!isGoogleRedirect && error && <ErrorMessage>{error}</ErrorMessage>}
         </InputGroup>
-
+        {!isGoogleRedirect && error && <ErrorMessage>{error}</ErrorMessage>}
         <LoginButton type="submit">로그인</LoginButton>
 
         <GoogleLoginButton onClick={() => handleGoogleLogin()}>
@@ -123,7 +140,7 @@ const Login: React.FC = () => {
         </GoogleLoginButton>
 
         <LinkContainer>
-          <Link to="/find-id">아이디 찾기</Link>
+          <Link to="/find_id">아이디 찾기</Link>
           <span>|</span>
           <Link to="/find-password">비밀번호 찾기</Link>
           <span>|</span>
