@@ -1,7 +1,13 @@
-import React, { useState } from "react";
-import type { ChangeEvent } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import React, { useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   ErrorMessage,
   GoogleLoginButton,
@@ -12,7 +18,7 @@ import {
   LoginButton,
   LoginContainer,
   LoginFormContainer,
-} from "./Login.styles";
+} from './Login.styles';
 
 // import Navbar from '../../components/Navbar';
 
@@ -25,13 +31,15 @@ const Login: React.FC = () => {
   const { setUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const from = location.state?.from?.pathname || "/";
+  const [searchParams] = useSearchParams();
+  const errorParam = searchParams.get('error');
+  const from = location.state?.from?.pathname || '/';
 
   const [formData, setFormData] = useState<FormData>({
-    username: "",
-    password: "",
+    username: '',
+    password: '',
   });
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
   const [isGoogleRedirect, setIsGoogleRedirect] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -41,16 +49,16 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(""); // 기존 에러 초기화
+    setError(''); // 기존 에러 초기화
 
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/login`,
         {
-          method: "POST",
-          credentials: "include",
+          method: 'POST',
+          credentials: 'include',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             login_id: formData.username,
@@ -61,11 +69,11 @@ const Login: React.FC = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError("아이디 또는 비밀번호가 올바르지 않습니다.");
+          setError('아이디 또는 비밀번호가 올바르지 않습니다.');
         } else if (response.status === 403) {
-          setError("승인 되지 않은 계정입니다.");
+          setError('승인 되지 않은 계정입니다.');
         } else {
-          setError("서버 오류가 발생했습니다. 다시 시도해주세요.");
+          setError('서버 오류가 발생했습니다. 다시 시도해주세요.');
         }
         return;
       }
@@ -74,12 +82,12 @@ const Login: React.FC = () => {
 
       // 로그인 성공 처리
 
-      console.log("로그인 성공:", data);
+      console.log('로그인 성공:', data);
       setUser(data.user);
       navigate(from, { replace: true });
     } catch (error) {
-      console.error("로그인 중 오류 발생:", error);
-      setError("네트워크 오류가 발생했습니다.");
+      console.error('로그인 중 오류 발생:', error);
+      setError('네트워크 오류가 발생했습니다.');
     }
   };
 
@@ -89,6 +97,16 @@ const Login: React.FC = () => {
       import.meta.env.VITE_API_URL
     }/api/v1/users/auth/google/login`;
   };
+
+  useEffect(() => {
+    if (errorParam === 'not_allowed') {
+      setError('승인되지 않은 아이디입니다.');
+    } else if (errorParam === 'not_found') {
+      setError('존재하지 않는 계정입니다.');
+    }
+    const newUrl = location.pathname;
+    navigate(newUrl, { replace: true });
+  }, [errorParam]);
 
   return (
     <LoginContainer>
@@ -113,9 +131,8 @@ const Login: React.FC = () => {
             value={formData.password}
             onChange={handleChange}
           />
-          {!isGoogleRedirect && error && <ErrorMessage>{error}</ErrorMessage>}
         </InputGroup>
-
+        {!isGoogleRedirect && error && <ErrorMessage>{error}</ErrorMessage>}
         <LoginButton type="submit">로그인</LoginButton>
 
         <GoogleLoginButton onClick={() => handleGoogleLogin()}>

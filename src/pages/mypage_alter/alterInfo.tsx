@@ -33,7 +33,7 @@ const ChangeButton = styled.button`
 
 import React, { useEffect, useState } from 'react';
 import type { User /*, UserUpdateRequest*/ } from '../../types/user';
-import { fetchUserData /*, updateMypageUser*/ } from '../../api/fetchMypage';
+import { fetchUserData, updateMypageUser } from '../../api/fetchMypage';
 import InfoChangeModal from './mypage_popup/InfoChangeModal';
 import {
   AlterInfoWrapper,
@@ -109,14 +109,17 @@ const AlterInfo: React.FC = () => {
     try {
       const result = await updateMypageUser(editedData); // 이 API에서 모든 처리
       // user 객체에서 user_id, user_name, user_phonenum만 추출해서 새 객체로 출력
-      const filteredUser = result && result.user ? {
-        user_id: result.user.user_id,
-        user_name: result.user.user_name,
-        user_phonenum: result.user.user_phonenum,
-      } : null;
+      const filteredUser =
+        result && result.user
+          ? {
+              user_id: result.user.user_id,
+              user_name: result.user.user_name,
+              user_phonenum: result.user.user_phonenum,
+            }
+          : null;
       console.log('updateMypageUser 응답:', {
         message: result?.message,
-        user: filteredUser
+        user: filteredUser,
       });
       if (result && result.user) {
         alert('정보 변경 완료');
