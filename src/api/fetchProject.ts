@@ -281,7 +281,7 @@ export async function postSummaryLog(
 export async function fetchDraftLogs(meeting_id: string): Promise<any[] | null> {
     try {
         const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/v1/docs/draft/${meeting_id}`,
+            `${import.meta.env.VITE_API_URL}/api/v1/docs/draft-logs/by-meeting/${meeting_id}`,
             {
                 method: 'GET',
                 credentials: 'include',
