@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+
 import type { Feedback, SummaryLog } from '../Dashboard.types';
+import type { Todo } from '../../../types/project';
+import { postSummaryTask } from '../../../api/fetchProject';
 
 
 const ModalOverlay = styled.div`
@@ -149,6 +152,12 @@ const BottomButton = styled.button`
     background: #009999;
   }
 `;
+const NoticeText = styled.span`
+  display: block; /* 간격 주려면 block 또는 margin-top */
+  margin-top: 0.5rem; /* 위 간격 */
+  color: #007bff; /* 파란색 (Bootstrap 기준 파랑) */
+  font-size: 0.875rem; /* 선택적으로 글씨 조금 작게 */
+`;
 
 // Tooltip 스타일 추가
 const TooltipWrapper = styled.div`
@@ -187,6 +196,7 @@ const TooltipText = styled.div<{ $show?: boolean }>`
 `;
 
 interface MailingDashboardProps {
+  offModify: () => void;
   onClose: () => void;
   summary: SummaryLog | null;
   tasks: any;
@@ -200,6 +210,7 @@ interface MailingDashboardProps {
     project_users: { user_id: string; user_name: string; user_email: string }[];
     meeting_id: string;
   };
+  meetingId: string | undefined;
 }
 
 type MailSection =
@@ -211,11 +222,13 @@ type MailSection =
     };
 
 const MailingDashboard = ({
+  offModify,
   onClose,
   summary,
   tasks,
   feedback,
   meetingInfo,
+  meetingId,
 }: MailingDashboardProps) => {
   console.log('meetingInfo:', meetingInfo);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -244,7 +257,7 @@ const MailingDashboard = ({
     selectedAttendees: [],
     selectedCustom: [],
   });
-  const [showPreview, setShowPreview] = useState(false);
+  // const [showPreview, setShowPreview] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -446,6 +459,46 @@ const MailingDashboard = ({
       onClose();
     } catch (e) {
       alert('메일 발송에 실패했습니다.');
+
+  // 받아온 assignRole(할 일 목록) insert할 때 정형화 된 형태로 변경
+  const getPostPayload = () => {
+    const allTodos: Todo[] = tasks
+      ? (Object.values(tasks).flat() as Todo[])
+      : [];
+
+    return {
+      updated_task_assign_contents: {
+        assigned_todos: allTodos,
+      },
+    };
+  };
+
+  // 데이터 fetch 함수
+  const handleSaveSummaryTasks = async () => {
+    // setIsEditingSummary(false);
+    if (!summary || !summary.updated_summary_contents) {
+      console.error('summaryLog가 정의되지 않았습니다.');
+      return;
+    }
+
+    const payload = getPostPayload();
+
+    if (!payload?.updated_task_assign_contents) {
+      console.error('작업 할당 내용이 없습니다.');
+      return;
+    }
+
+    try {
+      await postSummaryTask(
+        meetingId,
+        summary.updated_summary_contents,
+        payload.updated_task_assign_contents
+      );
+      console.log('저장 완료');
+      // 예: showToast('요약 및 작업이 성공적으로 저장되었습니다.');
+    } catch (error) {
+      console.error('저장 실패:', error);
+      // 예: showToast('저장에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -633,19 +686,26 @@ const MailingDashboard = ({
             </CheckboxLabel>
           </CheckboxGroup>
         </ReceiverBox>
-        <TooltipWrapper
-          onMouseEnter={() => isRecipientMissing && setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
-        >
-          <BottomButton
-            onClick={handleSendMail}
-          >
-            수정하고 메일 보내기
-          </BottomButton>
-          <TooltipText $show={showTooltip}>
-            수신 대상자를 선택하지 않으면 메일은 전송되지 않아요
-          </TooltipText>
-        </TooltipWrapper>
+        <NoticeText>
+          *수신 대상자를 선택하지 않으면 메일은 전송되지 않아요*
+        </NoticeText>
+
+         <TooltipWrapper
+           onMouseEnter={() => isRecipientMissing && setShowTooltip(true)}
+           onMouseLeave={() => setShowTooltip(false)}
+         >
+           <BottomButton
+              onClick={() => {
+                onClose();
+                offModify();
+                handleSaveSummaryTasks();
+                handleSendMail()
+              }}
+           >
+             수정하고 메일 보내기
+           </BottomButton>
+           <TooltipText $show={showTooltip}>
+
         <button
           onClick={onClose}
           style={{
