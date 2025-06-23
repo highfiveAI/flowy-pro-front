@@ -225,18 +225,6 @@ const TableHeader = styled.th`
   }
 `;
 
-const Button = styled.button`
-  padding: 0.5rem 1.2rem;
-  background: #4b2067;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.18s;
-  &:hover { background: #351745; }
-`;
-
 const SortIcon = styled.span<{ $direction: SortDirection }>`
   display: inline-block;
   margin-left: 4px;
