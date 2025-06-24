@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import MailingDashboard from './popup/mailingDashboard';
+import MailingDashboard_unedit from './popup/mailingDashboard_unedit';
 import PDFPopup from './popup/PDFPopup';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import {
@@ -56,6 +57,18 @@ import {
   TaskGridContainer,
 } from './Dashboard.styles';
 
+function formatDateWithDay(dateString: string) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  const week = ['일', '월', '화', '수', '목', '금', '토'];
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const day = week[date.getDay()];
+  return `${yyyy}.${mm}.${dd}(${day})`;
+}
+
 const Dashboard: React.FC = () => {
   const [project, setProject] = useState<Project>();
   const [meeting, setMeeting] = useState<Meeting>();
@@ -74,6 +87,7 @@ const Dashboard: React.FC = () => {
   const [showPDFPopup, setShowPDFPopup] = useState(false);
   const [isEditingSummary, setIsEditingSummary] = useState(false);
   const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
+  const [showMail_uneditPopup, setShowMail_uneditPopup] = useState(false);
 
   const FEEDBACK_LABELS: Record<string, string> = {
     'e508d0b2-1bfd-42a2-9687-1ae6cd36c648': '총평',
@@ -334,18 +348,29 @@ const Dashboard: React.FC = () => {
               alignItems: 'center',
             }}
           >
-            <img
-              src="/images/recommendfile.svg"
-              alt="PDF"
-              style={{ width: 22, height: 22, marginRight: 6 }}
-            />
             <SpeechBubbleButton
               onClick={() => setShowPDFPopup(true)}
               style={{ marginLeft: 8 }}
             >
+              <img
+                src="/images/recommendfile.svg"
+                alt="PDF"
+                style={{ width: 22, height: 22, marginRight: 6, verticalAlign: 'middle' }}
+              />
               PDF 다운로드
             </SpeechBubbleButton>
-
+            &nbsp;&nbsp;&nbsp;
+            <SpeechBubbleButton
+              onClick={() => setShowMail_uneditPopup(true)}
+              style={{ marginLeft: 8 }}
+            >
+              <img
+                src="/images/sendmail.svg"
+                alt="메일"
+                style={{ width: 22, height: 22, marginRight: 6, verticalAlign: 'middle' }}
+              />
+              메일전송하기
+            </SpeechBubbleButton>
             {/* <EditButton onClick={() => setShowMailPopup(true)}>
               수정하기
             </EditButton> */}
@@ -377,6 +402,17 @@ const Dashboard: React.FC = () => {
             tasks={assignRole}
             feedback={feedback}
             meetingInfo={mailMeetingInfo}
+          />
+        )}
+        {showMail_uneditPopup && (
+          <MailingDashboard_unedit
+            offModify={() => {}}
+            onClose={() => setShowMail_uneditPopup(false)}
+            summary={summaryLog}
+            tasks={assignRole}
+            feedback={feedback}
+            meetingInfo={mailMeetingInfo}
+            meetingId={meetingId}
           />
         )}
         <Section>
@@ -603,7 +639,7 @@ const Dashboard: React.FC = () => {
                                         placeholderText="날짜 선택"
                                       />
                                     ) : todo.schedule ? (
-                                      todo.schedule
+                                      formatDateWithDay(todo.schedule)
                                     ) : (
                                       '미정'
                                     )}
@@ -638,7 +674,7 @@ const Dashboard: React.FC = () => {
                             <TaskCardListItem key={`${col}__${idx}`}>
                               {todo.action}
                               <TaskCardDate>
-                                {todo.schedule ?? '미정'}
+                                {todo.schedule ? formatDateWithDay(todo.schedule) : '미정'}
                               </TaskCardDate>
                             </TaskCardListItem>
                           ))}
