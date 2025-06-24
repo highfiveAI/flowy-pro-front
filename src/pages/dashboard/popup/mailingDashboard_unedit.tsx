@@ -152,42 +152,6 @@ const NoticeText = styled.span`
   font-size: 0.875rem; /* 선택적으로 글씨 조금 작게 */
 `;
 
-// Tooltip 스타일 추가
-const TooltipWrapper = styled.div`
-  position: relative;
-  display: flex;
-  width: 100%;
-  justify-content: center;
-`;
-const TooltipText = styled.div<{ $show?: boolean }>`
-  visibility: ${(props) => (props.$show ? 'visible' : 'hidden')};
-  opacity: ${(props) => (props.$show ? 1 : 0)};
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(78, 42, 132, 0.6);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  white-space: nowrap;
-  z-index: 10;
-  transition: opacity 0.2s;
-  pointer-events: none;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 14px;
-    border-style: solid;
-    border-color: rgba(78, 42, 132, 0.5) transparent transparent transparent;
-  }
-`;
-
 interface MailingDashboardProps {
   offModify: () => void;
   onClose: () => void;
@@ -413,9 +377,7 @@ const MailingDashboard = ({
       console.log('백엔드로 보낼 payload:', payload);
       try {
         await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/api/v1/stt/meeting/send-update-email`,
+          `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-meeting-result`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -438,7 +400,7 @@ const MailingDashboard = ({
     console.log('백엔드로 보낼 payload:', payload);
     try {
       await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`,
+        `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-meeting-result`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -664,26 +626,20 @@ const MailingDashboard = ({
         </NoticeText>
 
         {/* 버튼 + 툴팁 */}
-        <TooltipWrapper
-          onMouseEnter={() => isRecipientMissing && setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
+        <BottomButton
+          disabled={isRecipientMissing}
+          onClick={() => {
+            if (isRecipientMissing) return;
+            const payload = makeMeetingInfoForMail();
+            console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
+            console.log(JSON.stringify(payload, null, 2));
+            onClose();
+            offModify();
+            handleSendMail();
+          }}
         >
-          <BottomButton
-            disabled={isRecipientMissing}
-            onClick={() => {
-              if (isRecipientMissing) return;
-              const payload = makeMeetingInfoForMail();
-              console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
-              console.log(JSON.stringify(payload, null, 2));
-              onClose();
-              offModify();
-              handleSendMail();
-            }}
-          >
-            수정하고 메일 보내기
-          </BottomButton>
-          <TooltipText $show={showTooltip} />
-        </TooltipWrapper>
+          메일 보내기
+        </BottomButton>
 
         {/* 닫기 버튼 */}
         <button

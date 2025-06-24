@@ -147,9 +147,6 @@ const BottomButton = styled.button`
   margin-top: 20px;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  &:hover {
-    background: #009999;
-  }
 `;
 const NoticeText = styled.span`
   display: block; /* 간격 주려면 block 또는 margin-top */
@@ -159,40 +156,40 @@ const NoticeText = styled.span`
 `;
 
 // Tooltip 스타일 추가
-const TooltipWrapper = styled.div`
-  position: relative;
-  display: flex;
-  width: 100%;
-  justify-content: center;
-`;
-const TooltipText = styled.div<{ $show?: boolean }>`
-  visibility: ${(props) => (props.$show ? 'visible' : 'hidden')};
-  opacity: ${(props) => (props.$show ? 1 : 0)};
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(78, 42, 132, 0.6);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  white-space: nowrap;
-  z-index: 10;
-  transition: opacity 0.2s;
-  pointer-events: none;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 14px;
-    border-style: solid;
-    border-color: rgba(78, 42, 132, 0.5) transparent transparent transparent;
-  }
-`;
+// const TooltipWrapper = styled.div`
+//   position: relative;
+//   display: flex;
+//   width: 100%;
+//   justify-content: center;
+// `;
+// const TooltipText = styled.div<{ $show?: boolean }>`
+//   visibility: ${(props) => (props.$show ? 'visible' : 'hidden')};
+//   opacity: ${(props) => (props.$show ? 1 : 0)};
+//   position: absolute;
+//   bottom: 100%;
+//   left: 50%;
+//   transform: translateX(-50%);
+//   background-color: rgba(78, 42, 132, 0.6);
+//   color: white;
+//   padding: 8px 12px;
+//   border-radius: 8px;
+//   font-size: 13px;
+//   white-space: nowrap;
+//   z-index: 10;
+//   transition: opacity 0.2s;
+//   pointer-events: none;
+//
+//   &::after {
+//     content: '';
+//     position: absolute;
+//     top: 100%;
+//     left: 50%;
+//     transform: translateX(-50%);
+//     border-width: 14px;
+//     border-style: solid;
+//     border-color: rgba(78, 42, 132, 0.5) transparent transparent transparent;
+//   }
+// `;
 
 interface MailingDashboardProps {
   offModify: () => void;
@@ -705,25 +702,19 @@ const MailingDashboard = ({
         </NoticeText>
 
         {/* 버튼 + 툴팁 */}
-        <TooltipWrapper
-          onMouseEnter={() => isRecipientMissing && setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
+        <BottomButton
+          onClick={() => {
+            const payload = makeMeetingInfoForMail();
+            console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
+            console.log(JSON.stringify(payload, null, 2));
+            onClose();
+            offModify();
+            handleSaveSummaryTasks();
+            handleSendMail();
+          }}
         >
-          <BottomButton
-            onClick={() => {
-              const payload = makeMeetingInfoForMail();
-              console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
-              console.log(JSON.stringify(payload, null, 2));
-              onClose();
-              offModify();
-              handleSaveSummaryTasks();
-              handleSendMail();
-            }}
-          >
-            수정하고 메일 보내기
-          </BottomButton>
-          <TooltipText $show={showTooltip} />
-        </TooltipWrapper>
+          수정하고 메일 보내기
+        </BottomButton>
 
         {/* 닫기 버튼 */}
         <button
