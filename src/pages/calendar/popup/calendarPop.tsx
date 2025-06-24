@@ -60,8 +60,8 @@ const CalendarPop: React.FC<CalendarPopProps> = ({
 
   return (
     <Overlay onClick={onClose}>
-      <PopContainer onClick={(e) => e.stopPropagation()}>
-        <CloseBtn onClick={onClose}>닫기 ✕</CloseBtn>
+      <PopContainer onClick={e => e.stopPropagation()}>
+        <CloseBtn onClick={onClose}>✕</CloseBtn>
         <Title>
           {date.getFullYear()}년 {date.getMonth() + 1}월 {date.getDate()}일 일정
         </Title>
@@ -88,9 +88,7 @@ const CalendarPop: React.FC<CalendarPopProps> = ({
               }
               return (
                 <MeetingBox
-                  key={
-                    m.id
-                  } /* onClick={() => setEditTarget({ type: 'meeting', event: m })} style={{cursor:'pointer'}}*/
+                  key={m.id}
                 >
                   {timeStr && <MeetingTimeBox>{timeStr}</MeetingTimeBox>}
                   {m.title}
@@ -115,10 +113,8 @@ const CalendarPop: React.FC<CalendarPopProps> = ({
               >
                 <LargeCheckbox
                   checked={t.completed}
-                  // onClick={e => e.stopPropagation()}
                   onChange={(e) => {
                     e.stopPropagation();
-                    console.log("체크박스 onEdit 호출", t.id, !t.completed);
                     onEdit && onEdit(t.id, !t.completed);
                   }}
                 />

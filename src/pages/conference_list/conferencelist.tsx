@@ -55,7 +55,7 @@ const ConferenceListPage: React.FC = () => {
 
   return (
     <Container>
-      <Title>회의 관리</Title>
+      <Title>분석결과 조회</Title>
       <SectionTitle>
         <SectionTitleLink onClick={() => navigate("/projectlist")}>
           프로젝트 목록

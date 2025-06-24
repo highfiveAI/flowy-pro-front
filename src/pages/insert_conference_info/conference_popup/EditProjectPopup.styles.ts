@@ -268,6 +268,7 @@ export const StyledInput = styled.input`
   border: 1px solid #ddd;
   border-radius: 8px; /* border-radius 조정 */
   font-size: 1rem; /* 폰트 사이즈 조정 */
+  font-family: 'Rethink Sans', sans-serif;
   background-color: #f8f9fa; /* 배경색 변경 */
   box-sizing: border-box;
   transition: all 0.2s;

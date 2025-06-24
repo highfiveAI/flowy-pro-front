@@ -32,6 +32,9 @@ import {
   TaskCheckbox,
   TaskTitle,
 } from "./Calendar.styles";
+import styled from "styled-components";
+import NewMeetingPopup from "./popup/new_meeting";
+import { useAuth } from "../../contexts/AuthContext";
 
 function formatYearMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
@@ -120,6 +123,45 @@ function YearMonthPicker({
   );
 }
 
+const FloatingAddButton = styled.button`
+  position: fixed;
+  right: 40px;
+  bottom: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #351745;
+  color: #fff;
+  font-size: 2.5rem;
+  border: none;
+  box-shadow: 0 4px 16px rgba(80,0,80,0.13);
+  cursor: pointer;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  &:hover {
+    background: #5a2a84;
+  }
+`;
+
+const Tooltip = styled.div`
+  position: fixed;
+  right: 110px;
+  bottom: 55px;
+  background: #351745;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  white-space: nowrap;
+  z-index: 10002;
+  box-shadow: 0 2px 8px rgba(80,0,80,0.13);
+  pointer-events: none;
+  opacity: 0.95;
+`;
+
 export default function CalendarPage() {
   const [value, setValue] = useState<Date>(new Date(2025, 5, 1));
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -132,6 +174,11 @@ export default function CalendarPage() {
   const [projects, setProjects] = useState<
     { project_id: string; project_name: string }[]
   >([]);
+  const [unscheduledOpen, setUnscheduledOpen] = useState(true);
+  const [addBtnHover, setAddBtnHover] = useState(false);
+  const [showNewMeeting, setShowNewMeeting] = useState(false);
+  const { user } = useAuth();
+  const [userDetail, setUserDetail] = useState<{ user_name: string; user_email: string; user_jobname: string } | null>(null);
 
   // 1. 로그인한 사용자의 user_id를 먼저 가져온다
   useEffect(() => {
@@ -140,7 +187,15 @@ export default function CalendarPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.user_id) setUserId(data.user_id);
+        if (data.user_id) {
+          setUserId(data.user_id);
+          // 사용자 상세 정보도 함께 저장
+          setUserDetail({
+            user_name: data.user_name || '',
+            user_email: data.user_email || '',
+            user_jobname: data.user_jobname || '',
+          });
+        }
       })
       .catch((err) => {
         console.error("유저 정보 불러오기 실패:", err);
@@ -262,9 +317,30 @@ export default function CalendarPage() {
       {/* 캘린더 */}
       <CalendarFixedBox>
         <CalendarWrapper>
-          <HeaderBar>
-            <div style={{ position: "relative" }}>
-              <Title>작업 관리</Title>
+          <HeaderBar style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+            {/* 1줄: 프로젝트 선택/적용 (오른쪽) */}
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <RightBox>
+                <FilterArea>
+                  <FilterSelectBox>
+                    <FaRegFileAlt style={{ fontSize: "1.2rem", opacity: 0.7 }} />
+                    <FilterSelect
+                      value={selectedProjectId || ""}
+                      onChange={(e) => setSelectedProjectId(e.target.value)}
+                    >
+                      {projects.map((proj) => (
+                        <option key={proj.project_id} value={proj.project_id}>
+                          {proj.project_name}
+                        </option>
+                      ))}
+                    </FilterSelect>
+                  </FilterSelectBox>
+                  <ApplyButton>적용</ApplyButton>
+                </FilterArea>
+              </RightBox>
+            </div>
+            {/* 2줄: 날짜 네비게이션 (왼쪽) */}
+            <div style={{ display: "flex", justifyContent: "flex-start", marginTop: 12 }}>
               <MonthNav>
                 <NavButton onClick={handlePrevMonth}>
                   <FiChevronLeft />
@@ -288,24 +364,6 @@ export default function CalendarPage() {
                 <TodayButton onClick={handleToday}>오늘</TodayButton>
               </MonthNav>
             </div>
-            <RightBox>
-              <FilterArea>
-                <FilterSelectBox>
-                  <FaRegFileAlt style={{ fontSize: "1.2rem", opacity: 0.7 }} />
-                  <FilterSelect
-                    value={selectedProjectId || ""}
-                    onChange={(e) => setSelectedProjectId(e.target.value)}
-                  >
-                    {projects.map((proj) => (
-                      <option key={proj.project_id} value={proj.project_id}>
-                        {proj.project_name}
-                      </option>
-                    ))}
-                  </FilterSelect>
-                </FilterSelectBox>
-                <ApplyButton>적용</ApplyButton>
-              </FilterArea>
-            </RightBox>
           </HeaderBar>
           <Calendar
             value={value}
@@ -425,34 +483,119 @@ export default function CalendarPage() {
           )}
 
       {/* 오른쪽 패널 */}
-      <UnscheduledPanel $open={true}>
+      <UnscheduledPanel $open={unscheduledOpen}>
         <div style={{ width: "100%" }}>
-          <div style={{ fontWeight: 700, marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", fontWeight: 700, marginBottom: 8 }}>
             일정 미정 task
+            <button
+              style={{
+                marginLeft: "auto",
+                background: "none",
+                border: "none",
+                fontSize: "1.3rem",
+                cursor: "pointer",
+                color: "#351745",
+                fontWeight: 700,
+              }}
+              onClick={() => setUnscheduledOpen((prev) => !prev)}
+              aria-label={unscheduledOpen ? "접기" : "펼치기"}
+            >
+              {unscheduledOpen ? "−" : "+"}
+            </button>
           </div>
-          <TaskList>
-            {unscheduledTodos.length === 0 ? (
-              <div style={{ color: "#aaa", padding: "16px 0" }}>
-                일정 미정 task가 없습니다.
-              </div>
-            ) : (
-              unscheduledTodos.map((t) => (
-                <TaskItem 
-                  key={t.id} 
-                  onClick={() => handleEditCompleted(t.id, !t.completed)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <TaskCheckbox
-                    checked={t.completed}
-                    onChange={() => handleEditCompleted(t.id, !t.completed)}
-                  />
-                  <TaskTitle completed={t.completed}>{t.title}</TaskTitle>
-                </TaskItem>
-              ))
-            )}
-          </TaskList>
+          {unscheduledOpen && (
+            <TaskList>
+              {unscheduledTodos.length === 0 ? (
+                <div style={{ color: "#aaa", padding: "16px 0" }}>
+                  일정 미정 task가 없습니다.
+                </div>
+              ) : (
+                unscheduledTodos.map((t) => (
+                  <TaskItem
+                    key={t.id}
+                    onClick={() => handleEditCompleted(t.id, !t.completed)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <TaskCheckbox
+                      checked={t.completed}
+                      onChange={() => handleEditCompleted(t.id, !t.completed)}
+                    />
+                    <TaskTitle completed={t.completed}>{t.title}</TaskTitle>
+                  </TaskItem>
+                ))
+              )}
+            </TaskList>
+          )}
         </div>
       </UnscheduledPanel>
+      <FloatingAddButton
+        onMouseEnter={() => setAddBtnHover(true)}
+        onMouseLeave={() => setAddBtnHover(false)}
+        aria-label="새 회의 일정 등록"
+        onClick={() => setShowNewMeeting(true)}
+      >
+        +
+      </FloatingAddButton>
+      {addBtnHover && <Tooltip>새 회의 일정 등록</Tooltip>}
+      {showNewMeeting && <NewMeetingPopup 
+        onClose={() => setShowNewMeeting(false)} 
+        onSuccess={() => {
+          // 새로운 회의 데이터를 캘린더에 추가
+          const newMeeting = {
+            id: `temp_${Date.now()}`,
+            user_id: userId || '',
+            project_id: selectedProjectId || '',
+            title: '새 회의', // 실제로는 팝업에서 전달받아야 함
+            start: new Date(),
+            end: new Date(Date.now() + 60 * 60 * 1000),
+            type: 'meeting' as const,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          
+          setEvents(prev => [...prev, newMeeting]);
+          
+          // 캘린더 이벤트 새로고침 (기존 로직)
+          if (userId && selectedProjectId) {
+            fetch(
+              `${
+                import.meta.env.VITE_API_URL
+              }/api/v1/calendar/${userId}/${selectedProjectId}`,
+              {
+                credentials: "include",
+              }
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                setEvents(
+                  data.map((ev: any) => ({
+                    id: ev.calendar_id,
+                    user_id: ev.user_id,
+                    project_id: ev.project_id,
+                    title: ev.title,
+                    start: ev.start ? new Date(ev.start) : undefined,
+                    end: ev.end ? new Date(ev.end) : undefined,
+                    type: ev.calendar_type,
+                    completed: ev.completed,
+                    created_at: ev.created_at,
+                    updated_at: ev.updated_at,
+                  }))
+                );
+              });
+          }
+        }}
+        projectName={(() => {
+          const proj = projects.find(p => p.project_id === selectedProjectId);
+          return proj ? proj.project_name : '';
+        })()} 
+        projectId={selectedProjectId || ''}
+        userId={userId || ''}
+        user={{
+          name: userDetail?.user_name || user?.name || '',
+          email: userDetail?.user_email || user?.email || '',
+          role: userDetail?.user_jobname || '',
+        }} 
+      />}
     </CalendarLayout>
   );
 }
