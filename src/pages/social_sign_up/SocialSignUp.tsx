@@ -64,6 +64,8 @@ const SocialSignUp: React.FC = () => {
 
     if (!formData.company) newErrors.company = '회사를 선택해주세요.';
 
+    if (!formData.position) newErrors.position = '직급을 선택해주세요.';
+
     return newErrors;
   };
 
@@ -245,9 +247,12 @@ const SocialSignUp: React.FC = () => {
             </InputGroup>
             {errors.company && <ErrorText>{errors.company}</ErrorText>}
             <InputGroup>
-              <Label>소속 직급명</Label>
+              <Label>
+                소속 직급명<StyledAsterisk>*</StyledAsterisk>
+              </Label>
               <Select
                 name="position"
+                required
                 onChange={handleChange}
                 value={formData.position}
               >
