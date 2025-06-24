@@ -1,8 +1,11 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import NewCompany from './popup/newCompany';
 import EditCompany from './popup/editCompany';
 import { useNavigate } from 'react-router-dom';
+import { fetchUsersByCompany } from '../../../api/fetchSignupInfos';
+
 
 // 스타일 컴포넌트 재사용
 const Container = styled.div`
@@ -204,12 +207,12 @@ const StatusBadge = styled.div<{ $status: boolean }>`
   border: none;
   box-shadow: none;
   &::before {
-    content: '';
+    content: "";
     width: 9px;
     height: 9px;
     border-radius: 50%;
     margin-right: 8px;
-    background-color: ${(props) => (props.$status ? '#16a34a' : '#dc2626')};
+    background-color: ${(props) => (props.$status ? "#16a34a" : "#dc2626")};
     display: inline-block;
   }
 `;
@@ -229,7 +232,7 @@ const StatusDropdown = styled.div`
 const StatusOption = styled.div<{ $status: boolean }>`
   padding: 8px 12px;
   cursor: pointer;
-  color: ${(props) => (props.$status ? '#480B6A' : '#dc2626')};
+  color: ${(props) => (props.$status ? "#480B6A" : "#dc2626")};
 
   &:hover {
     background-color: #f8fafc;
@@ -241,7 +244,7 @@ const StatusContainer = styled.div`
 `;
 
 // 정렬 방향을 위한 타입 추가
-type SortDirection = 'asc' | 'desc' | null;
+type SortDirection = "asc" | "desc" | null;
 
 // 정렬 상태를 위한 인터페이스
 interface SortState {
@@ -273,7 +276,7 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     display: block;
     width: 0;
     height: 0;
@@ -283,21 +286,21 @@ const SortIcon = styled.span<{ $direction: SortDirection }>`
 
   &::before {
     border-bottom: 4px solid
-      ${(props) => (props.$direction === 'asc' ? '#480B6A' : '#cbd5e1')};
+      ${(props) => (props.$direction === "asc" ? "#480B6A" : "#cbd5e1")};
     margin-bottom: 2px;
   }
 
   &::after {
     border-top: 4px solid
-      ${(props) => (props.$direction === 'desc' ? '#480B6A' : '#cbd5e1')};
+      ${(props) => (props.$direction === "desc" ? "#480B6A" : "#cbd5e1")};
   }
 `;
 
 // 날짜를 yyyy-MM-dd로 변환하는 함수
 const toDateInputValue = (dateString: string) => {
-  if (!dateString) return '';
+  if (!dateString) return "";
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
-  return dateString.split('T')[0];
+  return dateString.split("T")[0];
 };
 
 const AdminCompany: React.FC = () => {
@@ -311,45 +314,47 @@ const AdminCompany: React.FC = () => {
     string | null
   >(null);
   const [formData, setFormData] = useState({
-    company_name: '',
-    company_scale: '',
-    service_startdate: '',
-    service_enddate: '',
+    company_name: "",
+    company_scale: "",
+    service_startdate: "",
+    service_enddate: "",
     service_status: true,
-    admin_account: '',
+    admin_account: "",
   });
 
   // 정렬 상태 추가
   const [sortState, setSortState] = useState<SortState>({
-    field: '',
+    field: "",
     direction: null,
   });
 
+  const [adminUser, setAdminUser] = useState<{user_name: string, user_email: string} | null>(null);
+
   const navigate = useNavigate();
-  
+
   // 회사 목록 조회
   const fetchCompanies = async () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
         {
-          credentials: 'include',
+          credentials: "include",
         }
       );
       if (!response.ok) {
-        let errorMsg = '회사 목록 조회에 실패했습니다.';
+        let errorMsg = "회사 목록 조회에 실패했습니다.";
         try {
           const errorData = await response.json();
           if (errorData.detail) errorMsg = errorData.detail;
         } catch {}
         alert(errorMsg);
-        navigate('/')
+        navigate("/");
         throw new Error(errorMsg);
       }
       const data = await response.json();
       setCompanies(data);
     } catch (error) {
-      console.error('회사 목록 조회 실패:', error);
+      console.error("회사 목록 조회 실패:", error);
     }
   };
 
@@ -373,9 +378,13 @@ const AdminCompany: React.FC = () => {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
         {
-          method: 'POST',
+
+          method: "POST",
+          credentials: "include",
+
+
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
         }
@@ -383,16 +392,16 @@ const AdminCompany: React.FC = () => {
       if (response.ok) {
         fetchCompanies();
         setFormData({
-          company_name: '',
-          company_scale: '',
-          service_startdate: '',
-          service_enddate: '',
+          company_name: "",
+          company_scale: "",
+          service_startdate: "",
+          service_enddate: "",
           service_status: true,
-          admin_account: '',
+          admin_account: "",
         });
       }
     } catch (error) {
-      console.error('회사 생성 실패:', error);
+      console.error("회사 생성 실패:", error);
     }
   };
 
@@ -402,9 +411,12 @@ const AdminCompany: React.FC = () => {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`,
         {
+
           method: 'PUT',
+          credentials: 'include',
+
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
         }
@@ -414,25 +426,28 @@ const AdminCompany: React.FC = () => {
         setSelectedCompanyId(null);
       }
     } catch (error) {
-      console.error('회사 수정 실패:', error);
+      console.error("회사 수정 실패:", error);
     }
   };
 
   // 회사 삭제
   const handleDelete = async (companyId: string) => {
-    if (window.confirm('정말로 이 회사를 삭제하시겠습니까?')) {
+    if (window.confirm("정말로 이 회사를 삭제하시겠습니까?")) {
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`,
           {
+
             method: 'DELETE',
+            credentials: 'include',
+
           }
         );
         if (response.ok) {
           fetchCompanies();
         }
       } catch (error) {
-        console.error('회사 삭제 실패:', error);
+        console.error("회사 삭제 실패:", error);
       }
     }
   };
@@ -443,15 +458,18 @@ const AdminCompany: React.FC = () => {
     currentStatus: boolean
   ) => {
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
       const response = await fetch(
         `${
           import.meta.env.VITE_API_URL
         }/api/v1/admin/companies/${companyId}/status`,
         {
+
           method: 'PUT',
+          credentials: 'include',
+
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             service_status: !currentStatus,
@@ -467,11 +485,11 @@ const AdminCompany: React.FC = () => {
         setActiveStatusDropdown(null);
       }
     } catch (error) {
-      console.error('서비스 상태 변경 실패:', error);
+      console.error("서비스 상태 변경 실패:", error);
     }
   };
 
-  const handleRowClick = (company: Company) => {
+  const handleRowClick = async (company: Company) => {
     setSelectedCompanyId(company.company_id);
     setFormData({
       company_name: company.company_name,
@@ -479,19 +497,33 @@ const AdminCompany: React.FC = () => {
       service_startdate: company.service_startdate,
       service_enddate: company.service_enddate,
       service_status: company.service_status,
-      admin_account: company.admin_account || '',
+      admin_account: company.admin_account || "",
     });
+    // 유저 정보 가져오기
+    try {
+      const users = await fetchUsersByCompany(company.company_id);
+      // any로 캐스팅하여 user_sysrole_id 접근
+      const admin = (users as any[]).find(u => u.user_sysrole_id === 'f3d23b8c-6e7b-4f5d-a72d-8a9622f94084');
+      if (admin) {
+        setAdminUser({ user_name: admin.user_name, user_email: admin.user_email });
+        console.log("adminUser", adminUser);
+      } else {
+        setAdminUser(null);
+      }
+    } catch {
+      setAdminUser(null);
+    }
     setIsEditModalOpen(true);
   };
 
   const handleCreateClick = () => {
     setFormData({
-      company_name: '',
-      company_scale: '',
-      service_startdate: '',
-      service_enddate: '',
+      company_name: "",
+      company_scale: "",
+      service_startdate: "",
+      service_enddate: "",
       service_status: true,
-      admin_account: '',
+      admin_account: "",
     });
     setIsCreateModalOpen(true);
   };
@@ -502,12 +534,12 @@ const AdminCompany: React.FC = () => {
       field,
       direction:
         prev.field === field
-          ? prev.direction === 'asc'
-            ? 'desc'
-            : prev.direction === 'desc'
+          ? prev.direction === "asc"
+            ? "desc"
+            : prev.direction === "desc"
             ? null
-            : 'asc'
-          : 'asc',
+            : "asc"
+          : "asc",
     }));
   };
 
@@ -516,10 +548,10 @@ const AdminCompany: React.FC = () => {
     let sorted = [...companies];
     if (sortState.direction !== null) {
       sorted.sort((a, b) => {
-        const aValue = String(a[sortState.field as keyof Company] || '');
-        const bValue = String(b[sortState.field as keyof Company] || '');
+        const aValue = String(a[sortState.field as keyof Company] || "");
+        const bValue = String(b[sortState.field as keyof Company] || "");
 
-        return sortState.direction === 'asc'
+        return sortState.direction === "asc"
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       });
@@ -538,51 +570,51 @@ const AdminCompany: React.FC = () => {
         <Table>
           <thead>
             <tr>
-              <TableHeader onClick={() => handleSort('company_name')}>
+              <TableHeader onClick={() => handleSort("company_name")}>
                 회사명
                 <SortIcon
                   $direction={
-                    sortState.field === 'company_name'
+                    sortState.field === "company_name"
                       ? sortState.direction
                       : null
                   }
                 />
               </TableHeader>
-              <TableHeader onClick={() => handleSort('company_scale')}>
+              <TableHeader onClick={() => handleSort("company_scale")}>
                 규모
                 <SortIcon
                   $direction={
-                    sortState.field === 'company_scale'
+                    sortState.field === "company_scale"
                       ? sortState.direction
                       : null
                   }
                 />
               </TableHeader>
-              <TableHeader onClick={() => handleSort('service_startdate')}>
+              <TableHeader onClick={() => handleSort("service_startdate")}>
                 서비스 시작일
                 <SortIcon
                   $direction={
-                    sortState.field === 'service_startdate'
+                    sortState.field === "service_startdate"
                       ? sortState.direction
                       : null
                   }
                 />
               </TableHeader>
-              <TableHeader onClick={() => handleSort('service_enddate')}>
+              <TableHeader onClick={() => handleSort("service_enddate")}>
                 서비스 종료일
                 <SortIcon
                   $direction={
-                    sortState.field === 'service_enddate'
+                    sortState.field === "service_enddate"
                       ? sortState.direction
                       : null
                   }
                 />
               </TableHeader>
-              <TableHeader onClick={() => handleSort('service_status')}>
+              <TableHeader onClick={() => handleSort("service_status")}>
                 서비스 상태
                 <SortIcon
                   $direction={
-                    sortState.field === 'service_status'
+                    sortState.field === "service_status"
                       ? sortState.direction
                       : null
                   }
@@ -595,7 +627,7 @@ const AdminCompany: React.FC = () => {
               <tr
                 key={company.company_id}
                 onClick={() => handleRowClick(company)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
                 <td>{company.company_name}</td>
                 <td>{company.company_scale}</td>
@@ -613,7 +645,7 @@ const AdminCompany: React.FC = () => {
                         )
                       }
                     >
-                      {company.service_status ? '활성' : '비활성'}
+                      {company.service_status ? "활성" : "비활성"}
                     </StatusBadge>
                     {activeStatusDropdown === company.company_id && (
                       <StatusDropdown>
@@ -670,6 +702,7 @@ const AdminCompany: React.FC = () => {
           }
           formData={formData}
           onChange={handleInputChange}
+          adminUser={adminUser}
         />
       </MainContent>
     </Container>

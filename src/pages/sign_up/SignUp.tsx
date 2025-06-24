@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import SignUpSuccessModal from './SignUpSuccessModal';
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import SignUpSuccessModal from "./SignUpSuccessModal";
 import {
+  checkDuplicate,
   fetchSignupInfos,
   type Company,
   type CompanyPosition,
   // type Sysrole,
-} from '../../api/fetchSignupInfos';
+} from "../../api/fetchSignupInfos";
 
 export const SignUpWrapper = styled.div`
   display: flex;
@@ -129,23 +130,41 @@ export const ErrorText = styled.div`
   margin-left: 170px;
 `;
 
+const MessageWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 14px;
+`;
+
+const ErrorMessage = styled.span`
+  color: red;
+`;
+
+const SuccessMessage = styled.span`
+  color: green;
+`;
+
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
-    company: '',
-    position: '',
-    department: '',
-    team: '',
-    job: '',
+    name: "",
+    email: "",
+    phone: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    company: "",
+    position: "",
+    department: "",
+    team: "",
+    job: "",
   });
   const [showModal, setShowModal] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [positions, setPositions] = useState<CompanyPosition[]>([]);
+  const [isDuplicate, setIsDuplicate] = useState<boolean | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // const [sysroles, setSysroles] = useState<Sysrole[]>([]);
@@ -153,17 +172,17 @@ const SignUp: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.name) newErrors.name = '이름을 입력해주세요.';
+    if (!formData.name) newErrors.name = "이름을 입력해주세요.";
     if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      newErrors.email = '유효한 이메일 주소를 입력해주세요.';
+      newErrors.email = "유효한 이메일 주소를 입력해주세요.";
     }
 
     if (!formData.phone.match(/^\d+$/)) {
-      newErrors.phone = '전화번호는 숫자만 입력해주세요.';
+      newErrors.phone = "전화번호는 숫자만 입력해주세요.";
     }
 
     if (!formData.username.match(/^[a-z0-9]{6,16}$/)) {
-      newErrors.username = '아이디는 영문 소문자와 숫자 조합 6~16자입니다.';
+      newErrors.username = "아이디는 영문 소문자와 숫자 조합 6~16자입니다.";
     }
 
     if (
@@ -172,14 +191,14 @@ const SignUp: React.FC = () => {
       )
     ) {
       newErrors.password =
-        '비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자여야 합니다.';
+        "비밀번호는 영문, 숫자, 특수문자를 포함한 8~16자여야 합니다.";
     }
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
+      newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
     }
 
-    if (!formData.company) newErrors.company = '회사를 선택해주세요.';
+    if (!formData.company) newErrors.company = "회사를 선택해주세요.";
 
     return newErrors;
   };
@@ -189,7 +208,7 @@ const SignUp: React.FC = () => {
   ) => {
     const { name, value } = e.target;
 
-    if (name === 'company') {
+    if (name === "company") {
       const selectedCompany = companies.find((c) => c.company_id === value);
       if (selectedCompany) {
         setPositions(selectedCompany.company_positions || []);
@@ -201,7 +220,7 @@ const SignUp: React.FC = () => {
       setFormData((prev) => ({
         ...prev,
         company: value,
-        position: '', // 직급 초기화
+        position: "", // 직급 초기화
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -224,8 +243,8 @@ const SignUp: React.FC = () => {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/signup`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: formData.name,
             email: formData.email,
@@ -237,33 +256,33 @@ const SignUp: React.FC = () => {
             team: formData.team,
             position: formData.position,
             job: formData.job,
-            sysrole: '4864c9d2-7f9c-4862-9139-4e8b0ed117f4', // 일반 사원 데이터
-            login_type: 'general',
+            sysrole: "4864c9d2-7f9c-4862-9139-4e8b0ed117f4", // 일반 사원 데이터
+            login_type: "general",
           }),
         }
       );
 
       if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
           const errorData = await response.json();
-          throw new Error(errorData.message || '회원가입 실패');
+          throw new Error(errorData.message || "회원가입 실패");
         } else {
           throw new Error(
-            response.statusText || '회원가입 실패: 서버 응답 오류'
+            response.statusText || "회원가입 실패: 서버 응답 오류"
           );
         }
       }
 
       setShowModal(true); // 회원가입 성공 시 모달 열기
     } catch (error: any) {
-      console.error('error:', error);
+      console.error("error:", error);
       alert(`오류 발생: ${error.message}`);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
     }
   };
@@ -275,12 +294,33 @@ const SignUp: React.FC = () => {
         setCompanies(result.companies);
       } catch (err) {
         // 에러 처리
-        console.error('회사 목록 로딩 실패:', err);
+        console.error("회사 목록 로딩 실패:", err);
       }
     };
 
     loadCompanies();
   }, []);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      const usernameRegex = /^[a-z0-9]{6,16}$/;
+
+      // 아이디 길이 + 유효성 조건 통과 시에만 중복 확인 요청
+      if (
+        formData.username.length > 2 &&
+        usernameRegex.test(formData.username)
+      ) {
+        checkDuplicate(formData.username).then((result) =>
+          setIsDuplicate(result)
+        );
+      } else {
+        setIsDuplicate(null); // 유효하지 않으면 중복 결과 초기화
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [formData.username]);
+
   return (
     <>
       <SignUpWrapper>
@@ -338,7 +378,17 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
-            {errors.username && <ErrorText>{errors.username}</ErrorText>}
+            <MessageWrapper>
+              {isDuplicate === true && (
+                <ErrorMessage>이미 사용 중인 아이디입니다</ErrorMessage>
+              )}
+              {isDuplicate === false && (
+                <SuccessMessage>사용 가능한 아이디입니다</SuccessMessage>
+              )}
+              {errors.username && (
+                <ErrorMessage>{errors.username}</ErrorMessage>
+              )}
+            </MessageWrapper>
             <InputGroup>
               <Label>
                 비밀번호 <StyledAsterisk>*</StyledAsterisk>
