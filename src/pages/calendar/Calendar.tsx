@@ -22,7 +22,6 @@ import {
   MonthText,
   NavButton,
   RightBox,
-  Title,
   TodayButton,
   CalendarLayout,
   CalendarFixedBox,
