@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import type { Feedback, SummaryLog } from '../Dashboard.types';
-import type { Todo } from '../../../types/project';
+// import type { Todo } from '../../../types/project';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -185,11 +185,11 @@ const MailingDashboard = ({
   tasks,
   feedback,
   meetingInfo,
-  meetingId,
-}: MailingDashboardProps) => {
+}: // meetingId,
+MailingDashboardProps) => {
   console.log('meetingInfo:', meetingInfo);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [mailItems, setMailItems] = useState({
+  // const [showTooltip, setShowTooltip] = useState(false);
+  const [mailItems /*, setMailItems*/] = useState({
     summary: false,
     tasks: false,
     feedback: false,
@@ -342,7 +342,10 @@ const MailingDashboard = ({
       info_n: receivers.selectedCustom.map((user) => ({
         name: user.user_name,
         email: user.user_email,
-        roles: (tasks && tasks[user.user_name] ? tasks[user.user_name] : []).map((todo: any) => ({
+        roles: (tasks && tasks[user.user_name]
+          ? tasks[user.user_name]
+          : []
+        ).map((todo: any) => ({
           action: todo.action,
           schedule: todo.schedule ?? null,
         })),
@@ -361,7 +364,10 @@ const MailingDashboard = ({
       const mailList = meetingInfo.project_users.map((user) => ({
         name: user.user_name,
         email: user.user_email,
-        roles: (tasks && tasks[user.user_name] ? tasks[user.user_name] : []).map((todo: any) => ({
+        roles: (tasks && tasks[user.user_name]
+          ? tasks[user.user_name]
+          : []
+        ).map((todo: any) => ({
           action: todo.action,
           schedule: todo.schedule ?? null,
         })),
@@ -377,7 +383,9 @@ const MailingDashboard = ({
       console.log('백엔드로 보낼 payload:', payload);
       try {
         await fetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-meeting-result`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/v1/stt/meeting/send-meeting-result`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -400,7 +408,9 @@ const MailingDashboard = ({
     console.log('백엔드로 보낼 payload:', payload);
     try {
       await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-meeting-result`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/v1/stt/meeting/send-meeting-result`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -414,17 +424,17 @@ const MailingDashboard = ({
   };
 
   // 받아온 assignRole(할 일 목록) insert할 때 정형화 된 형태로 변경
-  const getPostPayload = () => {
-    const allTodos: Todo[] = tasks
-      ? (Object.values(tasks).flat() as Todo[])
-      : [];
+  // const getPostPayload = () => {
+  //   const allTodos: Todo[] = tasks
+  //     ? (Object.values(tasks).flat() as Todo[])
+  //     : [];
 
-    return {
-      updated_task_assign_contents: {
-        assigned_todos: allTodos,
-      },
-    };
-  };
+  //   return {
+  //     updated_task_assign_contents: {
+  //       assigned_todos: allTodos,
+  //     },
+  //   };
+  // };
 
   return (
     <ModalOverlay>

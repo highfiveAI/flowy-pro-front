@@ -227,7 +227,7 @@ const MailingDashboard = ({
   meetingId,
 }: MailingDashboardProps) => {
   console.log('meetingInfo:', meetingInfo);
-  const [showTooltip, setShowTooltip] = useState(false);
+  // const [showTooltip, setShowTooltip] = useState(false);
   const [mailItems /*, setMailItems*/] = useState({
     summary: false,
     tasks: false,
@@ -280,9 +280,9 @@ const MailingDashboard = ({
   }
   if (mailItems.feedback && feedback) mailPreview.push(...feedback);
 
-  const isRecipientMissing =
-    (!receivers.allProject && !receivers.allAttendees && !receivers.custom) ||
-    (receivers.custom && receivers.selectedCustom.length === 0);
+  // const isRecipientMissing =
+  //   (!receivers.allProject && !receivers.allAttendees && !receivers.custom) ||
+  //   (receivers.custom && receivers.selectedCustom.length === 0);
 
   // 회의 참석자 또는 프로젝트 참여자 전체 수신 시 자동 할당
   useEffect(() => {
@@ -375,14 +375,16 @@ const MailingDashboard = ({
     }
   };
 
-
   // meeting_info 데이터 구조 생성 함수 (roles 추가)
   const makeMeetingInfoForMail = () => {
     return {
       info_n: receivers.selectedCustom.map((user) => ({
         name: user.user_name,
         email: user.user_email,
-        roles: (tasks && tasks[user.user_name] ? tasks[user.user_name] : []).map((todo: any) => ({
+        roles: (tasks && tasks[user.user_name]
+          ? tasks[user.user_name]
+          : []
+        ).map((todo: any) => ({
           action: todo.action,
           schedule: todo.schedule ?? null,
         })),
@@ -393,7 +395,6 @@ const MailingDashboard = ({
       meeting_id: meetingInfo.meeting_id, // meetingInfo에 meeting_id가 반드시 있어야 함
     };
   };
-
 
   // db update용 함수(구현 예정)
   const handleDbUpdate = () => {
@@ -407,7 +408,10 @@ const MailingDashboard = ({
       const mailList = meetingInfo.project_users.map((user) => ({
         name: user.user_name,
         email: user.user_email,
-        roles: (tasks && tasks[user.user_name] ? tasks[user.user_name] : []).map((todo: any) => ({
+        roles: (tasks && tasks[user.user_name]
+          ? tasks[user.user_name]
+          : []
+        ).map((todo: any) => ({
           action: todo.action,
           schedule: todo.schedule ?? null,
         })),
