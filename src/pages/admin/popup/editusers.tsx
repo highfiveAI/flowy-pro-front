@@ -159,6 +159,26 @@ const EditUsers: React.FC<EditUsersProps> = ({
   onChange,
 }) => {
   if (!isOpen) return null;
+
+  // 승인 유효성 검사 핸들러
+  const handleApprove = () => {
+    if (!user.user_dept_name || user.user_dept_name.trim() === '') {
+      alert('부서명을 입력하세요.');
+      return;
+    }
+    if (!user.user_team_name || user.user_team_name.trim() === '') {
+      alert('팀명을 입력하세요.');
+      return;
+    }
+    if (!user.user_jobname || user.user_jobname.trim() === '') {
+      alert('직무를 입력하세요.');
+      return;
+    }
+    if (window.confirm('수정하시겠습니까?')) {
+      onApprove();
+    }
+  };
+
   return (
     <Modal $isOpen={isOpen}>
       <ModalContent>
@@ -229,7 +249,7 @@ const EditUsers: React.FC<EditUsersProps> = ({
             </InputBox>
           </FormGroup>
           <ButtonRow>
-            <ActionButton type="button" color="#13c7c1" onClick={onApprove}>
+            <ActionButton type="button" color="#13c7c1" onClick={handleApprove}>
               수정
             </ActionButton>
           </ButtonRow>

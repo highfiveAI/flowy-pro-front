@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import NewCompany from './popup/newCompany';
@@ -703,6 +702,7 @@ const AdminCompany: React.FC = () => {
           formData={formData}
           onChange={handleInputChange}
           adminUser={adminUser}
+          companyId={selectedCompanyId || ''}
         />
       </MainContent>
     </Container>
