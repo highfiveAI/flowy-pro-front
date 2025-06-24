@@ -317,9 +317,30 @@ export default function CalendarPage() {
       {/* 캘린더 */}
       <CalendarFixedBox>
         <CalendarWrapper>
-          <HeaderBar>
-            <div style={{ position: "relative" }}>
-              <Title>작업 관리</Title>
+          <HeaderBar style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+            {/* 1줄: 프로젝트 선택/적용 (오른쪽) */}
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <RightBox>
+                <FilterArea>
+                  <FilterSelectBox>
+                    <FaRegFileAlt style={{ fontSize: "1.2rem", opacity: 0.7 }} />
+                    <FilterSelect
+                      value={selectedProjectId || ""}
+                      onChange={(e) => setSelectedProjectId(e.target.value)}
+                    >
+                      {projects.map((proj) => (
+                        <option key={proj.project_id} value={proj.project_id}>
+                          {proj.project_name}
+                        </option>
+                      ))}
+                    </FilterSelect>
+                  </FilterSelectBox>
+                  <ApplyButton>적용</ApplyButton>
+                </FilterArea>
+              </RightBox>
+            </div>
+            {/* 2줄: 날짜 네비게이션 (왼쪽) */}
+            <div style={{ display: "flex", justifyContent: "flex-start", marginTop: 12 }}>
               <MonthNav>
                 <NavButton onClick={handlePrevMonth}>
                   <FiChevronLeft />
@@ -343,24 +364,6 @@ export default function CalendarPage() {
                 <TodayButton onClick={handleToday}>오늘</TodayButton>
               </MonthNav>
             </div>
-            <RightBox>
-              <FilterArea>
-                <FilterSelectBox>
-                  <FaRegFileAlt style={{ fontSize: "1.2rem", opacity: 0.7 }} />
-                  <FilterSelect
-                    value={selectedProjectId || ""}
-                    onChange={(e) => setSelectedProjectId(e.target.value)}
-                  >
-                    {projects.map((proj) => (
-                      <option key={proj.project_id} value={proj.project_id}>
-                        {proj.project_name}
-                      </option>
-                    ))}
-                  </FilterSelect>
-                </FilterSelectBox>
-                <ApplyButton>적용</ApplyButton>
-              </FilterArea>
-            </RightBox>
           </HeaderBar>
           <Calendar
             value={value}

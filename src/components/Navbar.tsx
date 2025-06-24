@@ -85,15 +85,15 @@ const Navbar: React.FC = () => {
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/insert_info')}>
-                새 회의
+                회의분석 요청
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/projectlist')}>
-                회의 관리
+                분석결과 조회
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/calendar')}>
-                작업 관리
+                캘린더
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               {/* <MenuItem onClick={() => navigate("/admin/dashboard")}>
