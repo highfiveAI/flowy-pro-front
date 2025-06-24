@@ -364,6 +364,8 @@ const getFileIcon = (fileName: string) => {
       return '/images/excel.png'; // 슬래시(/)로 시작하는 절대 경로
     case 'pdf':
       return '/images/pdf.png'; // 슬래시(/)로 시작하는 절대 경로
+    case 'pptx':
+      return '/images/ppt.png'; // 슬래시(/)로 시작하는 절대 경로
     default:
       return '/images/file.png'; // 기본 아이콘
   }

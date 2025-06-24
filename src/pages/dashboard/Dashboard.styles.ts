@@ -293,18 +293,6 @@ export const SpeechBubbleButton = styled.button`
   &:hover {
     box-shadow: 0 2px 8px rgba(53, 23, 69, 0.08);
   }
-  &::before {
-    content: '';
-    position: absolute;
-    left: -10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-right: 10px solid #f3eef8;
-  }
 `;
 
 // const RectButton = styled.button`

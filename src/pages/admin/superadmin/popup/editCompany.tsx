@@ -142,9 +142,17 @@ interface EditCompanyProps {
     admin_account?: string;
   };
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  adminUser?: { user_name: string; user_email: string } | null;
 }
 
-const EditCompany: React.FC<EditCompanyProps> = ({ visible, onClose, onSubmit, onDelete, formData, onChange }) => (
+// 날짜를 yyyy-MM-dd로 변환하는 함수
+const toDateInputValue = (dateString: string) => {
+  if (!dateString) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+  return dateString.split('T')[0];
+};
+
+const EditCompany: React.FC<EditCompanyProps> = ({ visible, onClose, onSubmit, onDelete, formData, onChange, adminUser }) => (
   <Modal $isOpen={visible}>
     <ModalContent>
       <ModalHeader>
@@ -158,6 +166,7 @@ const EditCompany: React.FC<EditCompanyProps> = ({ visible, onClose, onSubmit, o
           onClose();
         }}
       >
+
         <FormGroup>
           <InputBox>
             <label htmlFor="company_name">회사명</label>
@@ -173,20 +182,33 @@ const EditCompany: React.FC<EditCompanyProps> = ({ visible, onClose, onSubmit, o
         <FormGroup>
           <InputBox>
             <label htmlFor="service_startdate">서비스 시작일</label>
-            <input type="date" id="service_startdate" name="service_startdate" value={formData.service_startdate} onChange={onChange} required />
+            <input type="date" id="service_startdate" name="service_startdate" value={toDateInputValue(formData.service_startdate)} onChange={onChange} required />
           </InputBox>
         </FormGroup>
         <FormGroup>
           <InputBox>
             <label htmlFor="service_enddate">서비스 종료일</label>
-            <input type="date" id="service_enddate" name="service_enddate" value={formData.service_enddate} onChange={onChange} />
+            <input type="date" id="service_enddate" name="service_enddate" value={toDateInputValue(formData.service_enddate)} onChange={onChange} />
           </InputBox>
         </FormGroup>
         <FormGroup>
-          <InputBox>
-            <label htmlFor="admin_account">관리자 계정</label>
-            <input type="text" id="admin_account" name="admin_account" value={formData.admin_account || ''} onChange={onChange} />
-          </InputBox>
+        {/* 관리자 이름/이메일 표시 */}
+        {adminUser && (
+          <>
+            <FormGroup>
+              <InputBox>
+                <label>관리자 이름</label>
+                <input type="text" value={adminUser.user_name} disabled />
+              </InputBox>
+            </FormGroup>
+            <FormGroup>
+              <InputBox>
+                <label>관리자 이메일</label>
+                <input type="text" value={adminUser.user_email} disabled />
+              </InputBox>
+            </FormGroup>
+          </>
+        )}
         </FormGroup>
         <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
           <Button type="submit">수정</Button>

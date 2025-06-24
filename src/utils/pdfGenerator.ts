@@ -76,8 +76,8 @@ export function generateMeetingPDF({
     // PDF 본문 content 배열
     const content: any[] = [];
 
-    // [회의 기본 정보]
-    if (checked.info && meetingInfo) {
+    // [회의 기본 정보]는 무조건 포함
+    if (meetingInfo) {
       const infoSection: any[] = [
         { text: '[ 회의 기본 정보 ]', style: 'sectionTitle' },
         {
