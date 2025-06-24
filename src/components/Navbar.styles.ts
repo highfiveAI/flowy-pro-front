@@ -11,6 +11,7 @@ export const NavbarContainer = styled.nav`
   align-items: center;
   padding: 20px 40px;
   background: white;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 export const Left = styled.div`

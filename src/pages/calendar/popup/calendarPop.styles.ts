@@ -15,15 +15,16 @@ export const Overlay = styled.div`
 export const PopContainer = styled.div`
   background: #fff;
   border-radius: 16px;
-  min-width: 320px;
-  max-width: 90vw;
+  width: 350px;
+  height: 400px;
   padding: 32px 28px 24px 28px;
   box-shadow: 0 4px 24px rgba(80, 0, 80, 0.13);
   position: relative;
+  overflow-y: auto;
 `;
 export const Title = styled.h2`
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 500;
   color: #351745;
   margin-bottom: 18px;
 `;
@@ -36,7 +37,7 @@ export const MeetingBox = styled.div`
   font-weight: 600;
   padding: 4px 8px;
   margin-bottom: 4px;
-  display: inline-block;
+  display: block;
   font-size: 0.9rem;
   box-shadow: 0 2px 8px rgba(80, 0, 80, 0.04);
 `;
@@ -76,4 +77,43 @@ export const MeetingTimeBox = styled.span`
   padding: 2px 6px;
   margin-right: 6px;
   font-size: 0.9rem;
+`;
+
+export const PopupFloatingAddButton = styled.button`
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #351745;
+  color: #fff;
+  font-size: 2rem;
+  border: none;
+  box-shadow: 0 2px 8px rgba(80,0,80,0.13);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  &:hover {
+    background: #5a2a84;
+  }
+`;
+
+export const PopupTooltip = styled.div`
+  position: absolute;
+  right: 80px;
+  bottom: 36px;
+  background: #351745;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: 0 2px 8px rgba(80,0,80,0.13);
+  pointer-events: none;
+  opacity: 0.95;
 `;

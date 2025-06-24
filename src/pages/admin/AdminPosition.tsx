@@ -311,9 +311,10 @@ const AdminPosition: React.FC = () => {
   // 직급 목록 조회
   const fetchPositions = async () => {
     try {
+      if (!currentUserCompany) return;
       console.log('직급 목록 요청 시작');
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/`,
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${currentUserCompany.company_id}/positions/`,
         {
           credentials: 'include',
         }
@@ -339,8 +340,13 @@ const AdminPosition: React.FC = () => {
 
   useEffect(() => {
     fetchCurrentUser();
-    fetchPositions();
   }, []);
+
+  useEffect(() => {
+    if (currentUserCompany) {
+      fetchPositions();
+    }
+  }, [currentUserCompany]);
 
   // 입력 폼 핸들러
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -476,35 +482,20 @@ const AdminPosition: React.FC = () => {
     }));
   };
 
-  // 정렬된 직급 목록 계산 (회사별 필터링 추가)
+  // 정렬된 직급 목록 계산 (회사별 필터링 제거)
   const sortedPositions = useMemo(() => {
     let sorted = [...positions];
-    console.log('정렬 전 전체 직급:', sorted);
-    console.log('현재 회사 정보:', currentUserCompany);
-
-    // 현재 사용자의 회사에 속한 직급만 필터링
-    if (currentUserCompany) {
-      sorted = sorted.filter((position) => {
-        console.log('직급의 회사 ID:', position.position_company_id);
-        console.log('현재 회사 ID:', currentUserCompany.company_id);
-        return position.position_company_id === currentUserCompany.company_id;
-      });
-    }
-    console.log('필터링 후 직급:', sorted);
-
     if (sortState.direction !== null) {
       sorted.sort((a, b) => {
         const aValue = String(a[sortState.field as keyof Position] || '');
         const bValue = String(b[sortState.field as keyof Position] || '');
-
         return sortState.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       });
     }
-    console.log('최종 정렬된 직급:', sorted);
     return sorted;
-  }, [positions, sortState, currentUserCompany]);
+  }, [positions, sortState]);
 
   return (
     <Container>

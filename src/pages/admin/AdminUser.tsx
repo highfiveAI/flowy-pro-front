@@ -988,7 +988,7 @@ const AdminUser: React.FC = () => {
                     style={showRejectedOnly ? { cursor: 'default' } : {}}
                   >
                     {user.signup_completed_status || 'Unknown'}
-                    {!showRejectedOnly &&
+                    {!showRejectedOnly && !showPendingOnly &&
                       activeStatusDropdown === user.user_id && (
                         <StatusDropdown>
                           <StatusOption

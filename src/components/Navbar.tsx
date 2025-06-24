@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { logout } from '../utils/auth';
@@ -27,6 +27,7 @@ const Navbar: React.FC = () => {
   const [role, setRole] = useState<
     'user' | 'companyAdmin' | 'superAdmin' | null
   >(null);
+  const closeTimer = useRef<NodeJS.Timeout | null>(null);
 
   const systemMenuItems = [
     { name: '문서 에이전트', path: '/docs_agent_test' },
@@ -69,6 +70,21 @@ const Navbar: React.FC = () => {
     setRole(roleMap[user.sysrole] ?? null);
   }, [user]);
 
+  // 드롭다운 딜레이 오픈/클로즈 핸들러
+  const handleSystemMenuEnter = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setIsSystemMenuOpen(true);
+  };
+  const handleSystemMenuLeave = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => {
+      setIsSystemMenuOpen(false);
+    }, 200); // 200ms 딜레이
+  };
+
   return (
     <NavbarContainer>
       <Left>
@@ -85,15 +101,15 @@ const Navbar: React.FC = () => {
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/insert_info')}>
-                새 회의
+                회의분석 요청
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/projectlist')}>
-                회의 관리
+                분석결과 조회
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/calendar')}>
-                작업 관리
+                캘린더
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               {/* <MenuItem onClick={() => navigate("/admin/dashboard")}>
@@ -127,13 +143,15 @@ const Navbar: React.FC = () => {
 
           {user && role === 'companyAdmin' && (
             <>
-              <MenuItem
-                onMouseEnter={() => setIsSystemMenuOpen(true)}
-                onMouseLeave={() => setIsSystemMenuOpen(false)}
-                style={{ position: 'relative' }}
+              <div
+                style={{ position: 'relative', display: 'inline-block' }}
+                onMouseEnter={handleSystemMenuEnter}
+                onMouseLeave={handleSystemMenuLeave}
               >
-                시스템 관리
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+                <MenuItem>
+                  시스템 관리
+                  <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+                </MenuItem>
                 <DropdownMenu $isOpen={isSystemMenuOpen}>
                   {systemMenuItems.map((item, index) => (
                     <DropdownItem
@@ -144,7 +162,7 @@ const Navbar: React.FC = () => {
                     </DropdownItem>
                   ))}
                 </DropdownMenu>
-              </MenuItem>
+              </div>
               <MenuItem onClick={() => navigate('/admin/dashboard')}>
                 대시보드
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
@@ -152,13 +170,15 @@ const Navbar: React.FC = () => {
             </>
           )}
           {user && role === 'superAdmin' && (
-            <MenuItem
-              onMouseEnter={() => setIsSystemMenuOpen(true)}
-              onMouseLeave={() => setIsSystemMenuOpen(false)}
-              style={{ position: 'relative' }}
+            <div
+              style={{ position: 'relative', display: 'inline-block' }}
+              onMouseEnter={handleSystemMenuEnter}
+              onMouseLeave={handleSystemMenuLeave}
             >
-              시스템 관리
-              <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+              <MenuItem>
+                시스템 관리
+                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+              </MenuItem>
               <DropdownMenu $isOpen={isSystemMenuOpen}>
                 {superSystemMenuItems.map((item, index) => (
                   <DropdownItem key={index} onClick={() => navigate(item.path)}>
@@ -166,7 +186,7 @@ const Navbar: React.FC = () => {
                   </DropdownItem>
                 ))}
               </DropdownMenu>
-            </MenuItem>
+            </div>
           )}
         </Menu>
       </Left>

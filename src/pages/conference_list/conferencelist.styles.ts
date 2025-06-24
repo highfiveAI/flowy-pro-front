@@ -127,8 +127,4 @@ export const Td = styled.td`
 
   /* 셀 호버 효과 */
   transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #f3eef7;
-  }
 `;
