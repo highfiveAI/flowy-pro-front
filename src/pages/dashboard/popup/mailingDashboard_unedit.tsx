@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import type { Feedback, SummaryLog } from '../Dashboard.types';
 import type { Todo } from '../../../types/project';
-import { postSummaryTask } from '../../../api/fetchProject';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -69,16 +68,6 @@ const SectionLabel = styled.div`
   text-align: center;
   align-self: center;
 `;
-// const InfoBox = styled.div`
-//   background: #ededed;
-//   border-radius: 16px;
-//   padding: 20px 16px;
-//   min-height: 40px;
-//   max-height: 120px;
-//   margin-bottom: 24px;
-//   overflow-y: auto;
-//   color: #333;
-// `;
 const CheckboxGroup = styled.div`
   display: flex;
   flex-direction: column;
@@ -135,7 +124,7 @@ const RemoveButton = styled.button`
     color: #008080;
   }
 `;
-const BottomButton = styled.button`
+const BottomButton = styled.button<{ disabled?: boolean }>`
   width: 100%;
   background: #00b6b6;
   color: #fff;
@@ -147,6 +136,14 @@ const BottomButton = styled.button`
   margin-top: 20px;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  &:hover {
+    background: #009999;
+  }
+  &:disabled {
+    background: #cccccc;
+    color: #888888;
+    cursor: not-allowed;
+  }
 `;
 const NoticeText = styled.span`
   display: block; /* 간격 주려면 block 또는 margin-top */
@@ -154,42 +151,6 @@ const NoticeText = styled.span`
   color: #007bff; /* 파란색 (Bootstrap 기준 파랑) */
   font-size: 0.875rem; /* 선택적으로 글씨 조금 작게 */
 `;
-
-// Tooltip 스타일 추가
-// const TooltipWrapper = styled.div`
-//   position: relative;
-//   display: flex;
-//   width: 100%;
-//   justify-content: center;
-// `;
-// const TooltipText = styled.div<{ $show?: boolean }>`
-//   visibility: ${(props) => (props.$show ? 'visible' : 'hidden')};
-//   opacity: ${(props) => (props.$show ? 1 : 0)};
-//   position: absolute;
-//   bottom: 100%;
-//   left: 50%;
-//   transform: translateX(-50%);
-//   background-color: rgba(78, 42, 132, 0.6);
-//   color: white;
-//   padding: 8px 12px;
-//   border-radius: 8px;
-//   font-size: 13px;
-//   white-space: nowrap;
-//   z-index: 10;
-//   transition: opacity 0.2s;
-//   pointer-events: none;
-//
-//   &::after {
-//     content: '';
-//     position: absolute;
-//     top: 100%;
-//     left: 50%;
-//     transform: translateX(-50%);
-//     border-width: 14px;
-//     border-style: solid;
-//     border-color: rgba(78, 42, 132, 0.5) transparent transparent transparent;
-//   }
-// `;
 
 interface MailingDashboardProps {
   offModify: () => void;
@@ -228,7 +189,7 @@ const MailingDashboard = ({
 }: MailingDashboardProps) => {
   console.log('meetingInfo:', meetingInfo);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [mailItems /*, setMailItems*/] = useState({
+  const [mailItems, setMailItems] = useState({
     summary: false,
     tasks: false,
     feedback: false,
@@ -375,7 +336,6 @@ const MailingDashboard = ({
     }
   };
 
-
   // meeting_info 데이터 구조 생성 함수 (roles 추가)
   const makeMeetingInfoForMail = () => {
     return {
@@ -392,12 +352,6 @@ const MailingDashboard = ({
       update_dt: new Date().toISOString(),
       meeting_id: meetingInfo.meeting_id, // meetingInfo에 meeting_id가 반드시 있어야 함
     };
-  };
-
-
-  // db update용 함수(구현 예정)
-  const handleDbUpdate = () => {
-    // db에 update 기능 구현 예정
   };
 
   // 메일 발송 및 조건 분기 함수
@@ -423,9 +377,7 @@ const MailingDashboard = ({
       console.log('백엔드로 보낼 payload:', payload);
       try {
         await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/api/v1/stt/meeting/send-update-email`,
+          `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-meeting-result`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -440,7 +392,6 @@ const MailingDashboard = ({
     }
     // 2) 개별 수신자 지정만 체크하고 아무도 선택 안 한 경우
     if (receivers.custom && receivers.selectedCustom.length === 0) {
-      handleDbUpdate();
       onClose();
       return;
     }
@@ -449,7 +400,7 @@ const MailingDashboard = ({
     console.log('백엔드로 보낼 payload:', payload);
     try {
       await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`,
+        `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-meeting-result`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -473,35 +424,6 @@ const MailingDashboard = ({
         assigned_todos: allTodos,
       },
     };
-  };
-
-  // 데이터 fetch 함수
-  const handleSaveSummaryTasks = async () => {
-    // setIsEditingSummary(false);
-    if (!summary || !summary.updated_summary_contents) {
-      console.error('summaryLog가 정의되지 않았습니다.');
-      return;
-    }
-
-    const payload = getPostPayload();
-
-    if (!payload?.updated_task_assign_contents) {
-      console.error('작업 할당 내용이 없습니다.');
-      return;
-    }
-
-    try {
-      await postSummaryTask(
-        meetingId,
-        summary.updated_summary_contents,
-        payload.updated_task_assign_contents
-      );
-      console.log('저장 완료');
-      // 예: showToast('요약 및 작업이 성공적으로 저장되었습니다.');
-    } catch (error) {
-      console.error('저장 실패:', error);
-      // 예: showToast('저장에 실패했습니다. 다시 시도해주세요.');
-    }
   };
 
   return (
@@ -705,17 +627,18 @@ const MailingDashboard = ({
 
         {/* 버튼 + 툴팁 */}
         <BottomButton
+          disabled={isRecipientMissing}
           onClick={() => {
+            if (isRecipientMissing) return;
             const payload = makeMeetingInfoForMail();
             console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
             console.log(JSON.stringify(payload, null, 2));
             onClose();
             offModify();
-            handleSaveSummaryTasks();
             handleSendMail();
           }}
         >
-          수정하고 메일 보내기
+          메일 보내기
         </BottomButton>
 
         {/* 닫기 버튼 */}
