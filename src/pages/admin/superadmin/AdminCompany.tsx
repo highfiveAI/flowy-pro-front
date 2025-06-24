@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import NewCompany from './popup/newCompany';
 import EditCompany from './popup/editCompany';
 import { useNavigate } from 'react-router-dom';
+import { fetchUsersByCompany } from '../../../api/fetchSignupInfos';
 
 // 스타일 컴포넌트 재사용
 const Container = styled.div`
@@ -325,6 +326,8 @@ const AdminCompany: React.FC = () => {
     direction: null,
   });
 
+  const [adminUser, setAdminUser] = useState<{user_name: string, user_email: string} | null>(null);
+
   const navigate = useNavigate();
   
   // 회사 목록 조회
@@ -374,6 +377,7 @@ const AdminCompany: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
         {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -403,6 +407,7 @@ const AdminCompany: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`,
         {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -426,6 +431,7 @@ const AdminCompany: React.FC = () => {
           `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`,
           {
             method: 'DELETE',
+            credentials: 'include',
           }
         );
         if (response.ok) {
@@ -450,6 +456,7 @@ const AdminCompany: React.FC = () => {
         }/api/v1/admin/companies/${companyId}/status`,
         {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -471,7 +478,7 @@ const AdminCompany: React.FC = () => {
     }
   };
 
-  const handleRowClick = (company: Company) => {
+  const handleRowClick = async (company: Company) => {
     setSelectedCompanyId(company.company_id);
     setFormData({
       company_name: company.company_name,
@@ -481,6 +488,20 @@ const AdminCompany: React.FC = () => {
       service_status: company.service_status,
       admin_account: company.admin_account || '',
     });
+    // 유저 정보 가져오기
+    try {
+      const users = await fetchUsersByCompany(company.company_id);
+      // any로 캐스팅하여 user_sysrole_id 접근
+      const admin = (users as any[]).find(u => u.user_sysrole_id === 'f3d23b8c-6e7b-4f5d-a72d-8a9622f94084');
+      if (admin) {
+        setAdminUser({ user_name: admin.user_name, user_email: admin.user_email });
+        console.log("adminUser", adminUser);
+      } else {
+        setAdminUser(null);
+      }
+    } catch {
+      setAdminUser(null);
+    }
     setIsEditModalOpen(true);
   };
 
@@ -670,6 +691,7 @@ const AdminCompany: React.FC = () => {
           }
           formData={formData}
           onChange={handleInputChange}
+          adminUser={adminUser}
         />
       </MainContent>
     </Container>

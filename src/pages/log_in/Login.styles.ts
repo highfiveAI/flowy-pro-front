@@ -82,7 +82,7 @@ export const ErrorMessage = styled.p`
   line-height: normal;
   margin-top: 8px;
   margin-bottom: 0px;
-  text-align: left;
+  text-align: center;
 `;
 
 export const LoginButton = styled.button`

@@ -24,6 +24,13 @@ import {
   RightBox,
   Title,
   TodayButton,
+  CalendarLayout,
+  CalendarFixedBox,
+  UnscheduledPanel,
+  TaskList,
+  TaskItem,
+  TaskCheckbox,
+  TaskTitle,
 } from "./Calendar.styles";
 
 function formatYearMonth(date: Date) {
@@ -245,162 +252,207 @@ export default function CalendarPage() {
     }
   };
 
+  // 일정 미정 task 필터
+  const unscheduledTodos = events.filter(
+    (ev) => ev.type === "todo" && !ev.end
+  );
+
   return (
-    <CalendarWrapper>
-      <HeaderBar>
-        <div style={{ position: "relative" }}>
-          <Title>작업 관리</Title>
-          <MonthNav>
-            <NavButton onClick={handlePrevMonth}>
-              <FiChevronLeft />
-            </NavButton>
-            <MonthText
-              onClick={handleYearMonthClick}
-              style={{ cursor: "pointer" }}
-            >
-              {formatYearMonth(value)}
-            </MonthText>
-            <NavButton onClick={handleNextMonth}>
-              <FiChevronRight />
-            </NavButton>
-            {showPicker && (
-              <YearMonthPicker
-                currentDate={value}
-                onChange={handleYearMonthChange}
-                onClose={() => setShowPicker(false)}
-              />
-            )}
-            <TodayButton onClick={handleToday}>오늘</TodayButton>
-          </MonthNav>
-        </div>
-        <RightBox>
-          <FilterArea>
-            <FilterSelectBox>
-              <FaRegFileAlt style={{ fontSize: "1.2rem", opacity: 0.7 }} />
-              <FilterSelect
-                value={selectedProjectId || ""}
-                onChange={(e) => setSelectedProjectId(e.target.value)}
-              >
-                {projects.map((proj) => (
-                  <option key={proj.project_id} value={proj.project_id}>
-                    {proj.project_name}
-                  </option>
-                ))}
-              </FilterSelect>
-            </FilterSelectBox>
-            <ApplyButton>적용</ApplyButton>
-          </FilterArea>
-        </RightBox>
-      </HeaderBar>
-      <Calendar
-        value={value}
-        onChange={(v) => setValue(v as Date)}
-        tileContent={({ date, view }) => {
-          if (!date) return null;
-          if (view === "month") {
-            const day = date.getDate().toString().padStart(2, "0");
-            const dayTodos = events.filter(
-              (ev) => ev.type === "todo" && isSameDay(new Date(ev.start), date)
-            );
-            const dayMeetings = events.filter(
-              (ev) =>
-                ev.type === "meeting" && isSameDay(new Date(ev.start), date)
-            );
-            const dayOfWeek = date.getDay(); // 0: 일, 6: 토
-            const isCurrentMonth = date.getMonth() === value.getMonth();
-            let dayClass = "";
-            if (isCurrentMonth) {
-              if (dayOfWeek === 0) dayClass = "calendar-sunday";
-              if (dayOfWeek === 6) dayClass = "calendar-saturday";
-            }
-            return (
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                  cursor: "pointer",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPopupDate(date);
-                }}
-              >
-                <span
-                  className={dayClass}
-                  style={{
-                    position: "absolute",
-                    top: 8,
-                    right: 10,
-                    fontSize: "1.05rem",
-                    fontWeight: 500,
-                    zIndex: 2,
-                  }}
+    <CalendarLayout>
+      {/* 캘린더 */}
+      <CalendarFixedBox>
+        <CalendarWrapper>
+          <HeaderBar>
+            <div style={{ position: "relative" }}>
+              <Title>작업 관리</Title>
+              <MonthNav>
+                <NavButton onClick={handlePrevMonth}>
+                  <FiChevronLeft />
+                </NavButton>
+                <MonthText
+                  onClick={handleYearMonthClick}
+                  style={{ cursor: "pointer" }}
                 >
-                  {day}
-                </span>
-                <div style={{ width: "100%", paddingTop: 35 }}>
-                  {dayMeetings.map((m) => {
-                    let timeStr = "";
-                    if (m.start) {
-                      const d =
-                        typeof m.start === "string"
-                          ? new Date(m.start)
-                          : m.start;
-                      if (!isNaN(d.getTime())) {
-                        timeStr = d.toTimeString().slice(0, 5) + " ";
-                      }
-                    }
-                    return (
-                      <div key={m.id} className="calendar-event">
-                        {timeStr}
-                        {m.title}
-                      </div>
-                    );
-                  })}
-                  {dayTodos.map((t) => (
-                    <div key={t.id} className="calendar-todo">
-                      <CalendarCheckbox
-                        checked={t.completed}
-                        onChange={(e) => {
-                          e.stopPropagation(); // 체크박스 클릭 시 상위 이벤트 전파 중단
-                          handleEditCompleted(t.id, !t.completed);
-                        }}
-                      />
-                      <span
-                        style={{
-                          textDecoration: t.completed ? "line-through" : "none",
-                        }}
-                      >
-                        {t.title}
-                      </span>
+                  {formatYearMonth(value)}
+                </MonthText>
+                <NavButton onClick={handleNextMonth}>
+                  <FiChevronRight />
+                </NavButton>
+                {showPicker && (
+                  <YearMonthPicker
+                    currentDate={value}
+                    onChange={handleYearMonthChange}
+                    onClose={() => setShowPicker(false)}
+                  />
+                )}
+                <TodayButton onClick={handleToday}>오늘</TodayButton>
+              </MonthNav>
+            </div>
+            <RightBox>
+              <FilterArea>
+                <FilterSelectBox>
+                  <FaRegFileAlt style={{ fontSize: "1.2rem", opacity: 0.7 }} />
+                  <FilterSelect
+                    value={selectedProjectId || ""}
+                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                  >
+                    {projects.map((proj) => (
+                      <option key={proj.project_id} value={proj.project_id}>
+                        {proj.project_name}
+                      </option>
+                    ))}
+                  </FilterSelect>
+                </FilterSelectBox>
+                <ApplyButton>적용</ApplyButton>
+              </FilterArea>
+            </RightBox>
+          </HeaderBar>
+          <Calendar
+            value={value}
+            onChange={(v) => setValue(v as Date)}
+            tileContent={({ date, view }) => {
+              if (!date) return null;
+              if (view === "month") {
+                const day = date.getDate().toString().padStart(2, "0");
+                const dayTodos = events.filter(
+                  (ev) =>
+                    ev.type === "todo" &&
+                    ev.end &&
+                    isSameDay(new Date(ev.end), date)
+                );
+                const dayMeetings = events.filter(
+                  (ev) =>
+                    ev.type === "meeting" && isSameDay(new Date(ev.start), date)
+                );
+                const dayOfWeek = date.getDay(); // 0: 일, 6: 토
+                const isCurrentMonth = date.getMonth() === value.getMonth();
+                let dayClass = "";
+                if (isCurrentMonth) {
+                  if (dayOfWeek === 0) dayClass = "calendar-sunday";
+                  if (dayOfWeek === 6) dayClass = "calendar-saturday";
+                }
+                return (
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      height: "100%",
+                      cursor: "pointer",
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPopupDate(date);
+                    }}
+                  >
+                    <span
+                      className={dayClass}
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        right: 10,
+                        fontSize: "1.05rem",
+                        fontWeight: 500,
+                        zIndex: 2,
+                      }}
+                    >
+                      {day}
+                    </span>
+                    <div style={{ width: "100%", paddingTop: 35 }}>
+                      {dayMeetings.map((m) => {
+                        let timeStr = "";
+                        if (m.start) {
+                          const d =
+                            typeof m.start === "string"
+                              ? new Date(m.start)
+                              : m.start;
+                          if (!isNaN(d.getTime())) {
+                            timeStr = d.toTimeString().slice(0, 5) + " ";
+                          }
+                        }
+                        return (
+                          <div key={m.id} className="calendar-event">
+                            {timeStr}
+                            {m.title}
+                          </div>
+                        );
+                      })}
+                      {dayTodos.map((t) => (
+                        <div key={t.id} className="calendar-todo">
+                          <CalendarCheckbox
+                            checked={t.completed}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleEditCompleted(t.id, !t.completed);
+                            }}
+                          />
+                          <span
+                            style={{
+                              textDecoration: t.completed ? "line-through" : "none",
+                            }}
+                          >
+                            {t.title}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            );
-          }
-          return null;
-        }}
-        formatDay={(_, date) => date.getDate().toString().padStart(2, "0")}
-        locale="ko-KR"
-        calendarType="gregory"
-      />
+                  </div>
+                );
+              }
+              return null;
+            }}
+            formatDay={(_, date) => date.getDate().toString().padStart(2, "0")}
+            locale="ko-KR"
+            calendarType="gregory"
+          />
+
+        </CalendarWrapper>
+      </CalendarFixedBox>
+
       {popupDate && (
-        <CalendarPop
-          date={popupDate}
-          todos={events.filter(
-            (ev) =>
-              ev.type === "todo" && isSameDay(new Date(ev.start), popupDate)
+            <CalendarPop
+              date={popupDate}
+              todos={events.filter(
+                (ev) =>
+                  ev.type === "todo" && isSameDay(new Date(ev.start), popupDate)
+              )}
+              meetings={events.filter(
+                (ev) =>
+                  ev.type === "meeting" && isSameDay(new Date(ev.start), popupDate)
+              )}
+              onClose={handleClosePopup}
+              onEdit={handleEditCompleted}
+            />
           )}
-          meetings={events.filter(
-            (ev) =>
-              ev.type === "meeting" && isSameDay(new Date(ev.start), popupDate)
-          )}
-          onClose={handleClosePopup}
-          onEdit={handleEditCompleted}
-        />
-      )}
-    </CalendarWrapper>
+
+      {/* 오른쪽 패널 */}
+      <UnscheduledPanel $open={true}>
+        <div style={{ width: "100%" }}>
+          <div style={{ fontWeight: 700, marginBottom: 8 }}>
+            일정 미정 task
+          </div>
+          <TaskList>
+            {unscheduledTodos.length === 0 ? (
+              <div style={{ color: "#aaa", padding: "16px 0" }}>
+                일정 미정 task가 없습니다.
+              </div>
+            ) : (
+              unscheduledTodos.map((t) => (
+                <TaskItem 
+                  key={t.id} 
+                  onClick={() => handleEditCompleted(t.id, !t.completed)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <TaskCheckbox
+                    checked={t.completed}
+                    onChange={() => handleEditCompleted(t.id, !t.completed)}
+                  />
+                  <TaskTitle completed={t.completed}>{t.title}</TaskTitle>
+                </TaskItem>
+              ))
+            )}
+          </TaskList>
+        </div>
+      </UnscheduledPanel>
+    </CalendarLayout>
   );
 }

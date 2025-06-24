@@ -25,6 +25,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AlterInfo from './pages/mypage_alter/alterInfo';
 import ConferenceListPage from './pages/conference_list/conferencelist';
 import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
+import FindId from './pages/find_id/FindId';
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
               </RedirectIfAuthenticated>
             }
           />
+          <Route path="/find_id" element={<FindId />} />
           <Route path="/result" element={<Result />} />
 
           <Route
