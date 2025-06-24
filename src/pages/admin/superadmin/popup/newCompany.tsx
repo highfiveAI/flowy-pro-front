@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const Modal = styled.div<{ $isOpen: boolean }>`
@@ -146,54 +146,123 @@ const toDateInputValue = (dateString: string) => {
   return dateString.split('T')[0];
 };
 
-const NewCompany: React.FC<NewCompanyProps> = ({ visible, onClose, onSubmit, formData, onChange }) => (
-  <Modal $isOpen={visible}>
-    <ModalContent>
-      <CloseButton onClick={onClose}>×</CloseButton>
-      <ModalHeader>
-        <h2>신규 회사 등록</h2>
-      </ModalHeader>
-      <Form
-        onSubmit={e => {
-          e.preventDefault();
-          onSubmit(e);
-          onClose();
-        }}
-      >
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="company_name">회사명</label>
-            <input type="text" id="company_name" name="company_name" value={formData.company_name} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="company_scale">기업 규모</label>
-            <input type="text" id="company_scale" name="company_scale" value={formData.company_scale} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="service_startdate">서비스 시작일</label>
-            <input type="date" id="service_startdate" name="service_startdate" value={toDateInputValue(formData.service_startdate)} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="service_enddate">서비스 종료일</label>
-            <input type="date" id="service_enddate" name="service_enddate" value={toDateInputValue(formData.service_enddate)} onChange={onChange} />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="admin_account">관리자 계정</label>
-            <input type="text" id="admin_account" name="admin_account" value={formData.admin_account || ''} onChange={onChange} />
-          </InputBox>
-        </FormGroup>
-        <Button type="submit">등록</Button>
-      </Form>
-    </ModalContent>
-  </Modal>
-);
+const NewCompany: React.FC<NewCompanyProps> = ({ visible, onClose, onSubmit, formData, onChange }) => {
+  const [touched, setTouched] = useState({
+    company_name: false,
+    company_scale: false,
+    service_startdate: false,
+    service_enddate: false,
+  });
+
+  // 유효성 검사
+  const errors = {
+    company_name: !formData.company_name ? '회사명을 입력하세요.' : '',
+    company_scale: !formData.company_scale ? '기업 규모를 입력하세요.' : '',
+    service_startdate: !formData.service_startdate ? '시작일을 선택하세요.' : '',
+    service_enddate:
+      formData.service_enddate && formData.service_startdate &&
+      formData.service_enddate < formData.service_startdate
+        ? '종료일은 시작일 이후여야 합니다.'
+        : '',
+  };
+  const isValid =
+    !errors.company_name &&
+    !errors.company_scale &&
+    !errors.service_startdate &&
+    !errors.service_enddate;
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setTouched((prev) => ({ ...prev, [e.target.name]: true }));
+  };
+
+  return (
+    <Modal $isOpen={visible}>
+      <ModalContent>
+        <CloseButton onClick={onClose}>×</CloseButton>
+        <ModalHeader>
+          <h2>신규 회사 등록</h2>
+        </ModalHeader>
+        <Form
+          onSubmit={e => {
+            e.preventDefault();
+            if (isValid) {
+              onSubmit(e);
+              onClose();
+            }
+          }}
+        >
+          <FormGroup>
+            <InputBox>
+              <label htmlFor="company_name">회사명</label>
+              <input
+                type="text"
+                id="company_name"
+                name="company_name"
+                value={formData.company_name}
+                onChange={onChange}
+                onBlur={handleBlur}
+                required
+              />
+            </InputBox>
+            {touched.company_name && errors.company_name && (
+              <div style={{ color: '#dc2626', fontSize: '0.95rem', marginTop: 4 }}>{errors.company_name}</div>
+            )}
+          </FormGroup>
+          <FormGroup>
+            <InputBox>
+              <label htmlFor="company_scale">기업 규모</label>
+              <input
+                type="text"
+                id="company_scale"
+                name="company_scale"
+                value={formData.company_scale}
+                onChange={onChange}
+                onBlur={handleBlur}
+                required
+              />
+            </InputBox>
+            {touched.company_scale && errors.company_scale && (
+              <div style={{ color: '#dc2626', fontSize: '0.95rem', marginTop: 4 }}>{errors.company_scale}</div>
+            )}
+          </FormGroup>
+          <FormGroup>
+            <InputBox>
+              <label htmlFor="service_startdate">서비스 시작일</label>
+              <input
+                type="date"
+                id="service_startdate"
+                name="service_startdate"
+                value={toDateInputValue(formData.service_startdate)}
+                onChange={onChange}
+                onBlur={handleBlur}
+                required
+              />
+            </InputBox>
+            {touched.service_startdate && errors.service_startdate && (
+              <div style={{ color: '#dc2626', fontSize: '0.95rem', marginTop: 4 }}>{errors.service_startdate}</div>
+            )}
+          </FormGroup>
+          <FormGroup>
+            <InputBox>
+              <label htmlFor="service_enddate">서비스 종료일</label>
+              <input
+                type="date"
+                id="service_enddate"
+                name="service_enddate"
+                value={toDateInputValue(formData.service_enddate)}
+                onChange={onChange}
+                onBlur={handleBlur}
+              />
+            </InputBox>
+            {touched.service_enddate && errors.service_enddate && (
+              <div style={{ color: '#dc2626', fontSize: '0.95rem', marginTop: 4 }}>{errors.service_enddate}</div>
+            )}
+          </FormGroup>
+          <Button type="submit" disabled={!isValid}>등록</Button>
+        </Form>
+      </ModalContent>
+    </Modal>
+  );
+};
 
 export default NewCompany; 

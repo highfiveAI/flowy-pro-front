@@ -145,6 +145,13 @@ interface EditCompanyProps {
   adminUser?: { user_name: string; user_email: string } | null;
 }
 
+// 날짜를 yyyy-MM-dd로 변환하는 함수
+const toDateInputValue = (dateString: string) => {
+  if (!dateString) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+  return dateString.split('T')[0];
+};
+
 const EditCompany: React.FC<EditCompanyProps> = ({ visible, onClose, onSubmit, onDelete, formData, onChange, adminUser }) => (
   <Modal $isOpen={visible}>
     <ModalContent>
@@ -175,13 +182,13 @@ const EditCompany: React.FC<EditCompanyProps> = ({ visible, onClose, onSubmit, o
         <FormGroup>
           <InputBox>
             <label htmlFor="service_startdate">서비스 시작일</label>
-            <input type="date" id="service_startdate" name="service_startdate" value={formData.service_startdate} onChange={onChange} required />
+            <input type="date" id="service_startdate" name="service_startdate" value={toDateInputValue(formData.service_startdate)} onChange={onChange} required />
           </InputBox>
         </FormGroup>
         <FormGroup>
           <InputBox>
             <label htmlFor="service_enddate">서비스 종료일</label>
-            <input type="date" id="service_enddate" name="service_enddate" value={formData.service_enddate} onChange={onChange} />
+            <input type="date" id="service_enddate" name="service_enddate" value={toDateInputValue(formData.service_enddate)} onChange={onChange} />
           </InputBox>
         </FormGroup>
         <FormGroup>
