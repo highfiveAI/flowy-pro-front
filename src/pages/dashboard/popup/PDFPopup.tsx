@@ -252,6 +252,7 @@ const PDFPopup: React.FC<PDFPopupProps> = ({ onClose, meetingInfo, summary, task
         <DownloadButton
           onClick={() => {
             console.log('PDF로 넘기는 feedback 값:', feedback);
+            console.log('PDF로 넘기는 tasks 값:', tasks);
             generateMeetingPDF({
               checked,
               meetingInfo,
