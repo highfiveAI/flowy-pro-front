@@ -35,6 +35,13 @@ import styled from "styled-components";
 import NewMeetingPopup from "./popup/new_meeting";
 import { useAuth } from "../../contexts/AuthContext";
 
+type ProjectUser = {
+    user_id: string;
+    name: string;
+    email: string;
+    user_jobname: string;
+};
+
 function formatYearMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
     2,
@@ -178,6 +185,7 @@ export default function CalendarPage() {
   const [showNewMeeting, setShowNewMeeting] = useState(false);
   const { user } = useAuth();
   const [userDetail, setUserDetail] = useState<{ user_name: string; user_email: string; user_jobname: string } | null>(null);
+  const [projectUsers, setProjectUsers] = useState<ProjectUser[]>([]);
 
   // 1. 로그인한 사용자의 user_id를 먼저 가져온다
   useEffect(() => {
@@ -247,6 +255,17 @@ export default function CalendarPage() {
         );
       });
   }, [userId, selectedProjectId]);
+
+  useEffect(() => {
+    if (!selectedProjectId) return;
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/project-users/${selectedProjectId}`, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        setProjectUsers(data.users || []);
+      });
+  }, [selectedProjectId]);
 
   // const handleToggleTodo = (id: string) => {
   //   setEvents((prevEvents) =>
@@ -589,11 +608,7 @@ export default function CalendarPage() {
         })()} 
         projectId={selectedProjectId || ''}
         userId={userId || ''}
-        user={{
-          name: userDetail?.user_name || user?.name || '',
-          email: userDetail?.user_email || user?.email || '',
-          role: userDetail?.user_jobname || '',
-        }} 
+        projectUsers={projectUsers}
       />}
     </CalendarLayout>
   );
