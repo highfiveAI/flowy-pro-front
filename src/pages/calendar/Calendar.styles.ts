@@ -22,13 +22,12 @@ export const CalendarWrapper = styled.div`
   .react-calendar__month-view__days {
     display: grid !important;
     grid-template-rows: repeat(6, 1fr);
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, 150px);
     min-height: 800px;
     height: 800px;
   }
   .react-calendar__tile {
-    height: auto !important;
-    min-height: 0;
+    width: 150px !important;
     vertical-align: top;
     white-space: normal;
     word-break: keep-all;
@@ -95,8 +94,15 @@ export const CalendarWrapper = styled.div`
     color: #5e5553;
     padding: 8px 0;
     border: 1px solid #c7b8d9;
-    border-bottom: none;
+    border-bottom: 1px solid #c7b8d9;
     background: #f8f6fa;
+  }
+  .react-calendar__month-view__weekdays__weekday,
+  .react-calendar__month-view__weekdays__weekday *,
+  .react-calendar__month-view__weekdays__weekday::after,
+  .react-calendar__month-view__weekdays__weekday::before {
+    text-decoration: none !important;
+    content: none !important;
   }
   .react-calendar__month-view__weekdays__weekday:first-child {
     color: #c00f0cb2;
@@ -290,15 +296,17 @@ export const UnscheduledPanel = styled.div<{ $open: boolean }>`
   top: 200px;
   right: 50px;
   width: 250px;
-  background: #f8f5ff;
+  background: #f3e6ff;
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(80, 0, 80, 0.06);
-  padding: 24px;
+  padding: ${({ $open }) => ($open ? '24px' : '8px 24px')};
   overflow: hidden;
-  min-height: 400px;
+  min-height: ${({ $open }) => ($open ? '400px' : '0')};
+  height: ${({ $open }) => ($open ? 'auto' : '40px')};
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  transition: all 0.2s;
 `;
 
 export const TaskList = styled.div`
