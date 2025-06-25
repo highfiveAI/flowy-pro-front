@@ -173,7 +173,6 @@ export function generateMeetingPDF({
 
     // [작업 목록]
     if (checked.tasks && tasks && typeof tasks === 'object') {
-      // console.log('[PDFGenerator] 전달받은 tasks:', tasks);
       const taskTableBody: any[] = [
         [
           { text: '작업 내용', style: 'tableHeader' },
@@ -181,13 +180,13 @@ export function generateMeetingPDF({
           { text: '일정', style: 'tableHeader' },
         ],
       ];
-      Object.entries(tasks).forEach(([/*status,*/ arr]) => {
+      Object.entries(tasks).forEach(([assignee, arr]) => {
         if (!Array.isArray(arr) || arr.length === 0) return;
         arr.forEach((task: any) => {
           taskTableBody.push([
             task.action || '',
-            task.assignee || '',
-            task.schedule || '',
+            task.assignee || assignee || '',
+            formatScheduleDate(task.schedule || ''),
           ]);
         });
       });
@@ -364,4 +363,21 @@ function formatDateTime(dateString: string) {
   const hh = String(d.getHours()).padStart(2, '0');
   const min = String(d.getMinutes()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+}
+
+// 일정(날짜) 포맷 함수: YYYY.MM.DD(요일) 형태로 변환
+function formatScheduleDate(dateString: string) {
+  // 이미 (요일)까지 붙어 있으면 그대로 반환
+  if (!dateString) return '';
+  if (dateString.match(/\(.*\)$/)) return dateString;
+  // YYYY-MM-DD 또는 YYYY.MM.DD 등 다양한 구분자 처리
+  let d = dateString.replace(/\./g, '-').replace(/\//g, '-');
+  const date = new Date(d);
+  if (isNaN(date.getTime())) return dateString;
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const week = ['일', '월', '화', '수', '목', '금', '토'];
+  const day = week[date.getDay()];
+  return `${yyyy}.${mm}.${dd}(${day})`;
 }
