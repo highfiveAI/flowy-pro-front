@@ -118,3 +118,10 @@ export const ChangeButton = styled.button`
     background-color: #351745;
   }
 `;
+
+export const ErrorText = styled.div`
+  color: red;
+  font-size: 13px;
+  margin-bottom: 15px;
+  margin-left: 170px;
+`;

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { postLogin } from '../../api/fetchMypage';
 import {
@@ -18,6 +18,8 @@ const MyPage: React.FC = () => {
   const { user } = useAuth();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [searchParams] = useSearchParams();
+  const errorParam = searchParams.get('error');
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -32,10 +34,17 @@ const MyPage: React.FC = () => {
       window.location.replace('/mypage/alterInfo');
       // navigate('/mypage/alterInfo');
     } else {
-      setError('입력하신 비밀번호가 올바르지 않습니다.');
-      console.log('로그인 실패');
+      window.location.replace('/mypage?error=402');
     }
   };
+
+  useEffect(() => {
+    if (errorParam === '402') {
+      setError('비밀번호가 알맞지 않습니다.');
+    }
+    const newUrl = location.pathname;
+    navigate(newUrl, { replace: true });
+  }, [errorParam]);
 
   return (
     <MyPageWrapper>
