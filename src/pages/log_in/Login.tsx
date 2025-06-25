@@ -38,6 +38,7 @@ const Login: React.FC = () => {
     username: '',
     password: '',
   });
+  const errorMessage = location.state?.errorMessage || '';
   const [error, setError] = useState<string>('');
   const [isGoogleRedirect, setIsGoogleRedirect] = useState(false);
 
@@ -68,11 +69,11 @@ const Login: React.FC = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+          window.location.replace('/login?error=401');
         } else if (response.status === 403) {
-          setError('승인 되지 않은 계정입니다.');
+          window.location.replace('/login?error=not_allowed');
         } else {
-          setError('서버 오류가 발생했습니다. 다시 시도해주세요.');
+          window.location.replace('/login?error=500');
         }
         return;
       }
@@ -83,10 +84,10 @@ const Login: React.FC = () => {
 
       console.log('로그인 성공:', data);
       setUser(data.user);
-      navigate(from, { replace: true });
+      window.location.replace('/');
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
-      setError('네트워크 오류가 발생했습니다.');
+      window.location.replace('/login?error=501');
     }
   };
 
@@ -102,6 +103,12 @@ const Login: React.FC = () => {
       setError('승인되지 않은 아이디입니다.');
     } else if (errorParam === 'not_found') {
       setError('존재하지 않는 계정입니다.');
+    } else if (errorParam === '401') {
+      setError('아이디 또는 비밀번호 알맞지 않습니다.');
+    } else if (errorParam === '500') {
+      setError('서버 오류가 발생했습니다. 다시 시도해주세요.');
+    } else if (errorParam === '501') {
+      setError('네트워크 오류가 발생했습니다.');
     }
     const newUrl = location.pathname;
     navigate(newUrl, { replace: true });
@@ -142,7 +149,7 @@ const Login: React.FC = () => {
         <LinkContainer>
           <Link to="/find_id">아이디 찾기</Link>
           <span>|</span>
-          <Link to="/find-password">비밀번호 찾기</Link>
+          <Link to="/find_pw">비밀번호 찾기</Link>
           <span>|</span>
           <Link to="/sign_up">회원가입</Link>
         </LinkContainer>

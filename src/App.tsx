@@ -26,6 +26,8 @@ import AlterInfo from './pages/mypage_alter/alterInfo';
 import ConferenceListPage from './pages/conference_list/conferencelist';
 import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
 import FindId from './pages/find_id/FindId';
+import FindPw from './pages/find_pw/FindPw';
+import NotFoundAccount from './pages/find_pw/not_found/NotFoundAccount';
 
 function App() {
   return (
@@ -67,6 +69,8 @@ function App() {
             }
           />
           <Route path="/find_id" element={<FindId />} />
+          <Route path="/find_pw" element={<FindPw />} />
+          <Route path="/find_pw/not_found" element={<NotFoundAccount />} />
           <Route path="/result" element={<Result />} />
 
           <Route
