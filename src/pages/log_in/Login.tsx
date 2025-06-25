@@ -32,13 +32,13 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const errorParam = searchParams.get('error');
-  const from = location.state?.from?.pathname || '/';
+  // const from = location.state?.from?.pathname || '/';
 
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
   });
-  const errorMessage = location.state?.errorMessage || '';
+  // const errorMessage = location.state?.errorMessage || '';
   const [error, setError] = useState<string>('');
   const [isGoogleRedirect, setIsGoogleRedirect] = useState(false);
 
