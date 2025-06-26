@@ -143,6 +143,18 @@ const Navbar: React.FC = () => {
 
           {user && role === 'companyAdmin' && (
             <>
+              <MenuItem onClick={() => navigate('/insert_info')}>
+                회의분석 요청
+                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+              </MenuItem>
+              <MenuItem onClick={() => navigate('/projectlist')}>
+                분석결과 조회
+                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+              </MenuItem>
+              <MenuItem onClick={() => navigate('/calendar')}>
+                캘린더
+                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+              </MenuItem>
               <div
                 style={{ position: 'relative', display: 'inline-block' }}
                 onMouseEnter={handleSystemMenuEnter}
@@ -165,6 +177,10 @@ const Navbar: React.FC = () => {
               </div>
               <MenuItem onClick={() => navigate('/admin/dashboard')}>
                 대시보드
+                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+              </MenuItem>
+              <MenuItem onClick={() => navigate('/mypage')}>
+                마이페이지
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
             </>
