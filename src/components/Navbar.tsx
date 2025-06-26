@@ -134,6 +134,10 @@ const Navbar: React.FC = () => {
                   ))}
                 </DropdownMenu>
               </MenuItem> */}
+              <MenuItem onClick={() => navigate('/chatbot')}>
+                챗봇
+                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
+              </MenuItem>
               <MenuItem onClick={() => navigate('/mypage')}>
                 마이페이지
                 <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
