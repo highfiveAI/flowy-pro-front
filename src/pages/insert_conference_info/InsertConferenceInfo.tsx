@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FileUpload from './FileUpload';
 import AttendInfo from './AttendInfo';
 import Loading from '../../components/Loading';
@@ -63,6 +63,7 @@ import {
   TabSectionWrapper,
   TabsWrapper,
 } from './InsertConferenceInfo.styles.ts';
+import { checkAuth } from '../../api/fetchAuthCheck.ts';
 
 // 날짜를 'YYYY-MM-DD HH:mm:ss' 형식으로 변환하는 함수
 function formatDateToKST(date: Date): string {
@@ -76,7 +77,7 @@ function formatDateToKST(date: Date): string {
 }
 
 const InsertConferenceInfo: React.FC = () => {
-  const { user } = useAuth();
+  const { user, setUser, setLoading } = useAuth();
   const navigate = useNavigate();
   const [isCompleted /*, setIsCompleted*/] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -181,70 +182,42 @@ const InsertConferenceInfo: React.FC = () => {
 
     setIsLoading(true);
     console.log('함수 실행중...');
-    // const formData = new FormData();
 
     if (file) {
-      // STT API용 FormData
+      // host 정보
       const hostUser = projectUsers.find((u) => u.user_id === hostId);
       const hostName = hostUser?.name || '';
-      // const hostEmail = hostUser?.email || "";
-      // const hostJobname = hostUser?.user_jobname || "";
+      const hostEmail = hostUser?.email || '';
+      const hostJobname = hostUser?.user_jobname || '';
 
       // 참석자 정보(회의장 제외)
       const filteredAttendees = attendees.filter(
         (a) => a.user_id && a.user_id !== hostId
       );
+      const attendeesUserId = filteredAttendees.map((a) => a.user_id);
       const attendeesName = filteredAttendees.map((a) => a.name);
       const attendeesEmail = filteredAttendees.map((a) => a.email);
       const attendeesRole = filteredAttendees.map((a) => a.user_jobname);
 
-      const sttFormData = new FormData();
-      sttFormData.append('file', file, file.name);
-      sttFormData.append('subject', subject);
-      sttFormData.append('agenda', agenda);
-      sttFormData.append(
+      // 통합 FormData 준비
+      const formData = new FormData();
+      formData.append('file', file, file.name);
+      formData.append('project_id', projectId);
+      formData.append('meeting_title', subject); // subject가 회의 제목
+      formData.append('meeting_agenda', agenda);
+      formData.append(
         'meeting_date',
         meetingDate ? formatDateToKST(meetingDate) : ''
       );
-      sttFormData.append('project_name', projectName);
-      // host 정보
-      sttFormData.append('host_name', hostName);
-      sttFormData.append('host_email', hostEmail);
-      sttFormData.append('host_role', hostJobname);
-      // 참석자 정보 (각각 여러 번 append)
-      attendeesName.forEach((name) =>
-        sttFormData.append('attendees_name', name)
-      );
-      attendeesEmail.forEach((email) =>
-        sttFormData.append('attendees_email', email)
-      );
-      attendeesRole.forEach((role) =>
-        sttFormData.append('attendees_role', role)
-      );
-
-      // Meeting Upload API용 FormData
-      const meetingFormData = new FormData();
-      meetingFormData.append('file', file);
-      meetingFormData.append('project_id', projectId);
-      meetingFormData.append('meeting_title', subject);
-      meetingFormData.append('meeting_agenda', agenda);
-      if (meetingDate) {
-        meetingFormData.append('meeting_date', formatDateToKST(meetingDate));
-      }
-      // host 정보
-      meetingFormData.append('host_name', hostName);
-      meetingFormData.append('host_email', hostEmail);
-      meetingFormData.append('host_role', hostJobname);
-      // 참석자 정보
-      attendeesName.forEach((name) =>
-        meetingFormData.append('attendees_name', name)
-      );
-      attendeesEmail.forEach((email) =>
-        meetingFormData.append('attendees_email', email)
-      );
-      attendeesRole.forEach((role) =>
-        meetingFormData.append('attendees_role', role)
-      );
+      formData.append('host_id', hostId);
+      formData.append('host_name', hostName);
+      formData.append('host_email', hostEmail);
+      formData.append('host_role', hostJobname);
+      attendeesUserId.forEach((id) => formData.append('attendees_ids', id));
+      attendeesName.forEach((name) => formData.append('attendees_name', name));
+      attendeesEmail.forEach((email) => formData.append('attendees_email', email));
+      attendeesRole.forEach((role) => formData.append('attendees_role', role));
+      formData.append('subject', subject);
 
       // 콘솔로 값 확인
       console.log('hostId:', hostId);
@@ -256,100 +229,26 @@ const InsertConferenceInfo: React.FC = () => {
       console.log('attendeesRole:', attendeesRole);
 
       try {
-        // 1. STT API 호출
-        const sttResponse = await fetch(
+        // 통합 STT API 한 번만 호출
+        const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/v1/stt/`,
           {
             method: 'POST',
-            body: sttFormData,
-          }
-        );
-        if (!sttResponse.ok) {
-          const errorData = await sttResponse.json().catch(() => null);
-          throw new Error(errorData?.detail || 'STT 업로드에 실패했습니다.');
-        }
-
-        // 2. Meeting Upload API 호출
-        const meetingResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting-upload/`,
-          {
-            method: 'POST',
-            body: meetingFormData,
+            body: formData,
             credentials: 'include',
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
           }
         );
-        if (!meetingResponse.ok) {
-          const errorData = await meetingResponse.json().catch(() => null);
-          throw new Error(
-            errorData?.detail || '회의 정보 업로드에 실패했습니다.'
-          );
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.detail || '업로드에 실패했습니다.');
         }
+        const result = await response.json();
+        console.log('통합 STT 서버 응답:', result);
 
-        // 3. analyze-meeting API 호출 (결과는 기다리지 않음)
-        const sttResult = await sttResponse.json();
-        const meetingResult = await meetingResponse.json();
-
-        console.log('STT 서버 응답:', sttResult);
-        console.log('Meeting 서버 응답:', meetingResult);
-
-        const meetingId = meetingResult.meeting_id;
-        if (meetingId) {
-          const analyzeFormData = new FormData();
-          analyzeFormData.append('meeting_id', meetingId);
-          analyzeFormData.append('project_name', projectName);
-          analyzeFormData.append('subject', subject);
-
-          analyzeFormData.append(
-            'chunks',
-            JSON.stringify(sttResult.chunks || [])
-          );
-          analyzeFormData.append('host_name', hostName);
-          analyzeFormData.append('host_email', hostEmail);
-          analyzeFormData.append('host_role', hostJobname);
-
-          analyzeFormData.append('attendees_list', JSON.stringify(attendees));
-          analyzeFormData.append('agenda', agenda);
-          if (meetingDate) {
-            analyzeFormData.append(
-              'meeting_date',
-              formatDateToKST(meetingDate)
-            );
-          } else {
-            analyzeFormData.append('meeting_date', '');
-          }
-
-          fetch(`${import.meta.env.VITE_API_URL}/api/v1/stt/analyze-meeting/`, {
-            method: 'POST',
-            body: analyzeFormData,
-            credentials: 'include',
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          });
-
-          //           const analyzeData = await analyzeResponse.json();
-          //           console.log('분석 결과:', analyzeData);
-
-          //           alert('업로드가 완료되었습니다.');
-          //           setSubject('');
-          //           setAttendees([
-          //             { user_id: '', name: '', email: '', user_jobname: '' },
-          //           ]);
-          //           setFile(null);
-          //           setAgenda('');
-          //           setMeetingDate(null);
-          //           setResult(analyzeData); // 분석 결과를 결과로 설정
-          //           setIsCompleted(true);
-          //         } else {
-          //           alert('업로드가 완료되었지만, 분석 결과를 가져오지 못했습니다.');
-          //           setResult(null);
-          //           setIsCompleted(true);
-        }
-
-        // 4. 성공 시 팝업 띄우기
+        // 성공 시 팝업 띄우기
         setShowAnalysisRequestedPopup(true);
 
         // 입력값 초기화
@@ -555,6 +454,16 @@ const InsertConferenceInfo: React.FC = () => {
   const fetchProjects = async () => {
     // ... existing code ...
   };
+
+  useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
   return (
     <PageWrapper>

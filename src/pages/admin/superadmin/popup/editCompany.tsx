@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import ManagePositionsModal from './ManagePositionsModal';
 
 const Modal = styled.div<{ $isOpen: boolean }>`
   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
@@ -143,6 +144,7 @@ interface EditCompanyProps {
   };
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   adminUser?: { user_name: string; user_email: string } | null;
+  companyId: string;
 }
 
 // 날짜를 yyyy-MM-dd로 변환하는 함수
@@ -152,71 +154,100 @@ const toDateInputValue = (dateString: string) => {
   return dateString.split('T')[0];
 };
 
-const EditCompany: React.FC<EditCompanyProps> = ({ visible, onClose, onSubmit, onDelete, formData, onChange, adminUser }) => (
-  <Modal $isOpen={visible}>
-    <ModalContent>
-      <ModalHeader>
-        <h2>회사 정보 수정</h2>
-        <CloseButton onClick={onClose}>×</CloseButton>
-      </ModalHeader>
-      <Form
-        onSubmit={e => {
-          e.preventDefault();
-          onSubmit(e);
-          onClose();
-        }}
-      >
+const EditCompany: React.FC<EditCompanyProps> = ({ visible, onClose, onSubmit, onDelete, formData, onChange, adminUser, companyId }) => {
+  const [isPositionModalOpen, setIsPositionModalOpen] = useState(false);
 
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="company_name">회사명</label>
-            <input type="text" id="company_name" name="company_name" value={formData.company_name} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="company_scale">기업 규모</label>
-            <input type="text" id="company_scale" name="company_scale" value={formData.company_scale} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="service_startdate">서비스 시작일</label>
-            <input type="date" id="service_startdate" name="service_startdate" value={toDateInputValue(formData.service_startdate)} onChange={onChange} required />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-          <InputBox>
-            <label htmlFor="service_enddate">서비스 종료일</label>
-            <input type="date" id="service_enddate" name="service_enddate" value={toDateInputValue(formData.service_enddate)} onChange={onChange} />
-          </InputBox>
-        </FormGroup>
-        <FormGroup>
-        {/* 관리자 이름/이메일 표시 */}
-        {adminUser && (
-          <>
-            <FormGroup>
-              <InputBox>
-                <label>관리자 이름</label>
-                <input type="text" value={adminUser.user_name} disabled />
-              </InputBox>
-            </FormGroup>
-            <FormGroup>
-              <InputBox>
-                <label>관리자 이메일</label>
-                <input type="text" value={adminUser.user_email} disabled />
-              </InputBox>
-            </FormGroup>
-          </>
+  return (
+    <Modal $isOpen={visible}>
+      <ModalContent>
+        <ModalHeader>
+          <h2>회사 정보 수정</h2>
+          <CloseButton onClick={onClose}>×</CloseButton>
+          <button
+            style={{
+              position: 'absolute',
+              marginTop: 10,
+              right: 80,
+              background: '#ede6f7',
+              color: '#351745',
+              border: '1.5px solid #a48be0',
+              borderRadius: 8,
+              fontWeight: 600,
+              fontSize: '1rem',
+              padding: '8px 18px',
+              cursor: 'pointer',
+              zIndex: 1200,
+            }}
+            onClick={() => setIsPositionModalOpen(true)}
+          >
+            직책 관리
+          </button>
+        </ModalHeader>
+        <Form
+          onSubmit={e => {
+            e.preventDefault();
+            onSubmit(e);
+            onClose();
+          }}
+        >
+          <FormGroup>
+            <InputBox>
+              <label htmlFor="company_name">회사명</label>
+              <input type="text" id="company_name" name="company_name" value={formData.company_name} onChange={onChange} required />
+            </InputBox>
+          </FormGroup>
+          <FormGroup>
+            <InputBox>
+              <label htmlFor="company_scale">기업 규모</label>
+              <input type="text" id="company_scale" name="company_scale" value={formData.company_scale} onChange={onChange} required />
+            </InputBox>
+          </FormGroup>
+          <FormGroup>
+            <InputBox>
+              <label htmlFor="service_startdate">서비스 시작일</label>
+              <input type="date" id="service_startdate" name="service_startdate" value={toDateInputValue(formData.service_startdate)} onChange={onChange} required />
+            </InputBox>
+          </FormGroup>
+          <FormGroup>
+            <InputBox>
+              <label htmlFor="service_enddate">서비스 종료일</label>
+              <input type="date" id="service_enddate" name="service_enddate" value={toDateInputValue(formData.service_enddate)} onChange={onChange} />
+            </InputBox>
+          </FormGroup>
+          <FormGroup>
+            {/* 관리자 이름/이메일 표시 */}
+            {adminUser && (
+              <>
+                <FormGroup>
+                  <InputBox>
+                    <label>관리자 이름</label>
+                    <input type="text" value={adminUser.user_name} disabled />
+                  </InputBox>
+                </FormGroup>
+                <FormGroup>
+                  <InputBox>
+                    <label>관리자 이메일</label>
+                    <input type="text" value={adminUser.user_email} disabled />
+                  </InputBox>
+                </FormGroup>
+              </>
+            )}
+          </FormGroup>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
+            <Button type="submit">수정</Button>
+            <Button type="button" variant="danger" onClick={onDelete}>삭제</Button>
+          </div>
+        </Form>
+        {/* 직책 관리 모달 */}
+        {isPositionModalOpen && (
+          <ManagePositionsModal
+            companyId={companyId}
+            onClose={() => setIsPositionModalOpen(false)}
+          />
         )}
-        </FormGroup>
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
-          <Button type="submit">수정</Button>
-          <Button type="button" variant="danger" onClick={onDelete}>삭제</Button>
-        </div>
-      </Form>
-    </ModalContent>
-  </Modal>
-);
+      </ModalContent>
+    </Modal>
+  );
+};
 
 export default EditCompany; 

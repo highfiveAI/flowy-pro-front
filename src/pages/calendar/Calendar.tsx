@@ -2,14 +2,14 @@
 // 설치 명령: npm install react-big-calendar moment
 // 타입: npm install --save-dev @types/react-big-calendar @types/moment
 
-import { useState, useEffect } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import type { CalendarEvent } from "./event-utils";
-import { isSameDay } from "date-fns";
-import { FaRegFileAlt } from "react-icons/fa";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import CalendarPop from "./popup/calendarPop";
+import { useState, useEffect } from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import type { CalendarEvent } from './event-utils';
+import { isSameDay } from 'date-fns';
+import { FaRegFileAlt } from 'react-icons/fa';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import CalendarPop from './popup/calendarPop';
 import {
   ApplyButton,
   CalendarCheckbox,
@@ -22,7 +22,6 @@ import {
   MonthText,
   NavButton,
   RightBox,
-  Title,
   TodayButton,
   CalendarLayout,
   CalendarFixedBox,
@@ -31,15 +30,22 @@ import {
   TaskItem,
   TaskCheckbox,
   TaskTitle,
-} from "./Calendar.styles";
-import styled from "styled-components";
-import NewMeetingPopup from "./popup/new_meeting";
-import { useAuth } from "../../contexts/AuthContext";
+} from './Calendar.styles';
+import styled from 'styled-components';
+import NewMeetingPopup from './popup/new_meeting';
+// import { useAuth } from '../../contexts/AuthContext';
+
+type ProjectUser = {
+  user_id: string;
+  name: string;
+  email: string;
+  user_jobname: string;
+};
 
 function formatYearMonth(date: Date) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
     2,
-    "0"
+    '0'
   )}`;
 }
 
@@ -57,24 +63,24 @@ function YearMonthPicker({
   return (
     <div
       style={{
-        position: "absolute",
+        position: 'absolute',
         top: 60,
-        left: "50%",
-        transform: "translateX(-50%)",
-        background: "#fff",
-        border: "1.5px solid #C7B8D9",
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: '#fff',
+        border: '1.5px solid #C7B8D9',
         borderRadius: 8,
         padding: 16,
         zIndex: 100,
-        boxShadow: "0 2px 12px rgba(80,0,80,0.08)",
+        boxShadow: '0 2px 12px rgba(80,0,80,0.08)',
         width: 270,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
         <select
           value={year}
           onChange={(e) => setYear(Number(e.target.value))}
-          style={{ fontSize: "1rem", marginRight: 8 }}
+          style={{ fontSize: '1rem', marginRight: 8 }}
         >
           {Array.from({ length: 20 }, (_, i) => 2015 + i).map((y) => (
             <option key={y} value={y}>
@@ -85,7 +91,7 @@ function YearMonthPicker({
         <select
           value={month}
           onChange={(e) => setMonth(Number(e.target.value))}
-          style={{ fontSize: "1rem", marginRight: 16 }}
+          style={{ fontSize: '1rem', marginRight: 16 }}
         >
           {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
             <option key={m} value={m}>
@@ -96,9 +102,9 @@ function YearMonthPicker({
         <ApplyButton
           onClick={() => onChange(year, month)}
           style={{
-            padding: "0 18px",
+            padding: '0 18px',
             height: 36,
-            fontSize: "0.8rem",
+            fontSize: '0.8rem',
             marginLeft: 0,
           }}
         >
@@ -108,12 +114,12 @@ function YearMonthPicker({
           onClick={onClose}
           style={{
             marginLeft: 8,
-            background: "none",
-            border: "none",
-            color: "#351745",
+            background: 'none',
+            border: 'none',
+            color: '#351745',
             fontWeight: 600,
-            fontSize: "0.8rem",
-            cursor: "pointer",
+            fontSize: '0.8rem',
+            cursor: 'pointer',
           }}
         >
           닫기
@@ -134,7 +140,7 @@ const FloatingAddButton = styled.button`
   color: #fff;
   font-size: 2.5rem;
   border: none;
-  box-shadow: 0 4px 16px rgba(80,0,80,0.13);
+  box-shadow: 0 4px 16px rgba(80, 0, 80, 0.13);
   cursor: pointer;
   z-index: 10001;
   display: flex;
@@ -157,7 +163,7 @@ const Tooltip = styled.div`
   font-size: 1rem;
   white-space: nowrap;
   z-index: 10002;
-  box-shadow: 0 2px 8px rgba(80,0,80,0.13);
+  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.13);
   pointer-events: none;
   opacity: 0.95;
 `;
@@ -177,13 +183,20 @@ export default function CalendarPage() {
   const [unscheduledOpen, setUnscheduledOpen] = useState(true);
   const [addBtnHover, setAddBtnHover] = useState(false);
   const [showNewMeeting, setShowNewMeeting] = useState(false);
-  const { user } = useAuth();
-  const [userDetail, setUserDetail] = useState<{ user_name: string; user_email: string; user_jobname: string } | null>(null);
+  // const { user } = useAuth();
+  const [userDetail, setUserDetail] = useState<{
+    user_name: string;
+    user_email: string;
+    user_jobname: string;
+  } | null>(null);
+  const [projectUsers, setProjectUsers] = useState<ProjectUser[]>([]);
+
+  console.log(userDetail);
 
   // 1. 로그인한 사용자의 user_id를 먼저 가져온다
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/one`, {
-      credentials: "include",
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then((data) => {
@@ -198,14 +211,14 @@ export default function CalendarPage() {
         }
       })
       .catch((err) => {
-        console.error("유저 정보 불러오기 실패:", err);
+        console.error('유저 정보 불러오기 실패:', err);
       });
   }, []);
 
   useEffect(() => {
     if (!userId) return;
     fetch(`${import.meta.env.VITE_API_URL}/api/v1/projects/user_id/${userId}`, {
-      credentials: "include",
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then((data) => {
@@ -227,7 +240,7 @@ export default function CalendarPage() {
         import.meta.env.VITE_API_URL
       }/api/v1/calendar/${userId}/${selectedProjectId}`,
       {
-        credentials: "include",
+        credentials: 'include',
       }
     )
       .then((res) => res.json())
@@ -248,6 +261,22 @@ export default function CalendarPage() {
         );
       });
   }, [userId, selectedProjectId]);
+
+  useEffect(() => {
+    if (!selectedProjectId) return;
+    fetch(
+      `${
+        import.meta.env.VITE_API_URL
+      }/api/v1/stt/project-users/${selectedProjectId}`,
+      {
+        credentials: 'include',
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setProjectUsers(data.users || []);
+      });
+  }, [selectedProjectId]);
 
   // const handleToggleTodo = (id: string) => {
   //   setEvents((prevEvents) =>
@@ -281,9 +310,9 @@ export default function CalendarPage() {
   // completed만 수정하는 간단한 핸들러
   const handleEditCompleted = (id: string, completed: boolean) => {
     fetch(`${import.meta.env.VITE_API_URL}/api/v1/calendar/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         calendar_id: id,
         completed: completed,
@@ -308,9 +337,7 @@ export default function CalendarPage() {
   };
 
   // 일정 미정 task 필터
-  const unscheduledTodos = events.filter(
-    (ev) => ev.type === "todo" && !ev.end
-  );
+  const unscheduledTodos = events.filter((ev) => ev.type === 'todo' && !ev.end);
 
   return (
     <CalendarLayout>
@@ -319,13 +346,15 @@ export default function CalendarPage() {
         <CalendarWrapper>
           <HeaderBar style={{ flexDirection: 'column', alignItems: 'stretch' }}>
             {/* 1줄: 프로젝트 선택/적용 (오른쪽) */}
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <RightBox>
                 <FilterArea>
                   <FilterSelectBox>
-                    <FaRegFileAlt style={{ fontSize: "1.2rem", opacity: 0.7 }} />
+                    <FaRegFileAlt
+                      style={{ fontSize: '1.2rem', opacity: 0.7 }}
+                    />
                     <FilterSelect
-                      value={selectedProjectId || ""}
+                      value={selectedProjectId || ''}
                       onChange={(e) => setSelectedProjectId(e.target.value)}
                     >
                       {projects.map((proj) => (
@@ -340,14 +369,20 @@ export default function CalendarPage() {
               </RightBox>
             </div>
             {/* 2줄: 날짜 네비게이션 (왼쪽) */}
-            <div style={{ display: "flex", justifyContent: "flex-start", marginTop: 12 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                marginTop: 12,
+              }}
+            >
               <MonthNav>
                 <NavButton onClick={handlePrevMonth}>
                   <FiChevronLeft />
                 </NavButton>
                 <MonthText
                   onClick={handleYearMonthClick}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: 'pointer' }}
                 >
                   {formatYearMonth(value)}
                 </MonthText>
@@ -370,32 +405,32 @@ export default function CalendarPage() {
             onChange={(v) => setValue(v as Date)}
             tileContent={({ date, view }) => {
               if (!date) return null;
-              if (view === "month") {
-                const day = date.getDate().toString().padStart(2, "0");
+              if (view === 'month') {
+                const day = date.getDate().toString().padStart(2, '0');
                 const dayTodos = events.filter(
                   (ev) =>
-                    ev.type === "todo" &&
+                    ev.type === 'todo' &&
                     ev.end &&
                     isSameDay(new Date(ev.end), date)
                 );
                 const dayMeetings = events.filter(
                   (ev) =>
-                    ev.type === "meeting" && isSameDay(new Date(ev.start), date)
+                    ev.type === 'meeting' && isSameDay(new Date(ev.start), date)
                 );
                 const dayOfWeek = date.getDay(); // 0: 일, 6: 토
                 const isCurrentMonth = date.getMonth() === value.getMonth();
-                let dayClass = "";
+                let dayClass = '';
                 if (isCurrentMonth) {
-                  if (dayOfWeek === 0) dayClass = "calendar-sunday";
-                  if (dayOfWeek === 6) dayClass = "calendar-saturday";
+                  if (dayOfWeek === 0) dayClass = 'calendar-sunday';
+                  if (dayOfWeek === 6) dayClass = 'calendar-saturday';
                 }
                 return (
                   <div
                     style={{
-                      position: "relative",
-                      width: "100%",
-                      height: "100%",
-                      cursor: "pointer",
+                      position: 'relative',
+                      width: '100%',
+                      height: '100%',
+                      cursor: 'pointer',
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -405,26 +440,26 @@ export default function CalendarPage() {
                     <span
                       className={dayClass}
                       style={{
-                        position: "absolute",
+                        position: 'absolute',
                         top: 8,
                         right: 10,
-                        fontSize: "1.05rem",
+                        fontSize: '1.05rem',
                         fontWeight: 500,
                         zIndex: 2,
                       }}
                     >
                       {day}
                     </span>
-                    <div style={{ width: "100%", paddingTop: 35 }}>
+                    <div style={{ width: '100%', paddingTop: 35 }}>
                       {dayMeetings.map((m) => {
-                        let timeStr = "";
+                        let timeStr = '';
                         if (m.start) {
                           const d =
-                            typeof m.start === "string"
+                            typeof m.start === 'string'
                               ? new Date(m.start)
                               : m.start;
                           if (!isNaN(d.getTime())) {
-                            timeStr = d.toTimeString().slice(0, 5) + " ";
+                            timeStr = d.toTimeString().slice(0, 5) + ' ';
                           }
                         }
                         return (
@@ -445,7 +480,9 @@ export default function CalendarPage() {
                           />
                           <span
                             style={{
-                              textDecoration: t.completed ? "line-through" : "none",
+                              textDecoration: t.completed
+                                ? 'line-through'
+                                : 'none',
                             }}
                           >
                             {t.title}
@@ -458,55 +495,61 @@ export default function CalendarPage() {
               }
               return null;
             }}
-            formatDay={(_, date) => date.getDate().toString().padStart(2, "0")}
+            formatDay={(_, date) => date.getDate().toString().padStart(2, '0')}
             locale="ko-KR"
             calendarType="gregory"
           />
-
         </CalendarWrapper>
       </CalendarFixedBox>
 
       {popupDate && (
-            <CalendarPop
-              date={popupDate}
-              todos={events.filter(
-                (ev) =>
-                  ev.type === "todo" && isSameDay(new Date(ev.start), popupDate)
-              )}
-              meetings={events.filter(
-                (ev) =>
-                  ev.type === "meeting" && isSameDay(new Date(ev.start), popupDate)
-              )}
-              onClose={handleClosePopup}
-              onEdit={handleEditCompleted}
-            />
+        <CalendarPop
+          date={popupDate}
+          todos={events.filter(
+            (ev) =>
+              ev.type === 'todo' && isSameDay(new Date(ev.start), popupDate)
           )}
+          meetings={events.filter(
+            (ev) =>
+              ev.type === 'meeting' && isSameDay(new Date(ev.start), popupDate)
+          )}
+          onClose={handleClosePopup}
+          onEdit={handleEditCompleted}
+        />
+      )}
 
       {/* 오른쪽 패널 */}
       <UnscheduledPanel $open={unscheduledOpen}>
-        <div style={{ width: "100%" }}>
-          <div style={{ display: "flex", alignItems: "center", fontWeight: 700, marginBottom: 8 }}>
+        <div style={{ width: '100%' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              fontWeight: 700,
+              marginBottom: 8,
+            }}
+          >
             일정 미정 task
             <button
               style={{
-                marginLeft: "auto",
-                background: "none",
-                border: "none",
-                fontSize: "1.3rem",
-                cursor: "pointer",
-                color: "#351745",
+                marginLeft: 'auto',
+                background: 'none',
+                border: 'none',
+                fontSize: '1.3rem',
+                cursor: 'pointer',
+                color: '#351745',
                 fontWeight: 700,
               }}
               onClick={() => setUnscheduledOpen((prev) => !prev)}
-              aria-label={unscheduledOpen ? "접기" : "펼치기"}
+              aria-label={unscheduledOpen ? '접기' : '펼치기'}
             >
-              {unscheduledOpen ? "−" : "+"}
+              {unscheduledOpen ? '−' : '+'}
             </button>
           </div>
           {unscheduledOpen && (
             <TaskList>
               {unscheduledTodos.length === 0 ? (
-                <div style={{ color: "#aaa", padding: "16px 0" }}>
+                <div style={{ color: '#aaa', padding: '16px 0' }}>
                   일정 미정 task가 없습니다.
                 </div>
               ) : (
@@ -514,7 +557,7 @@ export default function CalendarPage() {
                   <TaskItem
                     key={t.id}
                     onClick={() => handleEditCompleted(t.id, !t.completed)}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: 'pointer' }}
                   >
                     <TaskCheckbox
                       checked={t.completed}
@@ -537,65 +580,65 @@ export default function CalendarPage() {
         +
       </FloatingAddButton>
       {addBtnHover && <Tooltip>새 회의 일정 등록</Tooltip>}
-      {showNewMeeting && <NewMeetingPopup 
-        onClose={() => setShowNewMeeting(false)} 
-        onSuccess={() => {
-          // 새로운 회의 데이터를 캘린더에 추가
-          const newMeeting = {
-            id: `temp_${Date.now()}`,
-            user_id: userId || '',
-            project_id: selectedProjectId || '',
-            title: '새 회의', // 실제로는 팝업에서 전달받아야 함
-            start: new Date(),
-            end: new Date(Date.now() + 60 * 60 * 1000),
-            type: 'meeting' as const,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          
-          setEvents(prev => [...prev, newMeeting]);
-          
-          // 캘린더 이벤트 새로고침 (기존 로직)
-          if (userId && selectedProjectId) {
-            fetch(
-              `${
-                import.meta.env.VITE_API_URL
-              }/api/v1/calendar/${userId}/${selectedProjectId}`,
-              {
-                credentials: "include",
-              }
-            )
-              .then((res) => res.json())
-              .then((data) => {
-                setEvents(
-                  data.map((ev: any) => ({
-                    id: ev.calendar_id,
-                    user_id: ev.user_id,
-                    project_id: ev.project_id,
-                    title: ev.title,
-                    start: ev.start ? new Date(ev.start) : undefined,
-                    end: ev.end ? new Date(ev.end) : undefined,
-                    type: ev.calendar_type,
-                    completed: ev.completed,
-                    created_at: ev.created_at,
-                    updated_at: ev.updated_at,
-                  }))
-                );
-              });
-          }
-        }}
-        projectName={(() => {
-          const proj = projects.find(p => p.project_id === selectedProjectId);
-          return proj ? proj.project_name : '';
-        })()} 
-        projectId={selectedProjectId || ''}
-        userId={userId || ''}
-        user={{
-          name: userDetail?.user_name || user?.name || '',
-          email: userDetail?.user_email || user?.email || '',
-          role: userDetail?.user_jobname || '',
-        }} 
-      />}
+      {showNewMeeting && (
+        <NewMeetingPopup
+          onClose={() => setShowNewMeeting(false)}
+          onSuccess={() => {
+            // 새로운 회의 데이터를 캘린더에 추가
+            const newMeeting = {
+              id: `temp_${Date.now()}`,
+              user_id: userId || '',
+              project_id: selectedProjectId || '',
+              title: '새 회의', // 실제로는 팝업에서 전달받아야 함
+              start: new Date(),
+              end: new Date(Date.now() + 60 * 60 * 1000),
+              type: 'meeting' as const,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            };
+
+            setEvents((prev) => [...prev, newMeeting]);
+
+            // 캘린더 이벤트 새로고침 (기존 로직)
+            if (userId && selectedProjectId) {
+              fetch(
+                `${
+                  import.meta.env.VITE_API_URL
+                }/api/v1/calendar/${userId}/${selectedProjectId}`,
+                {
+                  credentials: 'include',
+                }
+              )
+                .then((res) => res.json())
+                .then((data) => {
+                  setEvents(
+                    data.map((ev: any) => ({
+                      id: ev.calendar_id,
+                      user_id: ev.user_id,
+                      project_id: ev.project_id,
+                      title: ev.title,
+                      start: ev.start ? new Date(ev.start) : undefined,
+                      end: ev.end ? new Date(ev.end) : undefined,
+                      type: ev.calendar_type,
+                      completed: ev.completed,
+                      created_at: ev.created_at,
+                      updated_at: ev.updated_at,
+                    }))
+                  );
+                });
+            }
+          }}
+          projectName={(() => {
+            const proj = projects.find(
+              (p) => p.project_id === selectedProjectId
+            );
+            return proj ? proj.project_name : '';
+          })()}
+          projectId={selectedProjectId || ''}
+          userId={userId || ''}
+          projectUsers={projectUsers}
+        />
+      )}
     </CalendarLayout>
   );
 }

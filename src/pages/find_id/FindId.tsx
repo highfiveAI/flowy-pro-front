@@ -21,18 +21,18 @@ const Input = styled.input`
   font-size: 16px;
 `;
 
-const Button = styled.button`
+const Button = styled.button<{ disabled?: boolean }>`
   padding: 10px 16px;
   margin: 8px 0;
-  background-color: #007bff;
+  background-color: ${({ disabled }) => (disabled ? '#aaa' : '#007bff')};
   color: white;
   border: none;
   border-radius: 8px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   font-size: 15px;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: ${({ disabled }) => (disabled ? '#aaa' : '#0056b3')};
   }
 `;
 
@@ -50,8 +50,7 @@ const FindId: React.FC = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [foundId, setFoundId] = useState('');
   const [notFoundMsg, setNotFoundMsg] = useState('');
-
-  //   const { user, setUser, setLoading } = useAuth();
+  const [isSending, setIsSending] = useState(false);
 
   const handleEmailVerify = async () => {
     if (!email.includes('@')) {
@@ -59,16 +58,15 @@ const FindId: React.FC = () => {
       return;
     }
 
+    setIsSending(true);
     try {
       await sendEmailCode(email);
       alert('인증 코드가 발송되었습니다.');
       setShowCodeInput(true);
     } catch (error: any) {
-      if (error.message.includes('이메일 전송 중 오류')) {
-        alert('이메일 전송에 실패했습니다. 다시 시도해주세요.');
-      } else {
-        alert(error.message || '알 수 없는 오류가 발생했습니다.');
-      }
+      alert(error.message || '이메일 전송 실패');
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -80,14 +78,12 @@ const FindId: React.FC = () => {
     try {
       const result = await verifyCode(code);
       if (result.verified) {
-        // 인증 성공 처리
         setIsVerified(true);
       } else {
-        // 인증 실패 처리
         alert('인증이 실패했습니다.');
       }
     } catch (error: any) {
-      alert(error);
+      alert(error.message || '인증 중 오류가 발생했습니다.');
     }
   };
 
@@ -110,19 +106,22 @@ const FindId: React.FC = () => {
     if (isVerified) {
       handleFindId();
     }
-  }, [isVerified]); // 인증 성공 시에만 실행
+  }, [isVerified]);
 
   return (
     <Container>
       <h2>아이디 찾기</h2>
-      <input
+
+      <Input
         type="email"
         placeholder="이메일 입력"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        disabled={isSending}
       />
-
-      <Button onClick={handleEmailVerify}>이메일 인증</Button>
+      <Button onClick={handleEmailVerify} disabled={isSending}>
+        {isSending ? '발송중...' : '이메일 인증'}
+      </Button>
 
       {showCodeInput && (
         <>
@@ -132,7 +131,9 @@ const FindId: React.FC = () => {
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
-          <Button onClick={handleCodeConfirm}>코드 확인</Button>
+          <Button onClick={handleCodeConfirm} disabled={!code}>
+            코드 확인
+          </Button>
         </>
       )}
 

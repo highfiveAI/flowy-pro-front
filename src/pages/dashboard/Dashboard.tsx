@@ -638,10 +638,10 @@ const Dashboard: React.FC = () => {
                                         }
                                         placeholderText="날짜 선택"
                                       />
-                                    ) : todo.schedule ? (
-                                      formatDateWithDay(todo.schedule)
-                                    ) : (
+                                    ) : (String(todo.schedule).trim() === '언급 없음' || String(todo.schedule).trim() === '언급없음' || String(todo.schedule).trim() === '미정') ? (
                                       '미정'
+                                    ) : (
+                                      formatDateWithDay(String(todo.schedule).trim())
                                     )}
                                   </TaskCardDate>
                                 </TaskCardListItem>
@@ -674,7 +674,9 @@ const Dashboard: React.FC = () => {
                             <TaskCardListItem key={`${col}__${idx}`}>
                               {todo.action}
                               <TaskCardDate>
-                                {todo.schedule ? formatDateWithDay(todo.schedule) : '미정'}
+                                {(String(todo.schedule).trim() === '언급 없음' || String(todo.schedule).trim() === '언급없음' || String(todo.schedule).trim() === '미정')
+                                  ? '미정'
+                                  : formatDateWithDay(String(todo.schedule).trim())}
                               </TaskCardDate>
                             </TaskCardListItem>
                           ))}
