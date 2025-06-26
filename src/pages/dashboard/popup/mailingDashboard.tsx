@@ -405,41 +405,8 @@ const MailingDashboard = ({
   const handleSendMail = async () => {
     // 1) 아무것도 체크 안 한 경우
     if (!receivers.allProject && !receivers.allAttendees && !receivers.custom) {
-      const mailList = meetingInfo.project_users.map((user) => ({
-        name: user.user_name,
-        email: user.user_email,
-        roles: (tasks && tasks[user.user_name]
-          ? tasks[user.user_name]
-          : []
-        ).map((todo: any) => ({
-          action: todo.action,
-          schedule: todo.schedule ?? null,
-        })),
-      }));
-      const now = new Date().toISOString(); // update_dt
-      const payload = {
-        info_n: mailList,
-        dt: meetingInfo.date,
-        subj: meetingInfo.title,
-        update_dt: now,
-        meeting_id: meetingInfo.meeting_id,
-      };
-      console.log('백엔드로 보낼 payload:', payload);
-      try {
-        await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/api/v1/stt/meeting/send-update-email`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          }
-        );
-        onClose(); // 성공 시 팝업 닫기
-      } catch (e) {
-        alert('메일 발송에 실패했습니다.');
-      }
+      // 아무도 선택하지 않았으면 메일을 보내지 않고 함수 종료
+      onClose();
       return;
     }
     // 2) 개별 수신자 지정만 체크하고 아무도 선택 안 한 경우
