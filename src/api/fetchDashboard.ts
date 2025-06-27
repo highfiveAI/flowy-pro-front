@@ -1,4 +1,3 @@
-import { getAuthToken } from '../utils/auth';
 import type { DashboardResponse, FilterOptions } from '../types/dashboard';
 
 // 대시보드 데이터 타입 정의
@@ -31,7 +30,8 @@ export interface TableData {
 }
 
 // API 기본 URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+// const API_BASE_URL =
+//   import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 
 // 대시보드 통계 데이터 조회
 export const fetchDashboardStats = async (params: {
@@ -52,17 +52,22 @@ export const fetchDashboardStats = async (params: {
     if (params.start_date) queryParams.append('start_date', params.start_date);
     if (params.end_date) queryParams.append('end_date', params.end_date);
 
-    const response = await fetch(`${API_BASE_URL}/dashboard/stats?${queryParams}`, {
-      method: 'GET',
-      credentials: 'include', // 쿠키 포함
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/dashboard/stats?${queryParams}`,
+      {
+        method: 'GET',
+        credentials: 'include', // 쿠키 포함
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.detail || '대시보드 데이터 조회에 실패했습니다.');
+      throw new Error(
+        errorData.detail || '대시보드 데이터 조회에 실패했습니다.'
+      );
     }
 
     const data = await response.json();
@@ -84,13 +89,18 @@ export const fetchDashboardFilterOptions = async (params?: {
     if (params?.project_id) queryParams.append('project_id', params.project_id);
     if (params?.department) queryParams.append('department', params.department);
 
-    const response = await fetch(`${API_BASE_URL}/dashboard/filter-options?${queryParams}`, {
-      method: 'GET',
-      credentials: 'include', // 쿠키 포함
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${
+        import.meta.env.VITE_API_URL
+      }/api/v1/dashboard/filter-options?${queryParams}`,
+      {
+        method: 'GET',
+        credentials: 'include', // 쿠키 포함
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -103,4 +113,4 @@ export const fetchDashboardFilterOptions = async (params?: {
     console.error('필터 옵션 조회 오류:', error);
     throw error;
   }
-}; 
+};

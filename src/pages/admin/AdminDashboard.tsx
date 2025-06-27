@@ -19,8 +19,16 @@ import {
   flexRender,
   createColumnHelper,
 } from '@tanstack/react-table';
-import { fetchDashboardStats, fetchDashboardFilterOptions } from '../../api/fetchDashboard';
-import type { DashboardResponse, FilterOptions, ChartData, TableData, DashboardSummary } from '../../types/dashboard';
+import {
+  fetchDashboardStats,
+  fetchDashboardFilterOptions,
+} from '../../api/fetchDashboard';
+import type {
+  DashboardResponse,
+  FilterOptions,
+  TableData,
+  DashboardSummary,
+} from '../../types/dashboard';
 
 const DashboardContainer = styled.div`
   padding: 40px;
@@ -390,8 +398,12 @@ const AdminDashboard = () => {
   );
 
   // API 데이터 상태
-  const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null);
-  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(
+    null
+  );
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -416,47 +428,56 @@ const AdminDashboard = () => {
       // 계층적 필터링: 프로젝트 → 부서 → 사용자 순서로 적용
       if (selectedProject) {
         params.project_id = selectedProject;
-        console.log("▶ 대시보드 데이터 요청 (프로젝트 필터):", params);
+        console.log('▶ 대시보드 데이터 요청 (프로젝트 필터):', params);
       }
       if (selectedDepartment) {
         params.department = selectedDepartment;
-        console.log("▶ 대시보드 데이터 요청 (부서 필터):", params);
+        console.log('▶ 대시보드 데이터 요청 (부서 필터):', params);
       }
       if (selectedUser) {
         params.user_id = selectedUser;
-        console.log("▶ 대시보드 데이터 요청 (사용자 필터):", params);
+        console.log('▶ 대시보드 데이터 요청 (사용자 필터):', params);
       }
 
       const data: DashboardResponse = await fetchDashboardStats(params);
       setDashboardData(data);
-      console.log("▶ 대시보드 데이터 응답:", data);
+      console.log('▶ 대시보드 데이터 응답:', data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '데이터 로드에 실패했습니다.');
+      setError(
+        err instanceof Error ? err.message : '데이터 로드에 실패했습니다.'
+      );
       console.error('대시보드 데이터 로드 오류:', err);
     } finally {
       setLoading(false);
     }
-  }, [selectedPeriod, startDate, endDate, selectedProject, selectedDepartment, selectedUser]);
+  }, [
+    selectedPeriod,
+    startDate,
+    endDate,
+    selectedProject,
+    selectedDepartment,
+    selectedUser,
+  ]);
 
   // 필터 옵션 로드 - 계층적 필터링을 위해 파라미터 전달
   const loadFilterOptions = useCallback(async () => {
     try {
       setFilterLoading(true);
       const params: any = {};
-      
+
       // 계층적 필터링: 프로젝트 → 부서 → 사용자 순서로 적용
       if (selectedProject) {
         params.project_id = selectedProject;
-        console.log("▶ 초기 필터 옵션 요청 (프로젝트 기반):", params);
+        console.log('▶ 초기 필터 옵션 요청 (프로젝트 기반):', params);
       }
       if (selectedDepartment) {
         params.department = selectedDepartment;
-        console.log("▶ 초기 필터 옵션 요청 (부서 기반):", params);
+        console.log('▶ 초기 필터 옵션 요청 (부서 기반):', params);
       }
-      
+
       const options: FilterOptions = await fetchDashboardFilterOptions(params);
       setFilterOptions(options);
-      console.log("▶ 초기 필터 옵션 응답:", options);
+      console.log('▶ 초기 필터 옵션 응답:', options);
     } catch (err) {
       console.error('초기 필터 옵션 로드 오류:', err);
     } finally {
@@ -480,24 +501,24 @@ const AdminDashboard = () => {
 
   // 필터 변경 핸들러 - 계층적 연동 로직 구현
   const handleProjectChange = useCallback(async (projectId: string) => {
-    console.log("▶ 프로젝트 선택 값:", projectId);
+    console.log('▶ 프로젝트 선택 값:', projectId);
     setSelectedProject(projectId);
-    
+
     // 프로젝트 변경 시 부서와 사용자 초기화
     setSelectedDepartment('');
     setSelectedUser('');
-    
+
     // 프로젝트 선택 시 해당 프로젝트에 참여하는 부서/사용자만 가져오기
     try {
       setFilterLoading(true);
       const params: any = {};
       if (projectId) {
         params.project_id = projectId;
-        console.log("▶ 프로젝트 기반 필터 옵션 요청:", params);
+        console.log('▶ 프로젝트 기반 필터 옵션 요청:', params);
       }
       const options: FilterOptions = await fetchDashboardFilterOptions(params);
       setFilterOptions(options);
-      console.log("▶ 프로젝트 기반 필터 옵션 응답:", options);
+      console.log('▶ 프로젝트 기반 필터 옵션 응답:', options);
     } catch (err) {
       console.error('프로젝트 기반 필터 옵션 갱신 오류:', err);
     } finally {
@@ -505,41 +526,48 @@ const AdminDashboard = () => {
     }
   }, []);
 
-  const handleDepartmentChange = useCallback(async (department: string) => {
-    console.log("▶ 부서 선택 값:", department);
-    setSelectedDepartment(department);
-    
-    // 부서 변경 시 사용자 초기화
-    setSelectedUser('');
-    
-    // 부서 선택 시 해당 부서의 사용자만 가져오기
-    try {
-      setFilterLoading(true);
-      const params: any = {};
-      if (selectedProject) params.project_id = selectedProject;
-      if (department) {
-        params.department = department;
-        console.log("▶ 부서 기반 필터 옵션 요청:", params);
+  const handleDepartmentChange = useCallback(
+    async (department: string) => {
+      console.log('▶ 부서 선택 값:', department);
+      setSelectedDepartment(department);
+
+      // 부서 변경 시 사용자 초기화
+      setSelectedUser('');
+
+      // 부서 선택 시 해당 부서의 사용자만 가져오기
+      try {
+        setFilterLoading(true);
+        const params: any = {};
+        if (selectedProject) params.project_id = selectedProject;
+        if (department) {
+          params.department = department;
+          console.log('▶ 부서 기반 필터 옵션 요청:', params);
+        }
+        const options: FilterOptions = await fetchDashboardFilterOptions(
+          params
+        );
+        setFilterOptions(options);
+        console.log('▶ 부서 기반 필터 옵션 응답:', options);
+      } catch (err) {
+        console.error('부서 기반 필터 옵션 갱신 오류:', err);
+      } finally {
+        setFilterLoading(false);
       }
-      const options: FilterOptions = await fetchDashboardFilterOptions(params);
-      setFilterOptions(options);
-      console.log("▶ 부서 기반 필터 옵션 응답:", options);
-    } catch (err) {
-      console.error('부서 기반 필터 옵션 갱신 오류:', err);
-    } finally {
-      setFilterLoading(false);
-    }
-  }, [selectedProject]);
+    },
+    [selectedProject]
+  );
 
   const handleUserChange = useCallback((userId: string) => {
-    console.log("▶ 사용자 선택 값:", userId);
+    console.log('▶ 사용자 선택 값:', userId);
     setSelectedUser(userId);
   }, []);
 
   // 선택된 기간에 따라 데이터 필터링
   const filteredChartData = useMemo(() => {
     if (!dashboardData) return [];
-    return dashboardData.chartData.filter((data) => data.period === selectedPeriod);
+    return dashboardData.chartData.filter(
+      (data) => data.period === selectedPeriod
+    );
   }, [selectedPeriod, dashboardData]);
 
   const handlePeriodChange = useCallback((period: PeriodType) => {
@@ -703,25 +731,33 @@ const AdminDashboard = () => {
         <FilterGroup>
           <FilterSelect>
             <SelectLabel>프로젝트별</SelectLabel>
-            <Select 
-              value={selectedProject} 
+            <Select
+              value={selectedProject}
               onChange={(e) => handleProjectChange(e.target.value)}
               disabled={filterLoading}
             >
               <option value="">전체</option>
-              {filterOptions?.projects?.map((project: { id: string; name: string }) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
+              {filterOptions?.projects?.map(
+                (project: { id: string; name: string }) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                )
+              )}
             </Select>
-            {filterLoading && <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>로딩 중...</div>}
+            {filterLoading && (
+              <div
+                style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}
+              >
+                로딩 중...
+              </div>
+            )}
           </FilterSelect>
 
           <FilterSelect>
             <SelectLabel>부서별</SelectLabel>
-            <Select 
-              value={selectedDepartment} 
+            <Select
+              value={selectedDepartment}
               onChange={(e) => handleDepartmentChange(e.target.value)}
               disabled={filterLoading}
             >
@@ -732,24 +768,38 @@ const AdminDashboard = () => {
                 </option>
               ))}
             </Select>
-            {filterLoading && <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>로딩 중...</div>}
+            {filterLoading && (
+              <div
+                style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}
+              >
+                로딩 중...
+              </div>
+            )}
           </FilterSelect>
 
           <FilterSelect>
             <SelectLabel>사용자별</SelectLabel>
-            <Select 
-              value={selectedUser} 
+            <Select
+              value={selectedUser}
               onChange={(e) => handleUserChange(e.target.value)}
               disabled={filterLoading}
             >
               <option value="">전체</option>
-              {filterOptions?.users?.map((user: { id: string; name: string; login_id: string }) => (
-                <option key={user.id} value={user.id}>
-                  {user.name} ({user.login_id})
-                </option>
-              ))}
+              {filterOptions?.users?.map(
+                (user: { id: string; name: string; login_id: string }) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} ({user.login_id})
+                  </option>
+                )
+              )}
             </Select>
-            {filterLoading && <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>로딩 중...</div>}
+            {filterLoading && (
+              <div
+                style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}
+              >
+                로딩 중...
+              </div>
+            )}
           </FilterSelect>
         </FilterGroup>
 

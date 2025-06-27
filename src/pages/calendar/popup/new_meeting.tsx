@@ -92,7 +92,6 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
   onSuccess,
   projectName,
   projectId,
-  userId,
   projectUsers,
 }) => {
   const [subject, setSubject] = useState('');
@@ -148,9 +147,7 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
   const handleSelectAll = () => {
     if (allSelected) {
       // 전체 해제: 빈 값으로 초기화
-      setAttendees([
-        { user_id: '', name: '', email: '', user_jobname: '' },
-      ]);
+      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
       setAllSelected(false);
     } else {
       // 전체 선택: hostId 제외한 모든 projectUsers를 할당
@@ -189,7 +186,7 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
       return;
     }
     // 최소 2명 이상의 참석자 확인 (회의장 + 최소 1명의 참석자)
-    if (attendees.filter(a => a.user_id).length < 1) {
+    if (attendees.filter((a) => a.user_id).length < 1) {
       setError('최소 1명의 참석자가 필요합니다.');
       return;
     }
@@ -197,16 +194,16 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
     setError('');
     try {
       const meeting_date = new Date(meetingDate).toISOString();
-      
+
       // 회의장과 참석자를 합쳐서 users 배열 생성
       const users = [
         { user_id: hostId, role_id: '20ea65e2-d3b7-4adb-a8ce-9e67a2f21999' }, // 회의장
-        ...attendees.map((a) => ({ 
-          user_id: a.user_id, 
-          role_id: 'a55afc22-b4c1-48a4-9513-c66ff6ed3965' // 참석자
-        }))
+        ...attendees.map((a) => ({
+          user_id: a.user_id,
+          role_id: 'a55afc22-b4c1-48a4-9513-c66ff6ed3965', // 참석자
+        })),
       ];
-      
+
       const body = {
         project_id: projectId,
         meeting_title: subject,
@@ -301,11 +298,17 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
             />
           </FormGroup>
           <FormGroup>
-            <StyledLabel style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>회의 참석자 <span style={{ color: '#dc3545' }}>*</span></span>
-              <div
-                style={{ display: 'flex', alignItems: 'center' }}
-              >
+            <StyledLabel
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <span>
+                회의 참석자 <span style={{ color: '#dc3545' }}>*</span>
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -319,7 +322,11 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
                 >
                   전체 선택
                 </label>
-                <AddAttendeeButton type="button" onClick={handleAddAttendee} style={{ marginLeft: 8 }}>
+                <AddAttendeeButton
+                  type="button"
+                  onClick={handleAddAttendee}
+                  style={{ marginLeft: 8 }}
+                >
                   +
                 </AddAttendeeButton>
               </div>

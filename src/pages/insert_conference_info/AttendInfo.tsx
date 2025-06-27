@@ -19,6 +19,7 @@ interface AttendInfoProps {
   attendees: Attendee[];
   setAttendees: (a: Attendee[]) => void;
   projectUsers: ProjectUser[];
+
   hostId: string;
   setHostId: (id: string) => void;
   hostJobname: string;
@@ -106,6 +107,7 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
   projectUsers = [],
   hostId,
   setHostId,
+
   hostJobname,
   setHostJobname,
 }) => {
@@ -170,7 +172,7 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
         <EmailInput
           type="email"
           placeholder="이메일"
-          value={projectUsers.find(u => u.user_id === hostId)?.email || ''}
+          value={projectUsers.find((u) => u.user_id === hostId)?.email || ''}
           readOnly
           onClick={() => alert('이메일 수정이 불가능합니다.')}
         />
