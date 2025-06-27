@@ -199,7 +199,7 @@ const Dashboard: React.FC = () => {
         if (data) setRecommendFiles(data);
       });
     }
-  }, [user, meetingId]);
+  }, [user]);
 
   const mailMeetingInfo: meetingInfo = {
     project: project?.project_name || '',
@@ -404,11 +404,17 @@ const Dashboard: React.FC = () => {
               <img
                 src="/images/recommendfile.svg"
                 alt="PDF"
-                style={{ width: 22, height: 22, marginRight: 6, verticalAlign: 'middle' }}
+                style={{
+                  width: 22,
+                  height: 22,
+                  marginRight: 6,
+                  verticalAlign: 'middle',
+                }}
               />
               PDF 다운로드
             </SpeechBubbleButton>
             &nbsp;&nbsp;&nbsp;
+
             {isCurrentUserPO() && (
               <SpeechBubbleButton
                 onClick={() => setShowMail_uneditPopup(true)}
@@ -422,6 +428,7 @@ const Dashboard: React.FC = () => {
                 메일전송하기
               </SpeechBubbleButton>
             )}
+
             {/* <EditButton onClick={() => setShowMailPopup(true)}>
               수정하기
             </EditButton> */}
@@ -691,10 +698,17 @@ const Dashboard: React.FC = () => {
                                         }
                                         placeholderText="날짜 선택"
                                       />
-                                    ) : (String(todo.schedule).trim() === '언급 없음' || String(todo.schedule).trim() === '언급없음' || String(todo.schedule).trim() === '미정') ? (
+                                    ) : String(todo.schedule).trim() ===
+                                        '언급 없음' ||
+                                      String(todo.schedule).trim() ===
+                                        '언급없음' ||
+                                      String(todo.schedule).trim() ===
+                                        '미정' ? (
                                       '미정'
                                     ) : (
-                                      formatDateWithDay(String(todo.schedule).trim())
+                                      formatDateWithDay(
+                                        String(todo.schedule).trim()
+                                      )
                                     )}
                                   </TaskCardDate>
                                 </TaskCardListItem>
@@ -727,9 +741,13 @@ const Dashboard: React.FC = () => {
                             <TaskCardListItem key={`${col}__${idx}`}>
                               {todo.action}
                               <TaskCardDate>
-                                {(String(todo.schedule).trim() === '언급 없음' || String(todo.schedule).trim() === '언급없음' || String(todo.schedule).trim() === '미정')
+                                {String(todo.schedule).trim() === '언급 없음' ||
+                                String(todo.schedule).trim() === '언급없음' ||
+                                String(todo.schedule).trim() === '미정'
                                   ? '미정'
-                                  : formatDateWithDay(String(todo.schedule).trim())}
+                                  : formatDateWithDay(
+                                      String(todo.schedule).trim()
+                                    )}
                               </TaskCardDate>
                             </TaskCardListItem>
                           ))}
