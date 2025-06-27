@@ -4,6 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import MailingDashboard from './popup/mailingDashboard';
 import MailingDashboard_unedit from './popup/mailingDashboard_unedit';
 import PDFPopup from './popup/PDFPopup';
+import PreviewMeetingPopup from './popup/PreviewMeetingPopup';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import {
   fetchMeetings,
@@ -11,6 +12,11 @@ import {
   fetchDraftLogs,
   fetchProjectMetaData,
 } from '../../api/fetchProject';
+import {
+  fetchPendingPreviewMeeting,
+  confirmPreviewMeeting,
+  rejectPreviewMeeting,
+} from '../../api/fetchPreviewMeeting';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { checkAuth } from '../../api/fetchAuthCheck';
@@ -90,6 +96,10 @@ const Dashboard: React.FC = () => {
   const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
   const [showMail_uneditPopup, setShowMail_uneditPopup] = useState(false);
   const [poRoleId, setPoRoleId] = useState<string>('');
+  
+  // 예정 회의 팝업 관련 state
+  const [pendingPreviewMeeting, setPendingPreviewMeeting] = useState<any>(null);
+  const [showPreviewMeetingPopup, setShowPreviewMeetingPopup] = useState(false);
 
   // 현재 사용자가 PO(회의장)인지 확인하는 함수
   const isCurrentUserPO = () => {
@@ -198,8 +208,29 @@ const Dashboard: React.FC = () => {
       fetchDraftLogs(meetingId).then((data) => {
         if (data) setRecommendFiles(data);
       });
+
+      // 예정 회의 조회 (PO만)
+      if (isCurrentUserPO()) {
+        fetchPendingPreviewMeeting(meetingId)
+          .then((data) => {
+            console.log('예정 회의 조회 결과:', data);
+            // 백엔드에서 배열로 반환하는 경우 처리
+            if (Array.isArray(data) && data.length > 0) {
+              // 첫 번째 회의만 표시 (중복 방지)
+              setPendingPreviewMeeting(data[0]);
+              setShowPreviewMeetingPopup(true);
+            } else if (data && data.has_pending_meeting) {
+              // 기존 예상 형식
+              setPendingPreviewMeeting(data.pending_meeting);
+              setShowPreviewMeetingPopup(true);
+            }
+          })
+          .catch((error) => {
+            console.error('예정 회의 조회 실패:', error);
+          });
+      }
     }
-  }, [user, meetingId]);
+  }, [user, meetingId, poRoleId]); // poRoleId 추가 (isCurrentUserPO가 이를 사용)
 
   const mailMeetingInfo: meetingInfo = {
     project: project?.project_name || '',
@@ -327,6 +358,42 @@ const Dashboard: React.FC = () => {
 
   const handleEditSummary = () => {
     setIsEditingSummary(true);
+  };
+
+  // 예정 회의 팝업 핸들러들
+  const handleConfirmPreviewMeeting = async (confirmData: any) => {
+    try {
+      console.log('캘린더 등록 시작:', confirmData);
+      await confirmPreviewMeeting(meetingId!, pendingPreviewMeeting.meeting_id, confirmData);
+      
+      // 성공 시 팝업 닫기
+      setShowPreviewMeetingPopup(false);
+      setPendingPreviewMeeting(null);
+      alert('캘린더에 등록되었습니다!');
+    } catch (error) {
+      console.error('캘린더 등록 실패:', error);
+      alert('캘린더 등록에 실패했습니다.');
+    }
+  };
+
+  const handleRejectPreviewMeeting = async () => {
+    try {
+      console.log('예정 회의 거부 시작');
+      await rejectPreviewMeeting(meetingId!, pendingPreviewMeeting.meeting_id);
+      
+      // 성공 시 팝업 닫기
+      setShowPreviewMeetingPopup(false);
+      setPendingPreviewMeeting(null);
+      alert('예정 회의를 거부했습니다.');
+    } catch (error) {
+      console.error('예정 회의 거부 실패:', error);
+      alert('거부 처리에 실패했습니다.');
+    }
+  };
+
+  const handleClosePreviewMeetingPopup = () => {
+    setShowPreviewMeetingPopup(false);
+    // 데이터는 유지 (다음 진입 시 다시 팝업 표시)
   };
   // const handleSaveSummary = async () => {
   //   setIsEditingSummary(false);
@@ -835,6 +902,16 @@ const Dashboard: React.FC = () => {
             </ul>
           </SectionBody>
         </Section>
+
+        {/* 예정 회의 팝업 */}
+        {showPreviewMeetingPopup && pendingPreviewMeeting && (
+          <PreviewMeetingPopup
+            meeting={pendingPreviewMeeting}
+            onConfirm={handleConfirmPreviewMeeting}
+            onReject={handleRejectPreviewMeeting}
+            onClose={handleClosePreviewMeetingPopup}
+          />
+        )}
       </MainContent>
     </Container>
   );
