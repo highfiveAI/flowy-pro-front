@@ -43,6 +43,25 @@ const ProjectListPage: React.FC = () => {
   // 새 프로젝트 생성 팝업 상태
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // 현재 페이지에 보여줄 프로젝트 계산
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentProjects = projects.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(projects.length / itemsPerPage);
+
+  // 페이지네이션 관련
+  const pageGroupSize = 5;
+  const pageGroup = Math.floor((currentPage - 1) / pageGroupSize);
+  const startPage = pageGroup * pageGroupSize + 1;
+  const endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
+  const pageNumbers = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i);
+  }
+
   useEffect(() => {
     if (user?.id) {
       fetchProject(user?.id).then((data) => {
@@ -156,9 +175,9 @@ const ProjectListPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {projects.map((p, i) => (
+            {currentProjects.map((p, i) => (
               <Tr
-                key={i}
+                key={i + indexOfFirstItem}
                 onClick={() =>
                   navigate(`/conferencelist/${p.project.project_id}`)
                 }
@@ -241,6 +260,70 @@ const ProjectListPage: React.FC = () => {
           </tbody>
         </Table>
       </TableWrapper>
+      {/* 페이지네이션 */}
+      <div style={{ display: "flex", justifyContent: "center", marginTop: 20, gap: 4 }}>
+        {startPage > 1 && (
+          <button
+            onClick={() => setCurrentPage(startPage - 1)}
+            style={{
+              padding: "0 10px",
+              height: 32,
+              minWidth: 32,
+              borderRadius: 16,
+              background: "#fff",
+              color: "#2D1155",
+              border: "none",
+              fontSize: 16,
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
+          >
+            이전
+          </button>
+        )}
+        {pageNumbers.map((num) => (
+          <button
+            key={num}
+            onClick={() => setCurrentPage(num)}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: "50%",
+              background: currentPage === num ? "#351745" : "transparent",
+              color: currentPage === num ? "#fff" : "#2D1155",
+              border: "none",
+              fontSize: 16,
+              fontWeight: 500,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "background 0.2s, color 0.2s",
+            }}
+          >
+            {num}
+          </button>
+        ))}
+        {endPage < totalPages && (
+          <button
+            onClick={() => setCurrentPage(endPage + 1)}
+            style={{
+              padding: "0 10px",
+              height: 32,
+              minWidth: 32,
+              borderRadius: 16,
+              background: "#fff",
+              color: "#2D1155",
+              border: "none",
+              fontSize: 16,
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
+          >
+            다음
+          </button>
+        )}
+      </div>
       {showEditProjectPopup && editingProject && (
         <EditProjectPopup
           onClose={closeEditPopup}

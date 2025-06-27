@@ -33,6 +33,7 @@ export type Meeting = {
 export type ProjectUser = {
   user_id: string;
   user_name: string;
+  role_id?: string; // 역할 정보 추가
 };
 
 export interface meetingInfo {
