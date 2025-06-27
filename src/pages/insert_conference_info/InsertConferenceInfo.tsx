@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FileUpload from './FileUpload';
 import AttendInfo from './AttendInfo';
 import Loading from '../../components/Loading';
@@ -63,6 +63,7 @@ import {
   TabSectionWrapper,
   TabsWrapper,
 } from './InsertConferenceInfo.styles.ts';
+import { checkAuth } from '../../api/fetchAuthCheck.ts';
 
 // 날짜를 'YYYY-MM-DD HH:mm:ss' 형식으로 변환하는 함수
 function formatDateToKST(date: Date): string {
@@ -76,7 +77,7 @@ function formatDateToKST(date: Date): string {
 }
 
 const InsertConferenceInfo: React.FC = () => {
-  const { user } = useAuth();
+  const { user, setUser, setLoading } = useAuth();
   const navigate = useNavigate();
   const [isCompleted /*, setIsCompleted*/] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -453,6 +454,16 @@ const InsertConferenceInfo: React.FC = () => {
   const fetchProjects = async () => {
     // ... existing code ...
   };
+
+  useEffect(() => {
+    (async () => {
+      const user = await checkAuth();
+      if (user) {
+        setUser(user);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
   return (
     <PageWrapper>

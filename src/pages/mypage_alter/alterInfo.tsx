@@ -8,6 +8,7 @@ import {
   ButtonContainer,
   ChangeButton,
   Container,
+  ErrorText,
   FormArea,
   FormContainer,
   Input,
@@ -23,11 +24,23 @@ const AlterInfo: React.FC = () => {
   const [editedData, setEditedData] = useState({
     user_name: '',
     user_phonenum: '',
-    user_password: '',
   });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const closeModal = () => {
     setShowChangeModal(false);
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!editedData.user_name) newErrors.name = '이름을 입력해주세요.';
+
+    if (!editedData.user_phonenum.match(/^\d+$/)) {
+      newErrors.phone = '전화번호는 숫자만 입력해주세요.';
+    }
+
+    return newErrors;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +56,6 @@ const AlterInfo: React.FC = () => {
         setEditedData({
           user_name: mypageUser.user_name,
           user_phonenum: mypageUser.user_phonenum,
-          user_password: '', // 새 비밀번호만 입력받도록 초기화
         });
       }
       setIsEditing(true);
@@ -51,15 +63,27 @@ const AlterInfo: React.FC = () => {
     }
 
     // 편집 모드일 때만 API 호출
+
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
     try {
       console.log('🟢 서버로 보낼 데이터:', editedData);
       const result = await updateMypageUser(editedData); // 이 API에서 모든 처리
       // user 객체에서 user_id, user_name, user_phonenum만 추출해서 새 객체로 출력
-      const filteredUser = result && result.user ? {
-        user_id: result.user.user_id,
-        user_name: result.user.user_name,
-        user_phonenum: result.user.user_phonenum,
-      } : null;
+      const filteredUser =
+        result && result.user
+          ? {
+              user_id: result.user.user_id,
+              user_name: result.user.user_name,
+              user_phonenum: result.user.user_phonenum,
+            }
+          : null;
 
       console.log('updateMypageUser 응답:', {
         message: result?.message,
@@ -87,18 +111,6 @@ const AlterInfo: React.FC = () => {
       }
     };
 
-    getUser();
-  }, []);
-
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const data = await fetchUserData();
-        setMypageUser(data);
-      } catch (err) {
-        console.error('🚨 사용자 데이터 로딩 실패:', err);
-      }
-    };
     getUser();
   }, [isEditing]);
 
@@ -130,6 +142,7 @@ const AlterInfo: React.FC = () => {
                 placeholder={isEditing ? '새 이름을 입력하세요' : ''}
               />
             </InputGroup>
+            {errors.name && <ErrorText>{errors.name}</ErrorText>}
 
             <InputGroup>
               <Label>이메일주소</Label>
@@ -146,29 +159,6 @@ const AlterInfo: React.FC = () => {
                 type="text"
                 value={mypageUser?.user_login_id || ''}
                 readOnly
-              />
-            </InputGroup>
-
-            <InputGroup>
-              <Label>
-                비밀번호{' '}
-                {isEditing && (
-                  <span style={{ color: '#888', fontSize: '0.9rem' }}>
-                    {' '}
-                    (수정 가능)
-                  </span>
-                )}
-              </Label>
-              <Input
-                type="password"
-                name="user_password"
-                value={
-                  isEditing ? editedData.user_password : '****************'
-                }
-                onChange={handleChange}
-                isEditing={isEditing}
-                readOnly={!isEditing}
-                placeholder={isEditing ? '새 비밀번호를 입력하세요' : ''}
               />
             </InputGroup>
 
@@ -196,7 +186,7 @@ const AlterInfo: React.FC = () => {
                 placeholder={isEditing ? '휴대폰 번호를 입력하세요' : ''}
               />
             </InputGroup>
-
+            {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
             <InputGroup>
               <Label>소속 회사명</Label>
               <Input
@@ -231,70 +221,6 @@ const AlterInfo: React.FC = () => {
             </ButtonContainer>
           </FormContainer>
         </Container>
-
-        {/* <InputGroup>
-            <Label>휴대폰 번호</Label>
-            <Input
-              type="text"
-              name="user_phonenum"
-              value={mypageUser?.user_phonenum || ''}
-              onChange={handleChange}
-            />
-            <Button
-              onClick={() => {
-                runUpdate('user_phonenum', mypageUser?.user_phonenum);
-                handlePhoneChange();
-              }}
-            >
-              휴대폰 번호 변경
-            </Button>
-          </InputGroup>
-
-          <InputGroup>
-            <Label>소속 회사명</Label>
-            <Input
-              type="text"
-              value={mypageUser?.company_name || ''}
-              readOnly
-            />
-          </InputGroup>
-
-          <InputGroup>
-            <Label>소속 부서명</Label>
-            <Input
-              type="text"
-              name="user_dept_name"
-              value={mypageUser?.user_dept_name || ''}
-              onChange={handleChange}
-            />
-            <Button
-              onClick={() => {
-                runUpdate('user_dept_name', mypageUser?.user_dept_name);
-                handleDepartmentChange();
-              }}
-            >
-              소속 부서 변경
-            </Button>
-          </InputGroup>
-
-          <InputGroup>
-            <Label>소속 팀명</Label>
-            <Input
-              type="text"
-              name="user_team_name"
-              value={mypageUser?.user_team_name || ''}
-              onChange={handleChange}
-            />
-            <Button
-              onClick={() => {
-                runUpdate('user_team_name', mypageUser?.user_team_name);
-                handleTeamChange();
-              }}
-            >
-              소속 팀 변경
-            </Button>
-          </InputGroup>
-        </FormContainer> */}
       </FormArea>
 
       {showChangeModal && (

@@ -26,6 +26,8 @@ import AlterInfo from './pages/mypage_alter/alterInfo';
 import ConferenceListPage from './pages/conference_list/conferencelist';
 import RedirectIfAuthenticated from './components/RedirectIfAuthenticated';
 import FindId from './pages/find_id/FindId';
+import FindPw from './pages/find_pw/FindPw';
+import NotFoundAccount from './pages/find_pw/not_found/NotFoundAccount';
 
 function App() {
   return (
@@ -67,12 +69,14 @@ function App() {
             }
           />
           <Route path="/find_id" element={<FindId />} />
+          <Route path="/find_pw" element={<FindPw />} />
+          <Route path="/find_pw/not_found" element={<NotFoundAccount />} />
           <Route path="/result" element={<Result />} />
 
           <Route
             path="/dashboard/:meetingId"
             element={
-              <ProtectedRoute allowedRoles={['user']}>
+              <ProtectedRoute allowedRoles={['user','companyAdmin']}>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -80,7 +84,7 @@ function App() {
           <Route
             path="/insert_info"
             element={
-              <ProtectedRoute allowedRoles={['user']}>
+              <ProtectedRoute allowedRoles={['user','companyAdmin']}>
                 <InsertConferenceInfo />
               </ProtectedRoute>
             }
@@ -144,7 +148,7 @@ function App() {
           <Route
             path="/mypage"
             element={
-              <ProtectedRoute allowedRoles={['user']}>
+              <ProtectedRoute allowedRoles={['user','companyAdmin']}>
                 <MyPage />
               </ProtectedRoute>
             }
@@ -152,7 +156,7 @@ function App() {
           <Route
             path="/mypage/alterInfo"
             element={
-              <ProtectedRoute allowedRoles={['user']}>
+              <ProtectedRoute allowedRoles={['user','companyAdmin']}>
                 <AlterInfo />
               </ProtectedRoute>
             }
@@ -160,7 +164,7 @@ function App() {
           <Route
             path="/calendar"
             element={
-              <ProtectedRoute allowedRoles={['user']}>
+              <ProtectedRoute allowedRoles={['user','companyAdmin']}>
                 <Calendar />
               </ProtectedRoute>
             }
@@ -168,7 +172,7 @@ function App() {
           <Route
             path="/projectlist"
             element={
-              <ProtectedRoute allowedRoles={['user']}>
+              <ProtectedRoute allowedRoles={['user','companyAdmin']}>
                 <ProjectListPage />
               </ProtectedRoute>
             }
@@ -176,7 +180,7 @@ function App() {
           <Route
             path="/conferencelist/:projectId"
             element={
-              <ProtectedRoute allowedRoles={['user']}>
+              <ProtectedRoute allowedRoles={['user','companyAdmin']}>
                 <ConferenceListPage />
               </ProtectedRoute>
             }
