@@ -92,7 +92,6 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
   onSuccess,
   projectName,
   projectId,
-  userId,
   projectUsers,
 }) => {
   const [subject, setSubject] = useState('');
