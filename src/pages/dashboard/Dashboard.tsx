@@ -230,8 +230,8 @@ const Dashboard: React.FC = () => {
           });
       }
     }
-
   }, [user, meetingId, poRoleId]); // poRoleId 추가 (isCurrentUserPO가 이를 사용)
+
   const mailMeetingInfo: meetingInfo = {
     project: project?.project_name || '',
     title: meeting?.meeting_title || '',
