@@ -19,10 +19,9 @@ interface AttendInfoProps {
   attendees: Attendee[];
   setAttendees: (a: Attendee[]) => void;
   projectUsers: ProjectUser[];
+
   hostId: string;
   setHostId: (id: string) => void;
-  hostEmail: string;
-  setHostEmail: (email: string) => void;
   hostJobname: string;
   setHostJobname: (job: string) => void;
 }
@@ -108,8 +107,7 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
   projectUsers = [],
   hostId,
   setHostId,
-  hostEmail,
-  setHostEmail,
+
   hostJobname,
   setHostJobname,
 }) => {
@@ -151,10 +149,8 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
     setHostId(user_id);
     const selectedUser = projectUsers.find((u) => u.user_id === user_id);
     if (selectedUser) {
-      setHostEmail(selectedUser.email || '');
       setHostJobname(selectedUser.user_jobname || '');
     } else {
-      setHostEmail('');
       setHostJobname('');
     }
   };
@@ -176,8 +172,9 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
         <EmailInput
           type="email"
           placeholder="이메일"
-          value={hostEmail}
-          onChange={(e) => setHostEmail(e.target.value)}
+          value={projectUsers.find((u) => u.user_id === hostId)?.email || ''}
+          readOnly
+          onClick={() => alert('이메일 수정이 불가능합니다.')}
         />
         <RoleInput
           type="text"
@@ -206,7 +203,8 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
             type="email"
             placeholder="이메일"
             value={att.email}
-            onChange={(e) => handleAttendeeChange(idx, 'email', e.target.value)}
+            readOnly
+            onClick={() => alert('이메일 수정이 불가능합니다.')}
           />
           <RoleInput
             type="text"

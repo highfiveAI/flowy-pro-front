@@ -27,10 +27,30 @@ const ConferenceListPage: React.FC = () => {
 
   const { projectId } = useParams<{ projectId: string }>();
 
+  // 페이징 상태 추가
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
+
   // 검색어에 따른 회의 필터링
   const filteredMeetings = meetings.filter((meeting) =>
     meeting.meeting_title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // 페이징 계산
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentMeetings = filteredMeetings.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredMeetings.length / itemsPerPage);
+
+  // 페이지네이션 그룹 계산
+  const pageGroupSize = 5;
+  const pageGroup = Math.floor((currentPage - 1) / pageGroupSize);
+  const startPage = pageGroup * pageGroupSize + 1;
+  const endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
+  const pageNumbers = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i);
+  }
 
   useEffect(() => {
     if (projectId) {
@@ -82,9 +102,9 @@ const ConferenceListPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredMeetings.map((c, i) => (
+            {currentMeetings.map((c, i) => (
               <Tr
-                key={i}
+                key={i + indexOfFirstItem}
                 onClick={() => navigate(`/dashboard/${c.meeting_id}`)}
               >
                 <Td>{c.meeting_title}</Td>
@@ -107,6 +127,70 @@ const ConferenceListPage: React.FC = () => {
         {filteredMeetings.length === 0 && searchTerm && (
           <NoResultsMessage>검색 결과가 없습니다.</NoResultsMessage>
         )}
+        {/* 페이지네이션 */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 20, gap: 4 }}>
+          {startPage > 1 && (
+            <button
+              onClick={() => setCurrentPage(startPage - 1)}
+              style={{
+                padding: "0 10px",
+                height: 32,
+                minWidth: 32,
+                borderRadius: 16,
+                background: "#fff",
+                color: "#2D1155",
+                border: "none",
+                fontSize: 16,
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
+            >
+              이전
+            </button>
+          )}
+          {pageNumbers.map((num) => (
+            <button
+              key={num}
+              onClick={() => setCurrentPage(num)}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                background: currentPage === num ? "#351745" : "transparent",
+                color: currentPage === num ? "#fff" : "#2D1155",
+                border: "none",
+                fontSize: 16,
+                fontWeight: 500,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "background 0.2s, color 0.2s",
+              }}
+            >
+              {num}
+            </button>
+          ))}
+          {endPage < totalPages && (
+            <button
+              onClick={() => setCurrentPage(endPage + 1)}
+              style={{
+                padding: "0 10px",
+                height: 32,
+                minWidth: 32,
+                borderRadius: 16,
+                background: "#fff",
+                color: "#2D1155",
+                border: "none",
+                fontSize: 16,
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
+            >
+              다음
+            </button>
+          )}
+        </div>
       </TableWrapper>
     </Container>
   );

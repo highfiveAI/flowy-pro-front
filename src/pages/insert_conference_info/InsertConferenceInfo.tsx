@@ -107,7 +107,7 @@ const InsertConferenceInfo: React.FC = () => {
   const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
     React.useState(false);
 
-  const [hostEmail, setHostEmail] = useState('');
+  // const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
   const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
   const [sortOrder, setSortOrder] = useState<'latest' | 'oldest'>('latest');
@@ -194,6 +194,7 @@ const InsertConferenceInfo: React.FC = () => {
       const filteredAttendees = attendees.filter(
         (a) => a.user_id && a.user_id !== hostId
       );
+      const attendeesUserId = filteredAttendees.map((a) => a.user_id);
       const attendeesName = filteredAttendees.map((a) => a.name);
       const attendeesEmail = filteredAttendees.map((a) => a.email);
       const attendeesRole = filteredAttendees.map((a) => a.user_jobname);
@@ -208,11 +209,15 @@ const InsertConferenceInfo: React.FC = () => {
         'meeting_date',
         meetingDate ? formatDateToKST(meetingDate) : ''
       );
+      formData.append('host_id', hostId);
       formData.append('host_name', hostName);
       formData.append('host_email', hostEmail);
       formData.append('host_role', hostJobname);
+      attendeesUserId.forEach((id) => formData.append('attendees_ids', id));
       attendeesName.forEach((name) => formData.append('attendees_name', name));
-      attendeesEmail.forEach((email) => formData.append('attendees_email', email));
+      attendeesEmail.forEach((email) =>
+        formData.append('attendees_email', email)
+      );
       attendeesRole.forEach((role) => formData.append('attendees_role', role));
       formData.append('subject', subject);
 
@@ -254,7 +259,7 @@ const InsertConferenceInfo: React.FC = () => {
         setFile(null);
         setAgenda('');
         setMeetingDate(null);
-        setHostEmail('');
+        // setHostEmail('');
         setHostJobname('');
         setHostId('');
       } catch (error) {
@@ -746,8 +751,8 @@ const InsertConferenceInfo: React.FC = () => {
                           projectUsers={projectUsers}
                           hostId={hostId}
                           setHostId={setHostId}
-                          hostEmail={hostEmail}
-                          setHostEmail={setHostEmail}
+                          // hostEmail={hostEmail}
+                          // setHostEmail={setHostEmail}
                           hostJobname={hostJobname}
                           setHostJobname={setHostJobname}
                         />
@@ -899,8 +904,8 @@ const InsertConferenceInfo: React.FC = () => {
                           projectUsers={projectUsers}
                           hostId={hostId}
                           setHostId={setHostId}
-                          hostEmail={hostEmail}
-                          setHostEmail={setHostEmail}
+                          // hostEmail={hostEmail}
+                          // setHostEmail={setHostEmail}
                           hostJobname={hostJobname}
                           setHostJobname={setHostJobname}
                         />
