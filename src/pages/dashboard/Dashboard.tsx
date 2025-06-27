@@ -9,6 +9,7 @@ import {
   fetchMeetings,
   // postSummaryLog,
   fetchDraftLogs,
+  fetchProjectMetaData,
 } from '../../api/fetchProject';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -88,6 +89,28 @@ const Dashboard: React.FC = () => {
   const [isEditingSummary, setIsEditingSummary] = useState(false);
   const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
   const [showMail_uneditPopup, setShowMail_uneditPopup] = useState(false);
+  const [poRoleId, setPoRoleId] = useState<string>('');
+
+  // 현재 사용자가 PO(회의장)인지 확인하는 함수
+  const isCurrentUserPO = () => {
+    // console.log('=== PO 권한 확인 ===');
+    // console.log('현재 사용자 ID:', user?.id);
+    // console.log('회의 참석자 수:', projectUser.length);
+    // console.log('PO role_id:', poRoleId);
+    
+    if (!user?.id || !projectUser.length || !poRoleId) {
+      // console.log('기본 조건 실패 - 권한 없음');
+      return false;
+    }
+    
+    const currentUserInMeeting = projectUser.find(pu => pu.user_id === user.id);
+    // console.log('회의에서 현재 사용자 정보:', currentUserInMeeting);
+    // console.log('현재 사용자의 역할 ID:', currentUserInMeeting?.role_id);
+    // console.log('PO 역할 ID와 일치?', currentUserInMeeting?.role_id === poRoleId);
+    // console.log('==================');
+    
+    return currentUserInMeeting?.role_id === poRoleId;
+  };
 
   const FEEDBACK_LABELS: Record<string, string> = {
     'e508d0b2-1bfd-42a2-9687-1ae6cd36c648': '총평',
@@ -134,6 +157,7 @@ const Dashboard: React.FC = () => {
             data?.meeting_users?.map((mu: any) => ({
               user_id: mu.user.user_id,
               user_name: mu.user.user_name,
+              role_id: mu.role_id, // 역할 정보 추가
             })) ?? [];
 
           const userNames = extractedUsers.map((u: any) => u.user_name);
@@ -164,14 +188,18 @@ const Dashboard: React.FC = () => {
 
           setAssignRole(grouped);
 
-          console.log(data);
+          // console.log('=== Dashboard 데이터 확인 ===');
+          // console.log('전체 데이터:', data);
+          // console.log('현재 사용자 ID:', user?.id);
+          // console.log('회의 참석자들:', extractedUsers);
+          // console.log('========================');
         }
       });
       fetchDraftLogs(meetingId).then((data) => {
         if (data) setRecommendFiles(data);
       });
     }
-  }, [user, meetingId]);
+  }, [user]);
 
   const mailMeetingInfo: meetingInfo = {
     project: project?.project_name || '',
@@ -206,6 +234,27 @@ const Dashboard: React.FC = () => {
         setUser(user);
       }
       setLoading(false);
+      
+      // PO role_id 가져오기
+      try {
+        const metaData = await fetchProjectMetaData();
+        // console.log('=== PO Role ID 확인 ===');
+        // console.log('메타데이터:', metaData);
+        // console.log('roles 배열:', metaData?.roles);
+        if (metaData) {
+          const poRole = metaData.roles?.find((r: any) => r.role_name === 'PO');
+          // console.log('찾은 PO role:', poRole);
+          if (poRole) {
+            // console.log('설정할 PO role_id:', poRole.role_id);
+            setPoRoleId(poRole.role_id);
+          } else {
+            // console.log('PO role을 찾을 수 없습니다');
+          }
+        }
+        // console.log('==================');
+      } catch (error) {
+        console.error('Failed to fetch PO role ID:', error);
+      }
     })();
   }, []);
 
@@ -355,31 +404,42 @@ const Dashboard: React.FC = () => {
               <img
                 src="/images/recommendfile.svg"
                 alt="PDF"
-                style={{ width: 22, height: 22, marginRight: 6, verticalAlign: 'middle' }}
+                style={{
+                  width: 22,
+                  height: 22,
+                  marginRight: 6,
+                  verticalAlign: 'middle',
+                }}
               />
               PDF 다운로드
             </SpeechBubbleButton>
             &nbsp;&nbsp;&nbsp;
-            <SpeechBubbleButton
-              onClick={() => setShowMail_uneditPopup(true)}
-              style={{ marginLeft: 8 }}
-            >
-              <img
-                src="/images/sendmail.svg"
-                alt="메일"
-                style={{ width: 22, height: 22, marginRight: 6, verticalAlign: 'middle' }}
-              />
-              메일전송하기
-            </SpeechBubbleButton>
+
+            {isCurrentUserPO() && (
+              <SpeechBubbleButton
+                onClick={() => setShowMail_uneditPopup(true)}
+                style={{ marginLeft: 8 }}
+              >
+                <img
+                  src="/images/sendmail.svg"
+                  alt="메일"
+                  style={{ width: 22, height: 22, marginRight: 6, verticalAlign: 'middle' }}
+                />
+                메일전송하기
+              </SpeechBubbleButton>
+            )}
+
             {/* <EditButton onClick={() => setShowMailPopup(true)}>
               수정하기
             </EditButton> */}
-            {isEditingSummary ? (
-              <EditButton onClick={() => setShowMailPopup(true)}>
-                저장하기
-              </EditButton>
-            ) : (
-              <EditButton onClick={handleEditSummary}>수정하기</EditButton>
+            {isCurrentUserPO() && (
+              isEditingSummary ? (
+                <EditButton onClick={() => setShowMailPopup(true)}>
+                  저장하기
+                </EditButton>
+              ) : (
+                <EditButton onClick={handleEditSummary}>수정하기</EditButton>
+              )
             )}
           </div>
         </MeetingAnalysisHeader>
@@ -638,10 +698,17 @@ const Dashboard: React.FC = () => {
                                         }
                                         placeholderText="날짜 선택"
                                       />
-                                    ) : (String(todo.schedule).trim() === '언급 없음' || String(todo.schedule).trim() === '언급없음' || String(todo.schedule).trim() === '미정') ? (
+                                    ) : String(todo.schedule).trim() ===
+                                        '언급 없음' ||
+                                      String(todo.schedule).trim() ===
+                                        '언급없음' ||
+                                      String(todo.schedule).trim() ===
+                                        '미정' ? (
                                       '미정'
                                     ) : (
-                                      formatDateWithDay(String(todo.schedule).trim())
+                                      formatDateWithDay(
+                                        String(todo.schedule).trim()
+                                      )
                                     )}
                                   </TaskCardDate>
                                 </TaskCardListItem>
@@ -674,9 +741,13 @@ const Dashboard: React.FC = () => {
                             <TaskCardListItem key={`${col}__${idx}`}>
                               {todo.action}
                               <TaskCardDate>
-                                {(String(todo.schedule).trim() === '언급 없음' || String(todo.schedule).trim() === '언급없음' || String(todo.schedule).trim() === '미정')
+                                {String(todo.schedule).trim() === '언급 없음' ||
+                                String(todo.schedule).trim() === '언급없음' ||
+                                String(todo.schedule).trim() === '미정'
                                   ? '미정'
-                                  : formatDateWithDay(String(todo.schedule).trim())}
+                                  : formatDateWithDay(
+                                      String(todo.schedule).trim()
+                                    )}
                               </TaskCardDate>
                             </TaskCardListItem>
                           ))}

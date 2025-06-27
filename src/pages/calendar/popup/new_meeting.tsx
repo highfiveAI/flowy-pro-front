@@ -92,19 +92,16 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
   onSuccess,
   projectName,
   projectId,
-  userId,
   projectUsers,
 }) => {
   const [subject, setSubject] = useState('');
   const [meetingDate, setMeetingDate] = useState('');
   const [agenda, setAgenda] = useState('');
+  const [hostId, setHostId] = useState('');
+  const [hostEmail, setHostEmail] = useState('');
+  const [hostJobname, setHostJobname] = useState('');
   const [attendees, setAttendees] = useState<Attendee[]>([
-    (() => {
-      const me = projectUsers.find((u) => u.user_id === userId);
-      return me
-        ? { ...me }
-        : { user_id: userId, name: '', email: '', user_jobname: '' };
-    })(),
+    { user_id: '', name: '', email: '', user_jobname: '' },
   ]);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,12 +115,10 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
   };
 
   const handleRemoveAttendee = (idx: number) => {
-    if (idx === 0) return; // 본인은 삭제 불가
     setAttendees(attendees.filter((_, i) => i !== idx));
   };
 
   const handleUserSelect = (idx: number, user_id: string) => {
-    if (idx === 0) return; // 본인 정보는 select 불가
     const selectedUser = projectUsers.find((u) => u.user_id === user_id);
     if (selectedUser) {
       const updated = [...attendees];
@@ -136,25 +131,28 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
     }
   };
 
+  const handleHostSelect = (user_id: string) => {
+    setHostId(user_id);
+    const selectedUser = projectUsers.find((u) => u.user_id === user_id);
+    if (selectedUser) {
+      setHostEmail(selectedUser.email || '');
+      setHostJobname(selectedUser.user_jobname || '');
+    } else {
+      setHostEmail('');
+      setHostJobname('');
+    }
+  };
+
   // 전체 선택 체크박스 핸들러
   const handleSelectAll = () => {
     if (allSelected) {
-      // 전체 해제: 본인만 남기고 나머지 빈 값
-      setAttendees([
-        attendees[0],
-        ...attendees
-          .slice(1)
-          .map(() => ({ user_id: '', name: '', email: '', user_jobname: '' })),
-      ]);
+      // 전체 해제: 빈 값으로 초기화
+      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
       setAllSelected(false);
     } else {
-      // 전체 선택: 본인 제외 모든 줄에 남은 projectUsers를 순서대로 할당
-      // const usedIds = [userId];
-      const restUsers = projectUsers.filter((u) => u.user_id !== userId);
-      const newAttendees = [attendees[0]];
-      for (let i = 0; i < restUsers.length; i++) {
-        newAttendees.push({ ...restUsers[i] });
-      }
+      // 전체 선택: hostId 제외한 모든 projectUsers를 할당
+      const restUsers = projectUsers.filter((u) => u.user_id !== hostId);
+      const newAttendees = restUsers.map((u) => ({ ...u }));
       setAttendees(newAttendees);
       setAllSelected(true);
     }
@@ -162,17 +160,14 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
 
   // 전체 선택 상태 동기화
   React.useEffect(() => {
-    const restUsers = projectUsers.filter((u) => u.user_id !== userId);
-    const selectedIds = attendees
-      .slice(1)
-      .map((a) => a.user_id)
-      .filter(Boolean);
+    const restUsers = projectUsers.filter((u) => u.user_id !== hostId);
+    const selectedIds = attendees.map((a) => a.user_id).filter(Boolean);
     setAllSelected(
       selectedIds.length === restUsers.length &&
         restUsers.length > 0 &&
         selectedIds.every((id) => restUsers.some((u) => u.user_id === id))
     );
-  }, [attendees, projectUsers, userId]);
+  }, [attendees, projectUsers, hostId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,17 +175,35 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
       setError('필수 항목을 입력해주세요.');
       return;
     }
-    // 본인 외 참석자 유효성 검사
-    const invalid = attendees.slice(1).some((a) => !a.user_id);
+    if (!hostId) {
+      setError('회의장을 선택해주세요.');
+      return;
+    }
+    // 참석자 유효성 검사
+    const invalid = attendees.some((a) => !a.user_id);
     if (invalid) {
       setError('모든 참석자를 선택해주세요.');
+      return;
+    }
+    // 최소 2명 이상의 참석자 확인 (회의장 + 최소 1명의 참석자)
+    if (attendees.filter((a) => a.user_id).length < 1) {
+      setError('최소 1명의 참석자가 필요합니다.');
       return;
     }
     setIsSubmitting(true);
     setError('');
     try {
       const meeting_date = new Date(meetingDate).toISOString();
-      const users = attendees.map((a) => ({ user_id: a.user_id }));
+
+      // 회의장과 참석자를 합쳐서 users 배열 생성
+      const users = [
+        { user_id: hostId, role_id: '20ea65e2-d3b7-4adb-a8ce-9e67a2f21999' }, // 회의장
+        ...attendees.map((a) => ({
+          user_id: a.user_id,
+          role_id: 'a55afc22-b4c1-48a4-9513-c66ff6ed3965', // 참석자
+        })),
+      ];
+
       const body = {
         project_id: projectId,
         meeting_title: subject,
@@ -275,7 +288,9 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
             />
           </FormGroup>
           <FormGroup>
-            <StyledLabel>회의 안건</StyledLabel>
+            <StyledLabel>
+              회의 안건 <span style={{ color: '#dc3545' }}></span>
+            </StyledLabel>
             <StyledTextarea
               value={agenda}
               onChange={(e) => setAgenda(e.target.value)}
@@ -283,63 +298,91 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
             />
           </FormGroup>
           <FormGroup>
-            <StyledLabel>
-              회의 참석자 <span style={{ color: '#dc3545' }}>*</span>
-            </StyledLabel>
-            <div
-              style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}
+            <StyledLabel
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
             >
-              <input
-                type="checkbox"
-                checked={allSelected}
-                onChange={handleSelectAll}
-                id="selectAllAttendees"
-                style={{ marginRight: 8 }}
-              />
-              <label
-                htmlFor="selectAllAttendees"
-                style={{ cursor: 'pointer', userSelect: 'none' }}
+              <span>
+                회의 참석자 <span style={{ color: '#dc3545' }}>*</span>
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={handleSelectAll}
+                  id="selectAllAttendees"
+                  style={{ marginRight: 8 }}
+                />
+                <label
+                  htmlFor="selectAllAttendees"
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
+                >
+                  전체 선택
+                </label>
+                <AddAttendeeButton
+                  type="button"
+                  onClick={handleAddAttendee}
+                  style={{ marginLeft: 8 }}
+                >
+                  +
+                </AddAttendeeButton>
+              </div>
+            </StyledLabel>
+            <AttendeeRow>
+              <StyledSelect
+                value={hostId}
+                onChange={(e) => handleHostSelect(e.target.value)}
+                style={{ flex: 1, marginRight: 8 }}
               >
-                전체 선택
-              </label>
-            </div>
+                <option value="">회의장 선택</option>
+                {projectUsers.map((u) => (
+                  <option key={u.user_id} value={u.user_id}>
+                    {u.name}
+                  </option>
+                ))}
+              </StyledSelect>
+              <StyledInput
+                type="email"
+                value={hostEmail}
+                readOnly
+                placeholder="이메일"
+                style={{ flex: 2 }}
+              />
+              <StyledInput
+                type="text"
+                value={hostJobname}
+                readOnly
+                placeholder="역할"
+                style={{ flex: 1 }}
+              />
+            </AttendeeRow>
+          </FormGroup>
+          <FormGroup>
             {attendees.map((a, idx) => (
               <AttendeeRow key={idx}>
-                {idx === 0 ? (
-                  <StyledSelect
-                    value={a.user_id}
-                    disabled
-                    style={{
-                      flex: 1,
-                      marginRight: 8,
-                      color: '#888',
-                      background: '#f5f5f5',
-                    }}
-                  >
-                    <option value={a.user_id}>{a.name}</option>
-                  </StyledSelect>
-                ) : (
-                  <StyledSelect
-                    value={a.user_id}
-                    onChange={(e) => handleUserSelect(idx, e.target.value)}
-                    style={{ flex: 1, marginRight: 8 }}
-                  >
-                    <option value="">참석자 선택</option>
-                    {projectUsers
-                      .filter(
-                        (u) =>
-                          u.user_id !== userId &&
-                          !attendees.some(
-                            (att, i) => att.user_id === u.user_id && i !== idx
-                          )
-                      )
-                      .map((u) => (
-                        <option key={u.user_id} value={u.user_id}>
-                          {u.name}
-                        </option>
-                      ))}
-                  </StyledSelect>
-                )}
+                <StyledSelect
+                  value={a.user_id}
+                  onChange={(e) => handleUserSelect(idx, e.target.value)}
+                  style={{ flex: 1, marginRight: 8 }}
+                >
+                  <option value="">참석자 선택</option>
+                  {projectUsers
+                    .filter(
+                      (u) =>
+                        u.user_id !== hostId &&
+                        !attendees.some(
+                          (att, i) => att.user_id === u.user_id && i !== idx
+                        )
+                    )
+                    .map((u) => (
+                      <option key={u.user_id} value={u.user_id}>
+                        {u.name}
+                      </option>
+                    ))}
+                </StyledSelect>
                 <StyledInput
                   type="email"
                   value={a.email}
@@ -354,23 +397,15 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
                   placeholder="역할"
                   style={{ flex: 1 }}
                 />
-                {idx === 0 ? (
-                  <span style={{ color: '#888', fontSize: 13, marginLeft: 8 }}>
-                    본인
-                  </span>
-                ) : (
-                  <RemoveAttendeeButton
-                    type="button"
-                    onClick={() => handleRemoveAttendee(idx)}
-                  >
-                    ×
-                  </RemoveAttendeeButton>
-                )}
+                <RemoveAttendeeButton
+                  type="button"
+                  onClick={() => handleRemoveAttendee(idx)}
+                  style={{ display: attendees.length <= 1 ? 'none' : 'block' }}
+                >
+                  ×
+                </RemoveAttendeeButton>
               </AttendeeRow>
             ))}
-            <AddAttendeeButton type="button" onClick={handleAddAttendee}>
-              +
-            </AddAttendeeButton>
           </FormGroup>
           {error && (
             <div style={{ color: '#dc3545', marginBottom: 10 }}>{error}</div>
