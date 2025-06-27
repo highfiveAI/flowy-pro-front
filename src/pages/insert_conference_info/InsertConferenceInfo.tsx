@@ -107,7 +107,7 @@ const InsertConferenceInfo: React.FC = () => {
   const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
     React.useState(false);
 
-  const [hostEmail, setHostEmail] = useState('');
+  // const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
   const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
   const [sortOrder, setSortOrder] = useState<'latest' | 'oldest'>('latest');
@@ -215,7 +215,9 @@ const InsertConferenceInfo: React.FC = () => {
       formData.append('host_role', hostJobname);
       attendeesUserId.forEach((id) => formData.append('attendees_ids', id));
       attendeesName.forEach((name) => formData.append('attendees_name', name));
-      attendeesEmail.forEach((email) => formData.append('attendees_email', email));
+      attendeesEmail.forEach((email) =>
+        formData.append('attendees_email', email)
+      );
       attendeesRole.forEach((role) => formData.append('attendees_role', role));
       formData.append('subject', subject);
 
@@ -257,7 +259,7 @@ const InsertConferenceInfo: React.FC = () => {
         setFile(null);
         setAgenda('');
         setMeetingDate(null);
-        setHostEmail('');
+        // setHostEmail('');
         setHostJobname('');
         setHostId('');
       } catch (error) {
@@ -749,8 +751,8 @@ const InsertConferenceInfo: React.FC = () => {
                           projectUsers={projectUsers}
                           hostId={hostId}
                           setHostId={setHostId}
-                          hostEmail={hostEmail}
-                          setHostEmail={setHostEmail}
+                          // hostEmail={hostEmail}
+                          // setHostEmail={setHostEmail}
                           hostJobname={hostJobname}
                           setHostJobname={setHostJobname}
                         />
@@ -902,8 +904,8 @@ const InsertConferenceInfo: React.FC = () => {
                           projectUsers={projectUsers}
                           hostId={hostId}
                           setHostId={setHostId}
-                          hostEmail={hostEmail}
-                          setHostEmail={setHostEmail}
+                          // hostEmail={hostEmail}
+                          // setHostEmail={setHostEmail}
                           hostJobname={hostJobname}
                           setHostJobname={setHostJobname}
                         />
