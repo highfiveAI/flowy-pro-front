@@ -98,7 +98,7 @@ const Chatbot: React.FC = () => {
       const res = await sendChatMessage(input);
       const botMsg = {
         sender: 'bot',
-        text: res.message,
+        text: res.content,
       } as const;
 
       setMessages((prev) => [...prev, botMsg]);
