@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   LineChart,
@@ -19,6 +19,8 @@ import {
   flexRender,
   createColumnHelper,
 } from '@tanstack/react-table';
+import { fetchDashboardStats, fetchDashboardFilterOptions } from '../../api/fetchDashboard';
+import type { DashboardResponse, FilterOptions, ChartData, TableData, DashboardSummary } from '../../types/dashboard';
 
 const DashboardContainer = styled.div`
   padding: 40px;
@@ -105,6 +107,13 @@ const Select = styled.select`
   &:focus {
     outline: none;
     border-color: #351745;
+  }
+
+  &:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 `;
 
@@ -260,23 +269,6 @@ const Tr = styled.tr`
 
 type PeriodType = 'year' | 'quarter' | 'month' | 'week' | 'day';
 
-interface ChartData {
-  year: string;
-  발생빈도: number;
-  처리시간: number;
-  period: string; // 기간 정보 추가
-}
-
-// 테이블 데이터 타입
-interface TableData {
-  period: string;
-  target: string;
-  value: string;
-  pop: string;
-  prevValue: string;
-  growth: string;
-}
-
 // 날짜 선택 모달 스타일
 const ModalOverlay = styled.div`
   position: fixed;
@@ -397,36 +389,158 @@ const AdminDashboard = () => {
     new Date().toISOString().split('T')[0]
   );
 
-  // 차트 더미 데이터 - 컴포넌트 외부로 이동하거나 useMemo로 최적화
-  const chartData: ChartData[] = useMemo(
-    () => [
-      // 연별 데이터
-      { year: '2020', 발생빈도: 30, 처리시간: 40, period: 'year' },
-      { year: '2021', 발생빈도: 45, 처리시간: 55, period: 'year' },
-      { year: '2022', 발생빈도: 35, 처리시간: 45, period: 'year' },
-      { year: '2023', 발생빈도: 50, 처리시간: 60, period: 'year' },
-      { year: '2024', 발생빈도: 40, 처리시간: 50, period: 'year' },
-      // 월별 데이터
-      { year: '2024-01', 발생빈도: 15, 처리시간: 20, period: 'month' },
-      { year: '2024-02', 발생빈도: 20, 처리시간: 25, period: 'month' },
-      { year: '2024-03', 발생빈도: 25, 처리시간: 30, period: 'month' },
-      // 주별 데이터
-      { year: '2024-W1', 발생빈도: 5, 처리시간: 8, period: 'week' },
-      { year: '2024-W2', 발생빈도: 7, 처리시간: 10, period: 'week' },
-      // 일별 데이터
-      { year: '2024-03-01', 발생빈도: 2, 처리시간: 3, period: 'day' },
-      { year: '2024-03-02', 발생빈도: 3, 처리시간: 4, period: 'day' },
-      // 분기별 데이터
-      { year: '2024-Q1', 발생빈도: 30, 처리시간: 35, period: 'quarter' },
-      { year: '2024-Q2', 발생빈도: 25, 처리시간: 30, period: 'quarter' },
-    ],
-    []
-  );
+  // API 데이터 상태
+  const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null);
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [filterLoading, setFilterLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 필터 상태 - 기본값 "전체"
+  const [selectedProject, setSelectedProject] = useState<string>('');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+  const [selectedUser, setSelectedUser] = useState<string>('');
+
+  // 대시보드 데이터 로드 - 계층적 필터링 적용
+  const loadDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const params: any = {
+        period: selectedPeriod,
+        start_date: startDate,
+        end_date: endDate,
+      };
+
+      // 계층적 필터링: 프로젝트 → 부서 → 사용자 순서로 적용
+      if (selectedProject) {
+        params.project_id = selectedProject;
+        console.log("▶ 대시보드 데이터 요청 (프로젝트 필터):", params);
+      }
+      if (selectedDepartment) {
+        params.department = selectedDepartment;
+        console.log("▶ 대시보드 데이터 요청 (부서 필터):", params);
+      }
+      if (selectedUser) {
+        params.user_id = selectedUser;
+        console.log("▶ 대시보드 데이터 요청 (사용자 필터):", params);
+      }
+
+      const data: DashboardResponse = await fetchDashboardStats(params);
+      setDashboardData(data);
+      console.log("▶ 대시보드 데이터 응답:", data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '데이터 로드에 실패했습니다.');
+      console.error('대시보드 데이터 로드 오류:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedPeriod, startDate, endDate, selectedProject, selectedDepartment, selectedUser]);
+
+  // 필터 옵션 로드 - 계층적 필터링을 위해 파라미터 전달
+  const loadFilterOptions = useCallback(async () => {
+    try {
+      setFilterLoading(true);
+      const params: any = {};
+      
+      // 계층적 필터링: 프로젝트 → 부서 → 사용자 순서로 적용
+      if (selectedProject) {
+        params.project_id = selectedProject;
+        console.log("▶ 초기 필터 옵션 요청 (프로젝트 기반):", params);
+      }
+      if (selectedDepartment) {
+        params.department = selectedDepartment;
+        console.log("▶ 초기 필터 옵션 요청 (부서 기반):", params);
+      }
+      
+      const options: FilterOptions = await fetchDashboardFilterOptions(params);
+      setFilterOptions(options);
+      console.log("▶ 초기 필터 옵션 응답:", options);
+    } catch (err) {
+      console.error('초기 필터 옵션 로드 오류:', err);
+    } finally {
+      setFilterLoading(false);
+    }
+  }, [selectedProject, selectedDepartment]);
+
+  // 컴포넌트 마운트 시 초기 데이터 로드
+  useEffect(() => {
+    loadFilterOptions();
+    loadDashboardData();
+  }, []);
+
+  // 필터 변경 시 대시보드 데이터 갱신
+  useEffect(() => {
+    // 초기 로딩이 아닌 경우에만 대시보드 데이터 갱신
+    if (dashboardData !== null) {
+      loadDashboardData();
+    }
+  }, [selectedProject, selectedDepartment, selectedUser]);
+
+  // 필터 변경 핸들러 - 계층적 연동 로직 구현
+  const handleProjectChange = useCallback(async (projectId: string) => {
+    console.log("▶ 프로젝트 선택 값:", projectId);
+    setSelectedProject(projectId);
+    
+    // 프로젝트 변경 시 부서와 사용자 초기화
+    setSelectedDepartment('');
+    setSelectedUser('');
+    
+    // 프로젝트 선택 시 해당 프로젝트에 참여하는 부서/사용자만 가져오기
+    try {
+      setFilterLoading(true);
+      const params: any = {};
+      if (projectId) {
+        params.project_id = projectId;
+        console.log("▶ 프로젝트 기반 필터 옵션 요청:", params);
+      }
+      const options: FilterOptions = await fetchDashboardFilterOptions(params);
+      setFilterOptions(options);
+      console.log("▶ 프로젝트 기반 필터 옵션 응답:", options);
+    } catch (err) {
+      console.error('프로젝트 기반 필터 옵션 갱신 오류:', err);
+    } finally {
+      setFilterLoading(false);
+    }
+  }, []);
+
+  const handleDepartmentChange = useCallback(async (department: string) => {
+    console.log("▶ 부서 선택 값:", department);
+    setSelectedDepartment(department);
+    
+    // 부서 변경 시 사용자 초기화
+    setSelectedUser('');
+    
+    // 부서 선택 시 해당 부서의 사용자만 가져오기
+    try {
+      setFilterLoading(true);
+      const params: any = {};
+      if (selectedProject) params.project_id = selectedProject;
+      if (department) {
+        params.department = department;
+        console.log("▶ 부서 기반 필터 옵션 요청:", params);
+      }
+      const options: FilterOptions = await fetchDashboardFilterOptions(params);
+      setFilterOptions(options);
+      console.log("▶ 부서 기반 필터 옵션 응답:", options);
+    } catch (err) {
+      console.error('부서 기반 필터 옵션 갱신 오류:', err);
+    } finally {
+      setFilterLoading(false);
+    }
+  }, [selectedProject]);
+
+  const handleUserChange = useCallback((userId: string) => {
+    console.log("▶ 사용자 선택 값:", userId);
+    setSelectedUser(userId);
+  }, []);
 
   // 선택된 기간에 따라 데이터 필터링
   const filteredChartData = useMemo(() => {
-    return chartData.filter((data) => data.period === selectedPeriod);
-  }, [selectedPeriod, chartData]);
+    if (!dashboardData) return [];
+    return dashboardData.chartData.filter((data) => data.period === selectedPeriod);
+  }, [selectedPeriod, dashboardData]);
 
   const handlePeriodChange = useCallback((period: PeriodType) => {
     setSelectedPeriod(period);
@@ -447,29 +561,6 @@ const AdminDashboard = () => {
   // 기간 타입 배열을 안전하게 생성
   const periodTypes: PeriodType[] = useMemo(
     () => ['year', 'quarter', 'month', 'week', 'day'],
-    []
-  );
-
-  // 테이블 더미 데이터
-  const tableData: TableData[] = useMemo(
-    () => [
-      {
-        period: '2024',
-        target: '불필요대화 30% 이상',
-        value: '50.7건',
-        pop: '-4.5%',
-        prevValue: '51.7건',
-        growth: '-1.9%',
-      },
-      {
-        period: '2024',
-        target: '화제 전환 미숙의',
-        value: '41.2건',
-        pop: '-24.5%',
-        prevValue: '41.7건',
-        growth: '-1.2%',
-      },
-    ],
     []
   );
 
@@ -506,7 +597,7 @@ const AdminDashboard = () => {
   );
 
   const table = useReactTable({
-    data: tableData,
+    data: dashboardData?.tableData || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -553,10 +644,10 @@ const AdminDashboard = () => {
 
   // 날짜 적용
   const handleApplyDateRange = useCallback(() => {
-    // 여기에 날짜 범위 적용 로직 추가
-    console.log('적용된 날짜 범위:', { startDate, endDate });
+    // 날짜 범위가 변경되면 데이터를 다시 로드
+    loadDashboardData();
     setIsModalOpen(false);
-  }, [startDate, endDate]);
+  }, [loadDashboardData]);
 
   // 날짜 형식 변환 함수
   const formatDate = useCallback((dateString: string) => {
@@ -568,42 +659,29 @@ const AdminDashboard = () => {
     });
   }, []);
 
-  // Summary 데이터 구조 정의
-  const summaryData = [
-    {
-      title: '평균 회의시간',
-      unit: '분',
-      target: 60.4,
-      average: 40.8,
-      labelTarget: '조회 대상 기준',
-      labelAvg: '전체 평균',
-      color: '#351745',
-      colorAvg: '#bdbdbd',
-      yMax: 70,
-    },
-    {
-      title: '평균 회의빈도',
-      unit: '회',
-      target: 750.1,
-      average: 698.9,
-      labelTarget: '조회 대상 기준',
-      labelAvg: '전체 평균',
-      color: '#351745',
-      colorAvg: '#bdbdbd',
-      yMax: 800,
-    },
-    {
-      title: '평균 참석자 수',
-      unit: '명',
-      target: 6.7,
-      average: 7.1,
-      labelTarget: '조회 대상 기준',
-      labelAvg: '전체 평균',
-      color: '#351745',
-      colorAvg: '#bdbdbd',
-      yMax: 10,
-    },
-  ];
+  // 로딩 상태 표시
+  if (loading) {
+    return (
+      <DashboardContainer>
+        <PageTitle>대시보드</PageTitle>
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          데이터를 불러오는 중...
+        </div>
+      </DashboardContainer>
+    );
+  }
+
+  // 에러 상태 표시
+  if (error) {
+    return (
+      <DashboardContainer>
+        <PageTitle>대시보드</PageTitle>
+        <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>
+          오류: {error}
+        </div>
+      </DashboardContainer>
+    );
+  }
 
   return (
     <DashboardContainer>
@@ -625,29 +703,53 @@ const AdminDashboard = () => {
         <FilterGroup>
           <FilterSelect>
             <SelectLabel>프로젝트별</SelectLabel>
-            <Select>
-              <option value="">프로젝트를 선택하세요.</option>
-              <option value="project1">프로젝트 1</option>
-              <option value="project2">프로젝트 2</option>
+            <Select 
+              value={selectedProject} 
+              onChange={(e) => handleProjectChange(e.target.value)}
+              disabled={filterLoading}
+            >
+              <option value="">전체</option>
+              {filterOptions?.projects?.map((project: { id: string; name: string }) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
             </Select>
+            {filterLoading && <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>로딩 중...</div>}
           </FilterSelect>
 
           <FilterSelect>
             <SelectLabel>부서별</SelectLabel>
-            <Select defaultValue="operating">
-              <option value="operating">Operating Management</option>
-              <option value="dev">Development</option>
-              <option value="design">Design</option>
+            <Select 
+              value={selectedDepartment} 
+              onChange={(e) => handleDepartmentChange(e.target.value)}
+              disabled={filterLoading}
+            >
+              <option value="">전체</option>
+              {filterOptions?.departments?.map((dept: { name: string }) => (
+                <option key={dept.name} value={dept.name}>
+                  {dept.name}
+                </option>
+              ))}
             </Select>
+            {filterLoading && <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>로딩 중...</div>}
           </FilterSelect>
 
           <FilterSelect>
             <SelectLabel>사용자별</SelectLabel>
-            <Select defaultValue="dazzang22">
-              <option value="dazzang22">dazzang22</option>
-              <option value="user2">User 2</option>
-              <option value="user3">User 3</option>
+            <Select 
+              value={selectedUser} 
+              onChange={(e) => handleUserChange(e.target.value)}
+              disabled={filterLoading}
+            >
+              <option value="">전체</option>
+              {filterOptions?.users?.map((user: { id: string; name: string; login_id: string }) => (
+                <option key={user.id} value={user.id}>
+                  {user.name} ({user.login_id})
+                </option>
+              ))}
             </Select>
+            {filterLoading && <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>로딩 중...</div>}
           </FilterSelect>
         </FilterGroup>
 
@@ -698,7 +800,7 @@ const AdminDashboard = () => {
       <SummarySection>
         <SummaryTitle>Summary</SummaryTitle>
         <SummaryGrid>
-          {summaryData.map((item) => (
+          {dashboardData?.summary.map((item: DashboardSummary) => (
             <SummaryCard key={item.title}>
               <SummaryCardTitle>{item.title}</SummaryCardTitle>
               <div
