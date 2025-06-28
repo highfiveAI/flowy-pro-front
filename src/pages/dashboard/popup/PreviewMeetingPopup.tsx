@@ -132,17 +132,34 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
   onReject,
   onClose,
 }) => {
+  // 한국 시간대로 변환하여 datetime-local 형식으로 만드는 함수
+  const formatToDatetimeLocal = (dateString: string) => {
+    const date = new Date(dateString);
+    // 한국 시간대로 변환
+    const kstDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000) + (9 * 3600000));
+    const year = kstDate.getFullYear();
+    const month = String(kstDate.getMonth() + 1).padStart(2, '0');
+    const day = String(kstDate.getDate()).padStart(2, '0');
+    const hours = String(kstDate.getHours()).padStart(2, '0');
+    const minutes = String(kstDate.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   const [editData, setEditData] = useState({
     meeting_title: meeting.meeting_title,
-    meeting_date: meeting.meeting_date.slice(0, 16), // datetime-local 형식으로
+    meeting_date: formatToDatetimeLocal(meeting.meeting_date),
     meeting_agenda: meeting.meeting_agenda || '',
   });
 
   const handleConfirm = () => {
-    // datetime-local 값을 ISO 형식으로 변환
+    // datetime-local 값을 한국 시간대 기준 ISO 형식으로 변환
+    const localDate = new Date(editData.meeting_date);
+    // 로컬 시간을 한국 시간대로 해석하여 ISO 문자열 생성
+    const kstIsoString = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000)).toISOString();
+    
     const confirmData = {
       ...editData,
-      meeting_date: new Date(editData.meeting_date).toISOString(),
+      meeting_date: kstIsoString,
     };
     onConfirm(confirmData);
   };

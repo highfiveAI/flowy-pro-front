@@ -24,7 +24,6 @@ const ConferenceListPage: React.FC = () => {
   const [meetings, setMeetings] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
   const { projectId } = useParams<{ projectId: string }>();
 
   // 페이징 상태 추가
@@ -110,8 +109,8 @@ const ConferenceListPage: React.FC = () => {
                 <Td>{c.meeting_title}</Td>
                 <Td>
                   {new Date(c.meeting_date)
-                    .toISOString()
-                    .replace("T", " ")
+                    .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
+                    .replace('T', ' ')
                     .slice(0, 16)}
                 </Td>
                 <Td>
