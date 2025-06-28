@@ -1,8 +1,6 @@
-// src/components/Chatbot.tsx
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { sendChatMessage } from '../../api/fetchChatbot';
-// import { sendChatMessage } from "../api/chat";
+import React, { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
+import { sendChatMessage } from "../../api/fetchChatbot";
 
 const Container = styled.div`
   max-width: 400px;
@@ -40,6 +38,28 @@ const SendButton = styled.button`
   &:hover {
     background: #3578c0;
   }
+
+  &:disabled {
+    background: #a0c1f7;
+    cursor: not-allowed;
+  }
+`;
+
+const LinkButton = styled.button`
+  width: 100%;
+  margin-top: 12px;
+  background-color: #4a90e2;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+
+  &:hover {
+    background-color: #3578c0;
+  }
 `;
 
 const Messages = styled.div`
@@ -54,7 +74,7 @@ const Messages = styled.div`
 `;
 
 const MessageBubble = styled.div<{ isUser?: boolean }>`
-  background: ${({ isUser }) => (isUser ? '#d0ebff' : '#ffffff')};
+  background: ${({ isUser }) => (isUser ? "#d0ebff" : "#ffffff")};
   color: #333;
   padding: 12px 16px;
   border-radius: 12px;
@@ -66,66 +86,165 @@ const MessageBubble = styled.div<{ isUser?: boolean }>`
 
   display: inline-block;
 
-  align-self: ${({ isUser }) => (isUser ? 'flex-end' : 'flex-start')};
-  margin-left: ${({ isUser }) => (isUser ? 'auto' : '0')};
+  align-self: ${({ isUser }) => (isUser ? "flex-end" : "flex-start")};
+  margin-left: ${({ isUser }) => (isUser ? "auto" : "0")};
 
-  text-align: ${({ isUser }) => (isUser ? 'right' : 'left')};
+  text-align: ${({ isUser }) => (isUser ? "right" : "left")};
 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-  border-bottom-right-radius: ${({ isUser }) => (isUser ? '0' : '12px')};
-  border-bottom-left-radius: ${({ isUser }) => (isUser ? '12px' : '0')};
+  border-bottom-right-radius: ${({ isUser }) => (isUser ? "0" : "12px")};
+  border-bottom-left-radius: ${({ isUser }) => (isUser ? "12px" : "0")};
 `;
 
+// ... types
+
 type Message = {
-  sender: 'user' | 'bot';
-  text: string;
+  sender: "user" | "bot";
+  text?: string;
+  doc?: string;
+  link?: string;
+  summary?: string;
+  loading?: boolean; // 로딩 표시용 플래그
+};
+
+// ... 점 애니메이션
+
+const DotWrapper = styled.span`
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: 4px;
+  display: inline-block;
+  width: 24px; /* 고정된 너비 지정 */
+  white-space: nowrap; /* 줄바꿈 방지 */
+`;
+
+const LoadingDots: React.FC = () => {
+  const [count, setCount] = useState(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount((c) => (c === 3 ? 1 : c + 1));
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <DotWrapper>
+      {Array.from({ length: 3 }, (_, i) => (i < count ? "." : " "))}
+    </DotWrapper>
+  );
 };
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
-    const userMsg = { sender: 'user', text: input } as const;
+    // 유저 메시지 추가
+    const userMsg: Message = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
+    setInput("");
+
+    // 로딩 메시지 추가
+    const loadingMsg: Message = { sender: "bot", loading: true };
+    setMessages((prev) => [...prev, loadingMsg]);
+    setLoading(true);
 
     try {
-      setInput('');
       const res = await sendChatMessage(input);
-      const botMsg = {
-        sender: 'bot',
-        text: res.content,
-      } as const;
+      const cleaned = res.replace(/```json\n?/, "").replace(/\n?```$/, "");
+      const parsed = JSON.parse(cleaned);
+      const result = parsed.results?.[0];
 
-      setMessages((prev) => [...prev, botMsg]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'bot', text: '오류가 발생했어요. 다시 시도해주세요.' },
-      ]);
+      if (!result) throw new Error("결과가 비어 있습니다.");
+
+      const doc = result.document || "문서 없음";
+      let link = result.metadata?.link || "";
+      const summary = parsed.llm_summary || "";
+
+      if (link.startsWith("http:") && !link.startsWith("http://")) {
+        link = link.replace(/^http:/, "http://");
+      }
+
+      const botMsg: Message = {
+        sender: "bot",
+        doc,
+        link,
+        summary,
+      };
+
+      // 로딩 메시지 제거 후 봇 메시지 추가
+      setMessages((prev) => {
+        const filtered = prev.filter((m) => !m.loading);
+        return [...filtered, botMsg];
+      });
+    } catch (err) {
+      console.error("에러 발생:", err);
+      setMessages((prev) => {
+        const filtered = prev.filter((m) => !m.loading);
+        return [
+          ...filtered,
+          {
+            sender: "bot",
+            text: "❗ 결과를 이해하지 못했어요. JSON 파싱에 실패했거나 예상치 못한 형식이에요.",
+          },
+        ];
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Container>
       <Messages>
-        {messages.map((msg, idx) => (
-          <MessageBubble key={idx} isUser={msg.sender === 'user'}>
-            {msg.text}
-          </MessageBubble>
-        ))}
+        {messages.map((msg, idx) => {
+          const isUser = msg.sender === "user";
+
+          // 로딩 메시지일 경우 점 애니메이션 표시
+          if (msg.loading) {
+            return (
+              <MessageBubble key={idx} isUser={false}>
+                🕐 응답 중 <LoadingDots />
+              </MessageBubble>
+            );
+          }
+
+          return (
+            <MessageBubble key={idx} isUser={isUser}>
+              {isUser ? (
+                msg.text
+              ) : (
+                <>
+                  {msg.doc && <div>📄 안내: {msg.doc}</div>}
+                  {msg.summary && <div>📝 챗봇 응답: {msg.summary}</div>}
+                  {msg.link && (
+                    <LinkButton onClick={() => window.open(msg.link, "_blank")}>
+                      링크 열기
+                    </LinkButton>
+                  )}
+                </>
+              )}
+            </MessageBubble>
+          );
+        })}
       </Messages>
+
       <InputArea onSubmit={handleSubmit}>
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="메시지를 입력하세요..."
+          disabled={loading}
         />
-        <SendButton type="submit">전송</SendButton>
+        <SendButton type="submit" disabled={loading}>
+          {loading ? "전송 중..." : "전송"}
+        </SendButton>
       </InputArea>
     </Container>
   );
