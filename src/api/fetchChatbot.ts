@@ -1,6 +1,6 @@
 export async function sendChatMessage(message: string) {
   const res = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/v1/chatbot/chat`,
+    `${import.meta.env.VITE_API_URL}/api/v1/chatbot/chat/embed`,
     {
       method: 'POST',
       credentials: 'include',
