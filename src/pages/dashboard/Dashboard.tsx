@@ -152,6 +152,21 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if (meetingId) {
       fetchMeetings(meetingId).then((data) => {
+        console.log('=== 대시보드 백엔드 데이터 ===');
+        console.log('전체 데이터:', data);
+        console.log('프로젝트 정보:', data?.project);
+        console.log('회의 정보:', {
+          meeting_id: data?.meeting_id,
+          meeting_title: data?.meeting_title,
+          meeting_agenda: data?.meeting_agenda,
+          meeting_date: data?.meeting_date
+        });
+        console.log('회의 참석자들:', data?.meeting_users);
+        console.log('요약 로그:', data?.summary_log);
+        console.log('피드백 데이터:', data?.feedback);
+        console.log('작업 할당:', data?.task_assign_role);
+        console.log('============================');
+
         if (data) {
           setProject({ ...data.project, project_users: data.project_users });
 
@@ -174,6 +189,27 @@ const Dashboard: React.FC = () => {
 
           setProjectUser(extractedUsers);
           setSummaryLog(data.summary_log ?? null);
+          
+          // 피드백 데이터 상세 로그
+          if (data.feedback && Array.isArray(data.feedback)) {
+            console.log('=== 피드백 상세 분석 ===');
+            console.log('피드백 개수:', data.feedback.length);
+            data.feedback.forEach((feedback: any, index: number) => {
+              console.log(`피드백 ${index + 1}:`, {
+                feedbacktype_id: feedback.feedbacktype_id,
+                feedback_detail: feedback.feedback_detail,
+                type: typeof feedback.feedback_detail,
+                length: feedback.feedback_detail?.length || 0
+              });
+              
+              // 회의 시간 분석 데이터 특별 확인
+              if (feedback.feedbacktype_id === '0a5a835d-53d0-43a6-b821-7c36f603a071') {
+                console.log('🕐 회의 시간 분석 원본 텍스트:', feedback.feedback_detail);
+              }
+            });
+            console.log('======================');
+          }
+          
           setFeedback(data.feedback ?? []);
 
           const grouped: Record<string, Todo[]> = {};
@@ -454,6 +490,13 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container>
+      <style>
+        {`
+          #root > div > main > div > div > div:nth-child(4) > div.sc-jNkjTl.gyQyKm > div h3 {
+            color: #351745 !important;
+          }
+        `}
+      </style>
       <MainContent>
         <MeetingAnalysisHeader>
           <MeetingAnalysisTitle>회의 분석 결과 조회</MeetingAnalysisTitle>
@@ -868,9 +911,124 @@ const Dashboard: React.FC = () => {
                       <h3>{title}</h3>
                       {allDetails.length > 0 ? (
                         <ul>
-                          {allDetails.map((detail, idx) => (
-                            <li key={`${id}-${idx}`}>{detail}</li>
-                          ))}
+                          {allDetails.map((detail, idx) => {
+                            // 회의 시간 분석인 경우 특별 처리
+                            if (id === '0a5a835d-53d0-43a6-b821-7c36f603a071') {
+                                                            // 회의 시간 분석 파싱 - 각 섹션을 별도 항목으로 반환
+                              const parseTimeAnalysis = (text: string) => {
+                                const items: string[] = [];
+                                
+                                // | 기준으로 섹션 분리
+                                const sections = text.split('|').map(section => section.trim()).filter(section => section);
+                                
+                                sections.forEach(section => {
+                                  // 총 주제 수
+                                  if (section.startsWith('총 주제 수:')) {
+                                    const match = section.match(/총 주제 수:\s*(\d+)/);
+                                    if (match) {
+                                      items.push(`<strong>총 주제 수:</strong> ${match[1]}개`);
+                                    }
+                                  }
+                                  
+                                  // 주요 주제별 소요 시간
+                                  else if (section.startsWith('주요 주제별 소요 시간:')) {
+                                    let content = '<strong>주요 주제별 소요 시간:</strong>\n';
+                                    const timeContent = section.replace('주요 주제별 소요 시간:', '').trim();
+                                    
+                                    // 세미콜론으로 분리하여 각 항목 처리
+                                    const timeItems = timeContent.split(';').map(item => item.trim()).filter(item => item);
+                                    timeItems.forEach(item => {
+                                      if (item.includes(':') && item.includes('%')) {
+                                        content += `\t• ${item}\n`;
+                                      }
+                                    });
+                                    items.push(content.trim());
+                                  }
+                                  
+                                  // 주제 전환 빈도
+                                  else if (section.startsWith('주제 전환 빈도:')) {
+                                    const content = section.replace('주제 전환 빈도:', '').trim();
+                                    items.push(`<strong>주제 전환 빈도:</strong> ${content}`);
+                                  }
+                                  
+                                  // 주제별 편중
+                                  else if (section.startsWith('주제별 편중:')) {
+                                    const content = section.replace('주제별 편중:', '').trim();
+                                    items.push(`<strong>주제별 편중:</strong> ${content}`);
+                                  }
+                                  
+                                  // 효율 평가
+                                  else if (section.startsWith('효율 평가:')) {
+                                    let content = '<strong>효율 평가:</strong>\n';
+                                    const evalContent = section.replace('효율 평가:', '').trim();
+                                    
+                                    // 문장별로 분리하여 추가
+                                    const sentences = evalContent.split(/\.\s+/).filter(s => s.trim());
+                                    sentences.forEach(sentence => {
+                                      if (sentence.trim()) {
+                                        content += `\t${sentence.trim()}${sentence.endsWith('.') ? '' : '.'}\n`;
+                                      }
+                                    });
+                                    items.push(content.trim());
+                                  }
+                                });
+                                
+                                return items;
+                              };
+                              
+                              const parsedItems = parseTimeAnalysis(detail);
+                              
+                              return (
+                                <>
+                                  {parsedItems.map((item, itemIdx) => (
+                                    <li key={`${id}-${idx}-${itemIdx}`}>
+                                      {item.includes('\n') ? (
+                                        // 여러 줄인 경우 (주요 주제별 소요 시간, 효율 평가)
+                                        item.split('\n').map((line, lineIdx) => (
+                                          <div 
+                                            key={`${id}-${idx}-${itemIdx}-${lineIdx}`} 
+                                            style={{ marginBottom: '0.3rem' }}
+                                            dangerouslySetInnerHTML={{ __html: line }}
+                                          />
+                                        ))
+                                      ) : (
+                                        // 한 줄인 경우 (총 주제 수, 주제 전환 빈도, 주제별 편중)
+                                        <span dangerouslySetInnerHTML={{ __html: item }} />
+                                      )}
+                                    </li>
+                                  ))}
+                                </>
+                              );
+                            } else {
+                              // 다른 피드백 타입들은 기존 로직 사용
+                              const sentences = detail
+                                .split(/([.!?]\s+)/)
+                                .filter(sentence => sentence.trim() !== '')
+                                .reduce((acc: string[], curr, index, array) => {
+                                  if (index % 2 === 0) {
+                                    // 문장 부분
+                                    const nextPunctuation = array[index + 1] || '';
+                                    acc.push((curr + nextPunctuation).trim());
+                                  }
+                                  return acc;
+                                }, [] as string[])
+                                .filter(sentence => sentence.length > 1);
+
+                              return (
+                                <li key={`${id}-${idx}`}>
+                                  {sentences.length > 1 ? (
+                                    sentences.map((sentence, sentenceIdx) => (
+                                      <div key={`${id}-${idx}-${sentenceIdx}`} style={{ marginBottom: '0.5rem' }}>
+                                        {sentence}
+                                      </div>
+                                    ))
+                                  ) : (
+                                    detail
+                                  )}
+                                </li>
+                              );
+                            }
+                          })}
                         </ul>
                       ) : (
                         <ul>
