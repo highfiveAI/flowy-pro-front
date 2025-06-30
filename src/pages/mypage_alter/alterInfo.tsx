@@ -19,6 +19,11 @@ import {
 
 const AlterInfo: React.FC = () => {
   const [showChangeModal, setShowChangeModal] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: '',
+    description: <></>,
+    type: 'success' as 'success' | 'error'
+  });
   const [mypageUser, setMypageUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({
@@ -92,12 +97,45 @@ const AlterInfo: React.FC = () => {
 
       if (result && result.user) {
         setIsEditing(false);
-        alert('정보 변경 완료');
+        setModalContent({
+          title: '정보 변경이 완료되었습니다.',
+          description: (
+            <>
+              변경하신 정보가 성공적으로 저장되었습니다.
+              <br />
+              새로운 정보가 즉시 적용됩니다.
+            </>
+          ),
+          type: 'success'
+        });
+        setShowChangeModal(true);
       } else {
-        alert('정보 변경에 실패했습니다');
+        setModalContent({
+          title: '정보 변경에 실패했습니다',
+          description: (
+            <>
+              입력하신 정보를 다시 확인해주세요.
+              <br />
+              문제가 지속되면 관리자에게 문의하세요.
+            </>
+          ),
+          type: 'error'
+        });
+        setShowChangeModal(true);
       }
     } catch (e) {
-      alert('서버 오류가 발생했습니다');
+      setModalContent({
+        title: '서버 오류가 발생했습니다',
+        description: (
+          <>
+            일시적인 오류가 발생했습니다.
+            <br />
+            잠시 후 다시 시도해주세요.
+          </>
+        ),
+        type: 'error'
+      });
+      setShowChangeModal(true);
     }
   };
 
@@ -116,7 +154,6 @@ const AlterInfo: React.FC = () => {
 
   return (
     <AlterInfoWrapper>
-      <PageTitle>내 정보 확인</PageTitle>
       <FormArea>
         <Container>
           <FormContainer>
@@ -226,14 +263,9 @@ const AlterInfo: React.FC = () => {
       {showChangeModal && (
         <InfoChangeModal
           onClose={closeModal}
-          title="정보 변경이 완료되었습니다."
-          description={
-            <>
-              관리자의 확인 후 변경된 정보가 적용됩니다.
-              <br />
-              정보 변경 결과는 등록하신 이메일로 안내드립니다.
-            </>
-          }
+          title={modalContent.title}
+          description={modalContent.description}
+          type={modalContent.type}
         />
       )}
     </AlterInfoWrapper>
