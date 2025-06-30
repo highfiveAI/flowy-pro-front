@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
         <Menu>
           {!user || role === 'user' ? (
             <>
-              <MenuItem onClick={() => navigate('/')}>
+              <MenuItem onClick={() => navigate('/intro')}>
                 Flowy
               </MenuItem>
               <MenuItem onClick={() => navigate('/insert_info')}>
