@@ -3,9 +3,13 @@ import FileUpload from './FileUpload';
 import AttendInfo from './AttendInfo';
 import Loading from '../../components/Loading';
 import RecordInfoUpload from './RecordInfoUpload';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { ko } from 'date-fns/locale';
 import ResultContents from '../result/ResultContents';
+
+// 한국어 locale 등록
+registerLocale('ko', ko);
 import { useNavigate } from 'react-router-dom';
 import AddUserIcon from '/images/adduser.svg'; // adduser.svg 임포트
 import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg 임포트
@@ -296,19 +300,55 @@ const InsertConferenceInfo: React.FC = () => {
       );
       const data = await res.json();
       console.log('API 응답 데이터:', data); // 디버깅을 위한 로그
-      setProjectUsers(
-        data.users.map((u: any) => ({
-          user_id: u.user_id,
-          name: u.name,
-          email: u.email,
-          user_jobname: u.user_jobname,
-        }))
-      );
+      
+      const projectUsersData = data.users.map((u: any) => ({
+        user_id: u.user_id,
+        name: u.name,
+        email: u.email,
+        user_jobname: u.user_jobname,
+      }));
+      
+      setProjectUsers(projectUsersData);
+      
+      // 현재 로그인된 사용자를 기본 회의장으로 설정
+      if (user?.id) {
+        // 현재 사용자가 프로젝트 참가자 목록에 있는지 확인
+        const currentUserInProject = projectUsersData.find((u: any) => u.user_id === user.id);
+        if (currentUserInProject) {
+          setHostId(user.id);
+          setHostJobname(currentUserInProject.user_jobname || '회의장');
+        } else {
+          // 현재 사용자가 프로젝트 참가자 목록에 없다면 목록에 추가
+          const currentUserData = {
+            user_id: user.id,
+            name: user.name || '현재 사용자',
+            email: user.email || '',
+            user_jobname: '회의장'
+          };
+          setProjectUsers([...projectUsersData, currentUserData]);
+          setHostId(user.id);
+          setHostJobname('회의장');
+        }
+      }
+      
       setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]); // 항상 1개 이상 입력란 유지
     } catch (e) {
       console.error('프로젝트 사용자 정보를 가져오는데 실패했습니다:', e);
       setProjectUsers([]);
       setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+      
+      // 에러가 발생해도 현재 사용자는 회의장으로 설정
+      if (user?.id) {
+        const currentUserData = {
+          user_id: user.id,
+          name: user.name || '현재 사용자',
+          email: user.email || '',
+          user_jobname: '회의장'
+        };
+        setProjectUsers([currentUserData]);
+        setHostId(user.id);
+        setHostJobname('회의장');
+      }
     }
 
     // 기존 회의 불러오기 탭일 때 회의 목록도 불러오기
@@ -377,12 +417,13 @@ const InsertConferenceInfo: React.FC = () => {
     } else if (activeTab === 'new') {
       setProjectMeetings([]);
       setSelectedMeeting(null);
-      // 새 회의 만들기 탭으로 돌아갈 때 폼 초기화
+      // 새 회의 만들기 탭으로 돌아갈 때 폼 초기화 (회의장 정보는 유지)
       setSubject('');
       setAgenda('');
       setMeetingDate(null);
       setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
       setFile(null);
+      // hostId, hostJobname은 유지 (현재 사용자가 기본 회의장으로 계속 설정됨)
       // 프로젝트 선택 상태는 유지 (사용자가 다시 선택할 필요 없도록)
     }
   }, [activeTab]); // projectId 의존성 제거
@@ -506,13 +547,14 @@ const InsertConferenceInfo: React.FC = () => {
                   sortedProjects.map((proj, index) => (
                     <div key={index}>
                       <ProjectListItem
+                        className={projectId === proj.projectId ? 'selected' : ''}
                         onClick={() => {
                           handleProjectSelect(proj.projectId, proj.projectName);
                           toggleExpanded(index);
                         }}
                       >
                         <span className="name">
-                          {index + 1}. {proj.projectName}
+                          • {proj.projectName}
                         </span>
                         <EditIcon
                           onClick={(e) => {
@@ -522,9 +564,7 @@ const InsertConferenceInfo: React.FC = () => {
                         />
                         <span className="date">
                           {new Date(proj.projectCreatedDate)
-                            .toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' })
-                            .replace('T', ' ')
-                            .slice(0, 16)}
+                            .toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' })}
                         </span>
                       </ProjectListItem>
 
@@ -582,11 +622,9 @@ const InsertConferenceInfo: React.FC = () => {
                                         </div>
                                         <div className="meeting-date">
                                           {new Date(meeting.meeting_date)
-                                            .toLocaleString('sv-SE', {
+                                            .toLocaleDateString('sv-SE', {
                                               timeZone: 'Asia/Seoul',
-                                            })
-                                            .replace('T', ' ')
-                                            .slice(0, 16)}
+                                            })}
                                         </div>
                                         <div className="meeting-attendees">
                                           참석자:{' '}
@@ -677,10 +715,7 @@ const InsertConferenceInfo: React.FC = () => {
                           id="project-name"
                           value={projectName}
                           readOnly
-                          placeholder="프로젝트 목록에서 선택해주세요."
-                          onClick={() =>
-                            alert('프로젝트 목록중에서 선택해주세요')
-                          }
+                          placeholder=""
                         />
                       </FormGroup>
 
@@ -715,6 +750,12 @@ const InsertConferenceInfo: React.FC = () => {
                             dateFormat="yyyy-MM-dd HH:mm"
                             placeholderText="회의 일시를 선택하세요."
                             className="custom-datepicker"
+                            withPortal={true}
+                            calendarStartDay={0}
+                            locale="ko"
+                            showMonthDropdown={false}
+                            showYearDropdown={false}
+                            renderCustomHeader={undefined}
                           />
                         </DatePickerWrapper>
                       </FormGroup>
@@ -734,27 +775,18 @@ const InsertConferenceInfo: React.FC = () => {
 
                       {/* 참석자 */}
                       <FormGroup>
-                        <LabelButtonWrapper>
-                          <StyledLabel>
-                            회의 참석자 <span>*</span>
-                          </StyledLabel>
-                          <StyledAddAttendeeButton
-                            type="button"
-                            onClick={handleAddAttendee}
-                          >
-                            <img src={AddUserIcon} alt="참석자 추가" />
-                          </StyledAddAttendeeButton>
-                        </LabelButtonWrapper>
+                        <StyledLabel>
+                          회의 참석자 <span>*</span>
+                        </StyledLabel>
                         <AttendInfo
                           attendees={attendees}
                           setAttendees={setAttendees}
                           projectUsers={projectUsers}
                           hostId={hostId}
                           setHostId={setHostId}
-                          // hostEmail={hostEmail}
-                          // setHostEmail={setHostEmail}
                           hostJobname={hostJobname}
                           setHostJobname={setHostJobname}
+                          currentUser={user}
                         />
                       </FormGroup>
 
@@ -838,10 +870,7 @@ const InsertConferenceInfo: React.FC = () => {
                           id="project-name"
                           value={projectName}
                           readOnly
-                          placeholder="프로젝트 목록에서 선택해주세요."
-                          onClick={() =>
-                            alert('프로젝트 목록중에서 선택해주세요')
-                          }
+                          placeholder=""
                         />
                       </FormGroup>
                       <FormGroup>
@@ -872,6 +901,12 @@ const InsertConferenceInfo: React.FC = () => {
                             dateFormat="yyyy-MM-dd HH:mm"
                             placeholderText="회의 일시를 선택하세요."
                             className="custom-datepicker"
+                            withPortal={true}
+                            calendarStartDay={0}
+                            locale="ko"
+                            showMonthDropdown={false}
+                            showYearDropdown={false}
+                            renderCustomHeader={undefined}
                           />
                         </DatePickerWrapper>
                       </FormGroup>
@@ -887,27 +922,18 @@ const InsertConferenceInfo: React.FC = () => {
                         />
                       </FormGroup>
                       <FormGroup>
-                        <LabelButtonWrapper>
-                          <StyledLabel>
-                            회의 참석자 <span>*</span>
-                          </StyledLabel>
-                          <StyledAddAttendeeButton
-                            type="button"
-                            onClick={handleAddAttendee}
-                          >
-                            <img src={AddUserIcon} alt="참석자 추가" />
-                          </StyledAddAttendeeButton>
-                        </LabelButtonWrapper>
+                        <StyledLabel>
+                          회의 참석자 <span>*</span>
+                        </StyledLabel>
                         <AttendInfo
                           attendees={attendees}
                           setAttendees={setAttendees}
                           projectUsers={projectUsers}
                           hostId={hostId}
                           setHostId={setHostId}
-                          // hostEmail={hostEmail}
-                          // setHostEmail={setHostEmail}
                           hostJobname={hostJobname}
                           setHostJobname={setHostJobname}
+                          currentUser={user}
                         />
                       </FormGroup>
                       <FormGroup>

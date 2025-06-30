@@ -59,6 +59,9 @@ export const fetchUsersByCompany = async (
   company_id: string
 ): Promise<User[]> => {
   try {
+    console.log(`fetchUsersByCompany 호출 - company_id: ${company_id}`);
+    console.log(`API URL: ${import.meta.env.VITE_API_URL}/api/v1/admin/users/company/${company_id}`);
+    
     const response = await fetch(
       `${
         import.meta.env.VITE_API_URL
@@ -71,11 +74,40 @@ export const fetchUsersByCompany = async (
         },
       }
     );
-    if (!response.ok) throw new Error("사용자 목록을 가져오지 못했습니다.");
-    return await response.json();
+    
+    console.log(`응답 상태: ${response.status} ${response.statusText}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API 에러 응답:`, errorText);
+      
+      let errorMessage = "사용자 목록을 가져오지 못했습니다.";
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.detail) {
+          errorMessage = errorData.detail;
+        }
+      } catch (parseError) {
+        console.warn('에러 응답을 JSON으로 파싱할 수 없음:', parseError);
+      }
+      
+      throw new Error(`${response.status}: ${errorMessage}`);
+    }
+    
+    const data = await response.json();
+    console.log(`fetchUsersByCompany 성공 - 데이터:`, data);
+    
+    if (Array.isArray(data)) {
+      return data;
+    } else {
+      console.warn('응답 데이터가 배열이 아님:', data);
+      return [];
+    }
   } catch (error) {
     console.error("회사별 사용자 목록 요청 중 오류 발생:", error);
-    return [];
+    
+    // 에러를 다시 던져서 호출하는 쪽에서 처리할 수 있도록 함
+    throw error;
   }
 };
 
