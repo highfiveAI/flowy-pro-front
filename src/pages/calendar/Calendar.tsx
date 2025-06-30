@@ -576,7 +576,7 @@ export default function CalendarPage() {
               e.currentTarget.style.boxShadow = 'none';
             }}
             >
-              회의 {dayMeetings.length}개
+              회의 ({dayMeetings.length})
             </div>
           )}
           
@@ -612,7 +612,7 @@ export default function CalendarPage() {
               e.currentTarget.style.boxShadow = 'none';
             }}
             >
-              할일 {dayTodos.filter(t => t.completed).length}/{dayTodos.length}
+              할일 ({dayTodos.filter(t => t.completed).length}/{dayTodos.length})
             </div>
           )}
         </div>
@@ -640,7 +640,7 @@ export default function CalendarPage() {
               fontWeight: '600',
               color: '#6b21a8'
             }}>
-              회의 {getCurrentMonthCounts().meetings}개
+              회의 ({getCurrentMonthCounts().meetings})
             </div>
             <div style={{
               padding: '4px 12px', 
@@ -651,7 +651,7 @@ export default function CalendarPage() {
               fontWeight: '600',
               color: '#a16207'
             }}>
-              할일 {getCurrentMonthCounts().todos}개
+              할일 ({getCurrentMonthCounts().todos})
             </div>
           </div>
         </div>
@@ -758,7 +758,7 @@ export default function CalendarPage() {
           <h3 style={{ 
             margin: '0 0 12px 0', 
             fontSize: unscheduledOpen ? '1.1rem' : '1.5rem', 
-            color: '#2d1155', 
+            color: '#b45309', 
             textAlign: 'center',
             cursor: 'pointer',
             userSelect: 'none'
@@ -825,7 +825,7 @@ export default function CalendarPage() {
         <CalendarPop
           date={popupDate}
           todos={filteredEvents.filter((event) =>
-            event.type === 'todo' && event.start && isSameDay(new Date(event.start), popupDate)
+            event.type === 'todo' && event.end && isSameDay(new Date(event.end), popupDate)
           )}
           meetings={filteredEvents.filter((event) =>
             event.type === 'meeting' && event.start && isSameDay(new Date(event.start), popupDate)

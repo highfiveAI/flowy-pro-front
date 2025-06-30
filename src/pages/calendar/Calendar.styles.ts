@@ -588,7 +588,7 @@ export const TaskTitle = styled.span<{ completed: boolean }>`
   flex: 1;
   font-size: 0.875rem;
   font-weight: 500;
-  color: ${props => props.completed ? '#9ca3af' : '#374151'};
+  color: ${props => props.completed ? '#9ca3af' : '#1f2937'};
   text-decoration: ${props => props.completed ? 'line-through' : 'none'};
   line-height: 1.4;
 `;
