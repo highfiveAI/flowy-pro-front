@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FiChevronUp, FiChevronDown } from 'react-icons/fi';
+import { FiChevronUp, FiChevronDown, FiPlus } from 'react-icons/fi';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import NewPosition from './popup/newposition';
@@ -37,19 +37,18 @@ const PageHeader = styled.div`
 `;
 
 const CreateButton = styled.button`
-  padding: 16px 32px;
-  border-radius: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   border: none;
   background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
   color: white;
-  font-size: 16px;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 16px rgba(45, 17, 85, 0.2);
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
 
   &:hover {
     transform: translateY(-2px);
@@ -483,8 +482,8 @@ const AdminPosition: React.FC = () => {
       <MainContent>
         <PageHeader>
           <h1>직급 관리</h1>
-          <CreateButton onClick={handleCreatePosition}>
-            + 새 직급 등록
+          <CreateButton onClick={handleCreatePosition} title="새 직급 등록">
+            <FiPlus size={18} />
           </CreateButton>
         </PageHeader>
 

@@ -44,19 +44,18 @@ const HeaderActions = styled.div`
 `;
 
 const AddTemplateBtn = styled.button`
-  padding: 16px 32px;
-  border-radius: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   border: none;
   background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
   color: white;
-  font-size: 16px;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 16px rgba(45, 17, 85, 0.2);
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
 
   &:hover {
     transform: translateY(-2px);
@@ -794,10 +793,6 @@ const AdminTemplate: React.FC = () => {
         <PageHeader>
           <h1>템플릿 관리</h1>
           <HeaderActions>
-            <AddTemplateBtn onClick={() => setIsCreateModalOpen(true)}>
-              <FiPlus size={20} />
-              템플릿 추가하기
-            </AddTemplateBtn>
             <SearchContainer ref={searchContainerRef}>
               <SearchIconButton
                 className={isSearchExpanded ? 'active' : ''}
@@ -825,6 +820,9 @@ const AdminTemplate: React.FC = () => {
                 </ClearButton>
               )}
             </SearchContainer>
+            <AddTemplateBtn onClick={() => setIsCreateModalOpen(true)} title="템플릿 추가">
+              <FiPlus size={18} />
+            </AddTemplateBtn>
           </HeaderActions>
         </PageHeader>
 
