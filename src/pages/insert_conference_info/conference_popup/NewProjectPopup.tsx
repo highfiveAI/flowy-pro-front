@@ -37,6 +37,7 @@ import {
   UserManagementContainer,
   UserName,
   UserPanel,
+  PopupBody,
 } from './NewProjectPopup.styles';
 import { useAuth } from '../../../contexts/AuthContext';
 import { checkAuth } from '../../../api/fetchAuthCheck';
@@ -220,114 +221,114 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
     <PopupOverlay>
       <PopupContent>
         <PopupHeader>
-          <ProjectIcon src={AddProjectIcon2} alt="새 프로젝트 생성" />{' '}
-          {/* 아이콘을 AddProjectIcon2로 변경 */}
+          <ProjectIcon src={AddProjectIcon2} alt="새 프로젝트 생성" />
           <PopupTitle>새 프로젝트 생성하기</PopupTitle>
-          {/* <CloseButton onClick={onClose}>×</CloseButton> */}
+          <CloseButton onClick={onClose}>×</CloseButton>
         </PopupHeader>
-        <CloseButton onClick={onClose}>×</CloseButton>
 
-        <FormGroup>
-          <StyledLabel htmlFor="new-project-name">프로젝트명</StyledLabel>
-          <StyledInput
-            type="text"
-            id="new-project-name"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            placeholder="프로젝트명을 입력해주세요."
-          />
-        </FormGroup>
-        <FormGroup>
-          <StyledLabel htmlFor="project-attendees">
-            프로젝트 참여자 선택
-          </StyledLabel>
-          <UserManagementContainer>
-            <UserPanel>
-              <SearchContainer>
-                <SearchInput
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="사용자 검색"
-                />
-              </SearchContainer>
+        <PopupBody>
+          <FormGroup>
+            <StyledLabel htmlFor="new-project-name">프로젝트명</StyledLabel>
+            <StyledInput
+              type="text"
+              id="new-project-name"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              placeholder="프로젝트명을 입력해주세요"
+            />
+          </FormGroup>
+          <FormGroup>
+            <StyledLabel htmlFor="project-attendees">
+              프로젝트 참여자 선택
+            </StyledLabel>
+            <UserManagementContainer>
+              <UserPanel>
+                <SearchContainer>
+                  <SearchInput
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="사용자 검색"
+                  />
+                </SearchContainer>
 
-              {searchTerm.trim() ? (
-                <SearchResultsContainer>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user) => (
-                      <SearchResultItem
-                        key={user.user_id}
-                        onClick={() => handleSelectUser(user)}
-                      >
-                        <UserName>{user.user_name}</UserName>
-                        <AddButton>+</AddButton>
-                      </SearchResultItem>
-                    ))
-                  ) : (
-                    <NoResultsMessage>검색 결과가 없습니다.</NoResultsMessage>
-                  )}
-                </SearchResultsContainer>
-              ) : (
-                <UserListBox>
-                  {projectUsers
-                    .filter(
-                      (user) =>
-                        !selectedProjectUsers.some(
-                          (selected) => selected.user_id === user.user_id
-                        )
-                    )
-                    .map((user) => (
-                      <UserItem key={user.user_id}>
-                        <span>{user.user_name}</span>
-                        <AddButton onClick={() => handleSelectUser(user)}>
-                          +
-                        </AddButton>
-                      </UserItem>
-                    ))}
-                </UserListBox>
-              )}
-            </UserPanel>
-            <UserPanel>
-              <SelectedUsersContainer>
-                <SelectedUsersTitle>
-                  선택된 참여자 ({selectedProjectUsers.length}명)
-                </SelectedUsersTitle>
-                <TagsContainer>
-                  {selectedProjectUsers.length > 0 ? (
-                    selectedProjectUsers.map((selectedUser) => (
-                      <SelectedUserItem key={selectedUser.user_id}>
-                        <UserName>{selectedUser.user_name}</UserName>
-                        {selectedUser.user_id !== user?.id && (
-                          <RemoveButton
-                            onClick={() => handleDeselectUser(selectedUser)}
-                          >
-                            ×
-                          </RemoveButton>
-                        )}
-                      </SelectedUserItem>
-                    ))
-                  ) : (
-                    <NoResultsMessage>참여자를 추가해주세요.</NoResultsMessage>
-                  )}
-                </TagsContainer>
-              </SelectedUsersContainer>
-            </UserPanel>
-          </UserManagementContainer>
-        </FormGroup>
-        <FormGroup>
-          <StyledLabel htmlFor="project-details">프로젝트 설명</StyledLabel>
-          <StyledTextarea
-            id="project-details"
-            value={projectDetails}
-            onChange={(e) => setProjectDetails(e.target.value)}
-            placeholder="프로젝트에 대한 설명을 입력해주세요."
-          />
-        </FormGroup>
-        {errorMessage && <ErrorMessageBox>{errorMessage}</ErrorMessageBox>}
-        <CreateProjectButton onClick={() => handleCreateProject()}>
-          프로젝트 생성
-        </CreateProjectButton>
+                {searchTerm.trim() ? (
+                  <SearchResultsContainer>
+                    {filteredUsers.length > 0 ? (
+                      filteredUsers.map((user) => (
+                        <SearchResultItem
+                          key={user.user_id}
+                          onClick={() => handleSelectUser(user)}
+                        >
+                          <UserName>{user.user_name}</UserName>
+                          <AddButton>+</AddButton>
+                        </SearchResultItem>
+                      ))
+                    ) : (
+                      <NoResultsMessage>검색 결과가 없습니다.</NoResultsMessage>
+                    )}
+                  </SearchResultsContainer>
+                ) : (
+                  <UserListBox>
+                    {projectUsers
+                      .filter(
+                        (user) =>
+                          !selectedProjectUsers.some(
+                            (selected) => selected.user_id === user.user_id
+                          )
+                      )
+                      .map((user) => (
+                        <UserItem key={user.user_id}>
+                          <span>{user.user_name}</span>
+                          <AddButton onClick={() => handleSelectUser(user)}>
+                            +
+                          </AddButton>
+                        </UserItem>
+                      ))}
+                  </UserListBox>
+                )}
+              </UserPanel>
+              <UserPanel>
+                <SelectedUsersContainer>
+                  <SelectedUsersTitle>
+                    선택된 참여자 ({selectedProjectUsers.length}명)
+                  </SelectedUsersTitle>
+                  <TagsContainer>
+                    {selectedProjectUsers.length > 0 ? (
+                      selectedProjectUsers.map((selectedUser) => (
+                        <SelectedUserItem key={selectedUser.user_id}>
+                          <UserName>{selectedUser.user_name}</UserName>
+                          {selectedUser.user_id !== user?.id && (
+                            <RemoveButton
+                              onClick={() => handleDeselectUser(selectedUser)}
+                            >
+                              ×
+                            </RemoveButton>
+                          )}
+                        </SelectedUserItem>
+                      ))
+                    ) : (
+                      <NoResultsMessage>참여자를 추가해주세요.</NoResultsMessage>
+                    )}
+                  </TagsContainer>
+                </SelectedUsersContainer>
+              </UserPanel>
+            </UserManagementContainer>
+          </FormGroup>
+          <FormGroup>
+            <StyledLabel htmlFor="project-details">프로젝트 설명</StyledLabel>
+            <StyledTextarea
+              id="project-details"
+              value={projectDetails}
+              onChange={(e) => setProjectDetails(e.target.value)}
+              placeholder="프로젝트에 대한 설명을 입력해주세요"
+            />
+          </FormGroup>
+          {errorMessage && <ErrorMessageBox>{errorMessage}</ErrorMessageBox>}
+          <CreateProjectButton onClick={() => handleCreateProject()}>
+            프로젝트 생성
+          </CreateProjectButton>
+        </PopupBody>
       </PopupContent>
     </PopupOverlay>
   );
