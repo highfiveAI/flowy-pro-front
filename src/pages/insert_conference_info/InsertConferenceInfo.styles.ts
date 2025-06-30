@@ -385,7 +385,7 @@ export const NewProjectWrapper = styled.div`
   border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: transparent;
-  
+
   img {
     width: 24px;
     height: 24px;

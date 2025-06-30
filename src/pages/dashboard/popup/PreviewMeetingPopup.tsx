@@ -105,7 +105,7 @@ const Button = styled.button<{ variant?: 'primary' | 'danger' | 'secondary' }>`
     switch (props.variant) {
       case 'primary':
         return `
-          background-color: #351745;
+          background: linear-gradient(135deg, #351745 0%, #4a1168 100%);
           color: white;
           &:hover { background-color: #2a1236; }
         `;

@@ -791,9 +791,6 @@ export default function CalendarPage() {
                   <EmptyTitle>
                     {searchTerm ? '조건에 맞는 할일이 없습니다' : '일정 미정 할일이 없습니다'}
                   </EmptyTitle>
-                  <EmptyDescription>
-                    {searchTerm ? '다른 조건으로 검색해보세요' : '새로운 할일을 추가해보세요'}
-                  </EmptyDescription>
                 </EmptyState>
               )}
             </TaskList>

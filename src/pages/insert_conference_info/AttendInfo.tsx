@@ -82,7 +82,7 @@ const SearchInput = styled.input`
     border-color: #351745;
     box-shadow: 0 0 0 2px rgba(53, 23, 69, 0.1);
   }
-  
+
   &::placeholder {
     color: rgba(53, 23, 69, 0.6);
   }
@@ -140,7 +140,7 @@ const UserCard = styled.div<{ $selected: boolean; $isHost: boolean }>`
     props.$isHost ? 'rgba(72, 11, 106, 0.05)' : 
     props.$selected ? 'rgba(53, 23, 69, 0.05)' : 'white'
   };
-  
+
   &:hover {
     border-color: ${props => 
       props.$isHost ? '#480b6a' : '#351745'
@@ -262,7 +262,7 @@ const QuickButton = styled.button`
   transition: all 0.2s ease;
   
   &:hover {
-    background: #351745;
+    background: linear-gradient(135deg, #351745 0%, #4a1168 100%);
     color: white;
     transform: translateY(-1px);
     box-shadow: 0 2px 6px rgba(53, 23, 69, 0.2);
@@ -374,11 +374,11 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
            <SearchBox>
              <SearchIcon />
              <SearchInput
-               type="text"
+          type="text"
                placeholder="이름 또는 이메일로 검색..."
                value={searchTerm}
                onChange={(e) => setSearchTerm(e.target.value)}
-             />
+        />
            </SearchBox>
 
            <QuickActions>
@@ -414,12 +414,12 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
                 </div>
                 <UserInfo>
                   <UserNameEmail>
-                    {user.name}
+                  {user.name}
                     {isHost && <Crown size={16} color="#480b6a" />}
                     <UserEmailSpan>/ {user.email}</UserEmailSpan>
                   </UserNameEmail>
                   <UserRole
-                    type="text"
+            type="text"
                     placeholder="역할 입력"
                     value={currentRole}
                     onChange={(e) => handleRoleChange(user.user_id, e.target.value)}

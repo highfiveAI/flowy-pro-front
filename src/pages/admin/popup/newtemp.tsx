@@ -136,7 +136,7 @@ const Button = styled.button`
   border: none;
   transition: background 0.18s;
   cursor: pointer;
-  &:hover { background: #351745; }
+  &:hover { background: linear-gradient(135deg, #351745 0%, #4a1168 100%); }
 `;
 
 interface NewTemplateModalProps {

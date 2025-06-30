@@ -486,7 +486,7 @@ const SearchIconButton = styled.button`
   }
 
   &.active {
-    background: #2d1155;
+    background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
     border-color: #2d1155;
     color: white;
   }
@@ -593,7 +593,7 @@ const PageButton = styled.button<{ $active?: boolean }>`
   height: 40px;
   border-radius: 12px;
   border: 1px solid ${props => props.$active ? '#2d1155' : '#e5e7eb'};
-  background: ${props => props.$active ? '#2d1155' : 'white'};
+  background: ${props => props.$active ? 'linear-gradient(135deg, #2d1155 0%, #4b2067 100%)' : 'white'};
   color: ${props => props.$active ? 'white' : '#6b7280'};
   font-size: 0.875rem;
   font-weight: 500;
@@ -604,7 +604,7 @@ const PageButton = styled.button<{ $active?: boolean }>`
   justify-content: center;
 
   &:hover:not(:disabled) {
-    background: ${props => props.$active ? '#351745' : '#f9fafb'};
+    background: ${props => props.$active ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#f9fafb'};
     border-color: ${props => props.$active ? '#351745' : '#d1d5db'};
   }
 

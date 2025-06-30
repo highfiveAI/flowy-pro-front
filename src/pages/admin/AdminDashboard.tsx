@@ -32,15 +32,47 @@ import type {
 
 const DashboardContainer = styled.div`
   padding: 40px;
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
   min-height: 100vh;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(135deg, 
+      rgba(53, 23, 69, 0.05) 0%,
+      rgba(53, 23, 69, 0.02) 30%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
 `;
 
 const PageTitle = styled.h1`
   font-size: 32px;
-  font-weight: 600;
-  color: #351745;
+  font-weight: 700;
+  background: linear-gradient(135deg, #351745 0%, #4a1168 50%, #351745 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, #351745 0%, #4a1168 100%);
+    border-radius: 2px;
+  }
 `;
 
 const TabContainer = styled.div`
@@ -51,7 +83,7 @@ const TabContainer = styled.div`
 
 const Tab = styled.button<{ $isActive?: boolean }>`
   padding: 8px 16px;
-  background: ${(props) => (props.$isActive ? '#351745' : '#f5f5f5')};
+  background: ${(props) => (props.$isActive ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#f5f5f5')};
   color: ${(props) => (props.$isActive ? '#fff' : '#666')};
   border: none;
   cursor: pointer;
@@ -67,7 +99,7 @@ const Tab = styled.button<{ $isActive?: boolean }>`
   }
 
   &:hover {
-    background: ${(props) => (props.$isActive ? '#351745' : '#e0e0e0')};
+    background: ${(props) => (props.$isActive ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#e0e0e0')};
   }
 `;
 
@@ -400,7 +432,7 @@ const CustomCheckbox = styled.div<{ $isChecked?: boolean }>`
   height: 16px;
   border: 2px solid ${props => props.$isChecked ? '#351745' : '#ccc'};
   border-radius: 3px;
-  background: ${props => props.$isChecked ? '#351745' : '#fff'};
+  background: ${props => props.$isChecked ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#fff'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -602,11 +634,11 @@ const ModalButton = styled.button<{ $isPrimary?: boolean }>`
   ${(props) =>
     props.$isPrimary
       ? `
-    background: #351745;
+    background: linear-gradient(135deg, #351745 0%, #4a1168 100%);
     color: white;
     
     &:hover {
-      background: #4a1168;
+      background: linear-gradient(135deg, #4a1168 0%, #5d2b7a 100%);
     }
   `
       : `
