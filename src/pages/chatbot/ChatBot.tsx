@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
-import { sendChatMessage } from "../../api/fetchChatbot";
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { sendChatMessage } from '../../api/fetchChatbot';
 
 const Container = styled.div`
   max-width: 400px;
@@ -74,7 +74,7 @@ const Messages = styled.div`
 `;
 
 const MessageBubble = styled.div<{ isUser?: boolean }>`
-  background: ${({ isUser }) => (isUser ? "#d0ebff" : "#ffffff")};
+  background: ${({ isUser }) => (isUser ? '#d0ebff' : '#ffffff')};
   color: #333;
   padding: 12px 16px;
   border-radius: 12px;
@@ -86,21 +86,21 @@ const MessageBubble = styled.div<{ isUser?: boolean }>`
 
   display: inline-block;
 
-  align-self: ${({ isUser }) => (isUser ? "flex-end" : "flex-start")};
-  margin-left: ${({ isUser }) => (isUser ? "auto" : "0")};
+  align-self: ${({ isUser }) => (isUser ? 'flex-end' : 'flex-start')};
+  margin-left: ${({ isUser }) => (isUser ? 'auto' : '0')};
 
-  text-align: ${({ isUser }) => (isUser ? "right" : "left")};
+  text-align: ${({ isUser }) => (isUser ? 'right' : 'left')};
 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-  border-bottom-right-radius: ${({ isUser }) => (isUser ? "0" : "12px")};
-  border-bottom-left-radius: ${({ isUser }) => (isUser ? "12px" : "0")};
+  border-bottom-right-radius: ${({ isUser }) => (isUser ? '0' : '12px')};
+  border-bottom-left-radius: ${({ isUser }) => (isUser ? '12px' : '0')};
 `;
 
 // ... types
 
 type Message = {
-  sender: "user" | "bot";
+  sender: 'user' | 'bot';
   text?: string;
   doc?: string;
   link?: string;
@@ -131,14 +131,14 @@ const LoadingDots: React.FC = () => {
 
   return (
     <DotWrapper>
-      {Array.from({ length: 3 }, (_, i) => (i < count ? "." : " "))}
+      {Array.from({ length: 3 }, (_, i) => (i < count ? '.' : ' '))}
     </DotWrapper>
   );
 };
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -146,37 +146,48 @@ const Chatbot: React.FC = () => {
     if (!input.trim() || loading) return;
 
     // 유저 메시지 추가
-    const userMsg: Message = { sender: "user", text: input };
+    const userMsg: Message = { sender: 'user', text: input };
     setMessages((prev) => [...prev, userMsg]);
-    setInput("");
+    setInput('');
 
     // 로딩 메시지 추가
-    const loadingMsg: Message = { sender: "bot", loading: true };
+    const loadingMsg: Message = { sender: 'bot', loading: true };
     setMessages((prev) => [...prev, loadingMsg]);
     setLoading(true);
 
     try {
       const res = await sendChatMessage(input);
-      const cleaned = res.replace(/```json\n?/, "").replace(/\n?```$/, "");
+      const cleaned = res.replace(/```json\n?/, '').replace(/\n?```$/, '');
       const parsed = JSON.parse(cleaned);
       const result = parsed.results?.[0];
+      const summary = parsed.llm_summary || '';
 
-      if (!result) throw new Error("결과가 비어 있습니다.");
+      let botMsg: Message;
 
-      const doc = result.document || "문서 없음";
-      let link = result.metadata?.link || "";
-      const summary = parsed.llm_summary || "";
+      if (result) {
+        const doc = result.document || '문서 없음';
+        let link = result.metadata?.link || '';
 
-      if (link.startsWith("http:") && !link.startsWith("http://")) {
-        link = link.replace(/^http:/, "http://");
+        if (link.startsWith('http:') && !link.startsWith('http://')) {
+          link = link.replace(/^http:/, 'http://');
+        }
+
+        botMsg = {
+          sender: 'bot',
+          doc,
+          link,
+          summary,
+        };
+      } else if (summary) {
+        // 🔸 결과는 없지만 요약이 존재하는 경우
+        botMsg = {
+          sender: 'bot',
+          summary,
+        };
+      } else {
+        // 🔸 아무것도 없을 경우
+        throw new Error('결과가 완전히 비어 있습니다.');
       }
-
-      const botMsg: Message = {
-        sender: "bot",
-        doc,
-        link,
-        summary,
-      };
 
       // 로딩 메시지 제거 후 봇 메시지 추가
       setMessages((prev) => {
@@ -184,14 +195,14 @@ const Chatbot: React.FC = () => {
         return [...filtered, botMsg];
       });
     } catch (err) {
-      console.error("에러 발생:", err);
+      console.error('에러 발생:', err);
       setMessages((prev) => {
         const filtered = prev.filter((m) => !m.loading);
         return [
           ...filtered,
           {
-            sender: "bot",
-            text: "❗ 결과를 이해하지 못했어요. JSON 파싱에 실패했거나 예상치 못한 형식이에요.",
+            sender: 'bot',
+            text: '❗ 결과를 이해하지 못했어요. JSON 파싱에 실패했거나 예상치 못한 형식이에요.',
           },
         ];
       });
@@ -204,13 +215,13 @@ const Chatbot: React.FC = () => {
     <Container>
       <Messages>
         {messages.map((msg, idx) => {
-          const isUser = msg.sender === "user";
+          const isUser = msg.sender === 'user';
 
           // 로딩 메시지일 경우 점 애니메이션 표시
           if (msg.loading) {
             return (
               <MessageBubble key={idx} isUser={false}>
-                🕐 응답 중 <LoadingDots />
+                챗봇 응답 중 <LoadingDots />
               </MessageBubble>
             );
           }
@@ -224,7 +235,7 @@ const Chatbot: React.FC = () => {
                   {msg.doc && <div>📄 안내: {msg.doc}</div>}
                   {msg.summary && <div>📝 챗봇 응답: {msg.summary}</div>}
                   {msg.link && (
-                    <LinkButton onClick={() => window.open(msg.link, "_blank")}>
+                    <LinkButton onClick={() => window.open(msg.link, '_blank')}>
                       링크 열기
                     </LinkButton>
                   )}
@@ -243,7 +254,7 @@ const Chatbot: React.FC = () => {
           disabled={loading}
         />
         <SendButton type="submit" disabled={loading}>
-          {loading ? "전송 중..." : "전송"}
+          {loading ? '전송 중...' : '전송'}
         </SendButton>
       </InputArea>
     </Container>
