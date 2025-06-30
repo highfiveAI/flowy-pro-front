@@ -1,102 +1,162 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { FiChevronUp, FiChevronDown } from 'react-icons/fi';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import NewPosition from './popup/newposition';
+import EditPosition from './popup/editposition';
 
-// 스타일 컴포넌트 재사용
 const Container = styled.div`
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  background-color: #f7f7f7;
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 40px 20px;
 `;
 
 const MainContent = styled.div`
-  flex: 1;
-  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
 `;
 
-const Table = styled.table`
+const PageHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d1155;
+    margin: 0;
+    background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+`;
+
+const CreateButton = styled.button`
+  padding: 16px 32px;
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(45, 17, 85, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(45, 17, 85, 0.3);
+    background: linear-gradient(135deg, #351745 0%, #5d2b7a 100%);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const TableContainer = styled.div`
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+  margin-bottom: 30px;
+`;
+
+const PositionTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  margin-bottom: 2rem;
-
+  background: transparent;
   font-size: 1.05rem;
 
   th,
   td {
-    padding: 1rem;
+    padding: 20px 24px;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ececec;
+    font-size: 1.05rem;
+    color: #222;
+    font-weight: 400;
   }
 
   th {
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    color: #351745;
     font-weight: 600;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 1.08rem;
+    letter-spacing: -0.5px;
   }
 
-  td {
-    color: #5e5553;
-    border-bottom: 1.5px solid #eee;
-    background: #fff;
-  }
-
-  tr {
-    transition: all 0.2s ease;
+  tbody tr {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-
+    border-bottom: 1px solid #f1f5f9;
+    
     &:hover {
-      background-color: #f8f5ff;
-      transform: scale(1.01);
-      box-shadow: 0 2px 8px rgba(80, 0, 80, 0.1);
+      background: linear-gradient(135deg, #fefbff 0%, #f8f5ff 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(53, 23, 69, 0.08);
     }
-
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
     /* 선택된 상태 */
     &.selected {
-      background-color: #e5e0ee;
+      background: linear-gradient(135deg, #f0ebf8 0%, #e5e0ee 100%);
       border-left: 4px solid #4b2067;
     }
-
+    
     &.selected:hover {
-      background-color: #d4c7e8;
+      background: linear-gradient(135deg, #e5e0ee 0%, #d4c7e8 100%);
     }
-  }
-
-  tr:last-child td {
-    border-bottom: none;
   }
 `;
 
-const Form = styled.form`
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+const SortableHeader = styled.th`
+  text-align: left;
+  font-size: 1.08rem;
+  color: #351745;
+  font-weight: 600;
+  padding: 20px 24px;
+  border-bottom: 2px solid #e5e7eb;
+  position: relative;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+
+  &:hover {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  }
 `;
 
-const FormGroup = styled.div`
-  margin-bottom: 1rem;
-
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
+const SortIconContainer = styled.span`
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 8px;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  
+  &.active {
+    opacity: 1;
+    color: #2d1155;
   }
-
-  input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-
-    &:focus {
-      outline: none;
-      border-color: #007bff;
-    }
+  
+  &.inactive {
+    opacity: 0.2;
   }
 `;
 
@@ -113,155 +173,19 @@ interface Company {
   company_name: string;
 }
 
-const PageHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-
-  h1 {
-    font-size: 1.5rem;
-    color: #333;
-  }
-`;
-
-const CreateButton = styled.button`
-  padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-const Modal = styled.div<{ $isOpen: boolean }>`
-  display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-
-  h2 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #4b2067;
-    transform: scale(1.1);
-    box-shadow: 0 4px 16px rgba(80, 0, 80, 0.2);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-`;
-
-// 정렬 방향을 위한 타입
 type SortDirection = 'asc' | 'desc' | null;
 
-// 정렬 상태를 위한 인터페이스
 interface SortState {
   field: string;
   direction: SortDirection;
 }
 
-// 테이블 헤더 스타일 컴포넌트
-const TableHeader = styled.th`
-  background-color: #f8fafc;
-  color: #64748b;
-  font-weight: 500;
-  white-space: nowrap;
-  padding: 1rem;
-  text-align: left;
-  cursor: pointer;
-  user-select: none;
-  position: relative;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: #f1f5f9;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const SortIcon = styled.span<{ $direction: SortDirection }>`
-  display: inline-block;
-  margin-left: 4px;
-  vertical-align: middle;
-
-  &::before,
-  &::after {
-    content: '';
-    display: block;
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-  }
-
-  &::before {
-    border-bottom: 4px solid
-      ${(props) => (props.$direction === 'asc' ? '#2563eb' : '#cbd5e1')};
-    margin-bottom: 2px;
-  }
-
-  &::after {
-    border-top: 4px solid
-      ${(props) => (props.$direction === 'desc' ? '#2563eb' : '#cbd5e1')};
-  }
-`;
-
 const AdminPosition: React.FC = () => {
   const [positions, setPositions] = useState<Position[]>([]);
-  const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(
-    null
-  );
+  const [currentUserCompany, setCurrentUserCompany] = useState<Company | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedPositionId, setSelectedPositionId] = useState<string | null>(
-    null
-  );
+  const [selectedPositionId, setSelectedPositionId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     position_company_id: '',
     position_code: '',
@@ -439,9 +363,7 @@ const AdminPosition: React.FC = () => {
     if (window.confirm('정말로 이 직급을 삭제하시겠습니까?')) {
       try {
         const response = await fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/api/v1/admin/positions/${positionId}`,
+          `${import.meta.env.VITE_API_URL}/api/v1/admin/positions/${positionId}`,
           {
             method: 'DELETE',
             credentials: 'include',
@@ -482,7 +404,7 @@ const AdminPosition: React.FC = () => {
     }));
   };
 
-  // 정렬된 직급 목록 계산 (회사별 필터링 제거)
+  // 정렬된 직급 목록 계산
   const sortedPositions = useMemo(() => {
     let sorted = [...positions];
     if (sortState.direction !== null) {
@@ -497,213 +419,132 @@ const AdminPosition: React.FC = () => {
     return sorted;
   }, [positions, sortState]);
 
+  // 정렬 아이콘 렌더링 함수
+  const renderSortIcons = (field: string) => {
+    const isActive = sortState.field === field;
+    const direction = isActive ? sortState.direction : null;
+
+    return (
+      <SortIconContainer className={isActive ? 'active' : 'inactive'}>
+        <FiChevronUp
+          size={12}
+          style={{
+            color: direction === 'asc' ? '#2d1155' : '#9ca3af',
+            marginBottom: '-2px',
+          }}
+        />
+        <FiChevronDown
+          size={12}
+          style={{
+            color: direction === 'desc' ? '#2d1155' : '#9ca3af',
+            marginTop: '-2px',
+          }}
+        />
+      </SortIconContainer>
+    );
+  };
+
+  // 새 직급 등록 핸들러
+  const handleCreatePosition = () => {
+    setFormData({
+      position_company_id: '',
+      position_code: '',
+      position_name: '',
+      position_detail: '',
+    });
+    setIsCreateModalOpen(true);
+  };
+
+  // 수정 모달 닫기 핸들러
+  const handleEditClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedPositionId(null);
+  };
+
+  // 수정 제출 핸들러
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedPositionId) {
+      handleUpdate(selectedPositionId);
+    }
+  };
+
+  // 삭제 핸들러
+  const handleEditDelete = () => {
+    if (selectedPositionId) {
+      handleDelete(selectedPositionId);
+      setIsEditModalOpen(false);
+      setSelectedPositionId(null);
+    }
+  };
+
   return (
     <Container>
       <MainContent>
         <PageHeader>
           <h1>직급 관리</h1>
-          <CreateButton onClick={() => setIsCreateModalOpen(true)}>
+          <CreateButton onClick={handleCreatePosition}>
             + 새 직급 등록
           </CreateButton>
         </PageHeader>
 
-        <Table>
-          <thead>
-            <tr>
-              <TableHeader onClick={() => handleSort('position_code')}>
-                직급 코드
-                <SortIcon
-                  $direction={
-                    sortState.field === 'position_code'
-                      ? sortState.direction
-                      : null
-                  }
-                />
-              </TableHeader>
-              <TableHeader onClick={() => handleSort('position_name')}>
-                직급명
-                <SortIcon
-                  $direction={
-                    sortState.field === 'position_name'
-                      ? sortState.direction
-                      : null
-                  }
-                />
-              </TableHeader>
-              <TableHeader onClick={() => handleSort('position_detail')}>
-                레벨
-                <SortIcon
-                  $direction={
-                    sortState.field === 'position_detail'
-                      ? sortState.direction
-                      : null
-                  }
-                />
-              </TableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedPositions.map((position) => (
-              <tr
-                key={position.position_id}
-                onClick={() => handleRowClick(position)}
-                className={
-                  selectedPositionId === position.position_id ? 'selected' : ''
-                }
-              >
-                <td>{position.position_code}</td>
-                <td>{position.position_name}</td>
-                <td>{position.position_detail}</td>
+        <TableContainer>
+          <PositionTable>
+            <thead>
+              <tr>
+                <SortableHeader onClick={() => handleSort('position_code')}>
+                  직급 코드
+                  {renderSortIcons('position_code')}
+                </SortableHeader>
+                <SortableHeader onClick={() => handleSort('position_name')}>
+                  직급명
+                  {renderSortIcons('position_name')}
+                </SortableHeader>
+                <SortableHeader onClick={() => handleSort('position_detail')}>
+                  설명
+                  {renderSortIcons('position_detail')}
+                </SortableHeader>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-
-        {/* 생성 모달 */}
-        <Modal $isOpen={isCreateModalOpen}>
-          <ModalContent>
-            <ModalHeader>
-              <h2>새 직급 등록</h2>
-              <CloseButton onClick={() => setIsCreateModalOpen(false)}>
-                ×
-              </CloseButton>
-            </ModalHeader>
-            <Form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit(e);
-                setIsCreateModalOpen(false);
-              }}
-            >
-              <FormGroup>
-                <label>직급 코드</label>
-                <input
-                  type="text"
-                  name="position_code"
-                  value={formData.position_code}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>직급명</label>
-                <input
-                  type="text"
-                  name="position_name"
-                  value={formData.position_name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>레벨</label>
-                <input
-                  type="text"
-                  name="position_detail"
-                  value={formData.position_detail}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <Button type="submit">등록</Button>
-                <Button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
+            </thead>
+            <tbody>
+              {sortedPositions.map((position) => (
+                <tr
+                  key={position.position_id}
+                  onClick={() => handleRowClick(position)}
+                  className={
+                    selectedPositionId === position.position_id ? 'selected' : ''
+                  }
                 >
-                  취소
-                </Button>
-              </div>
-            </Form>
-          </ModalContent>
-        </Modal>
+                  <td>{position.position_code}</td>
+                  <td>{position.position_name}</td>
+                  <td>{position.position_detail}</td>
+                </tr>
+              ))}
+            </tbody>
+          </PositionTable>
+        </TableContainer>
 
-        {/* 수정 모달 */}
-        <Modal $isOpen={isEditModalOpen}>
-          <ModalContent>
-            <ModalHeader>
-              <h2>직급 정보 수정</h2>
-              <CloseButton onClick={() => setIsEditModalOpen(false)}>
-                ×
-              </CloseButton>
-            </ModalHeader>
-            <Form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (selectedPositionId) {
-                  handleUpdate(selectedPositionId);
-                  setIsEditModalOpen(false);
-                }
-              }}
-            >
-              <FormGroup>
-                <label>직급 코드</label>
-                <input
-                  type="text"
-                  name="position_code"
-                  value={formData.position_code}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>직급명</label>
-                <input
-                  type="text"
-                  name="position_name"
-                  value={formData.position_name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <label>레벨</label>
-                <input
-                  type="text"
-                  name="position_detail"
-                  value={formData.position_detail}
-                  onChange={handleInputChange}
-                  required
-                />
-              </FormGroup>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <Button type="submit">수정</Button>
-                <Button
-                  type="button"
-                  variant="danger"
-                  onClick={() => {
-                    if (selectedPositionId) {
-                      handleDelete(selectedPositionId);
-                      setIsEditModalOpen(false);
-                    }
-                  }}
-                >
-                  삭제
-                </Button>
-                <Button type="button" onClick={() => setIsEditModalOpen(false)}>
-                  취소
-                </Button>
-              </div>
-            </Form>
-          </ModalContent>
-        </Modal>
+        {/* 새 직급 등록 모달 */}
+        <NewPosition
+          isOpen={isCreateModalOpen}
+          formData={formData}
+          onChange={handleInputChange}
+          onSubmit={handleSubmit}
+          onClose={() => setIsCreateModalOpen(false)}
+        />
+
+        {/* 직급 수정 모달 */}
+        <EditPosition
+          visible={isEditModalOpen}
+          onClose={handleEditClose}
+          onSubmit={handleEditSubmit}
+          onDelete={handleEditDelete}
+          formData={formData}
+          onChange={handleInputChange}
+        />
       </MainContent>
     </Container>
   );
 };
 
 export default AdminPosition;
-
-const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  margin-right: 0.5rem;
-  background-color: ${(props) =>
-    props.variant === 'danger' ? '#dc3545' : '#007bff'};
-  color: white;
-  &:hover {
-    opacity: 0.9;
-  }
-`;

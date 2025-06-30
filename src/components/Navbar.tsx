@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
     { name: '문서 에이전트', path: '/docs_agent_test' },
     { name: '사용자 관리', path: '/admin/user' },
     // { name: "회사 관리", path: "/admin/company" },
-    { name: '직책 관리', path: '/admin/position' },
+    { name: '직급 관리', path: '/admin/position' },
     { name: '템플릿 관리', path: '/admin/template' },
     // { name: "관리자 관리", path: "/admin/admin" },
   ];
@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
     // { name: "문서 에이전트", path: "/docs_agent_test" },
     { name: '사용자 관리', path: '/admin/user' },
     { name: '회사 관리', path: '/admin/company' },
-    // { name: "직책 관리", path: "/admin/position" },
+    // { name: "직급 관리", path: "/admin/position" },
     // { name: "템플릿 관리", path: "/admin/template" },
     { name: '관리자 관리', path: '/admin/admin' },
   ];
