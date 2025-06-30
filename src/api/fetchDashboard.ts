@@ -82,12 +82,18 @@ export const fetchDashboardStats = async (params: {
 export const fetchDashboardFilterOptions = async (params?: {
   project_id?: string;
   department?: string;
+  user_id?: string;
+  start_date?: string;
+  end_date?: string;
 }): Promise<FilterOptions> => {
   try {
     // 쿼리 파라미터 구성
     const queryParams = new URLSearchParams();
     if (params?.project_id) queryParams.append('project_id', params.project_id);
     if (params?.department) queryParams.append('department', params.department);
+    if (params?.user_id) queryParams.append('user_id', params.user_id);
+    if (params?.start_date) queryParams.append('start_date', params.start_date);
+    if (params?.end_date) queryParams.append('end_date', params.end_date);
 
     const response = await fetch(
       `${
