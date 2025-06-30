@@ -868,9 +868,35 @@ const Dashboard: React.FC = () => {
                       <h3>{title}</h3>
                       {allDetails.length > 0 ? (
                         <ul>
-                          {allDetails.map((detail, idx) => (
-                            <li key={`${id}-${idx}`}>{detail}</li>
-                          ))}
+                          {allDetails.map((detail, idx) => {
+                            // 문장별로 분리 (마침표, 느낌표, 물음표 기준)
+                            const sentences = detail
+                              .split(/([.!?]\s+)/)
+                              .filter(sentence => sentence.trim() !== '')
+                              .reduce((acc: string[], curr, index, array) => {
+                                if (index % 2 === 0) {
+                                  // 문장 부분
+                                  const nextPunctuation = array[index + 1] || '';
+                                  acc.push((curr + nextPunctuation).trim());
+                                }
+                                return acc;
+                              }, [] as string[])
+                              .filter(sentence => sentence.length > 1);
+
+                            return (
+                              <li key={`${id}-${idx}`}>
+                                {sentences.length > 1 ? (
+                                  sentences.map((sentence, sentenceIdx) => (
+                                    <div key={`${id}-${idx}-${sentenceIdx}`} style={{ marginBottom: '0.5rem' }}>
+                                      {sentence}
+                                    </div>
+                                  ))
+                                ) : (
+                                  detail
+                                )}
+                              </li>
+                            );
+                          })}
                         </ul>
                       ) : (
                         <ul>
