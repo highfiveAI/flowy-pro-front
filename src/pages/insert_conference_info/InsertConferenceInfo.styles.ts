@@ -338,29 +338,37 @@ export const ProjectListItem = styled.li`
   }
 `;
 
+export const NewProjectTextsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+`;
+
 export const NewProjectTextTop = styled.span`
-  color: rgba(30, 30, 30, 0.78);
-  font-size: 11px;
+  color: #64748b;
+  font-size: 10px;
   font-style: normal;
-  font-weight: 450;
-  line-height: 15px;
+  font-weight: 500;
+  line-height: 14px;
+  opacity: 0.8;
   
   @media (max-width: 768px) {
-    font-size: 10px;
-    line-height: 13px;
+    font-size: 9px;
+    line-height: 12px;
   }
 `;
 
 export const NewProjectTextBottom = styled.span`
   color: #00b4ba;
-  font-size: 15px;
+  font-size: 13px;
   font-style: normal;
   font-weight: 600;
-  line-height: 20px;
+  line-height: 18px;
   
   @media (max-width: 768px) {
-    font-size: 13px;
-    line-height: 17px;
+    font-size: 12px;
+    line-height: 16px;
   }
 `;
 
@@ -370,33 +378,46 @@ export const NewProjectWrapper = styled.div`
   right: 0;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   cursor: pointer;
   z-index: 1;
-
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  
   img {
     width: 24px;
     height: 24px;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 1px 2px rgba(0, 180, 186, 0.2));
     
     @media (max-width: 768px) {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
     }
   }
 
   &:hover {
-    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 180, 186, 0.15);
+    transform: translateY(-1px);
+    
+    img {
+      transform: scale(1.05);
+      filter: drop-shadow(0 2px 4px rgba(0, 180, 186, 0.3));
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.8);
   }
   
   @media (max-width: 768px) {
-    gap: 3px;
+    gap: 6px;
+    padding: 6px 10px;
   }
-`;
-
-export const NewProjectTextsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0px; /* 텍스트 간격 조정 */
 `;
 
 export const MeetingList = styled.div`
