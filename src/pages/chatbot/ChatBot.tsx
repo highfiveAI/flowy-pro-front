@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { sendChatMessage } from '../../api/fetchChatbot';
 
 const Container = styled.div`
