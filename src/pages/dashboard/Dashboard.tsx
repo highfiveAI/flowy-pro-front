@@ -901,7 +901,7 @@ const Dashboard: React.FC = () => {
                       alt="추천문서"
                       style={{ width: 20, height: 20, marginRight: 8 }}
                     />
-                    {file.draft_ref_reason} 관련 문서 &nbsp;
+                    {file.draft_ref_reason}  &nbsp;
                     <a
                       href={file.ref_interdoc_id}
                       target="_blank"
