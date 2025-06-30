@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 // import AddProjectIcon from "/images/addprojecticon.svg"; // AddProjectIcon 임포트
-import AddProjectIcon2 from '/images/addprojecticon2.svg'; // AddProjectIcon2 임포트
-import { createProject, fetchProjectMetaData } from '../../../api/fetchProject';
+import AddProjectIcon2 from "/images/addprojecticon2.svg"; // AddProjectIcon2 임포트
+import { createProject, fetchProjectMetaData } from "../../../api/fetchProject";
 import type {
   ProjectRequestBody,
   // ProjectRoleIdName,
   ProjectUserIdName,
-} from '../../../types/project';
+} from "../../../types/project";
 import {
   AddButton,
   CloseButton,
@@ -37,9 +37,9 @@ import {
   UserManagementContainer,
   UserName,
   UserPanel,
-} from './NewProjectPopup.styles';
-import { useAuth } from '../../../contexts/AuthContext';
-import { checkAuth } from '../../../api/fetchAuthCheck';
+} from "./NewProjectPopup.styles";
+import { useAuth } from "../../../contexts/AuthContext";
+import { checkAuth } from "../../../api/fetchAuthCheck";
 
 interface PopupProps {
   onClose: () => void;
@@ -47,20 +47,20 @@ interface PopupProps {
 
 const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
   // 팝업 내부 상태
-  const [projectName, setProjectName] = React.useState('');
+  const [projectName, setProjectName] = React.useState("");
   const [projectUsers, setProjectUsers] = useState<ProjectUserIdName[]>([]);
   const [selectedProjectUsers, setSelectedProjectUsers] = useState<
     ProjectUserIdName[]
   >([]);
-  const [projectDetails, setProjectDetails] = useState<string>('');
+  const [projectDetails, setProjectDetails] = useState<string>("");
   // const [projectRoles, setProjectRoles] = useState<ProjectRoleIdName[]>([]);
-  const [companyId, setCompanyId] = useState<string>('');
+  const [companyId, setCompanyId] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [poId, setPoId] = useState<string>('');
-  const [ppId, setPpId] = useState<string>('');
-  
+  const [poId, setPoId] = useState<string>("");
+  const [ppId, setPpId] = useState<string>("");
+
   // 검색 관련 상태
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredUsers, setFilteredUsers] = useState<ProjectUserIdName[]>([]);
 
   const { user, setUser, setLoading } = useAuth();
@@ -73,7 +73,9 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
       const filtered = projectUsers.filter(
         (user) =>
           user.user_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          !selectedProjectUsers.some((selected) => selected.user_id === user.user_id)
+          !selectedProjectUsers.some(
+            (selected) => selected.user_id === user.user_id
+          )
       );
       setFilteredUsers(filtered);
     }
@@ -89,7 +91,7 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
         { ...user, role_id: ppId },
       ]);
       // 검색어 초기화
-      setSearchTerm('');
+      setSearchTerm("");
     }
   };
 
@@ -130,21 +132,21 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
   const handleCreateProject = async () => {
     // 유효성 검사
     if (!projectName.trim()) {
-      setErrorMessage('프로젝트명을 입력해주세요.');
+      setErrorMessage("프로젝트명을 입력해주세요.");
       return;
     }
 
     if (selectedProjectUsers.length === 0) {
-      setErrorMessage('참여자를 한 명 이상 선택해주세요.');
+      setErrorMessage("참여자를 한 명 이상 선택해주세요.");
       return;
     }
 
     const userWithoutRole = selectedProjectUsers.find(
-      (user) => !user.role_id || user.role_id === ''
+      (user) => !user.role_id || user.role_id === ""
     );
 
     if (userWithoutRole) {
-      setErrorMessage('모든 참여자에게 역할을 지정해주세요.');
+      setErrorMessage("모든 참여자에게 역할을 지정해주세요.");
       return;
     }
 
@@ -152,7 +154,7 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
 
     if (!hasPO) {
       setErrorMessage(
-        '프로젝트에 PO 역할을 가진 참여자가 1명 이상 있어야 합니다.'
+        "프로젝트에 PO 역할을 가진 참여자가 1명 이상 있어야 합니다."
       );
       return;
     }
@@ -173,10 +175,10 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
 
     try {
       const res = await createProject(requestBody);
-      console.log('프로젝트 생성 성공:', await res.json());
+      console.log("프로젝트 생성 성공:", await res.json());
       onClose(); // 팝업 닫기
     } catch (err) {
-      setErrorMessage('프로젝트 생성 중 오류가 발생했습니다.');
+      setErrorMessage("프로젝트 생성 중 오류가 발생했습니다.");
     }
   };
 
@@ -205,8 +207,8 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
         setProjectUsers(data.users);
         // setProjectRoles(data.roles);
 
-        const poRole = data.roles.find((r: any) => r.role_name === 'PO');
-        const ppRole = data.roles.find((r: any) => r.role_name === 'PP');
+        const poRole = data.roles.find((r: any) => r.role_name === "PO");
+        const ppRole = data.roles.find((r: any) => r.role_name === "PP");
 
         if (poRole) setPoId(poRole.role_id);
         if (ppRole) setPpId(ppRole.role_id);
@@ -220,7 +222,7 @@ const NewProjectPopup: React.FC<PopupProps> = ({ onClose }) => {
     <PopupOverlay>
       <PopupContent>
         <PopupHeader>
-          <ProjectIcon src={AddProjectIcon2} alt="새 프로젝트 생성" />{' '}
+          <ProjectIcon src={AddProjectIcon2} alt="새 프로젝트 생성" />{" "}
           {/* 아이콘을 AddProjectIcon2로 변경 */}
           <PopupTitle>새 프로젝트 생성하기</PopupTitle>
           {/* <CloseButton onClick={onClose}>×</CloseButton> */}
