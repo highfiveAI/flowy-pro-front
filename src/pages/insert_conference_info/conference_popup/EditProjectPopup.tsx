@@ -128,7 +128,7 @@ const EditProjectPopup: React.FC<PopupProps> = ({ onClose, projectToEdit }) => {
 
     try {
       await updateProjectWithUsers(projectToEdit.projectId, requestBody);
-      onClose();
+      window.location.replace('/insert_info');
     } catch (err) {
       setErrorMessage('프로젝트 수정 중 오류가 발생했습니다.');
     }
