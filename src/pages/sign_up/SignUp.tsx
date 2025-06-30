@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import SignUpSuccessModal from './SignUpSuccessModal';
 import {
   checkDuplicate,
@@ -49,12 +50,39 @@ export const FormContainer = styled.div`
   z-index: 1;
 `;
 
+// 뒤로가기 버튼 스타일
+const BackButton = styled.button`
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: #2d1155;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+
+  &:hover {
+    background: rgba(45, 17, 85, 0.1);
+    color: #4a1e75;
+    transform: translateX(-2px);
+  }
+`;
+
 export const Title = styled.h2`
   text-align: center;
   font-size: 32px;
   font-weight: 700;
   color: #2d1155;
   margin-bottom: 40px;
+  margin-top: 20px;
   text-shadow: 0 2px 4px rgba(45, 17, 85, 0.1);
 `;
 
@@ -195,31 +223,40 @@ export const ErrorText = styled.div`
 `;
 
 const MessageWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  font-weight: 600;
-  font-size: 14px;
+  margin-bottom: 15px;
+  margin-left: 170px;
+  font-weight: 500;
+  font-size: 13px;
 `;
 
-const ErrorMessage = styled.span`
+const ErrorMessage = styled.div`
   color: #e74c3c;
-  padding: 8px 16px;
+  padding: 8px 12px;
   background: rgba(231, 76, 60, 0.1);
-  border-radius: 20px;
-  border: 1px solid rgba(231, 76, 60, 0.2);
+  border-radius: 8px;
+  border-left: 3px solid #e74c3c;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
-const SuccessMessage = styled.span`
+const SuccessMessage = styled.div`
   color: #27ae60;
-  padding: 8px 16px;
+  padding: 8px 12px;
   background: rgba(39, 174, 96, 0.1);
-  border-radius: 20px;
-  border: 1px solid rgba(39, 174, 96, 0.2);
+  border-radius: 8px;
+  border-left: 3px solid #27ae60;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 const SignUp: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -238,6 +275,11 @@ const SignUp: React.FC = () => {
   const [positions, setPositions] = useState<CompanyPosition[]>([]);
   const [isDuplicate, setIsDuplicate] = useState<boolean | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // 뒤로가기 함수
+  const handleGoBack = () => {
+    navigate('/sign_up');
+  };
 
   // const [sysroles, setSysroles] = useState<Sysrole[]>([]);
 
@@ -397,9 +439,13 @@ const SignUp: React.FC = () => {
 
   return (
     <>
-      <SignUpWrapper>
-        <FormContainer>
-          <Title>회원가입</Title>
+              <SignUpWrapper>
+          <FormContainer>
+            <BackButton onClick={handleGoBack} title="회원가입 방식 선택으로 돌아가기">
+              ←
+            </BackButton>
+            
+            <Title>회원가입</Title>
           <Form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
             <InputGroup>
               <Label>
@@ -452,17 +498,19 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
               />
             </InputGroup>
-            <MessageWrapper>
-              {isDuplicate === true && (
-                <ErrorMessage>이미 사용 중인 아이디입니다</ErrorMessage>
-              )}
-              {isDuplicate === false && (
-                <SuccessMessage>사용 가능한 아이디입니다</SuccessMessage>
-              )}
-              {errors.username && (
-                <ErrorMessage>{errors.username}</ErrorMessage>
-              )}
-            </MessageWrapper>
+            {(isDuplicate !== null || errors.username) && (
+              <MessageWrapper>
+                {isDuplicate === true && (
+                  <ErrorMessage>이미 사용 중인 아이디입니다</ErrorMessage>
+                )}
+                {isDuplicate === false && (
+                  <SuccessMessage>사용 가능한 아이디입니다</SuccessMessage>
+                )}
+                {errors.username && (
+                  <ErrorMessage>{errors.username}</ErrorMessage>
+                )}
+              </MessageWrapper>
+            )}
             <InputGroup>
               <Label>
                 비밀번호 <StyledAsterisk>*</StyledAsterisk>

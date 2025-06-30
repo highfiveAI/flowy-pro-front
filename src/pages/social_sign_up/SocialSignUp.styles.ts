@@ -41,12 +41,38 @@ export const FormContainer = styled.div`
   z-index: 1;
 `;
 
+export const BackButton = styled.button`
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: #2d1155;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+
+  &:hover {
+    background: rgba(45, 17, 85, 0.1);
+    color: #4a1e75;
+    transform: translateX(-2px);
+  }
+`;
+
 export const Title = styled.h2`
   text-align: center;
   font-size: 32px;
   font-weight: 700;
   color: #2d1155;
   margin-bottom: 40px;
+  margin-top: 20px;
   text-shadow: 0 2px 4px rgba(45, 17, 85, 0.1);
 `;
 
