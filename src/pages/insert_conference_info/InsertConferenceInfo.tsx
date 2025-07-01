@@ -11,14 +11,14 @@ import ResultContents from '../result/ResultContents';
 // 한국어 locale 등록
 registerLocale('ko', ko);
 import { useNavigate } from 'react-router-dom';
-import AddUserIcon from '/images/adduser.svg'; // adduser.svg 임포트
 import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg 임포트
 import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
 import { useAuth } from '../../contexts/AuthContext';
 
 // import { checkAuth } from "../../api/fetchAuthCheck";
-import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup'; // 팝업 컴포넌트 임포트
+import PreviewMeetingBanner from '../dashboard/popup/PreviewMeetingBanner.tsx';
+import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup';
 import type { ProjectResponse } from '../../types/project';
 import { fetchMeetingsWithUsers } from '../../api/fetchProject';
 import EditProjectPopup from './conference_popup/EditProjectPopup.tsx';
@@ -137,6 +137,8 @@ const InsertConferenceInfo: React.FC = () => {
   // );
 
   const [showEditProjectPopup, setShowEditProjectPopup] = useState(false);
+  const [showBanner, setShowBanner] = React.useState(false);
+  const [showPopup, setShowPopup] = React.useState(false);
 
   const toggleExpanded = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -276,6 +278,7 @@ const InsertConferenceInfo: React.FC = () => {
         setIsLoading(false);
       }
     }
+    setShowBanner(true);
   };
 
   // 프로젝트 선택 핸들러 함수
@@ -738,7 +741,7 @@ const InsertConferenceInfo: React.FC = () => {
                         <StyledLabel htmlFor="meeting-date">
                           회의 일시 <span>*</span>
                         </StyledLabel>
-                        <DatePickerWrapper>
+                        <DatePickerWrapper style={{ zIndex: 1000 }}>
                           <DatePicker
                             selected={meetingDate}
                             onChange={(date: Date | null) =>
@@ -889,7 +892,7 @@ const InsertConferenceInfo: React.FC = () => {
                         <StyledLabel htmlFor="meeting-date">
                           회의 일시 <span>*</span>
                         </StyledLabel>
-                        <DatePickerWrapper>
+                        <DatePickerWrapper style={{ zIndex: 1000 }}>
                           <DatePicker
                             selected={meetingDate}
                             onChange={(date: Date | null) =>
@@ -997,13 +1000,11 @@ const InsertConferenceInfo: React.FC = () => {
       {showNewProjectPopup && (
         <NewProjectPopup onClose={() => setShowNewProjectPopup(false)} />
       )}
-      {showAnalysisRequestedPopup && (
-        <AnalysisRequestedPopup
-          onClose={() => {
-            setShowAnalysisRequestedPopup(false);
-            navigate('/'); // 홈으로 이동
-          }}
-        />
+      {showBanner && !showPopup && (
+        <PreviewMeetingBanner onClick={() => setShowPopup(true)} />
+      )}
+      {showPopup && (
+        <AnalysisRequestedPopup onClose={() => setShowPopup(false)} />
       )}
       {showEditProjectPopup && editingProject && (
         <EditProjectPopup
