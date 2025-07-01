@@ -10,7 +10,6 @@ import ResultContents from '../result/ResultContents';
 
 // 한국어 locale 등록
 registerLocale('ko', ko);
-import { useNavigate } from 'react-router-dom';
 import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg 임포트
 import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
@@ -80,15 +79,15 @@ function formatDateToKST(date: Date): string {
 
 // 파일 상단에 타입 정의가 없다면 추가
 type Attendee = {
-    user_id: string;
-    name: string;
-    email: string;
-    user_jobname: string;
+  user_id: string;
+  name: string;
+  email: string;
+  user_jobname: string;
 };
 
 const InsertConferenceInfo: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [isCompleted /*, setIsCompleted*/] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [subject, setSubject] = React.useState('');
@@ -112,8 +111,8 @@ const InsertConferenceInfo: React.FC = () => {
   const [projectMeetings, setProjectMeetings] = React.useState<any[]>([]); // 프로젝트 회의 목록 상태 추가
   const [selectedMeeting, setSelectedMeeting] = React.useState<any>(null); // 선택된 회의 상태 추가
   const [hostId, setHostId] = React.useState('');
-  const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
-    React.useState(false);
+  // const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
+  //   React.useState(false);
 
   // const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
@@ -179,7 +178,7 @@ const InsertConferenceInfo: React.FC = () => {
     }
 
     if (!meetingDate) {
-      const md: any = meetingDate;
+      // const md: any = meetingDate;
       setError('입력하지 않은 필수 항목이 있습니다.');
       return false;
     }
@@ -262,7 +261,7 @@ const InsertConferenceInfo: React.FC = () => {
         console.log('통합 STT 서버 응답:', result);
 
         // 성공 시 팝업 띄우기
-        setShowAnalysisRequestedPopup(true);
+        // setShowAnalysisRequestedPopup(true);
 
         // 입력값 초기화
         setSubject('');
