@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
+  CardSubtitle,
+  CardTitle,
   GoogleIcon,
+  IconWrapper,
   LogoImg,
   MobileIcon,
   OptionCard,
@@ -26,24 +29,26 @@ const ChooseMethod: React.FC = () => {
         <SelectionOptions>
           <Link to="/sign_up/form" style={{ textDecoration: 'none' }}>
             <OptionCard $primary={true}>
-              <MobileIcon src="/images/mobile-icon.svg" alt="Mobile Icon" />
-              휴대폰 번호로
-              <br />
-              회원가입
+              <IconWrapper>
+                <MobileIcon src="/images/mobile-icon.svg" alt="Mobile Icon" />
+              </IconWrapper>
+              <CardTitle>휴대폰 번호로 회원가입</CardTitle>
+              <CardSubtitle>빠르고 간편한 회원가입</CardSubtitle>
             </OptionCard>
           </Link>
           <div
             onClick={() => handleGoogleLogin()}
             style={{ textDecoration: 'none' }}
           >
-            <OptionCard $primary={false}>
-              <GoogleIcon
-                src="https://www.google.com/favicon.ico"
-                alt="Google Icon"
-              />
-              구글 이메일로
-              <br />
-              회원가입
+            <OptionCard $primary={false} data-primary="false">
+              <IconWrapper>
+                <GoogleIcon
+                  src="https://www.google.com/favicon.ico"
+                  alt="Google Icon"
+                />
+              </IconWrapper>
+              <CardTitle>구글 이메일로 회원가입</CardTitle>
+              <CardSubtitle>구글 계정으로 간편 가입</CardSubtitle>
             </OptionCard>
           </div>
         </SelectionOptions>

@@ -14,6 +14,7 @@ import AdminTemplate from './pages/admin/AdminTemplate';
 import Login from './pages/log_in/Login';
 import ChooseMethod from './pages/sign_up_choose/choose_method';
 import MyPage from './pages/mypage/MyPage';
+import Intro from './pages/intro/Intro';
 
 import Calendar from './pages/calendar/Calendar';
 import { AuthProvider } from './contexts/AuthContext';
@@ -37,6 +38,7 @@ function App() {
         <Route element={<Layout />}>
           {/* 공개 라우트 */}
           <Route path="/" element={<Home />} />
+          <Route path="/intro" element={<Intro />} />
           <Route
             path="/login"
             element={

@@ -10,7 +10,6 @@ import {
   LogoImg,
   LogoutText,
   Menu,
-  MenuIcon,
   MenuItem,
   NavbarContainer,
   ProfileIcon,
@@ -33,7 +32,7 @@ const Navbar: React.FC = () => {
     { name: '문서 에이전트', path: '/docs_agent_test' },
     { name: '사용자 관리', path: '/admin/user' },
     // { name: "회사 관리", path: "/admin/company" },
-    { name: '직책 관리', path: '/admin/position' },
+    { name: '직급 관리', path: '/admin/position' },
     { name: '템플릿 관리', path: '/admin/template' },
     // { name: "관리자 관리", path: "/admin/admin" },
   ];
@@ -42,7 +41,7 @@ const Navbar: React.FC = () => {
     // { name: "문서 에이전트", path: "/docs_agent_test" },
     { name: '사용자 관리', path: '/admin/user' },
     { name: '회사 관리', path: '/admin/company' },
-    // { name: "직책 관리", path: "/admin/position" },
+    // { name: "직급 관리", path: "/admin/position" },
     // { name: "템플릿 관리", path: "/admin/template" },
     { name: '관리자 관리', path: '/admin/admin' },
   ];
@@ -96,51 +95,23 @@ const Navbar: React.FC = () => {
         <Menu>
           {!user || role === 'user' ? (
             <>
-              <MenuItem onClick={() => navigate('/')}>
+              <MenuItem onClick={() => navigate('/intro')}>
                 Flowy
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/insert_info')}>
                 회의분석 요청
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/projectlist')}>
                 분석결과 조회
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/calendar')}>
                 캘린더
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
-              {/* <MenuItem onClick={() => navigate("/admin/dashboard")}>
-                대시보드
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
-              </MenuItem> */}
-              {/* <MenuItem
-                onMouseEnter={() => setIsSystemMenuOpen(true)}
-                onMouseLeave={() => setIsSystemMenuOpen(false)}
-                style={{ position: "relative" }}
-              >
-                시스템 관리
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
-                <DropdownMenu $isOpen={isSystemMenuOpen}>
-                  {systemMenuItems.map((item, index) => (
-                    <DropdownItem
-                      key={index}
-                      onClick={() => navigate(item.path)}
-                    >
-                      {item.name}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </MenuItem> */}
               <MenuItem onClick={() => navigate('/chatbot')}>
                 챗봇
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/mypage')}>
                 마이페이지
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
             </>
           ) : null}
@@ -149,15 +120,12 @@ const Navbar: React.FC = () => {
             <>
               <MenuItem onClick={() => navigate('/insert_info')}>
                 회의분석 요청
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/projectlist')}>
                 분석결과 조회
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/calendar')}>
                 캘린더
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <div
                 style={{ position: 'relative', display: 'inline-block' }}
@@ -166,7 +134,6 @@ const Navbar: React.FC = () => {
               >
                 <MenuItem>
                   시스템 관리
-                  <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
                 </MenuItem>
                 <DropdownMenu $isOpen={isSystemMenuOpen}>
                   {systemMenuItems.map((item, index) => (
@@ -181,11 +148,9 @@ const Navbar: React.FC = () => {
               </div>
               <MenuItem onClick={() => navigate('/admin/dashboard')}>
                 대시보드
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <MenuItem onClick={() => navigate('/mypage')}>
                 마이페이지
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
             </>
           )}
@@ -197,7 +162,6 @@ const Navbar: React.FC = () => {
             >
               <MenuItem>
                 시스템 관리
-                <MenuIcon src="/images/navibaricon.svg" alt="menu icon" />
               </MenuItem>
               <DropdownMenu $isOpen={isSystemMenuOpen}>
                 {superSystemMenuItems.map((item, index) => (

@@ -28,6 +28,7 @@ export interface ProjectUser {
   project_id: string;
   role_id: string;
   project: Project;
+  user_count: number;
 }
 
 export interface ProjectUserIdName {
