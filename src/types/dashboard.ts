@@ -26,7 +26,7 @@ export interface TableData {
   pop: string; // PoP (이전 기간 대비 현재 기간)
   total_avg: string; // 전체 평균
   vs_total: string;
-
+}
 
 export interface DashboardResponse {
   summary: DashboardSummary[];

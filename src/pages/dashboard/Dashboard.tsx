@@ -21,6 +21,8 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { checkAuth } from '../../api/fetchAuthCheck';
 import type { Todo } from '../../types/project';
+import PreviewMeetingBanner from './popup/PreviewMeetingBanner';
+
 
 import type {
   Feedback,
@@ -31,18 +33,31 @@ import type {
   SummaryLog,
 } from './Dashboard.types';
 
+
+
 import {
   AddButton,
   BasicInfoGrid,
   Container,
   EditButton,
+  EditModeInput,
+  EmptyRecommendFiles,
+  FeedbackTitle,
+  FloatingButton,
+  FloatingButtonContainer,
+  FloatingButtonLight,
   InfoContent,
   InfoLabel,
   InputWrapper,
   MainContent,
   MeetingAnalysisHeader,
   MeetingAnalysisTitle,
-  RecommendFileItem,
+  RecommendFileCard,
+  RecommendFileContent,
+  RecommendFileIcon,
+  RecommendFileLink,
+  RecommendFileReason,
+  RecommendFilesList,
   RedSection,
   Section,
   SectionBody,
@@ -61,6 +76,7 @@ import {
   TaskCardList,
   TaskCardListItem,
   TaskCardTitle,
+  TaskDatePickerWrapper,
   TaskGridContainer,
 } from './Dashboard.styles';
 
@@ -100,6 +116,10 @@ const Dashboard: React.FC = () => {
   // 예정 회의 팝업 관련 state
   const [pendingPreviewMeeting, setPendingPreviewMeeting] = useState<any>(null);
   const [showPreviewMeetingPopup, setShowPreviewMeetingPopup] = useState(false);
+  
+  // Floating 버튼 관련 state
+  const [showFloatingButtons, setShowFloatingButtons] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
 
   // 현재 사용자가 PO(회의장)인지 확인하는 함수
   const isCurrentUserPO = () => {
@@ -249,16 +269,9 @@ const Dashboard: React.FC = () => {
       if (isCurrentUserPO()) {
         fetchPendingPreviewMeeting(meetingId)
           .then((data) => {
-            console.log('예정 회의 조회 결과:', data);
-            // 백엔드에서 배열로 반환하는 경우 처리
-            if (Array.isArray(data) && data.length > 0) {
-              // 첫 번째 회의만 표시 (중복 방지)
-              setPendingPreviewMeeting(data[0]);
-              setShowPreviewMeetingPopup(true);
-            } else if (data && data.has_pending_meeting) {
-              // 기존 예상 형식
-              setPendingPreviewMeeting(data.pending_meeting);
-              setShowPreviewMeetingPopup(true);
+            if ((Array.isArray(data) && data.length > 0) || (data && data.has_pending_meeting)) {
+              setShowBanner(true);
+              setPendingPreviewMeeting(Array.isArray(data) ? data[0] : data.pending_meeting);
             }
           })
           .catch((error) => {
@@ -323,6 +336,18 @@ const Dashboard: React.FC = () => {
         console.error('Failed to fetch PO role ID:', error);
       }
     })();
+  }, []);
+
+  // 스크롤 이벤트로 floating 버튼 표시/숨김 처리
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      // 스크롤이 200px 이상 되면 floating 버튼 표시
+      setShowFloatingButtons(scrollY > 200);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleEditSummaryItem = (
@@ -399,11 +424,9 @@ const Dashboard: React.FC = () => {
   // 예정 회의 팝업 핸들러들
   const handleConfirmPreviewMeeting = async (confirmData: any) => {
     try {
-      console.log('캘린더 등록 시작:', confirmData);
       await confirmPreviewMeeting(meetingId!, pendingPreviewMeeting.meeting_id, confirmData);
-      
-      // 성공 시 팝업 닫기
       setShowPreviewMeetingPopup(false);
+      setShowBanner(false);
       setPendingPreviewMeeting(null);
       alert('캘린더에 등록되었습니다!');
     } catch (error) {
@@ -414,11 +437,9 @@ const Dashboard: React.FC = () => {
 
   const handleRejectPreviewMeeting = async () => {
     try {
-      console.log('예정 회의 거부 시작');
       await rejectPreviewMeeting(meetingId!, pendingPreviewMeeting.meeting_id);
-      
-      // 성공 시 팝업 닫기
       setShowPreviewMeetingPopup(false);
+      setShowBanner(false);
       setPendingPreviewMeeting(null);
       alert('예정 회의를 거부했습니다.');
     } catch (error) {
@@ -428,8 +449,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleClosePreviewMeetingPopup = () => {
-    setShowPreviewMeetingPopup(false);
-    // 데이터는 유지 (다음 진입 시 다시 팝업 표시)
+    setShowPreviewMeetingPopup(false); // 나중에 클릭 시 배너는 남김
   };
   // const handleSaveSummary = async () => {
   //   setIsEditingSummary(false);
@@ -459,7 +479,6 @@ const Dashboard: React.FC = () => {
   //   }
   // };
 
-  // 메일로 이전
   // const handleSaveSummaryTasks = async () => {
   //   setIsEditingSummary(false);
   //   if (!summaryLog || !summaryLog.updated_summary_contents) {
@@ -545,10 +564,22 @@ const Dashboard: React.FC = () => {
             {isCurrentUserPO() && (
               isEditingSummary ? (
                 <EditButton onClick={() => setShowMailPopup(true)}>
+                  <img
+                    src="/images/edit.svg"
+                    alt="저장"
+                    style={{ width: 18, height: 18 }}
+                  />
                   저장하기
                 </EditButton>
               ) : (
-                <EditButton onClick={handleEditSummary}>수정하기</EditButton>
+                <EditButton onClick={handleEditSummary}>
+                  <img
+                    src="/images/edit.svg"
+                    alt="수정"
+                    style={{ width: 18, height: 18 }}
+                  />
+                  수정하기
+                </EditButton>
               )
             )}
           </div>
@@ -593,8 +624,10 @@ const Dashboard: React.FC = () => {
             <BasicInfoGrid>
               <InfoLabel>상위 프로젝트</InfoLabel>
               <InfoContent>{project?.project_name}</InfoContent>
+              
               <InfoLabel>회의 제목</InfoLabel>
               <InfoContent>{meeting?.meeting_title}</InfoContent>
+              
               <InfoLabel>회의 일시</InfoLabel>
               <InfoContent>
                 {meeting?.meeting_date
@@ -604,13 +637,14 @@ const Dashboard: React.FC = () => {
                       .slice(0, 16)
                   : '날짜 없음'}
               </InfoContent>
+              
               <InfoLabel>회의 참석자</InfoLabel>
               <InfoContent>
                 {projectUser.length > 0
                   ? projectUser.map((user) => user.user_name).join(', ')
                   : '참석자 없음'}
               </InfoContent>
-
+              
               <InfoLabel>회의 안건</InfoLabel>
               <InfoContent>{meeting?.meeting_agenda}</InfoContent>
             </BasicInfoGrid>
@@ -632,32 +666,31 @@ const Dashboard: React.FC = () => {
               Object.keys(summaryLog.updated_summary_contents).length > 0 ? (
                 <>
                   {isEditingSummary ? (
-                    <div className="space-y-6">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                       {Object.entries(summaryLog.updated_summary_contents).map(
                         ([key, value]) => (
-                          <div key={key} className="space-y-2">
-                            <h3 className="text-lg font-semibold">{key}</h3>
-                            <ul className="space-y-1">
+                          <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <SummarySectionHeader>{key}</SummarySectionHeader>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                               {(Array.isArray(value)
                                 ? value
                                 : [String(value)]
                               ).map((item, itemIndex) => (
-                                <li key={itemIndex}>
-                                  <input
-                                    type="text"
-                                    value={item}
-                                    onChange={(e) =>
-                                      handleEditSummaryItem(
-                                        key,
-                                        itemIndex,
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full border border-gray-300 rounded p-2"
-                                  />
-                                </li>
+                                <EditModeInput
+                                  key={itemIndex}
+                                  type="text"
+                                  value={item}
+                                  onChange={(e) =>
+                                    handleEditSummaryItem(
+                                      key,
+                                      itemIndex,
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="내용을 입력하세요..."
+                                />
                               ))}
-                            </ul>
+                            </div>
                           </div>
                         )
                       )}
@@ -719,6 +752,7 @@ const Dashboard: React.FC = () => {
                       <div key={col} style={{ height: '100%' }}>
                         <TaskCard
                           $isUnassigned={col === '미할당'}
+                          draggable={false}
                           onDragOver={(e) => e.preventDefault()}
                           onDrop={(e) => {
                             const from = e.dataTransfer.getData('text/plain');
@@ -748,7 +782,7 @@ const Dashboard: React.FC = () => {
                             });
                           }}
                         >
-                          <TaskCardHeader>
+                          <TaskCardHeader $isUnassigned={col === '미할당'}>
                             <TaskCardTitle $isUnassigned={col === '미할당'}>
                               {col === '미할당' ? '미할당 작업 목록' : col}
                             </TaskCardTitle>
@@ -759,7 +793,7 @@ const Dashboard: React.FC = () => {
                                 key={`${col}__${idx}`}
                                 id={`${col}__${idx}`}
                                 style={{ cursor: 'grab' }}
-                                draggable
+                                draggable={true}
                                 onDragStart={(e) => {
                                   e.dataTransfer.setData(
                                     'text/plain',
@@ -767,7 +801,7 @@ const Dashboard: React.FC = () => {
                                   );
                                 }}
                               >
-                                <TaskCardListItem>
+                                <TaskCardListItem $isDraggable={true}>
                                   {todo.action}
                                   <TaskCardDate
                                     style={{ cursor: 'pointer' }}
@@ -778,36 +812,53 @@ const Dashboard: React.FC = () => {
                                   >
                                     {editingDate?.col === col &&
                                     editingDate?.idx === idx ? (
-                                      <DatePicker
-                                        selected={
-                                          isValidDate(todo.schedule)
-                                            ? new Date(todo.schedule!)
-                                            : null
-                                        }
-                                        onChange={(date) => {
-                                          const updatedTodos = [
-                                            ...assignRole[col],
-                                          ];
-                                          updatedTodos[idx] = {
-                                            ...updatedTodos[idx],
-                                            schedule: date
+                                      <TaskDatePickerWrapper>
+                                        <DatePicker
+                                          selected={
+                                            isValidDate(todo.schedule)
+                                              ? new Date(todo.schedule!)
+                                              : null
+                                          }
+                                          onChange={(date) => {
+                                            const currentSchedule = todo.schedule;
+                                            const newSchedule = date
                                               ?.toISOString()
-                                              .split('T')[0],
-                                          };
-                                          setAssignRole((prev) => ({
-                                            ...prev,
-                                            [col]: updatedTodos,
-                                          }));
-                                        }}
-                                        onBlur={() => setEditingDate(null)}
-                                        dateFormat="yyyy-MM-dd"
-                                        autoFocus
-                                        open
-                                        onClickOutside={() =>
-                                          setEditingDate(null)
-                                        }
-                                        placeholderText="날짜 선택"
-                                      />
+                                              .split('T')[0];
+                                            
+                                            // 같은 날짜를 두 번 클릭한 경우 미정으로 변경
+                                            const scheduleToSet = 
+                                              currentSchedule === newSchedule 
+                                                ? '미정' 
+                                                : newSchedule;
+                                            
+                                            const updatedTodos = [...assignRole[col]];
+                                            updatedTodos[idx] = {
+                                              ...updatedTodos[idx],
+                                              schedule: scheduleToSet,
+                                            };
+                                            setAssignRole((prev) => ({
+                                              ...prev,
+                                              [col]: updatedTodos,
+                                            }));
+                                            
+                                            // 미정으로 설정한 경우 즉시 달력 닫기
+                                            if (scheduleToSet === '미정') {
+                                              setEditingDate(null);
+                                            }
+                                          }}
+                                          onBlur={() => setEditingDate(null)}
+                                          dateFormat="yyyy-MM-dd"
+                                          autoFocus
+                                          open
+                                          onClickOutside={() =>
+                                            setEditingDate(null)
+                                          }
+                                          placeholderText="날짜 선택"
+                                          minDate={new Date()}
+                                          popperPlacement="bottom-start"
+                                          popperProps={{ strategy: 'fixed' }}
+                                        />
+                                      </TaskDatePickerWrapper>
                                     ) : String(todo.schedule).trim() ===
                                         '언급 없음' ||
                                       String(todo.schedule).trim() ===
@@ -839,8 +890,8 @@ const Dashboard: React.FC = () => {
                     ),
                   ].map((col) => (
                     <div key={col} style={{ height: '100%' }}>
-                      <TaskCard $isUnassigned={col === '미할당'}>
-                        <TaskCardHeader>
+                      <TaskCard $isUnassigned={col === '미할당'} draggable={false}>
+                        <TaskCardHeader $isUnassigned={col === '미할당'}>
                           <TaskCardTitle $isUnassigned={col === '미할당'}>
                             {col === '미할당' ? '미할당 작업 목록' : col}
                           </TaskCardTitle>
@@ -848,7 +899,7 @@ const Dashboard: React.FC = () => {
 
                         <TaskCardList>
                           {(assignRole[col] ?? []).map((todo, idx) => (
-                            <TaskCardListItem key={`${col}__${idx}`}>
+                            <TaskCardListItem key={`${col}__${idx}`} $isDraggable={false}>
                               {todo.action}
                               <TaskCardDate>
                                 {String(todo.schedule).trim() === '언급 없음' ||
@@ -908,7 +959,7 @@ const Dashboard: React.FC = () => {
 
                   return (
                     <div key={id} style={{ marginBottom: '1.5rem' }}>
-                      <h3>{title}</h3>
+                      <FeedbackTitle>{title}</FeedbackTitle>
                       {allDetails.length > 0 ? (
                         <ul>
                           {allDetails.map((detail, idx) => {
@@ -1048,37 +1099,40 @@ const Dashboard: React.FC = () => {
             <SectionTitle>추천 문서</SectionTitle>
           </SectionHeader>
           <SectionBody>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            <RecommendFilesList>
               {recommendFiles.length === 0 ? (
-                <li style={{ color: '#888' }}>추천 문서가 없습니다.</li>
+                <EmptyRecommendFiles>추천 문서가 없습니다.</EmptyRecommendFiles>
               ) : (
                 recommendFiles.map((file: any) => (
-                  <RecommendFileItem key={file.draft_id}>
-                    <img
-                      src="/images/recommendfile.svg"
-                      alt="추천문서"
-                      style={{ width: 20, height: 20, marginRight: 8 }}
-                    />
-                    {file.draft_ref_reason}  &nbsp;
-                    <a
-                      href={file.ref_interdoc_id}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: '#351745',
-                        textDecoration: 'underline',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {file.draft_title}
-                    </a>
-                  </RecommendFileItem>
+                  <RecommendFileCard key={file.draft_id}>
+                    <RecommendFileIcon>
+                      <img
+                        src="/images/recommendfile.svg"
+                        alt="추천문서"
+                        style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }}
+                      />
+                    </RecommendFileIcon>
+                    <RecommendFileContent>
+                      <RecommendFileReason>{file.draft_ref_reason}</RecommendFileReason>
+                      <RecommendFileLink
+                        href={file.ref_interdoc_id}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {file.draft_title}
+                      </RecommendFileLink>
+                    </RecommendFileContent>
+                  </RecommendFileCard>
                 ))
               )}
-            </ul>
+            </RecommendFilesList>
           </SectionBody>
         </Section>
 
+        {/* 배너: FloatingButton 위에 위치 */}
+        {showBanner && (
+          <PreviewMeetingBanner onClick={() => setShowPreviewMeetingPopup(true)} />
+        )}
         {/* 예정 회의 팝업 */}
         {showPreviewMeetingPopup && pendingPreviewMeeting && (
           <PreviewMeetingPopup
@@ -1086,9 +1140,46 @@ const Dashboard: React.FC = () => {
             onConfirm={handleConfirmPreviewMeeting}
             onReject={handleRejectPreviewMeeting}
             onClose={handleClosePreviewMeetingPopup}
+            onLater={handleClosePreviewMeetingPopup} // '나중에' 클릭 시
           />
         )}
       </MainContent>
+      
+      {/* Floating 버튼들 */}
+      <FloatingButtonContainer $isVisible={showFloatingButtons}>
+        <FloatingButtonLight onClick={() => setShowPDFPopup(true)}>
+          <img
+            src="/images/recommendfile.svg"
+            alt="PDF"
+            style={{ width: 18, height: 18 }}
+          />
+          PDF 다운로드
+        </FloatingButtonLight>
+        
+        {isCurrentUserPO() && (
+          <FloatingButtonLight onClick={() => setShowMail_uneditPopup(true)}>
+            <img
+              src="/images/sendmail.svg"
+              alt="메일"
+              style={{ width: 18, height: 18 }}
+            />
+            메일전송하기
+          </FloatingButtonLight>
+        )}
+        
+        {isCurrentUserPO() && (
+          <FloatingButtonLight 
+            onClick={isEditingSummary ? () => setShowMailPopup(true) : handleEditSummary}
+          >
+            <img
+              src="/images/edit.svg"
+              alt="수정"
+              style={{ width: 18, height: 18 }}
+            />
+            {isEditingSummary ? '저장하기' : '수정하기'}
+          </FloatingButtonLight>
+        )}
+      </FloatingButtonContainer>
     </Container>
   );
 };
