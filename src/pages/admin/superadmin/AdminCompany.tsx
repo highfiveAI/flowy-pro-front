@@ -1,104 +1,462 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { FiChevronUp, FiChevronDown, FiSearch, FiX, FiEdit } from 'react-icons/fi';
 import styled from 'styled-components';
 import NewCompany from './popup/newCompany';
 import EditCompany from './popup/editCompany';
 import { useNavigate } from 'react-router-dom';
 import { fetchUsersByCompany } from '../../../api/fetchSignupInfos';
 
-
-// 스타일 컴포넌트 재사용
 const Container = styled.div`
-  max-width: 1200px;
-  margin: 40px auto 0 auto;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(80, 0, 80, 0.06);
-  padding: 48px 40px 40px 40px;
-  min-height: 80vh;
-  position: relative;
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 40px 20px;
 `;
 
 const MainContent = styled.div`
-  flex: 1;
-  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+`;
+
+const PageHeader = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d1155;
+    margin: 0;
+    background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+`;
+
+const AddButton = styled.button`
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #351745 0%, #4a1168 100%);
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(53, 23, 69, 0.2);
+  font-weight: 600;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(53, 23, 69, 0.3);
+    background: linear-gradient(135deg, #4b2067 0%, #5d2b7a 100%);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const FilterContainer = styled.div`
+  background: white;
+  padding: 24px 32px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+`;
+
+const SearchContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const SearchIconButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #2d1155;
+    color: #2d1155;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
+    border-color: #2d1155;
+    color: white;
+  }
+`;
+
+const SearchInput = styled.input<{ $isExpanded: boolean }>`
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 40px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  padding: 0 16px 0 48px;
+  background: white;
+  color: #374151;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: ${props => props.$isExpanded ? '280px' : '40px'};
+  opacity: ${props => props.$isExpanded ? '1' : '0'};
+  pointer-events: ${props => props.$isExpanded ? 'auto' : 'none'};
+
+  &:hover {
+    border-color: #2d1155;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #2d1155;
+    box-shadow: 0 0 0 3px rgba(45, 17, 85, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  @media (max-width: 768px) {
+    width: ${props => props.$isExpanded ? '100%' : '40px'};
+    position: ${props => props.$isExpanded ? 'relative' : 'absolute'};
+  }
+`;
+
+const ClearButton = styled.button`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+`;
+
+const TableContainer = styled.div`
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+  margin-bottom: 30px;
 `;
 
 const Table = styled.table`
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: #fff;
-  margin-bottom: 2rem;
+  border-collapse: collapse;
+  background: transparent;
   font-size: 1.05rem;
+
   th,
   td {
-    padding: 1.2rem 0.5rem;
+    padding: 20px 16px;
     text-align: left;
-    border: none;
+    border-bottom: 1px solid #ececec;
     font-size: 1.05rem;
+    color: #222;
+    font-weight: 400;
   }
+
   th {
-    color: #5e5553;
-    font-weight: 700;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    color: #351745;
+    font-weight: 600;
+    border-bottom: 2px solid #e5e7eb;
     font-size: 1.08rem;
-    background: #fff;
-    border-bottom: 2px solid #eee;
+    letter-spacing: -0.5px;
   }
-  td {
-    color: #5e5553;
-    border-bottom: 1.5px solid #eee;
-    background: #fff;
-  }
-  tr:last-child td {
-    border-bottom: none;
+
+  tbody tr {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    
+    &:hover {
+      background: linear-gradient(135deg, #fefbff 0%, #f8f5ff 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(53, 23, 69, 0.08);
+    }
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    /* 선택된 상태 */
+    &.selected {
+      background: linear-gradient(135deg, #f0ebf8 0%, #e5e0ee 100%);
+      border-left: 4px solid #4b2067;
+    }
+    
+    &.selected:hover {
+      background: linear-gradient(135deg, #e5e0ee 0%, #d4c7e8 100%);
+    }
   }
 `;
 
-// const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
-//   padding: 0.5rem 1rem;
-//   border-radius: 4px;
-//   border: none;
-//   cursor: pointer;
-//   margin-right: 0.5rem;
-//   background-color: ${(props) =>
-//     props.variant === 'danger' ? '#dc3545' : '#007bff'};
-//   color: white;
+const SortableHeader = styled.th`
+  text-align: left;
+  font-size: 1rem;
+  color: #2d1155;
+  font-weight: 600;
+  padding: 20px 24px;
+  border-bottom: 2px solid #e5e7eb;
+  position: relative;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 
-//   &:hover {
-//     opacity: 0.9;
-//   }
-// `;
+  &:hover {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  }
+`;
 
-// const Form = styled.form`
-//   background-color: white;
-//   padding: 2rem;
-//   border-radius: 8px;
-//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-//   margin-bottom: 2rem;
-// `;
+const SortIconContainer = styled.span`
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 8px;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  
+  &.active {
+    opacity: 1;
+    color: #2d1155;
+  }
+  
+  &.inactive {
+    opacity: 0.2;
+  }
+`;
 
-// const FormGroup = styled.div`
-//   margin-bottom: 1rem;
+const NewSortIcon = styled.span`
+  font-size: 10px;
+  line-height: 1;
+  margin: -1px 0;
+  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  &.active {
+    color: #2d1155;
+  }
+`;
 
-//   label {
-//     display: block;
-//     margin-bottom: 0.5rem;
-//     font-weight: 500;
-//   }
+const StatusBadge = styled.div<{ $status: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  min-width: 80px;
+  justify-content: center;
 
-//   input {
-//     width: 100%;
-//     padding: 0.5rem;
-//     border: 1px solid #ddd;
-//     border-radius: 4px;
-//     font-size: 1rem;
+  ${(props) => {
+    if (props.$status) {
+      return `
+        background: rgba(34, 197, 94, 0.1);
+        color: #059669;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        
+        &:hover {
+          transform: translateY(-1px);
+          background: rgba(34, 197, 94, 0.15);
+          border-color: rgba(34, 197, 94, 0.3);
+          box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+        }
+      `;
+    } else {
+      return `
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        
+        &:hover {
+          transform: translateY(-1px);
+          background: rgba(239, 68, 68, 0.15);
+          border-color: rgba(239, 68, 68, 0.3);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+        }
+      `;
+    }
+  }}
 
-//     &:focus {
-//       outline: none;
-//       border-color: #007bff;
-//     }
-//   }
-// `;
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: ${(props) => (props.$status ? '#059669' : '#dc2626')};
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const IconButton = styled.button<{ variant?: 'edit' }>`
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(53, 23, 69, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  ${props => props.variant === 'edit' ? `
+    background: rgba(255, 255, 255, 0.95);
+    color: #2d1155;
+    
+    &:hover {
+      background: linear-gradient(135deg, #fefbff 0%, #f8f5ff 100%);
+      color: #4b2067;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(45, 17, 85, 0.3);
+      border-color: rgba(45, 17, 85, 0.4);
+    }
+  ` : `
+    background: #f3f4f6;
+    color: #6b7280;
+    
+    &:hover {
+      background: #e5e7eb;
+      color: #374151;
+      transform: translateY(-1px);
+    }
+  `}
+  
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+// 페이지네이션 스타일
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 40px;
+`;
+
+const PageButton = styled.button<{ $active?: boolean }>`
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid ${props => props.$active ? '#2d1155' : '#e5e7eb'};
+  background: ${props => props.$active ? 'linear-gradient(135deg, #2d1155 0%, #4b2067 100%)' : 'white'};
+  color: ${props => props.$active ? 'white' : '#6b7280'};
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background: ${props => props.$active ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#f9fafb'};
+    border-color: ${props => props.$active ? '#351745' : '#d1d5db'};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const PageNavButton = styled.button`
+  padding: 8px 16px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #d1d5db;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const Modal = styled.div<{ $isOpen: boolean }>`
+  display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
 
 interface Company {
   company_id: string;
@@ -107,316 +465,165 @@ interface Company {
   service_startdate: string;
   service_enddate: string;
   service_status: boolean;
-  admin_account: string;
 }
 
-const PageHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-  position: relative;
-  h1 {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #351745;
-    margin: 0;
-  }
-`;
-
-const AddButton = styled.button`
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #351745;
-  color: #fff;
-  border: none;
-  font-size: 2.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.08);
-  cursor: pointer;
-  transition: background 0.15s;
-  &:hover {
-    background: #4b2067;
-  }
-`;
-
-// const Modal = styled.div<{ $isOpen: boolean }>`
-//   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: 100%;
-//   background-color: rgba(0, 0, 0, 0.5);
-//   justify-content: center;
-//   align-items: center;
-//   z-index: 1000;
-// `;
-
-// const ModalContent = styled.div`
-//   background-color: white;
-//   padding: 2rem;
-//   border-radius: 8px;
-//   width: 100%;
-//   max-width: 600px;
-//   max-height: 80vh;
-//   overflow-y: auto;
-// `;
-
-// const ModalHeader = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   margin-bottom: 1.5rem;
-
-//   h2 {
-//     margin: 0;
-//     font-size: 1.5rem;
-//   }
-// `;
-
-// const CloseButton = styled.button`
-//   background: none;
-//   border: none;
-//   font-size: 1.5rem;
-//   cursor: pointer;
-//   padding: 0.5rem;
-//   color: #666;
-
-//   &:hover {
-//     color: #333;
-//   }
-// `;
-
-const StatusBadge = styled.div<{ $status: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  padding: 0.4rem 1.1rem 0.4rem 0.9rem;
-  border-radius: 1.2rem;
-  font-size: 1.02rem;
-  font-weight: 600;
-  background: #f5f5f7;
-  color: #5e5553;
-  border: none;
-  box-shadow: none;
-  &::before {
-    content: "";
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    margin-right: 8px;
-    background-color: ${(props) => (props.$status ? "#16a34a" : "#dc2626")};
-    display: inline-block;
-  }
-`;
-
-const StatusDropdown = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  min-width: 150px;
-  margin-top: 4px;
-`;
-
-const StatusOption = styled.div<{ $status: boolean }>`
-  padding: 8px 12px;
-  cursor: pointer;
-  color: ${(props) => (props.$status ? "#480B6A" : "#dc2626")};
-
-  &:hover {
-    background-color: #f8fafc;
-  }
-`;
-
-const StatusContainer = styled.div`
-  position: relative;
-`;
-
-// 정렬 방향을 위한 타입 추가
 type SortDirection = "asc" | "desc" | null;
 
-// 정렬 상태를 위한 인터페이스
 interface SortState {
   field: string;
   direction: SortDirection;
 }
 
-// 테이블 헤더 스타일 컴포넌트 추가
-const TableHeader = styled.th`
-  background-color: #f8fafc;
-  color: #480b6a;
-  font-weight: 500;
-  white-space: nowrap;
-  padding: 1rem;
-  text-align: left;
-  cursor: pointer;
-  user-select: none;
-  position: relative;
-
-  &:hover {
-    background-color: #f1f5f9;
-  }
-`;
-
-const SortIcon = styled.span<{ $direction: SortDirection }>`
-  display: inline-block;
-  margin-left: 4px;
-  vertical-align: middle;
-
-  &::before,
-  &::after {
-    content: "";
-    display: block;
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-  }
-
-  &::before {
-    border-bottom: 4px solid
-      ${(props) => (props.$direction === "asc" ? "#480B6A" : "#cbd5e1")};
-    margin-bottom: 2px;
-  }
-
-  &::after {
-    border-top: 4px solid
-      ${(props) => (props.$direction === "desc" ? "#480B6A" : "#cbd5e1")};
-  }
-`;
-
-// 날짜를 yyyy-MM-dd로 변환하는 함수
 const toDateInputValue = (dateString: string) => {
-  if (!dateString) return "";
+  if (!dateString) return '';
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
-  return dateString.split("T")[0];
+  return dateString.split('T')[0];
+};
+
+// 날짜를 표시용으로 포맷하는 함수 (YYYY.MM.DD 형식)
+const formatDisplayDate = (dateString: string) => {
+  if (!dateString) return '';
+  
+  let date: Date;
+  
+  if (dateString.includes('T')) {
+    // ISO 8601 형식
+    date = new Date(dateString);
+  } else if (dateString.includes('/')) {
+    // MM/DD/YYYY 또는 DD/MM/YYYY 형식
+    date = new Date(dateString);
+  } else if (dateString.includes('.')) {
+    // YYYY.MM.DD 형식
+    date = new Date(dateString.replace(/\./g, '-'));
+  } else {
+    // 기타 형식
+    date = new Date(dateString);
+  }
+  
+  // 유효한 날짜인지 확인
+  if (isNaN(date.getTime())) {
+    return dateString; // 원본 문자열 반환
+  }
+  
+  // YYYY.MM.DD 형식으로 변환
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  
+  return `${year}.${month}.${day}`;
 };
 
 const AdminCompany: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
-    null
-  );
-  const [activeStatusDropdown, setActiveStatusDropdown] = useState<
-    string | null
-  >(null);
-  const [formData, setFormData] = useState({
-    company_name: "",
-    company_scale: "",
-    service_startdate: "",
-    service_enddate: "",
-    service_status: true,
-    admin_account: "",
-  });
-
-  // 정렬 상태 추가
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [sortState, setSortState] = useState<SortState>({
-    field: "",
+    field: '',
     direction: null,
   });
-
-  const [adminUser, setAdminUser] = useState<{user_name: string, user_email: string} | null>(null);
+  
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  // 검색 상태
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   const navigate = useNavigate();
 
-  // 회사 목록 조회
+  const [formData, setFormData] = useState({
+    company_name: '',
+    company_scale: '',
+    service_startdate: '',
+    service_enddate: '',
+    service_status: true,
+  });
+
   const fetchCompanies = async () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
         {
-          credentials: "include",
+          credentials: 'include',
         }
       );
       if (!response.ok) {
-        let errorMsg = "회사 목록 조회에 실패했습니다.";
+        let errorMsg = '회사 목록 조회에 실패했습니다.';
         try {
           const errorData = await response.json();
           if (errorData.detail) errorMsg = errorData.detail;
         } catch {}
         alert(errorMsg);
-        navigate("/");
+        navigate('/');
         throw new Error(errorMsg);
       }
       const data = await response.json();
       setCompanies(data);
     } catch (error) {
-      console.error("회사 목록 조회 실패:", error);
+      console.error('회사 목록 조회 실패:', error);
+      navigate('/');
     }
   };
 
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  // 입력 폼 핸들러
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  // 회사 생성
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/`,
         {
-
-          method: "POST",
-          credentials: "include",
-
-
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(formData),
         }
       );
+      if (!response.ok) {
+        let errorMsg = '회사 생성에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) errorMsg = errorData.detail;
+        } catch {}
+        alert(errorMsg);
+        throw new Error(errorMsg);
+      }
       if (response.ok) {
         fetchCompanies();
         setFormData({
-          company_name: "",
-          company_scale: "",
-          service_startdate: "",
-          service_enddate: "",
+          company_name: '',
+          company_scale: '',
+          service_startdate: '',
+          service_enddate: '',
           service_status: true,
-          admin_account: "",
         });
       }
     } catch (error) {
-      console.error("회사 생성 실패:", error);
+      console.error('회사 생성 실패:', error);
+      alert('회사 생성 중 오류가 발생했습니다.');
     }
   };
 
-  // 회사 수정
   const handleUpdate = async (companyId: string) => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`,
         {
-
           method: 'PUT',
-          credentials: 'include',
-
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(formData),
         }
       );
@@ -425,66 +632,36 @@ const AdminCompany: React.FC = () => {
         setSelectedCompanyId(null);
       }
     } catch (error) {
-      console.error("회사 수정 실패:", error);
+      console.error('회사 수정 실패:', error);
     }
   };
 
-  // 회사 삭제
-  const handleDelete = async (companyId: string) => {
-    if (window.confirm("정말로 이 회사를 삭제하시겠습니까?")) {
+  const handleStatusToggle = async (
+    companyId: string,
+    currentStatus: boolean
+  ) => {
+    const newStatus = !currentStatus;
+    const statusText = newStatus ? "활성화" : "비활성화";
+    
+    if (window.confirm(`정말로 이 회사를 ${statusText}하시겠습니까?`)) {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}`,
+          `${import.meta.env.VITE_API_URL}/api/v1/admin/companies/${companyId}/status`,
           {
-
-            method: 'DELETE',
-            credentials: 'include',
-
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ service_status: newStatus }),
           }
         );
         if (response.ok) {
           fetchCompanies();
         }
       } catch (error) {
-        console.error("회사 삭제 실패:", error);
+        console.error("회사 상태 변경 실패:", error);
       }
-    }
-  };
-
-  // 서비스 상태 변경 함수
-  const handleStatusToggle = async (
-    companyId: string,
-    currentStatus: boolean
-  ) => {
-    try {
-      const today = new Date().toISOString().split("T")[0];
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/v1/admin/companies/${companyId}/status`,
-        {
-
-          method: 'PUT',
-          credentials: 'include',
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            service_status: !currentStatus,
-            // 비활성화로 변경할 때만 서비스 종료일 설정, 활성화로 변경할 때는 종료일 초기화
-            ...(currentStatus
-              ? { service_enddate: today }
-              : { service_enddate: null }),
-          }),
-        }
-      );
-      if (response.ok) {
-        await fetchCompanies();
-        setActiveStatusDropdown(null);
-      }
-    } catch (error) {
-      console.error("서비스 상태 변경 실패:", error);
     }
   };
 
@@ -493,217 +670,305 @@ const AdminCompany: React.FC = () => {
     setFormData({
       company_name: company.company_name,
       company_scale: company.company_scale,
-      service_startdate: company.service_startdate,
-      service_enddate: company.service_enddate,
+      service_startdate: toDateInputValue(company.service_startdate),
+      service_enddate: toDateInputValue(company.service_enddate),
       service_status: company.service_status,
-      admin_account: company.admin_account || "",
     });
-    // 유저 정보 가져오기
+    
     try {
-      const users = await fetchUsersByCompany(company.company_id);
-      // any로 캐스팅하여 user_sysrole_id 접근
-      const admin = (users as any[]).find(u => u.user_sysrole_id === 'f3d23b8c-6e7b-4f5d-a72d-8a9622f94084');
-      if (admin) {
-        setAdminUser({ user_name: admin.user_name, user_email: admin.user_email });
-        console.log("adminUser", adminUser);
-      } else {
-        setAdminUser(null);
-      }
-    } catch {
-      setAdminUser(null);
+      const response = await fetchUsersByCompany(company.company_id);
+      console.log('사용자 데이터:', response);
+    } catch (error) {
+      console.error('사용자 데이터 가져오기 실패:', error);
     }
+    
     setIsEditModalOpen(true);
   };
 
   const handleCreateClick = () => {
     setFormData({
-      company_name: "",
-      company_scale: "",
-      service_startdate: "",
-      service_enddate: "",
+      company_name: '',
+      company_scale: '',
+      service_startdate: '',
+      service_enddate: '',
       service_status: true,
-      admin_account: "",
     });
     setIsCreateModalOpen(true);
   };
 
-  // 정렬 핸들러 추가
   const handleSort = (field: string) => {
     setSortState((prev) => ({
       field,
       direction:
         prev.field === field
-          ? prev.direction === "asc"
-            ? "desc"
-            : prev.direction === "desc"
+          ? prev.direction === 'asc'
+            ? 'desc'
+            : prev.direction === 'desc'
             ? null
-            : "asc"
-          : "asc",
+            : 'asc'
+          : 'asc',
     }));
   };
 
-  // 정렬된 회사 목록 계산
-  const sortedCompanies = useMemo(() => {
-    let sorted = [...companies];
+  // 필터링된 회사 목록 계산
+  const filteredCompanies = useMemo(() => {
+    let filtered = [...companies];
+    
+    // 검색 필터링
+    if (searchTerm.trim()) {
+      filtered = filtered.filter((company) =>
+        company.company_name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // 정렬
     if (sortState.direction !== null) {
-      sorted.sort((a, b) => {
-        const aValue = String(a[sortState.field as keyof Company] || "");
-        const bValue = String(b[sortState.field as keyof Company] || "");
-
-        return sortState.direction === "asc"
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
+      filtered.sort((a, b) => {
+        const aValue = a[sortState.field as keyof Company] || '';
+        const bValue = b[sortState.field as keyof Company] || '';
+        
+        if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
+          return sortState.direction === 'asc'
+            ? (aValue ? 1 : 0) - (bValue ? 1 : 0)
+            : (bValue ? 1 : 0) - (aValue ? 1 : 0);
+        }
+        
+        return sortState.direction === 'asc'
+          ? String(aValue).localeCompare(String(bValue))
+          : String(bValue).localeCompare(String(aValue));
       });
     }
-    return sorted;
-  }, [companies, sortState]);
+    
+    return filtered;
+  }, [companies, searchTerm, sortState]);
+
+  // 페이지네이션된 회사 목록 계산
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCompanies = filteredCompanies.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
+
+  // 페이지네이션 관련
+  const pageGroupSize = 5;
+  const pageGroup = Math.floor((currentPage - 1) / pageGroupSize);
+  const startPage = pageGroup * pageGroupSize + 1;
+  const endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
+  const pageNumbers = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i);
+  }
+
+  // 검색어가 변경되면 첫 페이지로 이동
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortState]);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  // 정렬 아이콘 렌더링 함수
+  const renderSortIcons = (field: string) => {
+    return (
+      <SortIconContainer 
+        className={sortState.field === field ? 'active' : ''}
+      >
+        <NewSortIcon className={sortState.field === field && sortState.direction === 'asc' ? 'active' : ''}>
+          <FiChevronUp />
+        </NewSortIcon>
+        <NewSortIcon className={sortState.field === field && sortState.direction === 'desc' ? 'active' : ''}>
+          <FiChevronDown />
+        </NewSortIcon>
+      </SortIconContainer>
+    );
+  };
+
+  // 검색 핸들러 함수들
+  const handleSearchToggle = () => {
+    setIsSearchExpanded(!isSearchExpanded);
+    if (isSearchExpanded && searchTerm) {
+      setSearchTerm('');
+    }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSearchClear = () => {
+    setSearchTerm('');
+  };
+
+  const handleSearchBlur = () => {
+    // 검색어가 없으면 검색창을 축소
+    if (!searchTerm.trim()) {
+      setIsSearchExpanded(false);
+    }
+  };
+
+  const handleSearchFocus = () => {
+    // 포커스시 검색창 확장
+    setIsSearchExpanded(true);
+  };
 
   return (
     <Container>
       <MainContent>
         <PageHeader>
           <h1>회사 관리</h1>
-          <AddButton onClick={handleCreateClick}>+</AddButton>
         </PageHeader>
 
-        <Table>
-          <thead>
-            <tr>
-              <TableHeader onClick={() => handleSort("company_name")}>
-                회사명
-                <SortIcon
-                  $direction={
-                    sortState.field === "company_name"
-                      ? sortState.direction
-                      : null
-                  }
-                />
-              </TableHeader>
-              <TableHeader onClick={() => handleSort("company_scale")}>
-                규모
-                <SortIcon
-                  $direction={
-                    sortState.field === "company_scale"
-                      ? sortState.direction
-                      : null
-                  }
-                />
-              </TableHeader>
-              <TableHeader onClick={() => handleSort("service_startdate")}>
-                서비스 시작일
-                <SortIcon
-                  $direction={
-                    sortState.field === "service_startdate"
-                      ? sortState.direction
-                      : null
-                  }
-                />
-              </TableHeader>
-              <TableHeader onClick={() => handleSort("service_enddate")}>
-                서비스 종료일
-                <SortIcon
-                  $direction={
-                    sortState.field === "service_enddate"
-                      ? sortState.direction
-                      : null
-                  }
-                />
-              </TableHeader>
-              <TableHeader onClick={() => handleSort("service_status")}>
-                서비스 상태
-                <SortIcon
-                  $direction={
-                    sortState.field === "service_status"
-                      ? sortState.direction
-                      : null
-                  }
-                />
-              </TableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedCompanies.map((company) => (
-              <tr
-                key={company.company_id}
-                onClick={() => handleRowClick(company)}
-                style={{ cursor: "pointer" }}
-              >
-                <td>{company.company_name}</td>
-                <td>{company.company_scale}</td>
-                <td>{toDateInputValue(company.service_startdate)}</td>
-                <td>{toDateInputValue(company.service_enddate)}</td>
-                <td onClick={(e) => e.stopPropagation()}>
-                  <StatusContainer>
+        <FilterContainer>
+          <div></div> {/* 빈 공간 */}
+          
+          <SearchContainer>
+            <SearchIconButton 
+              onClick={handleSearchToggle}
+              className={isSearchExpanded ? 'active' : ''}
+            >
+              <FiSearch />
+            </SearchIconButton>
+            <SearchInput
+              $isExpanded={isSearchExpanded}
+              type="text"
+              placeholder="회사명으로 검색..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onBlur={handleSearchBlur}
+              onFocus={handleSearchFocus}
+              autoFocus={isSearchExpanded}
+            />
+            {searchTerm && (
+              <ClearButton onClick={handleSearchClear}>
+                <FiX />
+              </ClearButton>
+            )}
+            <AddButton onClick={handleCreateClick} title="회사 추가">
+              +
+            </AddButton>
+          </SearchContainer>
+        </FilterContainer>
+
+        <TableContainer>
+          <Table>
+            <thead>
+              <tr>
+                <SortableHeader onClick={() => handleSort('company_id')}>
+                  회사 ID
+                  {renderSortIcons('company_id')}
+                </SortableHeader>
+                <SortableHeader onClick={() => handleSort('company_name')}>
+                  회사명
+                  {renderSortIcons('company_name')}
+                </SortableHeader>
+                <SortableHeader onClick={() => handleSort('company_scale')}>
+                  규모
+                  {renderSortIcons('company_scale')}
+                </SortableHeader>
+                <SortableHeader onClick={() => handleSort('service_startdate')}>
+                  서비스 시작일
+                  {renderSortIcons('service_startdate')}
+                </SortableHeader>
+                <SortableHeader onClick={() => handleSort('service_enddate')}>
+                  서비스 종료일
+                  {renderSortIcons('service_enddate')}
+                </SortableHeader>
+                <SortableHeader onClick={() => handleSort('service_status')}>
+                  서비스 상태
+                  {renderSortIcons('service_status')}
+                </SortableHeader>
+                <th>작업</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentCompanies.map((company) => (
+                <tr
+                  key={company.company_id}
+                  onClick={() => handleRowClick(company)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <td>{company.company_id}</td>
+                  <td>{company.company_name}</td>
+                  <td>{company.company_scale}</td>
+                  <td>{formatDisplayDate(company.service_startdate)}</td>
+                  <td>{formatDisplayDate(company.service_enddate)}</td>
+                  <td onClick={(e) => e.stopPropagation()}>
                     <StatusBadge
                       $status={company.service_status}
-                      onClick={() =>
-                        setActiveStatusDropdown(
-                          activeStatusDropdown === company.company_id
-                            ? null
-                            : company.company_id
-                        )
-                      }
+                      onClick={() => handleStatusToggle(company.company_id, company.service_status)}
                     >
-                      {company.service_status ? "활성" : "비활성"}
+                      {company.service_status ? '활성' : '비활성'}
                     </StatusBadge>
-                    {activeStatusDropdown === company.company_id && (
-                      <StatusDropdown>
-                        <StatusOption
-                          $status={true}
-                          onClick={() =>
-                            handleStatusToggle(company.company_id, false)
-                          }
-                        >
-                          활성화
-                        </StatusOption>
-                        <StatusOption
-                          $status={false}
-                          onClick={() =>
-                            handleStatusToggle(company.company_id, true)
-                          }
-                        >
-                          비활성화
-                        </StatusOption>
-                      </StatusDropdown>
-                    )}
-                  </StatusContainer>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+                  </td>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <IconButton
+                      variant="edit"
+                      onClick={() => handleRowClick(company)}
+                      title="회사 수정"
+                    >
+                      <FiEdit />
+                    </IconButton>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </TableContainer>
 
-        <NewCompany
-          visible={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onSubmit={handleSubmit}
-          formData={formData}
-          onChange={handleInputChange}
-        />
-        <EditCompany
-          visible={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSubmit={
-            selectedCompanyId
-              ? (e) => {
-                  e.preventDefault();
-                  handleUpdate(selectedCompanyId);
-                }
-              : () => {}
-          }
-          onDelete={
-            selectedCompanyId
-              ? () => {
-                  handleDelete(selectedCompanyId);
-                  setIsEditModalOpen(false);
-                }
-              : () => {}
-          }
-          formData={formData}
-          onChange={handleInputChange}
-          adminUser={adminUser}
-          companyId={selectedCompanyId || ''}
-        />
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <Pagination>
+            <PageNavButton 
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              이전
+            </PageNavButton>
+            
+            {pageNumbers.map((number) => (
+              <PageButton 
+                key={number}
+                $active={currentPage === number}
+                onClick={() => setCurrentPage(number)}
+              >
+                {number}
+              </PageButton>
+            ))}
+            
+            <PageNavButton 
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              다음
+            </PageNavButton>
+          </Pagination>
+        )}
+
+        {/* 생성 모달 */}
+        <Modal $isOpen={isCreateModalOpen}>
+          <NewCompany
+            visible={isCreateModalOpen}
+            onSubmit={handleSubmit}
+            onClose={() => setIsCreateModalOpen(false)}
+            formData={formData}
+            onChange={handleInputChange}
+          />
+        </Modal>
+
+        {/* 수정 모달 */}
+        <Modal $isOpen={isEditModalOpen}>
+          <EditCompany
+            visible={isEditModalOpen}
+            onSubmit={() => {
+              if (selectedCompanyId) handleUpdate(selectedCompanyId);
+              setIsEditModalOpen(false);
+            }}
+            onClose={() => setIsEditModalOpen(false)}
+            formData={formData}
+            onChange={handleInputChange}
+            companyId={selectedCompanyId || ''}
+          />
+        </Modal>
       </MainContent>
     </Container>
   );

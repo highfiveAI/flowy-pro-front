@@ -11,7 +11,6 @@ import {
   InputGroup,
   Label,
   MyPageWrapper,
-  PageTitle,
 } from './MyPage.styles';
 
 const MyPage: React.FC = () => {
@@ -38,9 +37,15 @@ const MyPage: React.FC = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   useEffect(() => {
     if (errorParam === '402') {
-      setError('비밀번호가 알맞지 않습니다.');
+      setError('비밀번호가 일치하지 않습니다.');
     }
     const newUrl = location.pathname;
     navigate(newUrl, { replace: true });
@@ -48,7 +53,6 @@ const MyPage: React.FC = () => {
 
   return (
     <MyPageWrapper>
-      <PageTitle>마이페이지</PageTitle>
       <FormArea>
         <FormContainer>
           <InputGroup>
@@ -62,6 +66,8 @@ const MyPage: React.FC = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="비밀번호를 입력하세요"
             />
           </InputGroup>
           {error && <ErrorText>{error}</ErrorText>}
