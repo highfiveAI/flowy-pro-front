@@ -776,6 +776,7 @@ const AlertButtonContainer = styled.div`
   gap: 12px;
 `;
 
+
 const AlertButton = styled.button<{ variant?: 'success' | 'danger' | 'secondary' }>`
   padding: 14px 24px;
   border-radius: 12px;
