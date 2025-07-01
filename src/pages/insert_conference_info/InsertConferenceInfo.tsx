@@ -22,6 +22,7 @@ import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup';
 import type { ProjectResponse } from '../../types/project';
 import { fetchMeetingsWithUsers } from '../../api/fetchProject';
 import EditProjectPopup from './conference_popup/EditProjectPopup.tsx';
+
 import {
   ContainerWrapper,
   ContentWrapper,
