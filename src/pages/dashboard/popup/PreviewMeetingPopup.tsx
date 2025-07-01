@@ -160,7 +160,7 @@ const Input = styled.input`
   &:hover {
     border-color: #2d1155;
   }
-  
+
   &:focus {
     outline: none;
     border-color: #2d1155;
@@ -176,7 +176,7 @@ const DatePickerWrapper = styled.div`
   position: relative;
   width: 100%;
   z-index: 1000;
-  
+
   /* 입력 컨테이너 스타일 */
   .react-datepicker-wrapper {
     width: 100%;
@@ -184,7 +184,7 @@ const DatePickerWrapper = styled.div`
   .react-datepicker__input-container {
     width: 100%;
   }
-  
+
   /* 입력 필드 스타일 */
   .custom-datepicker {
     width: 100%;
@@ -199,17 +199,17 @@ const DatePickerWrapper = styled.div`
     box-sizing: border-box;
     font-family: 'Rethink Sans', sans-serif;
     cursor: pointer;
-    
+
     &:hover {
       border-color: #2d1155;
     }
-    
+
     &:focus {
       outline: none;
       border-color: #2d1155;
       box-shadow: 0 0 0 3px rgba(45, 17, 85, 0.1);
     }
-    
+
     &::placeholder {
       color: #9ca3af;
     }
@@ -229,7 +229,7 @@ const DatePickerWrapper = styled.div`
     justify-content: center !important;
     backdrop-filter: blur(3px) !important;
   }
-  
+
   .react-datepicker__portal .react-datepicker {
     position: relative !important;
     margin: auto !important;
@@ -237,20 +237,20 @@ const DatePickerWrapper = styled.div`
     z-index: 2147483647 !important;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3) !important;
   }
-  
+
   /* 달력 팝업 컨테이너 */
   .react-datepicker-popper {
     z-index: 9999 !important;
     position: absolute !important;
   }
-  
-  .react-datepicker-popper[data-placement^="bottom"] {
+
+  .react-datepicker-popper[data-placement^='bottom'] {
     margin-top: 8px;
   }
 
   /* 메인 달력 컨테이너 */
   .react-datepicker {
-    font-family: "Rethink Sans", sans-serif !important;
+    font-family: 'Rethink Sans', sans-serif !important;
     border: none !important;
     border-radius: 16px !important;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1) !important;
@@ -370,7 +370,7 @@ const DatePickerWrapper = styled.div`
     flex-grow: 0 !important;
     flex-basis: 2.5rem !important;
     box-sizing: border-box !important;
-    
+
     &:hover {
       background: linear-gradient(135deg, #e8e0ee, #d4c7e8) !important;
       color: #351745 !important;
@@ -385,7 +385,7 @@ const DatePickerWrapper = styled.div`
     font-weight: 600;
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(72, 11, 106, 0.3);
-    
+
     &:hover {
       background: linear-gradient(135deg, #5c1f7a, #480b6a) !important;
       transform: scale(1.1);
@@ -403,7 +403,7 @@ const DatePickerWrapper = styled.div`
   /* 다른 달 날짜 */
   .react-datepicker__day--outside-month {
     color: #ccc;
-    
+
     &:hover {
       background: #f0f0f0;
       color: #999;
@@ -414,7 +414,7 @@ const DatePickerWrapper = styled.div`
   .react-datepicker__day--disabled {
     color: #ccc !important;
     cursor: not-allowed !important;
-    
+
     &:hover {
       background: transparent !important;
       transform: none !important;
@@ -442,7 +442,7 @@ const DatePickerWrapper = styled.div`
     overflow: hidden !important;
     font-size: 0 !important;
     color: transparent !important;
-    
+
     &:hover {
       background: rgba(53, 23, 69, 0.1) !important;
       border-radius: 50% !important;
@@ -467,8 +467,9 @@ const DatePickerWrapper = styled.div`
     position: relative !important;
     top: 1px !important;
   }
-  
-  .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+
+  .react-datepicker__navigation:hover
+    .react-datepicker__navigation-icon::before {
     border-color: #2a1238 !important;
   }
 
@@ -521,20 +522,20 @@ const DatePickerWrapper = styled.div`
     padding: 4px 8px 4px 4px !important;
     margin: 0 !important;
     box-sizing: border-box !important;
-    
+
     &::-webkit-scrollbar {
       width: 8px !important;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f1f1 !important;
       border-radius: 4px !important;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: linear-gradient(135deg, #480b6a, #351745) !important;
       border-radius: 4px !important;
-      
+
       &:hover {
         background: linear-gradient(135deg, #5c1f7a, #480b6a) !important;
       }
@@ -550,7 +551,7 @@ const DatePickerWrapper = styled.div`
     transition: all 0.2s ease;
     border-radius: 6px;
     margin: 2px 4px;
-    
+
     &:hover {
       background: linear-gradient(135deg, #e8e0ee, #d4c7e8);
       color: #351745;
@@ -562,7 +563,7 @@ const DatePickerWrapper = styled.div`
     background: linear-gradient(135deg, #480b6a, #351745) !important;
     color: white !important;
     font-weight: 600;
-    
+
     &:hover {
       background: linear-gradient(135deg, #5c1f7a, #480b6a) !important;
     }
@@ -604,7 +605,7 @@ const TextArea = styled.textarea`
   &:hover {
     border-color: #2d1155;
   }
-  
+
   &:focus {
     outline: none;
     border-color: #2d1155;
@@ -635,8 +636,8 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' | 'danger' }>`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  
-  ${props => {
+
+  ${(props) => {
     switch (props.variant) {
       case 'danger':
         return `
@@ -706,11 +707,10 @@ const AlertContent = styled.div`
 `;
 
 const AlertHeader = styled.div<{ variant: 'success' | 'danger' }>`
-  background: ${props => 
-    props.variant === 'success' 
+  background: ${(props) =>
+    props.variant === 'success'
       ? 'linear-gradient(135deg, #2d1155 0%, #4b2067 100%)'
-      : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
-  };
+      : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'};
   color: white;
   padding: 32px 40px;
   display: flex;
@@ -776,7 +776,9 @@ const AlertButtonContainer = styled.div`
   gap: 12px;
 `;
 
-const AlertButton = styled.button<{ variant?: 'success' | 'danger' | 'secondary' }>`
+const AlertButton = styled.button<{
+  variant?: 'success' | 'danger' | 'secondary';
+}>`
   padding: 14px 24px;
   border-radius: 12px;
   border: none;
@@ -789,8 +791,8 @@ const AlertButton = styled.button<{ variant?: 'success' | 'danger' | 'secondary'
   justify-content: center;
   gap: 8px;
   min-width: 120px;
-  
-  ${props => {
+
+  ${(props) => {
     switch (props.variant) {
       case 'success':
         return `
@@ -858,10 +860,15 @@ const AlertModalComponent: React.FC<AlertModalProps> = ({
   variant,
   title,
   message,
-  onClose
+  onClose,
 }) => {
-  console.log('AlertModalComponent props:', { isOpen, variant, title, message });
-  
+  console.log('AlertModalComponent props:', {
+    isOpen,
+    variant,
+    title,
+    message,
+  });
+
   if (!isOpen) return null;
 
   return (
@@ -878,10 +885,10 @@ const AlertModalComponent: React.FC<AlertModalProps> = ({
             <FiX />
           </AlertCloseButton>
         </AlertHeader>
-        
+
         <AlertBody>
           <AlertDescription>{message}</AlertDescription>
-          
+
           <AlertButtonContainer>
             <AlertButton variant={variant} onClick={onClose}>
               확인
@@ -901,17 +908,17 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
   onLater,
 }) => {
   // 한국 시간대로 변환하여 datetime-local 형식으로 만드는 함수
-  const formatToDatetimeLocal = (dateString: string) => {
-    const date = new Date(dateString);
-    // 한국 시간대로 변환
-    const kstDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000) + (9 * 3600000));
-    const year = kstDate.getFullYear();
-    const month = String(kstDate.getMonth() + 1).padStart(2, '0');
-    const day = String(kstDate.getDate()).padStart(2, '0');
-    const hours = String(kstDate.getHours()).padStart(2, '0');
-    const minutes = String(kstDate.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
+  // const formatToDatetimeLocal = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   // 한국 시간대로 변환
+  //   const kstDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000) + (9 * 3600000));
+  //   const year = kstDate.getFullYear();
+  //   const month = String(kstDate.getMonth() + 1).padStart(2, '0');
+  //   const day = String(kstDate.getDate()).padStart(2, '0');
+  //   const hours = String(kstDate.getHours()).padStart(2, '0');
+  //   const minutes = String(kstDate.getMinutes()).padStart(2, '0');
+  //   return `${year}-${month}-${day}T${hours}:${minutes}`;
+  // };
 
   const [editData, setEditData] = useState({
     meeting_title: meeting.meeting_title,
@@ -928,7 +935,7 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
     isOpen: false,
     variant: 'success',
     title: '',
-    message: ''
+    message: '',
   });
 
   const handleConfirm = () => {
@@ -938,30 +945,30 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
       meeting_date: editData.meeting_date.toISOString(),
     };
     onConfirm(confirmData);
-    
+
     // 등록 알림 모달 표시 (보라색)
     setAlertModal({
       isOpen: true,
       variant: 'success', // success variant를 보라색으로 사용
       title: '일정 등록 완료',
-      message: '회의 일정이 캘린더에 성공적으로 등록되었습니다.'
+      message: '회의 일정이 캘린더에 성공적으로 등록되었습니다.',
     });
   };
 
   const handleReject = () => {
     onReject();
-    
+
     // 삭제 알림 모달 표시
     setAlertModal({
       isOpen: true,
       variant: 'danger',
       title: '일정 삭제 완료',
-      message: '회의 일정이 성공적으로 삭제되었습니다.'
+      message: '회의 일정이 성공적으로 삭제되었습니다.',
     });
   };
 
   const closeAlertModal = () => {
-    setAlertModal(prev => ({ ...prev, isOpen: false }));
+    setAlertModal((prev) => ({ ...prev, isOpen: false }));
     onClose(); // 알림 모달 닫으면서 메인 팝업도 닫기
   };
 
@@ -984,33 +991,37 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
             <FiX />
           </CloseButton>
         </ModalHeader>
-        
+
         <ModalBody>
           <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label>회의 제목</Label>
+            <FormGroup>
+              <Label>회의 제목</Label>
               <InputContainer>
-          <Input
-            type="text"
-            value={editData.meeting_title}
-            onChange={(e) => setEditData(prev => ({
-              ...prev,
-              meeting_title: e.target.value
-            }))}
-            placeholder="회의 제목을 입력하세요"
-          />
+                <Input
+                  type="text"
+                  value={editData.meeting_title}
+                  onChange={(e) =>
+                    setEditData((prev) => ({
+                      ...prev,
+                      meeting_title: e.target.value,
+                    }))
+                  }
+                  placeholder="회의 제목을 입력하세요"
+                />
               </InputContainer>
-        </FormGroup>
+            </FormGroup>
 
-        <FormGroup>
-          <Label>회의 일시</Label>
+            <FormGroup>
+              <Label>회의 일시</Label>
               <DatePickerWrapper>
                 <DatePicker
                   selected={editData.meeting_date}
-                  onChange={(date: Date | null) => setEditData(prev => ({
-              ...prev,
-                    meeting_date: date || new Date()
-                  }))}
+                  onChange={(date: Date | null) =>
+                    setEditData((prev) => ({
+                      ...prev,
+                      meeting_date: date || new Date(),
+                    }))
+                  }
                   showTimeSelect
                   timeIntervals={15}
                   timeFormat="HH:mm"
@@ -1020,19 +1031,21 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
                   placeholderText="회의 일시를 선택하세요"
                 />
               </DatePickerWrapper>
-        </FormGroup>
+            </FormGroup>
 
-        <FormGroup>
-          <Label>회의 안건</Label>
-          <TextArea
-            value={editData.meeting_agenda}
-            onChange={(e) => setEditData(prev => ({
-              ...prev,
-              meeting_agenda: e.target.value
-            }))}
-            placeholder="회의 안건을 입력하세요..."
-          />
-        </FormGroup>
+            <FormGroup>
+              <Label>회의 안건</Label>
+              <TextArea
+                value={editData.meeting_agenda}
+                onChange={(e) =>
+                  setEditData((prev) => ({
+                    ...prev,
+                    meeting_agenda: e.target.value,
+                  }))
+                }
+                placeholder="회의 안건을 입력하세요..."
+              />
+            </FormGroup>
 
             <ButtonContainer>
               <Button variant="primary" type="submit">
@@ -1040,15 +1053,19 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
               </Button>
               <Button variant="danger" type="button" onClick={handleReject}>
                 일정 삭제
-          </Button>
-              <Button variant="secondary" type="button" onClick={onLater || onClose}>
+              </Button>
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={onLater || onClose}
+              >
                 나중에 보기
-          </Button>
+              </Button>
             </ButtonContainer>
           </Form>
         </ModalBody>
       </ModalContent>
-      
+
       {/* 알림 모달 */}
       <AlertModalComponent
         isOpen={alertModal.isOpen}
@@ -1061,4 +1078,4 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
   );
 };
 
-export default PreviewMeetingPopup; 
+export default PreviewMeetingPopup;

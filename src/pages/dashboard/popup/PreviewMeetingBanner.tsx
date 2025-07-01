@@ -71,6 +71,7 @@ const AlertDot = styled.span`
   margin-left: 18px;
   animation: pulse 2s ease-in-out infinite;
   
+  
   @keyframes pulse {
     0%, 100% {
       transform: scale(1);

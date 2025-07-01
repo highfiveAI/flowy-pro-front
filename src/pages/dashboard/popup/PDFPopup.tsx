@@ -372,6 +372,7 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
         feedback: value,
         recommend: value,
       });
+      
     } else {
       setChecked(prev => {
         const newChecked = { ...prev, [key]: value };

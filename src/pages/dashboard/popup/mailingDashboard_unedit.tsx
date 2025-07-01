@@ -354,6 +354,7 @@ MailingDashboardProps) => {
     selectedAttendees: [],
     selectedCustom: [],
   });
+  
   // const [showPreview, setShowPreview] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownContainerRef = React.useRef<HTMLDivElement>(null);
