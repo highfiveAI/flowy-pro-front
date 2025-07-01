@@ -141,7 +141,7 @@ const Login: React.FC = () => {
         {!isGoogleRedirect && error && <ErrorMessage>{error}</ErrorMessage>}
         <LoginButton type="submit">로그인</LoginButton>
 
-        <GoogleLoginButton onClick={() => handleGoogleLogin()}>
+        <GoogleLoginButton type="button" onClick={() => handleGoogleLogin()}>
           <img src="https://www.google.com/favicon.ico" alt="Google icon" />
           구글 이메일로 로그인
         </GoogleLoginButton>

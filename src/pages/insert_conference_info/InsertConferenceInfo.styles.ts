@@ -126,8 +126,7 @@ export const ProjectListContainer = styled.div`
   max-width: 750px;
   box-sizing: border-box;
   height: 800px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   margin-top: 10px;
   
   @media (max-width: 1200px) {
@@ -205,8 +204,7 @@ export const ExpandedArea = styled.div`
 
   animation: fadeIn 0.3s ease;
   max-height: 250px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
 
   .user-list {
     display: flex;
@@ -710,6 +708,10 @@ export const StyledTextarea = styled.textarea`
 `;
 
 export const DatePickerWrapper = styled.div`
+  position: fixed !important;
+  left: 50% !important;
+  top: 200px !important;
+  transform: translateX(-50%) !important;
   /* 입력 컨테이너 스타일 */
   .react-datepicker-wrapper {
     width: 100%;
@@ -836,8 +838,9 @@ export const DatePickerWrapper = styled.div`
     pointer-events: auto !important;
     display: flex !important;
     flex-direction: row !important;
-    width: auto !important;
-    min-width: 400px !important; /* 최소 너비 보장 */
+    width: 25% !important;
+    min-width: 25% !important;
+    max-width: 25% !important;
   }
   
   /* 달력 래퍼에 클릭 이벤트 보호 */
