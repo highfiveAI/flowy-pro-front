@@ -762,6 +762,7 @@ const MailingDashboard = ({
                 }
               }}
             >
+              
               수정하고 메일 보내기
             </ActionButton>
           </ScrollableBody>
