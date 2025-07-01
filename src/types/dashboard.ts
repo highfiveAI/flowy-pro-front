@@ -13,18 +13,18 @@ export interface DashboardSummary {
 
 export interface ChartData {
   year: string;
-  발생빈도: number;
-  처리시간: number;
+  feedback_type: string;
+  count: number;
   period: string;
 }
 
 export interface TableData {
   period: string;
-  target: string;
-  value: string;
-  pop: string;
-  prevValue: string;
-  growth: string;
+  feedback_type: string;
+  filtered_avg: string; // 조회 평균 (필터링된 결과)
+  pop: string; // PoP (이전 기간 대비 현재 기간)
+  total_avg: string; // 전체 평균
+  vs_total: string;
 }
 
 export interface DashboardResponse {
@@ -35,6 +35,12 @@ export interface DashboardResponse {
 
 export interface FilterOptions {
   projects: Array<{ id: string; name: string }>;
-  departments: Array<{ name: string }>;
-  users: Array<{ id: string; name: string; login_id: string }>;
-} 
+  departments: string[];
+  users: Array<{
+    id: string;
+    name: string;
+    login_id: string;
+    department: string;
+  }>;
+  selected_user_department?: string;
+}

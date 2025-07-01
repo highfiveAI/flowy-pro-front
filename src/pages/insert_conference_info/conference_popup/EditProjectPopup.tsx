@@ -38,6 +38,7 @@ import {
   UserManagementContainer,
   UserName,
   UserPanel,
+  PopupBody,
 } from './EditProjectPopup.styles';
 
 interface PopupProps {
@@ -128,7 +129,7 @@ const EditProjectPopup: React.FC<PopupProps> = ({ onClose, projectToEdit }) => {
 
     try {
       await updateProjectWithUsers(projectToEdit.projectId, requestBody);
-      onClose();
+      window.location.replace('/insert_info');
     } catch (err) {
       setErrorMessage('프로젝트 수정 중 오류가 발생했습니다.');
     }
@@ -197,96 +198,100 @@ const EditProjectPopup: React.FC<PopupProps> = ({ onClose, projectToEdit }) => {
         <PopupHeader>
           <ProjectIcon src={AddProjectIcon2} alt="프로젝트 수정" />
           <PopupTitle>프로젝트 수정하기</PopupTitle>
+          <CloseButton onClick={onClose}>×</CloseButton>
         </PopupHeader>
-        <CloseButton onClick={onClose}>×</CloseButton>
 
-        <FormGroup>
-          <StyledLabel htmlFor="edit-project-name">프로젝트명</StyledLabel>
-          <StyledInput
-            type="text"
-            id="edit-project-name"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup>
-          <StyledLabel htmlFor="project-attendees">
-            프로젝트 참여자 선택
-          </StyledLabel>
-          <UserManagementContainer>
-            <UserPanel>
-              <SearchContainer>
-                <SearchInput
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="사용자 검색"
-                />
-              </SearchContainer>
-              <UserListBox>
-                {filteredUsers
-                  .filter(
-                    (u) =>
-                      !selectedProjectUsers.some(
-                        (su) => su.user_id === u.user_id
-                      )
-                  )
-                  .map((user) => (
-                    <UserItem key={user.user_id}>
-                      <span>{user.user_name}</span>
-                      <AddButton onClick={() => handleSelectUser(user)}>
-                        +
-                      </AddButton>
-                    </UserItem>
-                  ))}
-              </UserListBox>
-            </UserPanel>
-            <UserPanel>
-              <SelectedUsersContainer>
-                <SelectedUsersTitle>
-                  선택된 참여자 ({selectedProjectUsers.length}명)
-                </SelectedUsersTitle>
-                <TagsContainer>
-                  {/* PO 역할을 가진 사용자 먼저 렌더링 */}
-                  {selectedProjectUsers
-                    .filter((user) => user.role_id === poId)
-                    .map((selectedUser) => (
-                      <SelectedUserItem key={selectedUser.user_id}>
-                        <UserName>Host: {selectedUser.user_name}</UserName>
-                        {/* PO는 제거 버튼 없음 */}
-                      </SelectedUserItem>
+        <PopupBody>
+          <FormGroup>
+            <StyledLabel htmlFor="edit-project-name">프로젝트명</StyledLabel>
+            <StyledInput
+              type="text"
+              id="edit-project-name"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              placeholder="프로젝트명을 입력해주세요"
+            />
+          </FormGroup>
+          <FormGroup>
+            <StyledLabel htmlFor="project-attendees">
+              프로젝트 참여자 선택
+            </StyledLabel>
+            <UserManagementContainer>
+              <UserPanel>
+                <SearchContainer>
+                  <SearchInput
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="사용자 검색"
+                  />
+                </SearchContainer>
+                <UserListBox>
+                  {filteredUsers
+                    .filter(
+                      (u) =>
+                        !selectedProjectUsers.some(
+                          (su) => su.user_id === u.user_id
+                        )
+                    )
+                    .map((user) => (
+                      <UserItem key={user.user_id}>
+                        <span>{user.user_name}</span>
+                        <AddButton onClick={() => handleSelectUser(user)}>
+                          +
+                        </AddButton>
+                      </UserItem>
                     ))}
+                </UserListBox>
+              </UserPanel>
+              <UserPanel>
+                <SelectedUsersContainer>
+                  <SelectedUsersTitle>
+                    선택된 참여자 ({selectedProjectUsers.length}명)
+                  </SelectedUsersTitle>
+                  <TagsContainer>
+                    {/* PO 역할을 가진 사용자 먼저 렌더링 */}
+                    {selectedProjectUsers
+                      .filter((user) => user.role_id === poId)
+                      .map((selectedUser) => (
+                        <SelectedUserItem key={selectedUser.user_id}>
+                          <UserName>Host: {selectedUser.user_name}</UserName>
+                          {/* PO는 제거 버튼 없음 */}
+                        </SelectedUserItem>
+                      ))}
 
-                  {/* 나머지 사용자 렌더링 */}
-                  {selectedProjectUsers
-                    .filter((user) => user.role_id !== poId)
-                    .map((selectedUser) => (
-                      <SelectedUserItem key={selectedUser.user_id}>
-                        <UserName>{selectedUser.user_name}</UserName>
-                        <RemoveButton
-                          onClick={() => handleDeselectUser(selectedUser)}
-                        >
-                          ×
-                        </RemoveButton>
-                      </SelectedUserItem>
-                    ))}
-                </TagsContainer>
-              </SelectedUsersContainer>
-            </UserPanel>
-          </UserManagementContainer>
-        </FormGroup>
-        <FormGroup>
-          <StyledLabel htmlFor="project-details">프로젝트 설명</StyledLabel>
-          <StyledTextarea
-            id="project-details"
-            value={projectDetails}
-            onChange={(e) => setProjectDetails(e.target.value)}
-          ></StyledTextarea>
-        </FormGroup>
-        {errorMessage && <ErrorMessageBox>{errorMessage}</ErrorMessageBox>}
-        <CreateProjectButton onClick={handleUpdateProject}>
-          수정하기
-        </CreateProjectButton>
+                    {/* 나머지 사용자 렌더링 */}
+                    {selectedProjectUsers
+                      .filter((user) => user.role_id !== poId)
+                      .map((selectedUser) => (
+                        <SelectedUserItem key={selectedUser.user_id}>
+                          <UserName>{selectedUser.user_name}</UserName>
+                          <RemoveButton
+                            onClick={() => handleDeselectUser(selectedUser)}
+                          >
+                            ×
+                          </RemoveButton>
+                        </SelectedUserItem>
+                      ))}
+                  </TagsContainer>
+                </SelectedUsersContainer>
+              </UserPanel>
+            </UserManagementContainer>
+          </FormGroup>
+          <FormGroup>
+            <StyledLabel htmlFor="project-details">프로젝트 설명</StyledLabel>
+            <StyledTextarea
+              id="project-details"
+              value={projectDetails}
+              onChange={(e) => setProjectDetails(e.target.value)}
+              placeholder="프로젝트에 대한 설명을 입력해주세요"
+            />
+          </FormGroup>
+          {errorMessage && <ErrorMessageBox>{errorMessage}</ErrorMessageBox>}
+          <CreateProjectButton onClick={handleUpdateProject}>
+            수정하기
+          </CreateProjectButton>
+        </PopupBody>
       </PopupContent>
     </PopupOverlay>
   );

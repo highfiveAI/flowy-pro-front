@@ -119,31 +119,7 @@ export async function fetchMeetings(meeting_id: string): Promise<any | null> {
   }
 }
 
-export async function deleteProject(projectId: string): Promise<void> {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/v1/projects/${projectId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          // Authorization: `Bearer ${token}`, // 필요 시 인증 토큰 추가
-        },
-      }
-    );
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || '프로젝트 삭제에 실패했습니다.');
-    }
-
-    const result = await response.json();
-    console.log('프로젝트 삭제 성공:', result.message);
-  } catch (error) {
-    console.error('프로젝트 삭제 중 오류:', error);
-    throw error;
-  }
-}
 
 export async function updateProjectName(
   projectId: string,

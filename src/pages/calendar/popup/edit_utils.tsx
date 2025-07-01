@@ -88,7 +88,7 @@ const BtnRow = styled.div`
   gap: 10px;
 `;
 const Button = styled.button`
-  background: #351745;
+      background: linear-gradient(135deg, #351745 0%, #4a1168 100%);
   color: #fff;
   border: none;
   border-radius: 8px;

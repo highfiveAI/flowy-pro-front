@@ -28,7 +28,7 @@ export const Right = styled.div`
 export const Menu = styled.ul`
   list-style: none;
   display: flex;
-  gap: 20px;
+  gap: 30px;
 `;
 
 export const MenuItem = styled.li`
@@ -62,15 +62,7 @@ export const MenuItem = styled.li`
   }
 `;
 
-export const MenuIcon = styled.img`
-  width: 20px;
-  height: 20px;
-  transition: transform 0.2s ease;
 
-  ${MenuItem}:hover & {
-    transform: rotate(180deg);
-  }
-`;
 
 export const TextButton = styled.button`
   background: none;

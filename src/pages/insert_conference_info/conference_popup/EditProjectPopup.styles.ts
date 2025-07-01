@@ -1,92 +1,151 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
+const slideUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+`;
 
 export const ErrorMessageBox = styled.div`
-  background-color: #ffe6e6;
-  color: #cc0000;
-  padding: 10px 15px;
-  border-radius: 6px;
-  margin-top: -10px;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #dc2626;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin: 16px 0;
   font-size: 0.95rem;
   font-weight: 500;
   text-align: center;
+  border: 1px solid #f87171;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 export const CloseButton = styled.button`
   position: absolute;
   top: 20px;
   right: 25px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #999;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
   cursor: pointer;
-  transition: color 0.2s;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 
   &:hover {
-    color: #333;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
   }
 `;
 
 export const RoleSelect = styled.select`
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
   font-size: 0.9rem;
-  background-color: white;
-`;
-
-export const UserListBox = styled.div`
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow-y: auto;
-  padding: 8px;
-  flex-grow: 1;
-`;
-
-export const SearchContainer = styled.div`
-  margin-bottom: 15px;
-`;
-
-export const SearchInput = styled.input`
-  width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  background-color: white;
-  box-sizing: border-box;
+  background: white;
+  color: #374151;
+  font-family: 'Rethink Sans', sans-serif;
+  transition: all 0.2s ease;
 
   &:focus {
     outline: none;
     border-color: #00b4ba;
-    box-shadow: 0 0 0 2px rgba(0, 180, 186, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 180, 186, 0.1);
+  }
+`;
+
+export const UserListBox = styled.div`
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  overflow-y: auto;
+  padding: 8px;
+  flex-grow: 1;
+  background: white;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #00b4ba;
+  }
+`;
+
+export const SearchContainer = styled.div`
+  margin-bottom: 16px;
+`;
+
+export const SearchInput = styled.input`
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: white;
+  color: #374151;
+  box-sizing: border-box;
+  font-family: 'Rethink Sans', sans-serif;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #00b4ba;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 180, 186, 0.1);
+    transform: translateY(-1px);
+  }
+
+  &:hover {
+    border-color: #00b4ba;
   }
 
   &::placeholder {
-    color: #999;
+    color: #9ca3af;
   }
 `;
 
 export const SearchResultsContainer = styled.div`
   overflow-y: auto;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
   flex-grow: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 `;
 
 export const SearchResultItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
-  border-bottom: 1px solid #eee;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    transform: translateY(-1px);
   }
 
   &:last-child {
@@ -96,7 +155,9 @@ export const SearchResultItem = styled.div`
 
 export const UserName = styled.span`
   font-size: 0.95rem;
-  color: #333;
+  color: #374151;
+  font-weight: 500;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 export const SelectedUsersContainer = styled.div`
@@ -106,71 +167,101 @@ export const SelectedUsersContainer = styled.div`
 `;
 
 export const SelectedUsersTitle = styled.div`
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #888;
-  margin-bottom: 5px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 8px;
   text-align: right;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 export const TagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   overflow-y: auto;
-  background-color: #f8f9fa;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 16px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
   flex-grow: 1;
   align-content: flex-start;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 export const SelectedUserItem = styled.div`
   display: flex;
   align-items: center;
-  padding: 6px 12px;
-  background-color: #f0f0f0;
-  border-radius: 16px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #00b4ba 0%, #00939a 100%);
+  color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 180, 186, 0.2);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 180, 186, 0.3);
+  }
+
+  ${UserName} {
+    color: white;
+    font-weight: 500;
+  }
 `;
 
 export const RemoveButton = styled.button`
-  background: transparent;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: #333;
+  color: white;
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
   margin-left: 8px;
-  padding: 0;
+  padding: 4px 6px;
+  border-radius: 50%;
   line-height: 1;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: #000;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
   }
 `;
 
 export const NoResultsMessage = styled.div`
-  padding: 15px;
+  padding: 20px;
   text-align: center;
-  color: #666;
+  color: #6b7280;
   font-size: 0.9rem;
+  font-family: 'Rethink Sans', sans-serif;
+  font-style: italic;
 `;
 
 export const UserItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
-  border-bottom: 1px solid #eee;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    transform: translateY(-1px);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 export const AddButton = styled.button`
-  background-color: #771277;
+  background: linear-gradient(135deg, #00b4ba 0%, #00939a 100%);
   color: white;
   border: none;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -178,10 +269,18 @@ export const AddButton = styled.button`
   justify-content: center;
   padding: 0;
   font-size: 16px;
-  transition: background-color 0.2s;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 180, 186, 0.2);
 
   &:hover {
-    background-color: #5e0e5e;
+    background: linear-gradient(135deg, #009ca2 0%, #007b82 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 180, 186, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0) scale(1);
   }
 `;
 
@@ -191,53 +290,57 @@ export const PopupOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  animation: ${fadeIn} 0.3s ease-out;
 `;
 
 export const PopupContent = styled.div`
   position: relative;
   background: white;
-  padding: 40px; /* 패딩 조정 */
-  border-radius: 20px; /* border-radius 조정 */
-  width: 450px; /* 너비 조정 */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  border-radius: 24px;
+  width: 520px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 180, 186, 0.15);
+  border: 1px solid rgba(0, 180, 186, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  animation: ${slideUp} 0.3s ease-out;
 `;
 
 export const PopupHeader = styled.div`
+  background: linear-gradient(135deg, #00b4ba 0%, #00939a 100%);
+  color: white;
+  padding: 32px 40px;
   display: flex;
-  align-items: center; /* 세로 중앙 정렬 */
-  gap: 10px; /* 아이콘과 텍스트 간격 */
-  /* border-bottom: 1px solid #eee; */ /* 이미지에 없음 */
-  padding-bottom: 0px; /* 패딩 제거 */
-  margin-bottom: 30px; /* 제목 아래 여백 추가 */
+  align-items: center;
+  gap: 16px;
+  position: relative;
 `;
 
 export const ProjectIcon = styled.img`
-  width: 28px;
-  height: 28px;
-  /* margin-top: 2px; */ /* 아이콘을 텍스트와 시각적으로 정렬하기 위해 약간 아래로 내림 */
-  /* vertical-align: middle; */ /* 텍스트와 수직 중앙 정렬 */
-  transform: translateY(
-    2px
-  ); /* 아이콘을 텍스트와 시각적으로 정렬하기 위해 미세 조정 */
+  width: 32px;
+  height: 32px;
+  filter: brightness(0) invert(1);
 `;
 
 export const PopupTitle = styled.h2`
   margin: 0;
-  color: #351745; /* 색상 변경 */
-  font-size: 1.8rem; /* 폰트 사이즈 조정 */
-  font-weight: 600; /* 폰트 굵기 조정 */
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 export const FormGroup = styled.div`
-  margin-bottom: 15px; /* 각 폼 그룹 간 간격 */
+  margin-bottom: 24px;
   width: 100%;
 `;
 
@@ -251,71 +354,108 @@ export const UserPanel = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 250px; /* 고정 높이 */
+  height: 280px;
 `;
 
 export const StyledLabel = styled.label`
   display: block;
-  margin-bottom: 10px; /* 레이블과 입력 필드 간 간격 */
-  font-size: 1rem; /* 폰트 사이즈 조정 */
-  color: #333;
-  font-weight: 500;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #374151;
+  font-weight: 600;
+  font-family: 'Rethink Sans', sans-serif;
 `;
 
 export const StyledInput = styled.input`
   width: 100%;
-  padding: 12px 18px; /* 패딩 조정 */
-  border: 1px solid #ddd;
-  border-radius: 8px; /* border-radius 조정 */
-  font-size: 1rem; /* 폰트 사이즈 조정 */
+  padding: 14px 18px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
   font-family: 'Rethink Sans', sans-serif;
-  background-color: #f8f9fa; /* 배경색 변경 */
+  background: white;
+  color: #374151;
   box-sizing: border-box;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #00b4ba; /* 포커스 색상 변경 */
-    background-color: white;
+    border-color: #00b4ba;
+    background: #ffffff;
     box-shadow: 0 0 0 3px rgba(0, 180, 186, 0.1);
+    transform: translateY(-1px);
+  }
+
+  &:hover {
+    border-color: #00b4ba;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
   }
 `;
 
 export const StyledTextarea = styled.textarea`
   width: 100%;
-  padding: 12px 18px; /* 패딩 조정 */
-  border: 1px solid #ddd;
-  border-radius: 8px; /* border-radius 조정 */
-  font-size: 1rem; /* 폰트 사이즈 조정 */
+  padding: 14px 18px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
   font-family: 'Rethink Sans', sans-serif;
   box-sizing: border-box;
   height: 120px;
   resize: none;
-  background-color: #f8f9fa; /* 배경색 변경 */
-  transition: all 0.2s;
+  background: white;
+  color: #374151;
+  transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #00b4ba; /* 포커스 색상 변경 */
-    background-color: white;
+    border-color: #00b4ba;
+    background: #ffffff;
     box-shadow: 0 0 0 3px rgba(0, 180, 186, 0.1);
+    transform: translateY(-1px);
+  }
+
+  &:hover {
+    border-color: #00b4ba;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
   }
 `;
 
 export const CreateProjectButton = styled.button`
-  padding: 15px 0;
-  background-color: #00b4ba; /* 버튼 색상 변경 */
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #00b4ba 0%, #00939a 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem; /* 폰트 사이즈 조정 */
+  border-radius: 12px;
+  font-size: 1.1rem;
   font-weight: 600;
+  font-family: 'Rethink Sans', sans-serif;
   cursor: pointer;
   width: 100%;
-  margin-top: 15px; /* 버튼 위 간격 추가 */
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 180, 186, 0.2);
 
   &:hover {
-    background-color: #00939a;
+    background: linear-gradient(135deg, #009ca2 0%, #007b82 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 180, 186, 0.3);
   }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+export const PopupBody = styled.div`
+  padding: 40px;
+  overflow-y: auto;
+  max-height: calc(90vh - 120px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 `; 

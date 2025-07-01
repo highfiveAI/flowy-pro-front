@@ -1,11 +1,13 @@
-// src/components/SignUpSuccessModal.tsx
-import React from "react";
-import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import styled from 'styled-components';
 
-interface Props {
-  visible: boolean;
+interface AlertModalProps {
+  isOpen: boolean;
   onClose: () => void;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message: string;
+  confirmText?: string;
 }
 
 const Overlay = styled.div`
@@ -39,7 +41,7 @@ const ModalBox = styled.div`
   border-radius: 25px;
   padding: 40px 30px;
   width: 90%;
-  max-width: 450px;
+  max-width: 420px;
   text-align: center;
   box-shadow: 
     0 25px 50px rgba(45, 17, 85, 0.3),
@@ -70,18 +72,42 @@ const ModalBox = styled.div`
   }
 `;
 
-const SuccessIcon = styled.div`
+const IconWrapper = styled.div<{ type: 'success' | 'error' | 'warning' | 'info' }>`
   width: 80px;
   height: 80px;
   margin: 0 auto 25px;
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  background: ${({ type }) => {
+    switch (type) {
+      case 'success':
+        return 'linear-gradient(135deg, #27ae60, #2ecc71)';
+      case 'error':
+        return 'linear-gradient(135deg, #e74c3c, #c0392b)';
+      case 'warning':
+        return 'linear-gradient(135deg, #f39c12, #e67e22)';
+      case 'info':
+      default:
+        return 'linear-gradient(135deg, #3498db, #2980b9)';
+    }
+  }};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
   color: white;
-  box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+  box-shadow: ${({ type }) => {
+    switch (type) {
+      case 'success':
+        return '0 8px 20px rgba(39, 174, 96, 0.3)';
+      case 'error':
+        return '0 8px 20px rgba(231, 76, 60, 0.3)';
+      case 'warning':
+        return '0 8px 20px rgba(243, 156, 18, 0.3)';
+      case 'info':
+      default:
+        return '0 8px 20px rgba(52, 152, 219, 0.3)';
+    }
+  }};
   animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
   @keyframes bounceIn {
@@ -97,38 +123,53 @@ const SuccessIcon = styled.div`
   }
 
   &::after {
-    content: '✓';
+    content: ${({ type }) => {
+      switch (type) {
+        case 'success':
+          return "'✓'";
+        case 'error':
+          return "'✕'";
+        case 'warning':
+          return "'⚠'";
+        case 'info':
+        default:
+          return "'ℹ'";
+      }
+    }};
+    font-weight: 700;
   }
 `;
 
-const Title = styled.h2`
+const Title = styled.h3`
   color: #2d1155;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   text-shadow: 0 2px 4px rgba(45, 17, 85, 0.1);
 `;
 
-const Text = styled.p`
+const Message = styled.p`
   color: rgba(45, 17, 85, 0.8);
   font-size: 16px;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 30px;
   line-height: 1.5;
+  white-space: pre-line;
 `;
 
 const Button = styled.button`
-  margin-top: 30px;
+  width: 100%;
+  height: 56px;
+  border-radius: 15px;
   background: linear-gradient(135deg, #2d1155 0%, #4a1e75 100%);
   color: white;
-  font-weight: 700;
   font-size: 16px;
-  padding: 16px 32px;
+  font-weight: 700;
+  padding: 0 32px;
   border: none;
-  border-radius: 15px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(45, 17, 85, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 20px rgba(45, 17, 85, 0.3);
   position: relative;
   overflow: hidden;
 
@@ -158,29 +199,34 @@ const Button = styled.button`
   }
 `;
 
-const SignUpSuccessModal: React.FC<Props> = ({ visible, onClose }) => {
-  const navigate = useNavigate();
+const AlertModal: React.FC<AlertModalProps> = ({
+  isOpen,
+  onClose,
+  type,
+  title,
+  message,
+  confirmText = '확인'
+}) => {
+  if (!isOpen) return null;
 
-  if (!visible) return null;
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
   return (
-    <Overlay>
+    <Overlay onClick={handleOverlayClick}>
       <ModalBox>
-        <SuccessIcon />
-        <Title>회원가입이 완료되었습니다.</Title>
-        <Text>관리자의 승인 후 서비스를 이용하실 수 있습니다.</Text>
-        <Text>승인 결과는 등록하신 이메일로 안내드립니다.</Text>
-        <Button
-          onClick={() => {
-            onClose(); // optional close
-            navigate("/");
-          }}
-        >
-          메인으로 돌아가기
+        <IconWrapper type={type} />
+        <Title>{title}</Title>
+        <Message>{message}</Message>
+        <Button onClick={onClose}>
+          {confirmText}
         </Button>
       </ModalBox>
     </Overlay>
   );
 };
 
-export default SignUpSuccessModal;
+export default AlertModal; 

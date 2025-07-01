@@ -1,4 +1,16 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+// 아래에서 위로 등장하는 애니메이션 정의
+const slideUpAnimation = keyframes`
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
 
 export const Hero = styled.section`
   width: 100vw;
@@ -38,4 +50,5 @@ export const CenteredText = styled.h1`
   line-height: 120px;
   letter-spacing: -2px;
   margin-top: 120px;
+  animation: ${slideUpAnimation} 1.2s ease-out;
 `;

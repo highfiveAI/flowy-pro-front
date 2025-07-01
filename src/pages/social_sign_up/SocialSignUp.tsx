@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SignUpSuccessModal from '../sign_up/SignUpSuccessModal';
 import {
   fetchSignupInfos,
@@ -6,6 +7,7 @@ import {
   type CompanyPosition,
 } from '../../api/fetchSignupInfos';
 import {
+  BackButton,
   ErrorText,
   Form,
   FormContainer,
@@ -20,6 +22,7 @@ import {
 } from './SocialSignUp.styles';
 
 const SocialSignUp: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -153,6 +156,10 @@ const SocialSignUp: React.FC = () => {
     }
   };
 
+  const handleGoBack = () => {
+    navigate('/sign_up');
+  };
+
   useEffect(() => {
     const loadCompanies = async () => {
       try {
@@ -171,6 +178,10 @@ const SocialSignUp: React.FC = () => {
     <>
       <Wrapper>
         <FormContainer>
+          <BackButton onClick={handleGoBack} title="회원가입 방식 선택으로 돌아가기">
+            ←
+          </BackButton>
+          
           <Title>소셜 회원가입</Title>
           <Form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
             <InputGroup>

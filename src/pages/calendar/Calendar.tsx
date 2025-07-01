@@ -7,21 +7,30 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import type { CalendarEvent } from './event-utils';
 import { isSameDay } from 'date-fns';
-import { FaRegFileAlt } from 'react-icons/fa';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiSearch,
+  FiPlus,
+  FiCalendar,
+} from 'react-icons/fi';
 import CalendarPop from './popup/calendarPop';
 import {
-  ApplyButton,
-  CalendarCheckbox,
-  CalendarWrapper,
-  FilterArea,
+  Container,
+  Header,
+  ControlsSection,
+  SectionTitle,
+  SearchContainer,
+  SearchInput,
+  FilterContainer,
+  FilterCheckbox,
   FilterSelect,
-  FilterSelectBox,
-  HeaderBar,
+  ApplyButton,
+  CalendarWrapper,
   MonthNav,
   MonthText,
   NavButton,
-  RightBox,
   TodayButton,
   CalendarLayout,
   CalendarFixedBox,
@@ -30,8 +39,13 @@ import {
   TaskItem,
   TaskCheckbox,
   TaskTitle,
+  FloatingAddButton,
+  Tooltip,
+  EmptyState,
+  EmptyIcon,
+  EmptyTitle,
 } from './Calendar.styles';
-import styled from 'styled-components';
+
 import NewMeetingPopup from './popup/new_meeting';
 // import { useAuth } from '../../contexts/AuthContext';
 
@@ -68,105 +82,114 @@ function YearMonthPicker({
         left: '50%',
         transform: 'translateX(-50%)',
         background: '#fff',
-        border: '1.5px solid #C7B8D9',
-        borderRadius: 8,
-        padding: 16,
+        border: '2px solid #e5e7eb',
+        borderRadius: 12,
+        padding: 20,
         zIndex: 100,
-        boxShadow: '0 2px 12px rgba(80,0,80,0.08)',
-        width: 270,
+        boxShadow: '0 4px 24px rgba(45, 17, 85, 0.1)',
+        width: 320,
+        minWidth: 320,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-        <select
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-          style={{ fontSize: '1rem', marginRight: 8 }}
-        >
-          {Array.from({ length: 20 }, (_, i) => 2015 + i).map((y) => (
-            <option key={y} value={y}>
-              {y}년
-            </option>
-          ))}
-        </select>
-        <select
-          value={month}
-          onChange={(e) => setMonth(Number(e.target.value))}
-          style={{ fontSize: '1rem', marginRight: 16 }}
-        >
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-            <option key={m} value={m}>
-              {m}월
-            </option>
-          ))}
-        </select>
-        <ApplyButton
-          onClick={() => onChange(year, month)}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          width: '100%',
+        }}
+      >
+        <div
           style={{
-            padding: '0 18px',
-            height: 36,
-            fontSize: '0.8rem',
-            marginLeft: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            width: '100%',
           }}
         >
-          이동
-        </ApplyButton>
-        <button
-          onClick={onClose}
+          <select
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+            style={{
+              fontSize: '1rem',
+              padding: '8px 12px',
+              borderRadius: 8,
+              border: '1px solid #d1d5db',
+              flex: 1,
+              minWidth: 80,
+            }}
+          >
+            {Array.from({ length: 20 }, (_, i) => 2015 + i).map((y) => (
+              <option key={y} value={y}>
+                {y}년
+              </option>
+            ))}
+          </select>
+          <select
+            value={month}
+            onChange={(e) => setMonth(Number(e.target.value))}
+            style={{
+              fontSize: '1rem',
+              padding: '8px 12px',
+              borderRadius: 8,
+              border: '1px solid #d1d5db',
+              flex: 1,
+              minWidth: 80,
+            }}
+          >
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+              <option key={m} value={m}>
+                {m}월
+              </option>
+            ))}
+          </select>
+        </div>
+        <div
           style={{
-            marginLeft: 8,
-            background: 'none',
-            border: 'none',
-            color: '#351745',
-            fontWeight: 600,
-            fontSize: '0.8rem',
-            cursor: 'pointer',
+            display: 'flex',
+            gap: 8,
+            justifyContent: 'flex-end',
           }}
         >
-          닫기
-        </button>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: '1px solid #d1d5db',
+              color: '#6b7280',
+              fontWeight: 500,
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              padding: '8px 16px',
+              borderRadius: 8,
+              transition: 'all 0.2s ease',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = '#f9fafb';
+              e.currentTarget.style.borderColor = '#9ca3af';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = 'none';
+              e.currentTarget.style.borderColor = '#d1d5db';
+            }}
+          >
+            닫기
+          </button>
+          <ApplyButton
+            onClick={() => onChange(year, month)}
+            style={{
+              padding: '8px 16px',
+              fontSize: '0.875rem',
+              minWidth: 60,
+            }}
+          >
+            이동
+          </ApplyButton>
+        </div>
       </div>
     </div>
   );
 }
-
-const FloatingAddButton = styled.button`
-  position: fixed;
-  right: 40px;
-  bottom: 40px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #351745;
-  color: #fff;
-  font-size: 2.5rem;
-  border: none;
-  box-shadow: 0 4px 16px rgba(80, 0, 80, 0.13);
-  cursor: pointer;
-  z-index: 10001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  &:hover {
-    background: #5a2a84;
-  }
-`;
-
-const Tooltip = styled.div`
-  position: fixed;
-  right: 110px;
-  bottom: 55px;
-  background: #351745;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 1rem;
-  white-space: nowrap;
-  z-index: 10002;
-  box-shadow: 0 2px 8px rgba(80, 0, 80, 0.13);
-  pointer-events: none;
-  opacity: 0.95;
-`;
 
 export default function CalendarPage() {
   const [value, setValue] = useState<Date>(new Date(2025, 5, 1));
@@ -183,6 +206,12 @@ export default function CalendarPage() {
   const [unscheduledOpen, setUnscheduledOpen] = useState(true);
   const [addBtnHover, setAddBtnHover] = useState(false);
   const [showNewMeeting, setShowNewMeeting] = useState(false);
+
+  // 새로 추가된 상태들
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showMeetings, setShowMeetings] = useState(true);
+  const [showTodos, setShowTodos] = useState(true);
+
   // const { user } = useAuth();
   const [userDetail, setUserDetail] = useState<{
     user_name: string;
@@ -234,7 +263,54 @@ export default function CalendarPage() {
   }, [userId]);
 
   useEffect(() => {
-    if (!userId || !selectedProjectId) return;
+    if (!userId) return;
+
+    // 전체 프로젝트 선택 시 모든 프로젝트의 캘린더 데이터를 가져옴
+    if (!selectedProjectId) {
+      // 모든 프로젝트의 캘린더 데이터를 병합해서 가져오기
+      const fetchAllCalendarData = async () => {
+        try {
+          const allEvents: any[] = [];
+          for (const project of projects) {
+            const response = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/v1/calendar/${userId}/${
+                project.project_id
+              }`,
+              { credentials: 'include' }
+            );
+            const data = await response.json();
+            allEvents.push(...data);
+          }
+
+          setEvents(
+            allEvents
+              .filter((ev: any) => ev.start) // start가 있는 이벤트만 포함
+              .map((ev: any) => ({
+                id: ev.calendar_id,
+                user_id: ev.user_id,
+                project_id: ev.project_id,
+                title: ev.title,
+                start: new Date(ev.start),
+                end: ev.end ? new Date(ev.end) : undefined,
+                type: ev.calendar_type,
+                completed: ev.completed,
+                created_at: ev.created_at,
+                updated_at: ev.updated_at,
+              }))
+          );
+        } catch (error) {
+          console.error('전체 캘린더 데이터 불러오기 실패:', error);
+          setEvents([]);
+        }
+      };
+
+      if (projects.length > 0) {
+        fetchAllCalendarData();
+      }
+      return;
+    }
+
+    // 특정 프로젝트 선택 시
     fetch(
       `${
         import.meta.env.VITE_API_URL
@@ -259,11 +335,54 @@ export default function CalendarPage() {
             updated_at: ev.updated_at,
           }))
         );
+      })
+      .catch((error) => {
+        console.error('캘린더 데이터 불러오기 실패:', error);
+        setEvents([]);
       });
-  }, [userId, selectedProjectId]);
+  }, [userId, selectedProjectId, projects]);
 
   useEffect(() => {
-    if (!selectedProjectId) return;
+    if (!selectedProjectId) {
+      // 전체 프로젝트 선택 시 모든 프로젝트의 사용자 정보 병합
+      const fetchAllProjectUsers = async () => {
+        try {
+          const allUsers: ProjectUser[] = [];
+          const userIds = new Set<string>(); // 중복 제거용
+
+          for (const project of projects) {
+            const response = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/v1/stt/project-users/${
+                project.project_id
+              }`,
+              { credentials: 'include' }
+            );
+            const data = await response.json();
+            const users = data.users || [];
+
+            // 중복 사용자 제거하면서 추가
+            users.forEach((user: ProjectUser) => {
+              if (!userIds.has(user.user_id)) {
+                userIds.add(user.user_id);
+                allUsers.push(user);
+              }
+            });
+          }
+
+          setProjectUsers(allUsers);
+        } catch (error) {
+          console.error('전체 프로젝트 사용자 불러오기 실패:', error);
+          setProjectUsers([]);
+        }
+      };
+
+      if (projects.length > 0) {
+        fetchAllProjectUsers();
+      }
+      return;
+    }
+
+    // 특정 프로젝트 선택 시
     fetch(
       `${
         import.meta.env.VITE_API_URL
@@ -275,8 +394,12 @@ export default function CalendarPage() {
       .then((res) => res.json())
       .then((data) => {
         setProjectUsers(data.users || []);
+      })
+      .catch((error) => {
+        console.error('프로젝트 사용자 불러오기 실패:', error);
+        setProjectUsers([]);
       });
-  }, [selectedProjectId]);
+  }, [selectedProjectId, projects]);
 
   // const handleToggleTodo = (id: string) => {
   //   setEvents((prevEvents) =>
@@ -289,23 +412,23 @@ export default function CalendarPage() {
   // };
 
   // 월 이동 함수
-  const handlePrevMonth = () => {
-    setValue((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-  };
-  const handleNextMonth = () => {
-    setValue((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
-  };
+  // const handlePrevMonth = () => {
+  //   setValue((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  // };
+  // const handleNextMonth = () => {
+  //   setValue((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  // };
 
-  const handleYearMonthClick = () => setShowPicker(true);
+  // const handleYearMonthClick = () => setShowPicker(true);
   const handleYearMonthChange = (year: number, month: number) => {
     setValue(new Date(year, month - 1, 1));
     setShowPicker(false);
   };
 
-  const handleToday = () => {
-    setValue(new Date());
-    setShowPicker(false);
-  };
+  // const handleToday = () => {
+  //   setValue(new Date());
+  //   setShowPicker(false);
+  // };
 
   // completed만 수정하는 간단한 핸들러
   const handleEditCompleted = (id: string, completed: boolean) => {
@@ -329,285 +452,459 @@ export default function CalendarPage() {
   };
 
   // 팝업 닫기 함수 추가 (팝업이 닫힐 때 포커스 해제)
-  const handleClosePopup = () => {
-    setPopupDate(null);
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
+  // const handleClosePopup = () => {
+  //   setPopupDate(null);
+  //   if (document.activeElement instanceof HTMLElement) {
+  //     document.activeElement.blur();
+  //   }
+  // };
+
+  // 검색 및 필터 기능
+  const filteredEvents = events.filter((event) => {
+    // 검색어 필터링
+    if (
+      searchTerm &&
+      !event.title.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
+      return false;
     }
-  };
+
+    // 유형별 필터링
+    if (event.type === 'meeting' && !showMeetings) {
+      return false;
+    }
+    if (event.type === 'todo' && !showTodos) {
+      return false;
+    }
+
+    return true;
+  });
 
   // 일정 미정 task 필터
-  const unscheduledTodos = events.filter((ev) => ev.type === 'todo' && !ev.end);
+  const unscheduledTodos = filteredEvents.filter(
+    (ev) => ev.type === 'todo' && !ev.end
+  );
 
-  return (
-    <CalendarLayout>
-      {/* 캘린더 */}
-      <CalendarFixedBox>
-        <CalendarWrapper>
-          <HeaderBar style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-            {/* 1줄: 프로젝트 선택/적용 (오른쪽) */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <RightBox>
-                <FilterArea>
-                  <FilterSelectBox>
-                    <FaRegFileAlt
-                      style={{ fontSize: '1.2rem', opacity: 0.7 }}
-                    />
-                    <FilterSelect
-                      value={selectedProjectId || ''}
-                      onChange={(e) => setSelectedProjectId(e.target.value)}
-                    >
-                      {projects.map((proj) => (
-                        <option key={proj.project_id} value={proj.project_id}>
-                          {proj.project_name}
-                        </option>
-                      ))}
-                    </FilterSelect>
-                  </FilterSelectBox>
-                  <ApplyButton>적용</ApplyButton>
-                </FilterArea>
-              </RightBox>
-            </div>
-            {/* 2줄: 날짜 네비게이션 (왼쪽) */}
+  const changeMonth = (direction: number) => {
+    const newDate = new Date(value);
+    newDate.setMonth(newDate.getMonth() + direction);
+    setValue(newDate);
+  };
+
+  // 현재 월의 일정만 필터링하는 함수
+  const getCurrentMonthEvents = () => {
+    return filteredEvents.filter((event) => {
+      if (!event.start) return false;
+      const eventDate = new Date(event.start);
+      return (
+        eventDate.getFullYear() === value.getFullYear() &&
+        eventDate.getMonth() === value.getMonth()
+      );
+    });
+  };
+
+  // 현재 월의 회의와 할일 개수 계산
+  const getCurrentMonthCounts = () => {
+    const currentMonthEvents = getCurrentMonthEvents();
+    const meetings = currentMonthEvents.filter(
+      (event) => event.type === 'meeting'
+    );
+    const todos = currentMonthEvents.filter((event) => event.type === 'todo');
+    return { meetings: meetings.length, todos: todos.length };
+  };
+
+  const renderTileContent = (date: Date) => {
+    const day = date.getDate();
+    const dayTodos = filteredEvents.filter(
+      (ev) => ev.type === 'todo' && ev.end && isSameDay(new Date(ev.end), date)
+    );
+    const dayMeetings = filteredEvents.filter(
+      (ev) =>
+        ev.type === 'meeting' && ev.start && isSameDay(new Date(ev.start), date)
+    );
+
+    const dayOfWeek = date.getDay();
+    const isCurrentMonth = date.getMonth() === value.getMonth();
+    let dayClass = '';
+    if (isCurrentMonth) {
+      if (dayOfWeek === 0) dayClass = 'calendar-sunday';
+      else if (dayOfWeek === 6) dayClass = 'calendar-saturday';
+      else dayClass = 'calendar-weekday';
+    } else {
+      dayClass = 'calendar-other-month';
+    }
+
+    return (
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          minHeight: '100px',
+          cursor: 'pointer',
+          padding: '8px',
+          boxSizing: 'border-box',
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          setPopupDate(date);
+        }}
+      >
+        <span
+          className={dayClass}
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            fontSize: '1.05rem',
+            fontWeight: 500,
+            zIndex: 2,
+            lineHeight: 1,
+          }}
+        >
+          {day}
+        </span>
+        <div
+          style={{
+            width: '100%',
+            paddingTop: 32,
+            paddingLeft: 4,
+            paddingRight: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+          }}
+        >
+          {/* 회의 개수 표시 */}
+          {dayMeetings.length > 0 && (
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                marginTop: 12,
+                padding: '3px 6px',
+                background: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)',
+                border: '1px solid #c084fc',
+                borderRadius: 6,
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                color: '#6b21a8',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                textAlign: 'center',
+                lineHeight: 1.2,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow =
+                  '0 2px 8px rgba(107, 33, 168, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
-              <MonthNav>
-                <NavButton onClick={handlePrevMonth}>
-                  <FiChevronLeft />
-                </NavButton>
-                <MonthText
-                  onClick={handleYearMonthClick}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {formatYearMonth(value)}
-                </MonthText>
-                <NavButton onClick={handleNextMonth}>
-                  <FiChevronRight />
-                </NavButton>
-                {showPicker && (
-                  <YearMonthPicker
-                    currentDate={value}
-                    onChange={handleYearMonthChange}
-                    onClose={() => setShowPicker(false)}
-                  />
-                )}
-                <TodayButton onClick={handleToday}>오늘</TodayButton>
-              </MonthNav>
+              회의 ({dayMeetings.length})
             </div>
-          </HeaderBar>
-          <Calendar
-            value={value}
-            onChange={(v) => setValue(v as Date)}
-            tileContent={({ date, view }) => {
-              if (!date) return null;
-              if (view === 'month') {
-                const day = date.getDate().toString().padStart(2, '0');
-                const dayTodos = events.filter(
-                  (ev) =>
-                    ev.type === 'todo' &&
-                    ev.end &&
-                    isSameDay(new Date(ev.end), date)
-                );
-                const dayMeetings = events.filter(
-                  (ev) =>
-                    ev.type === 'meeting' && isSameDay(new Date(ev.start), date)
-                );
-                const dayOfWeek = date.getDay(); // 0: 일, 6: 토
-                const isCurrentMonth = date.getMonth() === value.getMonth();
-                let dayClass = '';
-                if (isCurrentMonth) {
-                  if (dayOfWeek === 0) dayClass = 'calendar-sunday';
-                  if (dayOfWeek === 6) dayClass = 'calendar-saturday';
-                }
-                return (
-                  <div
-                    style={{
-                      position: 'relative',
-                      width: '100%',
-                      height: '100%',
-                      cursor: 'pointer',
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupDate(date);
-                    }}
-                  >
-                    <span
-                      className={dayClass}
-                      style={{
-                        position: 'absolute',
-                        top: 8,
-                        right: 10,
-                        fontSize: '1.05rem',
-                        fontWeight: 500,
-                        zIndex: 2,
-                      }}
-                    >
-                      {day}
-                    </span>
-                    <div style={{ width: '100%', paddingTop: 35 }}>
-                      {dayMeetings.map((m) => {
-                        let timeStr = '';
-                        if (m.start) {
-                          const d =
-                            typeof m.start === 'string'
-                              ? new Date(m.start)
-                              : m.start;
-                          if (!isNaN(d.getTime())) {
-                            timeStr = d.toTimeString().slice(0, 5) + ' ';
-                          }
-                        }
-                        return (
-                          <div key={m.id} className="calendar-event">
-                            {timeStr}
-                            {m.title}
-                          </div>
-                        );
-                      })}
-                      {dayTodos.map((t) => (
-                        <div key={t.id} className="calendar-todo">
-                          <CalendarCheckbox
-                            checked={t.completed}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              handleEditCompleted(t.id, !t.completed);
-                            }}
-                          />
-                          <span
-                            style={{
-                              textDecoration: t.completed
-                                ? 'line-through'
-                                : 'none',
-                            }}
-                          >
-                            {t.title}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              }
-              return null;
+          )}
+
+          {/* 할일 개수 표시 */}
+          {dayTodos.length > 0 && (
+            <div
+              style={{
+                padding: '3px 6px',
+                background: dayTodos.every((t) => t.completed)
+                  ? 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)'
+                  : 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                border: dayTodos.every((t) => t.completed)
+                  ? '1px solid #86efac'
+                  : '1px solid #fbbf24',
+                borderRadius: 6,
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                color: dayTodos.every((t) => t.completed)
+                  ? '#166534'
+                  : '#a16207',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                textAlign: 'center',
+                lineHeight: 1.2,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = dayTodos.every(
+                  (t) => t.completed
+                )
+                  ? '0 2px 8px rgba(22, 101, 52, 0.2)'
+                  : '0 2px 8px rgba(161, 98, 7, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              할일 ({dayTodos.filter((t) => t.completed).length}/
+              {dayTodos.length})
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <Container>
+      <Header></Header>
+
+      <ControlsSection>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <SectionTitle style={{ margin: 0 }}>
+            {formatYearMonth(value)}
+          </SectionTitle>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
+              style={{
+                padding: '4px 12px',
+                background: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)',
+                border: '1px solid #c084fc',
+                borderRadius: '20px',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: '#6b21a8',
+              }}
+            >
+              회의 ({getCurrentMonthCounts().meetings})
+            </div>
+            <div
+              style={{
+                padding: '4px 12px',
+                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                border: '1px solid #fbbf24',
+                borderRadius: '20px',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: '#a16207',
+              }}
+            >
+              할일 ({getCurrentMonthCounts().todos})
+            </div>
+          </div>
+        </div>
+
+        <FilterContainer>
+          <FilterSelect
+            value={selectedProjectId || '전체'}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedProjectId(value === '전체' ? null : value);
             }}
-            formatDay={(_, date) => date.getDate().toString().padStart(2, '0')}
-            locale="ko-KR"
-            calendarType="gregory"
-          />
-        </CalendarWrapper>
-      </CalendarFixedBox>
+          >
+            <option value="전체">전체 프로젝트</option>
+            {projects.map((proj) => (
+              <option key={proj.project_id} value={proj.project_id}>
+                {proj.project_name}
+              </option>
+            ))}
+          </FilterSelect>
 
-      {popupDate && (
-        <CalendarPop
-          date={popupDate}
-          todos={events.filter(
-            (ev) =>
-              ev.type === 'todo' && isSameDay(new Date(ev.start), popupDate)
-          )}
-          meetings={events.filter(
-            (ev) =>
-              ev.type === 'meeting' && isSameDay(new Date(ev.start), popupDate)
-          )}
-          onClose={handleClosePopup}
-          onEdit={handleEditCompleted}
-        />
-      )}
-
-      {/* 오른쪽 패널 */}
-      <UnscheduledPanel $open={unscheduledOpen}>
-        <div style={{ width: '100%' }}>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              fontWeight: 700,
-              marginBottom: 8,
+              gap: '20px',
             }}
           >
-            일정 미정 task
-            <button
-              style={{
-                marginLeft: 'auto',
-                background: 'none',
-                border: 'none',
-                fontSize: '1.3rem',
-                cursor: 'pointer',
-                color: '#351745',
-                fontWeight: 700,
-              }}
-              onClick={() => setUnscheduledOpen((prev) => !prev)}
-              aria-label={unscheduledOpen ? '접기' : '펼치기'}
-            >
-              {unscheduledOpen ? '−' : '+'}
-            </button>
+            <FilterCheckbox>
+              <input
+                type="checkbox"
+                checked={showMeetings}
+                onChange={(e) => setShowMeetings(e.target.checked)}
+              />
+              회의
+            </FilterCheckbox>
+
+            <FilterCheckbox>
+              <input
+                type="checkbox"
+                checked={showTodos}
+                onChange={(e) => setShowTodos(e.target.checked)}
+              />
+              할일
+            </FilterCheckbox>
           </div>
+
+          <SearchContainer>
+            <FiSearch size={18} color="#9ca3af" />
+            <SearchInput
+              type="text"
+              placeholder="검색"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </SearchContainer>
+        </FilterContainer>
+      </ControlsSection>
+
+      <CalendarLayout>
+        <CalendarFixedBox>
+          <CalendarWrapper>
+            <MonthNav>
+              <NavButton onClick={() => changeMonth(-1)}>
+                <FiChevronLeft />
+              </NavButton>
+              <MonthText
+                onClick={() => setShowPicker(!showPicker)}
+                style={{ cursor: 'pointer' }}
+              >
+                {formatYearMonth(value)}
+              </MonthText>
+              <NavButton onClick={() => changeMonth(1)}>
+                <FiChevronRight />
+              </NavButton>
+              <TodayButton onClick={() => setValue(new Date())}>
+                오늘
+              </TodayButton>
+              {showPicker && (
+                <YearMonthPicker
+                  currentDate={value}
+                  onChange={handleYearMonthChange}
+                  onClose={() => setShowPicker(false)}
+                />
+              )}
+            </MonthNav>
+
+            <Calendar
+              locale="ko-KR"
+              value={value}
+              onClickDay={(date) => setPopupDate(date)}
+              tileContent={({ date }) => <div>{renderTileContent(date)}</div>}
+              tileClassName={({ date }) =>
+                date.getDay() === 0
+                  ? 'calendar-sunday'
+                  : date.getDay() === 6
+                  ? 'calendar-saturday'
+                  : ''
+              }
+              calendarType="gregory"
+              formatShortWeekday={(locale, date) => {
+                console.log(locale);
+                const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+                return weekdays[date.getDay()];
+              }}
+            />
+          </CalendarWrapper>
+        </CalendarFixedBox>
+
+        <UnscheduledPanel
+          $open={unscheduledOpen}
+          onClick={() => setUnscheduledOpen(!unscheduledOpen)}
+        >
+          <h3
+            style={{
+              margin: '0 0 12px 0',
+              fontSize: unscheduledOpen ? '1.1rem' : '1.5rem',
+              color: '#b45309',
+              textAlign: 'center',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            {unscheduledOpen ? '일정 미정 할일' : '📋'}
+          </h3>
           {unscheduledOpen && (
             <TaskList>
-              {unscheduledTodos.length === 0 ? (
-                <div style={{ color: '#aaa', padding: '16px 0' }}>
-                  일정 미정 task가 없습니다.
-                </div>
-              ) : (
-                unscheduledTodos.map((t) => (
+              {unscheduledTodos.length > 0 ? (
+                unscheduledTodos.map((todo) => (
                   <TaskItem
-                    key={t.id}
-                    onClick={() => handleEditCompleted(t.id, !t.completed)}
-                    style={{ cursor: 'pointer' }}
+                    key={todo.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditCompleted(todo.id, !todo.completed);
+                    }}
                   >
                     <TaskCheckbox
-                      checked={t.completed}
-                      onChange={() => handleEditCompleted(t.id, !t.completed)}
+                      checked={todo.completed}
+                      onChange={(e) => e.stopPropagation()}
                     />
-                    <TaskTitle completed={t.completed}>{t.title}</TaskTitle>
+                    <TaskTitle completed={todo.completed || false}>
+                      {todo.title}
+                    </TaskTitle>
                   </TaskItem>
                 ))
+              ) : (
+                <EmptyState>
+                  <EmptyIcon>📝</EmptyIcon>
+                  <EmptyTitle>
+                    {searchTerm
+                      ? '조건에 맞는 할일이 없습니다'
+                      : '일정 미정 할일이 없습니다'}
+                  </EmptyTitle>
+                </EmptyState>
               )}
             </TaskList>
           )}
-        </div>
-      </UnscheduledPanel>
+        </UnscheduledPanel>
+      </CalendarLayout>
+
       <FloatingAddButton
         onMouseEnter={() => setAddBtnHover(true)}
         onMouseLeave={() => setAddBtnHover(false)}
-        aria-label="새 회의 일정 등록"
         onClick={() => setShowNewMeeting(true)}
       >
-        +
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <FiCalendar size={20} />
+          <FiPlus
+            size={12}
+            style={{
+              position: 'absolute',
+              top: '-6px',
+              right: '-6px',
+              background: '#1a0b3d',
+              borderRadius: '50%',
+              padding: '2px',
+              border: '1px solid white',
+            }}
+          />
+        </div>
       </FloatingAddButton>
-      {addBtnHover && <Tooltip>새 회의 일정 등록</Tooltip>}
+      {addBtnHover && <Tooltip>새 일정 등록</Tooltip>}
+
+      {popupDate && (
+        <CalendarPop
+          date={popupDate}
+          todos={filteredEvents.filter(
+            (event) =>
+              event.type === 'todo' &&
+              event.end &&
+              isSameDay(new Date(event.end), popupDate)
+          )}
+          meetings={filteredEvents.filter(
+            (event) =>
+              event.type === 'meeting' &&
+              event.start &&
+              isSameDay(new Date(event.start), popupDate)
+          )}
+          onClose={() => setPopupDate(null)}
+          onEdit={(id, completed) => handleEditCompleted(id, completed)}
+        />
+      )}
+
       {showNewMeeting && (
         <NewMeetingPopup
           onClose={() => setShowNewMeeting(false)}
           onSuccess={() => {
-            // 새로운 회의 데이터를 캘린더에 추가
-            const newMeeting = {
-              id: `temp_${Date.now()}`,
-              user_id: userId || '',
-              project_id: selectedProjectId || '',
-              title: '새 회의', // 실제로는 팝업에서 전달받아야 함
-              start: new Date(),
-              end: new Date(Date.now() + 60 * 60 * 1000),
-              type: 'meeting' as const,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            };
-
-            setEvents((prev) => [...prev, newMeeting]);
-
-            // 캘린더 이벤트 새로고침 (기존 로직)
+            setShowNewMeeting(false);
+            // 캘린더 데이터 새로고침
             if (userId && selectedProjectId) {
               fetch(
                 `${
                   import.meta.env.VITE_API_URL
                 }/api/v1/calendar/${userId}/${selectedProjectId}`,
-                {
-                  credentials: 'include',
-                }
+                { credentials: 'include' }
               )
                 .then((res) => res.json())
                 .then((data) => {
@@ -628,17 +925,15 @@ export default function CalendarPage() {
                 });
             }
           }}
-          projectName={(() => {
-            const proj = projects.find(
-              (p) => p.project_id === selectedProjectId
-            );
-            return proj ? proj.project_name : '';
-          })()}
+          projectName={
+            projects.find((p) => p.project_id === selectedProjectId)
+              ?.project_name || ''
+          }
           projectId={selectedProjectId || ''}
           userId={userId || ''}
           projectUsers={projectUsers}
         />
       )}
-    </CalendarLayout>
+    </Container>
   );
 }
