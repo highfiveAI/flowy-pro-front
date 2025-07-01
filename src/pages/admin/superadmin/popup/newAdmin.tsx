@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { FiChevronDown, FiUser, FiArrowLeft, FiArrowRight, FiX } from 'react-icons/fi';
-import { fetchSignupInfos, fetchUsersByCompany } from '../../../../api/fetchSignupInfos';
+import { FiUser, FiArrowLeft, FiArrowRight, FiX } from 'react-icons/fi';
+import {
+  fetchSignupInfos,
+  fetchUsersByCompany,
+} from '../../../../api/fetchSignupInfos';
 
 const Modal = styled.div<{ $isOpen: boolean }>`
   display: ${(props) => (props.$isOpen ? 'flex' : 'none')};
@@ -18,8 +21,12 @@ const Modal = styled.div<{ $isOpen: boolean }>`
   animation: fadeIn 0.3s ease-out;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 `;
 
@@ -106,12 +113,12 @@ const Step = styled.div<{ $active: boolean; $completed: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  
+
   &:not(:last-child)::after {
     content: '';
     width: 60px;
     height: 2px;
-    background: ${props => props.$completed ? '#2d1155' : '#e2e8f0'};
+    background: ${(props) => (props.$completed ? '#2d1155' : '#e2e8f0')};
     margin: 0 24px;
     border-radius: 1px;
   }
@@ -127,8 +134,8 @@ const StepNumber = styled.div<{ $active: boolean; $completed: boolean }>`
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s ease;
-  
-  ${props => {
+
+  ${(props) => {
     if (props.$completed) {
       return `
         background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
@@ -155,7 +162,8 @@ const StepNumber = styled.div<{ $active: boolean; $completed: boolean }>`
 const StepLabel = styled.span<{ $active: boolean; $completed: boolean }>`
   font-size: 14px;
   font-weight: 500;
-  color: ${props => (props.$active || props.$completed) ? '#2d1155' : '#64748b'};
+  color: ${(props) =>
+    props.$active || props.$completed ? '#2d1155' : '#64748b'};
   transition: color 0.3s ease;
 `;
 
@@ -214,7 +222,8 @@ const UserTable = styled.table`
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  th, td {
+  th,
+  td {
     padding: 16px;
     text-align: left;
     border-bottom: 1px solid #e5e7eb;
@@ -291,8 +300,12 @@ const LoadingSpinner = styled.div`
   margin-bottom: 16px;
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -323,58 +336,58 @@ const SearchInput = styled.input`
   }
 `;
 
-const ErrorContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  text-align: center;
-  background: linear-gradient(135deg, #fef2f2 0%, #fde8e8 100%);
-  border: 1px solid #fca5a5;
-  border-radius: 12px;
-  color: #dc2626;
-`;
+// const ErrorContainer = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 40px 20px;
+//   text-align: center;
+//   background: linear-gradient(135deg, #fef2f2 0%, #fde8e8 100%);
+//   border: 1px solid #fca5a5;
+//   border-radius: 12px;
+//   color: #dc2626;
+// `;
 
-const ErrorIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  margin-bottom: 16px;
-  color: #ef4444;
-  font-size: 48px;
-`;
+// const ErrorIcon = styled.div`
+//   width: 48px;
+//   height: 48px;
+//   margin-bottom: 16px;
+//   color: #ef4444;
+//   font-size: 48px;
+// `;
 
-const ErrorTitle = styled.h3`
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #dc2626;
-`;
+// const ErrorTitle = styled.h3`
+//   margin: 0 0 8px 0;
+//   font-size: 18px;
+//   font-weight: 600;
+//   color: #dc2626;
+// `;
 
-const ErrorMessage = styled.p`
-  margin: 0 0 16px 0;
-  font-size: 14px;
-  color: #991b1b;
-  line-height: 1.5;
-  white-space: pre-line;
-`;
+// const ErrorMessage = styled.p`
+//   margin: 0 0 16px 0;
+//   font-size: 14px;
+//   color: #991b1b;
+//   line-height: 1.5;
+//   white-space: pre-line;
+// `;
 
-const RetryButton = styled.button`
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #dc2626;
-  background: #dc2626;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+// const RetryButton = styled.button`
+//   padding: 8px 16px;
+//   border-radius: 8px;
+//   border: 1px solid #dc2626;
+//   background: #dc2626;
+//   color: white;
+//   font-size: 14px;
+//   font-weight: 500;
+//   cursor: pointer;
+//   transition: all 0.2s ease;
 
-  &:hover {
-    background: #b91c1c;
-    border-color: #b91c1c;
-  }
-`;
+//   &:hover {
+//     background: #b91c1c;
+//     border-color: #b91c1c;
+//   }
+// `;
 
 const ConfirmationCard = styled.div`
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -471,7 +484,9 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   cursor: pointer;
   border: none;
 
-  ${props => props.variant === 'primary' ? `
+  ${(props) =>
+    props.variant === 'primary'
+      ? `
     background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(45, 17, 85, 0.3);
@@ -486,7 +501,8 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
       cursor: not-allowed;
       transform: none;
     }
-  ` : `
+  `
+      : `
     background: white;
     color: #6b7280;
     border: 1px solid #d1d5db;
@@ -531,7 +547,13 @@ interface NewAdminProps {
   onUserSelect: (userData: any) => void;
 }
 
-const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formData, onUserSelect }) => {
+const NewAdmin: React.FC<NewAdminProps> = ({
+  visible,
+  onClose,
+  onSubmit,
+  // formData,
+  onUserSelect,
+}) => {
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -539,7 +561,7 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (visible) {
@@ -549,14 +571,14 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
       setSelectedUser(null);
       setUsers([]);
       setSearchTerm('');
-      setError(null);
+      // setError(null);
     }
   }, [visible]);
 
   const loadCompanies = async () => {
     try {
       const data = await fetchSignupInfos();
-      
+
       if (data.companies && Array.isArray(data.companies)) {
         setCompanies(data.companies);
       } else {
@@ -569,11 +591,11 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
 
   const loadUsers = async (companyId: string) => {
     setLoading(true);
-    setError(null);
-    
+    // setError(null);
+
     try {
       const users = await fetchUsersByCompany(companyId);
-      
+
       if (users && Array.isArray(users)) {
         setUsers(users);
       } else {
@@ -581,20 +603,26 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
       }
     } catch (error) {
       let errorMessage = '사용자 목록을 불러오는데 실패했습니다.';
-      
+
       if (error instanceof Error) {
         if (error.message.includes('500')) {
-          errorMessage = '서버에 일시적인 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.';
-        } else if (error.message.includes('timeout') || error.message.includes('TimeoutError')) {
-          errorMessage = '서버 응답 시간이 초과되었습니다.\n잠시 후 다시 시도해주세요.';
+          errorMessage =
+            '서버에 일시적인 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.';
+        } else if (
+          error.message.includes('timeout') ||
+          error.message.includes('TimeoutError')
+        ) {
+          errorMessage =
+            '서버 응답 시간이 초과되었습니다.\n잠시 후 다시 시도해주세요.';
         } else if (error.message.includes('403')) {
           errorMessage = '이 회사의 사용자 목록을 볼 권한이 없습니다.';
         } else if (error.message.includes('404')) {
           errorMessage = '해당 회사를 찾을 수 없습니다.';
         }
       }
-      
-      setError(errorMessage);
+
+      // setError(errorMessage);
+      console.log(errorMessage);
       setUsers([]);
     } finally {
       setLoading(false);
@@ -603,14 +631,14 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
 
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const companyId = e.target.value;
-    
-    const company = companies.find(c => c.company_id === companyId);
-    
+
+    const company = companies.find((c) => c.company_id === companyId);
+
     setSelectedCompany(company || null);
     setSelectedUser(null);
     setSearchTerm('');
-    setError(null);
-    
+    // setError(null);
+
     if (company) {
       loadUsers(companyId);
     } else {
@@ -642,22 +670,27 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
         user_phonenum: selectedUser.user_phonenum,
         company_name: selectedCompany.company_name,
       };
-      
+
       onUserSelect(adminData);
-      
+
       onSubmit(e, adminData);
     }
   };
 
   const filteredUsers = useMemo(() => {
     if (!searchTerm.trim()) return users;
-    
-    return users.filter(user => 
-      user.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.user_login_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.user_dept_name && user.user_dept_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (user.user_team_name && user.user_team_name.toLowerCase().includes(searchTerm.toLowerCase()))
+
+    return users.filter(
+      (user) =>
+        user.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.user_login_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.user_dept_name &&
+          user.user_dept_name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())) ||
+        (user.user_team_name &&
+          user.user_team_name.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [users, searchTerm]);
 
@@ -665,9 +698,12 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
     <>
       <FormGroup>
         <Label>회사 선택</Label>
-        <Select value={selectedCompany?.company_id || ''} onChange={handleCompanyChange}>
+        <Select
+          value={selectedCompany?.company_id || ''}
+          onChange={handleCompanyChange}
+        >
           <option value="">회사를 선택하세요</option>
-          {companies.map(company => (
+          {companies.map((company) => (
             <option key={company.company_id} value={company.company_id}>
               {company.company_name}
             </option>
@@ -696,7 +732,7 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            
+
             {filteredUsers.length > 0 ? (
               <UserTable>
                 <thead>
@@ -708,16 +744,24 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map(user => (
+                  {filteredUsers.map((user) => (
                     <tr
                       key={user.user_id}
                       onClick={() => {
                         handleUserSelect(user);
                       }}
-                      className={selectedUser?.user_id === user.user_id ? 'selected' : ''}
+                      className={
+                        selectedUser?.user_id === user.user_id ? 'selected' : ''
+                      }
                       style={{
-                        backgroundColor: selectedUser?.user_id === user.user_id ? 'rgba(45, 17, 85, 0.1)' : 'transparent',
-                        borderLeft: selectedUser?.user_id === user.user_id ? '4px solid #2d1155' : 'none'
+                        backgroundColor:
+                          selectedUser?.user_id === user.user_id
+                            ? 'rgba(45, 17, 85, 0.1)'
+                            : 'transparent',
+                        borderLeft:
+                          selectedUser?.user_id === user.user_id
+                            ? '4px solid #2d1155'
+                            : 'none',
                       }}
                     >
                       <td>
@@ -755,15 +799,13 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
       {selectedUser && selectedCompany && (
         <ConfirmationCard>
           <UserInfo>
-            <UserAvatar>
-              {selectedUser.user_name.charAt(0)}
-            </UserAvatar>
+            <UserAvatar>{selectedUser.user_name.charAt(0)}</UserAvatar>
             <UserDetails>
               <h3>{selectedUser.user_name}</h3>
               <p>{selectedCompany.company_name}</p>
             </UserDetails>
           </UserInfo>
-          
+
           <InfoGrid>
             <InfoItem>
               <label>로그인 ID</label>
@@ -784,9 +826,9 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
           </InfoGrid>
         </ConfirmationCard>
       )}
-      
+
       <p style={{ color: '#6b7280', fontSize: '14px', lineHeight: '1.5' }}>
-        선택한 사용자를 관리자로 등록하시겠습니까? 
+        선택한 사용자를 관리자로 등록하시겠습니까?
         <br />
         기존 관리자가 있는 경우 일반 사용자로 변경됩니다.
       </p>
@@ -800,7 +842,9 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
           <HeaderContent>
             <Title>관리자 계정 등록</Title>
             <Subtitle>
-              {currentStep === 1 ? '회사를 선택하고 관리자로 등록할 사용자를 선택하세요.' : '선택한 사용자 정보를 확인하세요.'}
+              {currentStep === 1
+                ? '회사를 선택하고 관리자로 등록할 사용자를 선택하세요.'
+                : '선택한 사용자 정보를 확인하세요.'}
             </Subtitle>
           </HeaderContent>
           <CloseButton onClick={onClose}>
@@ -810,14 +854,17 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
 
         <StepIndicator>
           <Step $active={currentStep === 1} $completed={currentStep > 1}>
-            <StepNumber $active={currentStep === 1} $completed={currentStep > 1}>
+            <StepNumber
+              $active={currentStep === 1}
+              $completed={currentStep > 1}
+            >
               1
             </StepNumber>
             <StepLabel $active={currentStep === 1} $completed={currentStep > 1}>
               사용자 선택
             </StepLabel>
           </Step>
-          
+
           <Step $active={currentStep === 2} $completed={false}>
             <StepNumber $active={currentStep === 2} $completed={false}>
               2
@@ -841,12 +888,25 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
               </Button>
             )}
           </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '8px',
+            }}
+          >
             {currentStep === 1 && (
               <>
                 {selectedUser && (
-                  <div style={{ fontSize: '12px', color: '#2d1155', fontWeight: '500' }}>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#2d1155',
+                      fontWeight: '500',
+                    }}
+                  >
                     ✓ 선택됨: {selectedUser.user_name}
                   </div>
                 )}
@@ -854,10 +914,10 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
                   variant="primary"
                   onClick={handleNext}
                   disabled={!selectedUser}
-                  style={{ 
+                  style={{
                     opacity: selectedUser ? 1 : 0.5,
                     cursor: selectedUser ? 'pointer' : 'not-allowed',
-                    minWidth: '120px'
+                    minWidth: '120px',
                   }}
                 >
                   다음 {selectedUser ? '✓' : ''}
@@ -865,7 +925,7 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
                 </Button>
               </>
             )}
-            
+
             {currentStep === 2 && (
               <Button variant="primary" onClick={handleSubmit}>
                 관리자로 등록
@@ -878,4 +938,4 @@ const NewAdmin: React.FC<NewAdminProps> = ({ visible, onClose, onSubmit, formDat
   );
 };
 
-export default NewAdmin; 
+export default NewAdmin;

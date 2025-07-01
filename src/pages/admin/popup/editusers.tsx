@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { FiX, FiEdit3, FiUser, FiAlertTriangle } from 'react-icons/fi';
+import { FiX, FiEdit3, FiUser } from 'react-icons/fi';
 
 const fadeIn = keyframes`
   from {
@@ -194,8 +194,10 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  
-  ${props => props.variant === 'secondary' ? `
+
+  ${(props) =>
+    props.variant === 'secondary'
+      ? `
     background: #f8fafc;
     color: #64748b;
     border: 2px solid #e2e8f0;
@@ -205,7 +207,8 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
       border-color: #cbd5e1;
       transform: translateY(-1px);
     }
-  ` : `
+  `
+      : `
     background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(45, 17, 85, 0.3);
@@ -304,7 +307,9 @@ const ConfirmButton = styled.button<{ variant?: 'cancel' | 'confirm' }>`
   transition: all 0.3s ease;
   min-width: 100px;
 
-  ${props => props.variant === 'confirm' ? `
+  ${(props) =>
+    props.variant === 'confirm'
+      ? `
     background: linear-gradient(135deg, #2d1155 0%, #4b2067 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(45, 17, 85, 0.3);
@@ -314,7 +319,8 @@ const ConfirmButton = styled.button<{ variant?: 'cancel' | 'confirm' }>`
       box-shadow: 0 6px 16px rgba(45, 17, 85, 0.4);
       background: linear-gradient(135deg, #351745 0%, #5d2b7a 100%);
     }
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #374151;
     border: 1px solid #d1d5db;
@@ -325,7 +331,7 @@ const ConfirmButton = styled.button<{ variant?: 'cancel' | 'confirm' }>`
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
   `}
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -364,7 +370,7 @@ const EditUsers: React.FC<EditUsersProps> = ({
   // 유효성 검사
   const validateForm = (): string[] => {
     const errors: string[] = [];
-    
+
     if (!user.user_dept_name || user.user_dept_name.trim() === '') {
       errors.push('부서명을 입력하세요.');
     }
@@ -374,19 +380,19 @@ const EditUsers: React.FC<EditUsersProps> = ({
     if (!user.user_jobname || user.user_jobname.trim() === '') {
       errors.push('직무를 입력하세요.');
     }
-    
+
     return errors;
   };
 
   // 수정 버튼 클릭 핸들러
   const handleEditClick = () => {
     const errors = validateForm();
-    
+
     if (errors.length > 0) {
       setValidationErrors(errors);
       return;
     }
-    
+
     setValidationErrors([]);
     setIsConfirmOpen(true);
   };
@@ -417,21 +423,21 @@ const EditUsers: React.FC<EditUsersProps> = ({
               <FiX />
             </CloseButton>
           </ModalHeader>
-          
+
           <ModalBody>
             <Form onSubmit={(e) => e.preventDefault()}>
               {/* 기본 정보 섹션 */}
               <FormSection>
                 <SectionTitle>기본 정보</SectionTitle>
-                
+
                 <FormGroup>
                   <Label htmlFor="user_name">이름</Label>
                   <InputContainer>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       id="user_name"
-                      value={user.user_name || ''} 
-                      disabled 
+                      value={user.user_name || ''}
+                      disabled
                     />
                   </InputContainer>
                 </FormGroup>
@@ -439,11 +445,11 @@ const EditUsers: React.FC<EditUsersProps> = ({
                 <FormGroup>
                   <Label htmlFor="user_email">이메일</Label>
                   <InputContainer>
-                    <Input 
-                      type="email" 
+                    <Input
+                      type="email"
                       id="user_email"
-                      value={user.user_email || ''} 
-                      disabled 
+                      value={user.user_email || ''}
+                      disabled
                     />
                   </InputContainer>
                 </FormGroup>
@@ -451,11 +457,11 @@ const EditUsers: React.FC<EditUsersProps> = ({
                 <FormGroup>
                   <Label htmlFor="user_login_id">로그인 ID</Label>
                   <InputContainer>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       id="user_login_id"
-                      value={user.user_login_id || ''} 
-                      disabled 
+                      value={user.user_login_id || ''}
+                      disabled
                     />
                   </InputContainer>
                 </FormGroup>
@@ -463,11 +469,11 @@ const EditUsers: React.FC<EditUsersProps> = ({
                 <FormGroup>
                   <Label htmlFor="user_phonenum">전화번호</Label>
                   <InputContainer>
-                    <Input 
-                      type="tel" 
+                    <Input
+                      type="tel"
                       id="user_phonenum"
-                      value={user.user_phonenum || ''} 
-                      disabled 
+                      value={user.user_phonenum || ''}
+                      disabled
                     />
                   </InputContainer>
                 </FormGroup>
@@ -476,7 +482,7 @@ const EditUsers: React.FC<EditUsersProps> = ({
               {/* 조직 정보 섹션 */}
               <FormSection>
                 <SectionTitle>조직 정보</SectionTitle>
-                
+
                 <FormGroup>
                   <Label htmlFor="user_dept_name">부서명 *</Label>
                   <InputContainer>
@@ -525,14 +531,16 @@ const EditUsers: React.FC<EditUsersProps> = ({
 
               {/* 에러 메시지 표시 */}
               {validationErrors.length > 0 && (
-                <div style={{ 
-                  color: '#dc2626', 
-                  fontSize: '14px', 
-                  background: '#fef2f2', 
-                  padding: '12px 16px', 
-                  borderRadius: '8px',
-                  border: '1px solid #fecaca'
-                }}>
+                <div
+                  style={{
+                    color: '#dc2626',
+                    fontSize: '14px',
+                    background: '#fef2f2',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid #fecaca',
+                  }}
+                >
                   {validationErrors.map((error, index) => (
                     <div key={index}>• {error}</div>
                   ))}

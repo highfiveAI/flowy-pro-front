@@ -21,9 +21,10 @@ export interface ChartData {
 export interface TableData {
   period: string;
   feedback_type: string;
-  filtered_avg: string;  // 조회 평균 (필터링된 결과)
-  pop: string;           // PoP (이전 기간 대비 현재 기간)
-  total_avg: string;     // 전체 평균
+  filtered_avg: string; // 조회 평균 (필터링된 결과)
+  pop: string; // PoP (이전 기간 대비 현재 기간)
+  total_avg: string; // 전체 평균
+  vs_total: string;
 }
 
 export interface DashboardResponse {
@@ -35,6 +36,11 @@ export interface DashboardResponse {
 export interface FilterOptions {
   projects: Array<{ id: string; name: string }>;
   departments: string[];
-  users: Array<{ id: string; name: string; login_id: string; department: string }>;
+  users: Array<{
+    id: string;
+    name: string;
+    login_id: string;
+    department: string;
+  }>;
   selected_user_department?: string;
-} 
+}

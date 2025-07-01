@@ -11,7 +11,6 @@ import {
   InputGroup,
   Label,
   MyPageWrapper,
-  PageTitle,
 } from './MyPage.styles';
 
 const MyPage: React.FC = () => {

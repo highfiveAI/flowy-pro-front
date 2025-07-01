@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import styled, { keyframes } from "styled-components";
-import { FiX, FiUserCheck, FiUserX, FiUsers, FiCheckCircle, FiXCircle } from 'react-icons/fi';
+import React, { useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { FiX, FiUsers, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 const fadeIn = keyframes`
   from {
@@ -198,8 +198,8 @@ const Button = styled.button<{ variant?: 'approve' | 'reject' | 'secondary' }>`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  
-  ${props => {
+
+  ${(props) => {
     switch (props.variant) {
       case 'approve':
         return `
@@ -284,10 +284,13 @@ const ConfirmHeader = styled.div<{ variant?: 'approve' | 'reject' }>`
   display: flex;
   align-items: center;
   gap: 16px;
-  
-  ${props => props.variant === 'approve' ? `
+
+  ${(props) =>
+    props.variant === 'approve'
+      ? `
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  ` : `
+  `
+      : `
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   `}
 `;
@@ -322,7 +325,9 @@ const ConfirmButtons = styled.div`
   justify-content: center;
 `;
 
-const ConfirmButton = styled.button<{ variant?: 'cancel' | 'approve' | 'reject' }>`
+const ConfirmButton = styled.button<{
+  variant?: 'cancel' | 'approve' | 'reject';
+}>`
   padding: 12px 24px;
   border-radius: 12px;
   font-size: 14px;
@@ -332,7 +337,7 @@ const ConfirmButton = styled.button<{ variant?: 'cancel' | 'approve' | 'reject' 
   transition: all 0.3s ease;
   min-width: 100px;
 
-  ${props => {
+  ${(props) => {
     switch (props.variant) {
       case 'approve':
         return `
@@ -372,7 +377,7 @@ const ConfirmButton = styled.button<{ variant?: 'cancel' | 'approve' | 'reject' 
         `;
     }
   }}
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -396,15 +401,17 @@ interface ManageUsersProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ManageUsers: React.FC<ManageUsersProps> = ({ 
-  isOpen, 
-  user, 
-  onApprove, 
-  onReject, 
-  onClose, 
-  onChange 
+const ManageUsers: React.FC<ManageUsersProps> = ({
+  isOpen,
+  user,
+  onApprove,
+  onReject,
+  onClose,
+  onChange,
 }) => {
-  const [confirmType, setConfirmType] = useState<'approve' | 'reject' | null>(null);
+  const [confirmType, setConfirmType] = useState<'approve' | 'reject' | null>(
+    null
+  );
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   if (!isOpen) return null;
@@ -412,7 +419,7 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
   // 유효성 검사
   const validateForm = (): string[] => {
     const errors: string[] = [];
-    
+
     if (!user.user_dept_name || user.user_dept_name.trim() === '') {
       errors.push('부서명을 입력하세요.');
     }
@@ -422,19 +429,19 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
     if (!user.user_jobname || user.user_jobname.trim() === '') {
       errors.push('직무를 입력하세요.');
     }
-    
+
     return errors;
   };
 
   // 승인 버튼 클릭
   const handleApproveClick = () => {
     const errors = validateForm();
-    
+
     if (errors.length > 0) {
       setValidationErrors(errors);
       return;
     }
-    
+
     setValidationErrors([]);
     setConfirmType('approve');
   };
@@ -477,21 +484,21 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
               <FiX />
             </CloseButton>
           </ModalHeader>
-          
+
           <ModalBody>
             <Form onSubmit={(e) => e.preventDefault()}>
               {/* 기본 정보 섹션 */}
               <FormSection>
                 <SectionTitle>기본 정보</SectionTitle>
-                
+
                 <FormGroup>
                   <Label htmlFor="user_name">이름</Label>
                   <InputContainer>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       id="user_name"
-                      value={user.user_name || ''} 
-                      disabled 
+                      value={user.user_name || ''}
+                      disabled
                     />
                   </InputContainer>
                 </FormGroup>
@@ -499,11 +506,11 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
                 <FormGroup>
                   <Label htmlFor="user_email">이메일</Label>
                   <InputContainer>
-                    <Input 
-                      type="email" 
+                    <Input
+                      type="email"
                       id="user_email"
-                      value={user.user_email || ''} 
-                      disabled 
+                      value={user.user_email || ''}
+                      disabled
                     />
                   </InputContainer>
                 </FormGroup>
@@ -511,11 +518,11 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
                 <FormGroup>
                   <Label htmlFor="user_login_id">로그인 ID</Label>
                   <InputContainer>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       id="user_login_id"
-                      value={user.user_login_id || ''} 
-                      disabled 
+                      value={user.user_login_id || ''}
+                      disabled
                     />
                   </InputContainer>
                 </FormGroup>
@@ -523,11 +530,11 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
                 <FormGroup>
                   <Label htmlFor="user_phonenum">전화번호</Label>
                   <InputContainer>
-                    <Input 
-                      type="tel" 
+                    <Input
+                      type="tel"
                       id="user_phonenum"
-                      value={user.user_phonenum || ''} 
-                      disabled 
+                      value={user.user_phonenum || ''}
+                      disabled
                     />
                   </InputContainer>
                 </FormGroup>
@@ -536,7 +543,7 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
               {/* 조직 정보 섹션 */}
               <FormSection>
                 <SectionTitle>조직 정보 설정</SectionTitle>
-                
+
                 <FormGroup>
                   <Label htmlFor="user_dept_name">부서명 *</Label>
                   <InputContainer>
@@ -585,14 +592,16 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
 
               {/* 에러 메시지 표시 */}
               {validationErrors.length > 0 && (
-                <div style={{ 
-                  color: '#dc2626', 
-                  fontSize: '14px', 
-                  background: '#fef2f2', 
-                  padding: '12px 16px', 
-                  borderRadius: '8px',
-                  border: '1px solid #fecaca'
-                }}>
+                <div
+                  style={{
+                    color: '#dc2626',
+                    fontSize: '14px',
+                    background: '#fef2f2',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid #fecaca',
+                  }}
+                >
                   {validationErrors.map((error, index) => (
                     <div key={index}>• {error}</div>
                   ))}
@@ -603,11 +612,19 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
                 <Button type="button" variant="secondary" onClick={onClose}>
                   취소
                 </Button>
-                <Button type="button" variant="approve" onClick={handleApproveClick}>
+                <Button
+                  type="button"
+                  variant="approve"
+                  onClick={handleApproveClick}
+                >
                   <FiCheckCircle />
                   승인
                 </Button>
-                <Button type="button" variant="reject" onClick={handleRejectClick}>
+                <Button
+                  type="button"
+                  variant="reject"
+                  onClick={handleRejectClick}
+                >
                   <FiXCircle />
                   반려
                 </Button>
@@ -678,4 +695,4 @@ const ManageUsers: React.FC<ManageUsersProps> = ({
   );
 };
 
-export default ManageUsers; 
+export default ManageUsers;

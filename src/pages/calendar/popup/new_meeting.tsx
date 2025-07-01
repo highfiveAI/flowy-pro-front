@@ -3,13 +3,18 @@ import styled from 'styled-components';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
-import { FiCalendar, FiSearch, FiUser, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import {
+  FiCalendar,
+  FiSearch,
+  FiUser,
+  FiChevronDown,
+  FiChevronUp,
+} from 'react-icons/fi';
 import { RiVipCrownFill } from 'react-icons/ri';
 
 // 한국어 locale 등록
 registerLocale('ko', ko);
 import {
-  CloseButton,
   FormGroup,
   StyledLabel,
   StyledInput,
@@ -106,7 +111,7 @@ const HostSectionTitle = styled.h4`
   gap: 8px;
   cursor: pointer;
   user-select: none;
-  
+
   &:hover {
     color: #00b4ba;
   }
@@ -143,7 +148,7 @@ const SearchInput = styled.input`
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.9);
   color: #00798d;
-  
+
   &:focus {
     outline: none;
     border-color: #00b4ba;
@@ -188,20 +193,20 @@ const UserGrid = styled.div`
   gap: 6px;
   max-height: 180px;
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(0, 180, 186, 0.1);
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: rgba(0, 180, 186, 0.3);
     border-radius: 3px;
-    
+
     &:hover {
       background: rgba(0, 180, 186, 0.5);
     }
@@ -212,25 +217,27 @@ const UserCard = styled.div<{ $selected: boolean; $isHost: boolean }>`
   display: flex;
   align-items: center;
   padding: 8px;
-  border: 2px solid ${props => 
-    props.$isHost ? '#00798d' : 
-    props.$selected ? '#00b4ba' : 'rgba(0, 180, 186, 0.2)'
-  };
+  border: 2px solid
+    ${(props) =>
+      props.$isHost
+        ? '#00798d'
+        : props.$selected
+        ? '#00b4ba'
+        : 'rgba(0, 180, 186, 0.2)'};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: ${props => 
-    props.$isHost ? 'rgba(0, 121, 141, 0.05)' : 
-    props.$selected ? 'rgba(0, 180, 186, 0.05)' : 'white'
-  };
+  background: ${(props) =>
+    props.$isHost
+      ? 'rgba(0, 121, 141, 0.05)'
+      : props.$selected
+      ? 'rgba(0, 180, 186, 0.05)'
+      : 'white'};
 
   &:hover {
-    border-color: ${props => 
-      props.$isHost ? '#00798d' : '#00b4ba'
-    };
-    background: ${props => 
-      props.$isHost ? 'rgba(0, 121, 141, 0.08)' : 'rgba(0, 180, 186, 0.08)'
-    };
+    border-color: ${(props) => (props.$isHost ? '#00798d' : '#00b4ba')};
+    background: ${(props) =>
+      props.$isHost ? 'rgba(0, 121, 141, 0.08)' : 'rgba(0, 180, 186, 0.08)'};
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 180, 186, 0.15);
   }
@@ -286,34 +293,34 @@ const SelectedCount = styled.div`
   border: 1px solid rgba(0, 180, 186, 0.2);
 `;
 
-const AddAttendeeButton = styled.button`
-  background: #00b4ba;
-  color: white;
-  border: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 16px;
-  margin-left: 8px;
-  transition: all 0.2s ease;
+// const AddAttendeeButton = styled.button`
+//   background: #00b4ba;
+//   color: white;
+//   border: none;
+//   width: 24px;
+//   height: 24px;
+//   border-radius: 50%;
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 0;
+//   font-size: 16px;
+//   margin-left: 8px;
+//   transition: all 0.2s ease;
 
-  &:hover {
-    background: #009ca2;
-    transform: scale(1.1);
-  }
-`;
+//   &:hover {
+//     background: #009ca2;
+//     transform: scale(1.1);
+//   }
+// `;
 
 // DatePicker 커스텀 스타일
 const DatePickerWrapper = styled.div`
   .react-datepicker-wrapper {
     width: 100%;
   }
-  
+
   .react-datepicker__input-container input {
     width: 100%;
     padding: 12px 15px;
@@ -324,17 +331,17 @@ const DatePickerWrapper = styled.div`
     font-size: 1rem;
     font-family: inherit;
     box-sizing: border-box;
-    
+
     &:focus {
       outline: 2px solid #5dd3d9;
       background-color: #fff;
     }
-    
+
     &::placeholder {
       color: #999;
     }
   }
-  
+
   .react-datepicker {
     border: none;
     border-radius: 16px;
@@ -342,27 +349,27 @@ const DatePickerWrapper = styled.div`
     overflow: hidden;
     font-family: inherit;
   }
-  
+
   .react-datepicker__header {
     background: linear-gradient(135deg, #5dd3d9, #4bc5cb);
     border-bottom: none;
     border-radius: 16px 16px 0 0;
     padding: 20px 0;
   }
-  
+
   .react-datepicker__current-month {
     color: white;
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 10px;
   }
-  
+
   .react-datepicker__day-names {
     background: rgba(93, 211, 217, 0.15);
     margin: 0;
     padding: 8px 0;
   }
-  
+
   .react-datepicker__day-name {
     color: #3b9ba0;
     font-weight: 600;
@@ -371,13 +378,13 @@ const DatePickerWrapper = styled.div`
     line-height: 2.2rem;
     margin: 0;
   }
-  
+
   .react-datepicker__month {
     margin: 0;
     padding: 8px;
     background: white;
   }
-  
+
   .react-datepicker__day {
     width: 2.2rem;
     height: 2.2rem;
@@ -388,36 +395,36 @@ const DatePickerWrapper = styled.div`
     font-weight: 500;
     color: #374151;
     transition: all 0.2s ease;
-    
+
     &:hover {
       background: rgba(93, 211, 217, 0.15);
       color: #3b9ba0;
       transform: scale(1.05);
     }
   }
-  
+
   .react-datepicker__day--selected {
     background: linear-gradient(135deg, #5dd3d9, #4bc5cb);
     color: white;
     font-weight: 600;
-    
+
     &:hover {
       background: linear-gradient(135deg, #4bc5cb, #3bb3ba);
       transform: scale(1.05);
     }
   }
-  
+
   .react-datepicker__day--today {
     background: rgba(93, 211, 217, 0.2);
     color: #3b9ba0;
     font-weight: 600;
     border: 2px solid rgba(93, 211, 217, 0.4);
   }
-  
+
   .react-datepicker__day--outside-month {
     color: #d1d5db;
   }
-  
+
   .react-datepicker__navigation {
     top: 22px;
     width: 30px;
@@ -425,63 +432,63 @@ const DatePickerWrapper = styled.div`
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.25);
     transition: all 0.2s ease;
-    
+
     &:hover {
       background: rgba(255, 255, 255, 0.4);
       transform: scale(1.1);
     }
   }
-  
+
   .react-datepicker__navigation-icon::before {
     border-color: white;
     border-width: 2px 2px 0 0;
     width: 6px;
     height: 6px;
   }
-  
+
   .react-datepicker__time-container {
     border-left: 1px solid rgba(93, 211, 217, 0.25);
     width: 120px;
   }
-  
+
   .react-datepicker__time-container-header {
     display: none;
   }
-  
+
   .react-datepicker__time-list {
     height: 320px !important;
-    
+
     &::-webkit-scrollbar {
       width: 6px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f5f9;
       border-radius: 3px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: rgba(93, 211, 217, 0.4);
       border-radius: 3px;
-      
+
       &:hover {
         background: rgba(93, 211, 217, 0.6);
       }
     }
   }
-  
+
   .react-datepicker__time-list-item {
     height: 35px;
     line-height: 35px;
     padding: 0 12px;
     font-size: 0.9rem;
     transition: all 0.2s ease;
-    
+
     &:hover {
       background: rgba(93, 211, 217, 0.15);
       color: #3b9ba0;
     }
-    
+
     &--selected {
       background: #5dd3d9;
       color: white;
@@ -525,23 +532,23 @@ const ScrollablePopupContent = styled(PopupContent)`
 const ScrollableBody = styled(PopupBody)`
   max-height: 60vh;
   overflow-y: auto;
-  
+
   /* 스크롤바 스타일링 */
   &::-webkit-scrollbar {
     width: 8px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f5f9;
     border-radius: 4px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 4px;
     transition: background 0.2s ease;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
   }
@@ -558,40 +565,44 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
   const [meetingDate, setMeetingDate] = useState<Date | null>(null);
   const [agenda, setAgenda] = useState('');
   const [hostId, setHostId] = useState('');
-  const [hostEmail, setHostEmail] = useState('');
-  const [hostJobname, setHostJobname] = useState('');
+  // const [hostEmail, setHostEmail] = useState('');
+  // const [hostJobname, setHostJobname] = useState('');
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [allSelected, setAllSelected] = useState(false);
-  
+
   // 검색 관련 상태
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // 회의장 선택 토글 상태
   const [isHostSectionExpanded, setIsHostSectionExpanded] = useState(true);
 
   // 필터링된 사용자 목록 (검색어 적용)
-  const filteredUsers = projectUsers.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = projectUsers.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // 참석자 선택/해제 토글
   const handleAttendeeToggle = (user: ProjectUser) => {
-    const isSelected = attendees.some(a => a.user_id === user.user_id);
-    
+    const isSelected = attendees.some((a) => a.user_id === user.user_id);
+
     if (isSelected) {
       // 이미 선택된 경우 제거
-      setAttendees(attendees.filter(a => a.user_id !== user.user_id));
+      setAttendees(attendees.filter((a) => a.user_id !== user.user_id));
     } else {
       // 선택되지 않은 경우 추가
-      setAttendees([...attendees, {
-        user_id: user.user_id,
-        name: user.name,
-        email: user.email,
-        user_jobname: user.user_jobname
-      }]);
+      setAttendees([
+        ...attendees,
+        {
+          user_id: user.user_id,
+          name: user.name,
+          email: user.email,
+          user_jobname: user.user_jobname,
+        },
+      ]);
     }
   };
 
@@ -599,17 +610,17 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
     setHostId(user_id);
     const selectedUser = projectUsers.find((u) => u.user_id === user_id);
     if (selectedUser) {
-      setHostEmail(selectedUser.email || '');
-      setHostJobname(selectedUser.user_jobname || '');
-      
+      // setHostEmail(selectedUser.email || '');
+      // setHostJobname(selectedUser.user_jobname || '');
+
       // 회의장으로 선택된 사용자는 참석자 목록에서 제거
-      setAttendees(prev => prev.filter(a => a.user_id !== user_id));
-      
+      setAttendees((prev) => prev.filter((a) => a.user_id !== user_id));
+
       // 회의장 선택 후 토글 닫기
       setIsHostSectionExpanded(false);
     } else {
-      setHostEmail('');
-      setHostJobname('');
+      // setHostEmail('');
+      // setHostJobname('');
     }
   };
 
@@ -622,21 +633,25 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
     } else {
       // 전체 선택: hostId 제외한 모든 사용자를 참석자로 선택
       const availableUsers = projectUsers.filter((u) => u.user_id !== hostId);
-      setAttendees(availableUsers.map(u => ({
-        user_id: u.user_id,
-        name: u.name,
-        email: u.email,
-        user_jobname: u.user_jobname
-      })));
+      setAttendees(
+        availableUsers.map((u) => ({
+          user_id: u.user_id,
+          name: u.name,
+          email: u.email,
+          user_jobname: u.user_jobname,
+        }))
+      );
       setAllSelected(true);
     }
   };
 
   // 전체 선택 상태 체크
   useEffect(() => {
-    const availableUsers = projectUsers.filter(u => u.user_id !== hostId);
+    const availableUsers = projectUsers.filter((u) => u.user_id !== hostId);
     const selectedCount = attendees.length;
-    setAllSelected(selectedCount > 0 && selectedCount === availableUsers.length);
+    setAllSelected(
+      selectedCount > 0 && selectedCount === availableUsers.length
+    );
   }, [attendees, hostId, projectUsers]);
 
   // 회의장이 선택되지 않은 경우 토글 자동 열기
@@ -681,7 +696,7 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
     setIsSubmitting(true);
     setError('');
     try {
-      const meeting_date = new Date(meetingDate).toISOString();
+      // const meeting_date = new Date(meetingDate).toISOString();
 
       // 회의장과 참석자를 합쳐서 users 배열 생성
       const users = [
@@ -737,184 +752,203 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
           <StyledCloseButton onClick={onClose}>×</StyledCloseButton>
         </PopupHeader>
         <ScrollableBody>
-        <form onSubmit={handleSubmit}>
-          <FormGroup>
-            <StyledLabel>프로젝트명</StyledLabel>
-            <StyledInput type="text" value={projectName} readOnly />
-          </FormGroup>
-          <FormGroup>
-            <StyledLabel>
-              회의 제목 <span style={{ color: '#dc3545' }}>*</span>
-            </StyledLabel>
-            <StyledInput
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="회의 제목을 입력하세요"
-            />
-          </FormGroup>
-          <FormGroup>
-            <StyledLabel>
-              회의 일시 <span style={{ color: '#dc3545' }}>*</span>
-            </StyledLabel>
-            <DatePickerWrapper>
-              <DatePicker
-                selected={meetingDate}
-                onChange={(date: Date | null) => setMeetingDate(date)}
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={15}
-                dateFormat="yyyy년 MM월 dd일 HH:mm"
-                placeholderText="회의 일시를 선택하세요"
-                withPortal={false}
-                calendarStartDay={0}
-                locale="ko"
-                minDate={new Date()}
-                maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
-                popperClassName="custom-popper"
-                showPopperArrow={false}
+          <form onSubmit={handleSubmit}>
+            <FormGroup>
+              <StyledLabel>프로젝트명</StyledLabel>
+              <StyledInput type="text" value={projectName} readOnly />
+            </FormGroup>
+            <FormGroup>
+              <StyledLabel>
+                회의 제목 <span style={{ color: '#dc3545' }}>*</span>
+              </StyledLabel>
+              <StyledInput
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="회의 제목을 입력하세요"
               />
-            </DatePickerWrapper>
-          </FormGroup>
-          <FormGroup>
-            <StyledLabel>
-              회의 안건 <span style={{ color: '#dc3545' }}></span>
-            </StyledLabel>
-            <StyledTextarea
-              value={agenda}
-              onChange={(e) => setAgenda(e.target.value)}
-              placeholder="회의 안건을 입력하세요"
-            />
-          </FormGroup>
-          <FormGroup>
-            <StyledLabel>
-              회의 참석자 <span style={{ color: '#dc3545' }}>*</span>
-            </StyledLabel>
-            <UserSelectionPanel>
-              {/* 회의장 선택 섹션 */}
-              <HostSelectionSection>
-                <HostSectionTitle onClick={() => setIsHostSectionExpanded(!isHostSectionExpanded)}>
-                  <RiVipCrownFill /> 회의장 선택
-                  {hostId && !isHostSectionExpanded && (
-                    <span style={{ 
-                      fontSize: '0.85rem', 
-                      color: '#6b7280', 
-                      fontWeight: '400',
-                      marginLeft: '8px'
-                    }}>
-                      ({projectUsers.find(u => u.user_id === hostId)?.name || '선택됨'})
-                    </span>
-                  )}
-                  {isHostSectionExpanded ? <FiChevronUp /> : <FiChevronDown />}
-                </HostSectionTitle>
-                {isHostSectionExpanded && (
-                  <UserGrid>
-                    {projectUsers.map((user) => (
-                      <UserCard
-                        key={user.user_id}
-                        $selected={hostId === user.user_id}
-                        $isHost={hostId === user.user_id}
-                        onClick={() => handleHostSelect(user.user_id)}
-                      >
-                        <UserCheckbox
-                          type="radio"
-                          name="host"
-                          checked={hostId === user.user_id}
-                          onChange={() => handleHostSelect(user.user_id)}
-                        />
-                        <UserInfo>
-                          <UserName>
-                            {user.name}
-                            <UserEmail>{user.email}</UserEmail>
-                            {hostId === user.user_id && (
-                              <HostBadge>
-                                <RiVipCrownFill /> 회의장
-                              </HostBadge>
-                            )}
-                          </UserName>
-                        </UserInfo>
-                      </UserCard>
-                    ))}
-                  </UserGrid>
-                )}
-              </HostSelectionSection>
-
-              {/* 참석자 선택 섹션 */}
-              <div>
-                <AttendeesSectionTitle>
-                  <FiUser /> 참석자 선택
-                </AttendeesSectionTitle>
-                
-                <SearchAndActionsRow>
-                  <SearchBox>
-                    <SearchIcon />
-                    <SearchInput
-                      type="text"
-                      placeholder="참석자 검색..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </SearchBox>
-                  <ActionButton
-                    type="button"
-                    onClick={handleSelectAll}
+            </FormGroup>
+            <FormGroup>
+              <StyledLabel>
+                회의 일시 <span style={{ color: '#dc3545' }}>*</span>
+              </StyledLabel>
+              <DatePickerWrapper>
+                <DatePicker
+                  selected={meetingDate}
+                  onChange={(date: Date | null) => setMeetingDate(date)}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="yyyy년 MM월 dd일 HH:mm"
+                  placeholderText="회의 일시를 선택하세요"
+                  withPortal={false}
+                  calendarStartDay={0}
+                  locale="ko"
+                  minDate={new Date()}
+                  maxDate={
+                    new Date(
+                      new Date().setFullYear(new Date().getFullYear() + 1)
+                    )
+                  }
+                  popperClassName="custom-popper"
+                  showPopperArrow={false}
+                />
+              </DatePickerWrapper>
+            </FormGroup>
+            <FormGroup>
+              <StyledLabel>
+                회의 안건 <span style={{ color: '#dc3545' }}></span>
+              </StyledLabel>
+              <StyledTextarea
+                value={agenda}
+                onChange={(e) => setAgenda(e.target.value)}
+                placeholder="회의 안건을 입력하세요"
+              />
+            </FormGroup>
+            <FormGroup>
+              <StyledLabel>
+                회의 참석자 <span style={{ color: '#dc3545' }}>*</span>
+              </StyledLabel>
+              <UserSelectionPanel>
+                {/* 회의장 선택 섹션 */}
+                <HostSelectionSection>
+                  <HostSectionTitle
+                    onClick={() =>
+                      setIsHostSectionExpanded(!isHostSectionExpanded)
+                    }
                   >
-                    {allSelected ? '전체 해제' : '전체 선택'}
-                  </ActionButton>
-                  <SelectedCount>
-                    {attendees.length}명 선택
-                  </SelectedCount>
-                </SearchAndActionsRow>
-
-                <UserGrid>
-                  {filteredUsers
-                    .filter(user => user.user_id !== hostId)
-                    .map((user) => {
-                      const isSelected = attendees.some(a => a.user_id === user.user_id);
-                      return (
+                    <RiVipCrownFill /> 회의장 선택
+                    {hostId && !isHostSectionExpanded && (
+                      <span
+                        style={{
+                          fontSize: '0.85rem',
+                          color: '#6b7280',
+                          fontWeight: '400',
+                          marginLeft: '8px',
+                        }}
+                      >
+                        (
+                        {projectUsers.find((u) => u.user_id === hostId)?.name ||
+                          '선택됨'}
+                        )
+                      </span>
+                    )}
+                    {isHostSectionExpanded ? (
+                      <FiChevronUp />
+                    ) : (
+                      <FiChevronDown />
+                    )}
+                  </HostSectionTitle>
+                  {isHostSectionExpanded && (
+                    <UserGrid>
+                      {projectUsers.map((user) => (
                         <UserCard
                           key={user.user_id}
-                          $selected={isSelected}
-                          $isHost={false}
-                          onClick={() => handleAttendeeToggle(user)}
+                          $selected={hostId === user.user_id}
+                          $isHost={hostId === user.user_id}
+                          onClick={() => handleHostSelect(user.user_id)}
                         >
                           <UserCheckbox
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => handleAttendeeToggle(user)}
+                            type="radio"
+                            name="host"
+                            checked={hostId === user.user_id}
+                            onChange={() => handleHostSelect(user.user_id)}
                           />
                           <UserInfo>
                             <UserName>
                               {user.name}
                               <UserEmail>{user.email}</UserEmail>
+                              {hostId === user.user_id && (
+                                <HostBadge>
+                                  <RiVipCrownFill /> 회의장
+                                </HostBadge>
+                              )}
                             </UserName>
                           </UserInfo>
                         </UserCard>
-                      );
-                    })}
-                </UserGrid>
-                
-                {filteredUsers.filter(user => user.user_id !== hostId).length === 0 && (
-                  <div style={{ 
-                    textAlign: 'center', 
-                    color: '#6b7280', 
-                    padding: '12px',
-                    fontStyle: 'italic',
-                    fontSize: '0.85rem'
-                  }}>
-                    {searchTerm ? '검색 결과가 없습니다.' : '참석 가능한 사용자가 없습니다.'}
-                  </div>
-                )}
-              </div>
-            </UserSelectionPanel>
-          </FormGroup>
-          {error && (
-            <div style={{ color: '#dc3545', marginBottom: 10 }}>{error}</div>
-          )}
-          <CreateProjectButton type="submit" disabled={isSubmitting}>
-            등록
-          </CreateProjectButton>
-        </form>
+                      ))}
+                    </UserGrid>
+                  )}
+                </HostSelectionSection>
+
+                {/* 참석자 선택 섹션 */}
+                <div>
+                  <AttendeesSectionTitle>
+                    <FiUser /> 참석자 선택
+                  </AttendeesSectionTitle>
+
+                  <SearchAndActionsRow>
+                    <SearchBox>
+                      <SearchIcon />
+                      <SearchInput
+                        type="text"
+                        placeholder="참석자 검색..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </SearchBox>
+                    <ActionButton type="button" onClick={handleSelectAll}>
+                      {allSelected ? '전체 해제' : '전체 선택'}
+                    </ActionButton>
+                    <SelectedCount>{attendees.length}명 선택</SelectedCount>
+                  </SearchAndActionsRow>
+
+                  <UserGrid>
+                    {filteredUsers
+                      .filter((user) => user.user_id !== hostId)
+                      .map((user) => {
+                        const isSelected = attendees.some(
+                          (a) => a.user_id === user.user_id
+                        );
+                        return (
+                          <UserCard
+                            key={user.user_id}
+                            $selected={isSelected}
+                            $isHost={false}
+                            onClick={() => handleAttendeeToggle(user)}
+                          >
+                            <UserCheckbox
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleAttendeeToggle(user)}
+                            />
+                            <UserInfo>
+                              <UserName>
+                                {user.name}
+                                <UserEmail>{user.email}</UserEmail>
+                              </UserName>
+                            </UserInfo>
+                          </UserCard>
+                        );
+                      })}
+                  </UserGrid>
+
+                  {filteredUsers.filter((user) => user.user_id !== hostId)
+                    .length === 0 && (
+                    <div
+                      style={{
+                        textAlign: 'center',
+                        color: '#6b7280',
+                        padding: '12px',
+                        fontStyle: 'italic',
+                        fontSize: '0.85rem',
+                      }}
+                    >
+                      {searchTerm
+                        ? '검색 결과가 없습니다.'
+                        : '참석 가능한 사용자가 없습니다.'}
+                    </div>
+                  )}
+                </div>
+              </UserSelectionPanel>
+            </FormGroup>
+            {error && (
+              <div style={{ color: '#dc3545', marginBottom: 10 }}>{error}</div>
+            )}
+            <CreateProjectButton type="submit" disabled={isSubmitting}>
+              등록
+            </CreateProjectButton>
+          </form>
         </ScrollableBody>
       </ScrollablePopupContent>
     </PopupOverlay>
