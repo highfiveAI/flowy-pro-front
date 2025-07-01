@@ -23,7 +23,6 @@ import { checkAuth } from '../../api/fetchAuthCheck';
 import type { Todo } from '../../types/project';
 import PreviewMeetingBanner from './popup/PreviewMeetingBanner';
 
-
 import type {
   Feedback,
   Meeting,
@@ -33,8 +32,6 @@ import type {
   SummaryLog,
 } from './Dashboard.types';
 
-
-
 import {
   AddButton,
   BasicInfoGrid,
@@ -43,7 +40,7 @@ import {
   EditModeInput,
   EmptyRecommendFiles,
   FeedbackTitle,
-  FloatingButton,
+  // FloatingButton,
   FloatingButtonContainer,
   FloatingButtonLight,
   InfoContent,
@@ -112,11 +109,11 @@ const Dashboard: React.FC = () => {
   const [recommendFiles, setRecommendFiles] = useState<any[]>([]);
   const [showMail_uneditPopup, setShowMail_uneditPopup] = useState(false);
   const [poRoleId, setPoRoleId] = useState<string>('');
-  
+
   // 예정 회의 팝업 관련 state
   const [pendingPreviewMeeting, setPendingPreviewMeeting] = useState<any>(null);
   const [showPreviewMeetingPopup, setShowPreviewMeetingPopup] = useState(false);
-  
+
   // Floating 버튼 관련 state
   const [showFloatingButtons, setShowFloatingButtons] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
@@ -127,18 +124,20 @@ const Dashboard: React.FC = () => {
     // console.log('현재 사용자 ID:', user?.id);
     // console.log('회의 참석자 수:', projectUser.length);
     // console.log('PO role_id:', poRoleId);
-    
+
     if (!user?.id || !projectUser.length || !poRoleId) {
       // console.log('기본 조건 실패 - 권한 없음');
       return false;
     }
-    
-    const currentUserInMeeting = projectUser.find(pu => pu.user_id === user.id);
+
+    const currentUserInMeeting = projectUser.find(
+      (pu) => pu.user_id === user.id
+    );
     // console.log('회의에서 현재 사용자 정보:', currentUserInMeeting);
     // console.log('현재 사용자의 역할 ID:', currentUserInMeeting?.role_id);
     // console.log('PO 역할 ID와 일치?', currentUserInMeeting?.role_id === poRoleId);
     // console.log('==================');
-    
+
     return currentUserInMeeting?.role_id === poRoleId;
   };
 
@@ -179,7 +178,7 @@ const Dashboard: React.FC = () => {
           meeting_id: data?.meeting_id,
           meeting_title: data?.meeting_title,
           meeting_agenda: data?.meeting_agenda,
-          meeting_date: data?.meeting_date
+          meeting_date: data?.meeting_date,
         });
         console.log('회의 참석자들:', data?.meeting_users);
         console.log('요약 로그:', data?.summary_log);
@@ -209,7 +208,7 @@ const Dashboard: React.FC = () => {
 
           setProjectUser(extractedUsers);
           setSummaryLog(data.summary_log ?? null);
-          
+
           // 피드백 데이터 상세 로그
           if (data.feedback && Array.isArray(data.feedback)) {
             console.log('=== 피드백 상세 분석 ===');
@@ -219,17 +218,23 @@ const Dashboard: React.FC = () => {
                 feedbacktype_id: feedback.feedbacktype_id,
                 feedback_detail: feedback.feedback_detail,
                 type: typeof feedback.feedback_detail,
-                length: feedback.feedback_detail?.length || 0
+                length: feedback.feedback_detail?.length || 0,
               });
-              
+
               // 회의 시간 분석 데이터 특별 확인
-              if (feedback.feedbacktype_id === '0a5a835d-53d0-43a6-b821-7c36f603a071') {
-                console.log('🕐 회의 시간 분석 원본 텍스트:', feedback.feedback_detail);
+              if (
+                feedback.feedbacktype_id ===
+                '0a5a835d-53d0-43a6-b821-7c36f603a071'
+              ) {
+                console.log(
+                  '🕐 회의 시간 분석 원본 텍스트:',
+                  feedback.feedback_detail
+                );
               }
             });
             console.log('======================');
           }
-          
+
           setFeedback(data.feedback ?? []);
 
           const grouped: Record<string, Todo[]> = {};
@@ -269,9 +274,14 @@ const Dashboard: React.FC = () => {
       if (isCurrentUserPO()) {
         fetchPendingPreviewMeeting(meetingId)
           .then((data) => {
-            if ((Array.isArray(data) && data.length > 0) || (data && data.has_pending_meeting)) {
+            if (
+              (Array.isArray(data) && data.length > 0) ||
+              (data && data.has_pending_meeting)
+            ) {
               setShowBanner(true);
-              setPendingPreviewMeeting(Array.isArray(data) ? data[0] : data.pending_meeting);
+              setPendingPreviewMeeting(
+                Array.isArray(data) ? data[0] : data.pending_meeting
+              );
             }
           })
           .catch((error) => {
@@ -314,7 +324,7 @@ const Dashboard: React.FC = () => {
         setUser(user);
       }
       setLoading(false);
-      
+
       // PO role_id 가져오기
       try {
         const metaData = await fetchProjectMetaData();
@@ -424,7 +434,11 @@ const Dashboard: React.FC = () => {
   // 예정 회의 팝업 핸들러들
   const handleConfirmPreviewMeeting = async (confirmData: any) => {
     try {
-      await confirmPreviewMeeting(meetingId!, pendingPreviewMeeting.meeting_id, confirmData);
+      await confirmPreviewMeeting(
+        meetingId!,
+        pendingPreviewMeeting.meeting_id,
+        confirmData
+      );
       setShowPreviewMeetingPopup(false);
       setShowBanner(false);
       setPendingPreviewMeeting(null);
@@ -543,7 +557,6 @@ const Dashboard: React.FC = () => {
               PDF 다운로드
             </SpeechBubbleButton>
             &nbsp;&nbsp;&nbsp;
-
             {isCurrentUserPO() && (
               <SpeechBubbleButton
                 onClick={() => setShowMail_uneditPopup(true)}
@@ -552,17 +565,21 @@ const Dashboard: React.FC = () => {
                 <img
                   src="/images/sendmail.svg"
                   alt="메일"
-                  style={{ width: 22, height: 22, marginRight: 6, verticalAlign: 'middle' }}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    marginRight: 6,
+                    verticalAlign: 'middle',
+                  }}
                 />
                 메일전송하기
               </SpeechBubbleButton>
             )}
-
             {/* <EditButton onClick={() => setShowMailPopup(true)}>
               수정하기
             </EditButton> */}
-            {isCurrentUserPO() && (
-              isEditingSummary ? (
+            {isCurrentUserPO() &&
+              (isEditingSummary ? (
                 <EditButton onClick={() => setShowMailPopup(true)}>
                   <img
                     src="/images/edit.svg"
@@ -580,8 +597,7 @@ const Dashboard: React.FC = () => {
                   />
                   수정하기
                 </EditButton>
-              )
-            )}
+              ))}
           </div>
         </MeetingAnalysisHeader>
 
@@ -624,10 +640,10 @@ const Dashboard: React.FC = () => {
             <BasicInfoGrid>
               <InfoLabel>상위 프로젝트</InfoLabel>
               <InfoContent>{project?.project_name}</InfoContent>
-              
+
               <InfoLabel>회의 제목</InfoLabel>
               <InfoContent>{meeting?.meeting_title}</InfoContent>
-              
+
               <InfoLabel>회의 일시</InfoLabel>
               <InfoContent>
                 {meeting?.meeting_date
@@ -637,14 +653,14 @@ const Dashboard: React.FC = () => {
                       .slice(0, 16)
                   : '날짜 없음'}
               </InfoContent>
-              
+
               <InfoLabel>회의 참석자</InfoLabel>
               <InfoContent>
                 {projectUser.length > 0
                   ? projectUser.map((user) => user.user_name).join(', ')
                   : '참석자 없음'}
               </InfoContent>
-              
+
               <InfoLabel>회의 안건</InfoLabel>
               <InfoContent>{meeting?.meeting_agenda}</InfoContent>
             </BasicInfoGrid>
@@ -666,12 +682,31 @@ const Dashboard: React.FC = () => {
               Object.keys(summaryLog.updated_summary_contents).length > 0 ? (
                 <>
                   {isEditingSummary ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '24px',
+                      }}
+                    >
                       {Object.entries(summaryLog.updated_summary_contents).map(
                         ([key, value]) => (
-                          <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <div
+                            key={key}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '12px',
+                            }}
+                          >
                             <SummarySectionHeader>{key}</SummarySectionHeader>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '8px',
+                              }}
+                            >
                               {(Array.isArray(value)
                                 ? value
                                 : [String(value)]
@@ -801,7 +836,7 @@ const Dashboard: React.FC = () => {
                                   );
                                 }}
                               >
-                                <TaskCardListItem $isDraggable={true}>
+                                <TaskCardListItem /*$isDraggable={true}*/>
                                   {todo.action}
                                   <TaskCardDate
                                     style={{ cursor: 'pointer' }}
@@ -820,18 +855,21 @@ const Dashboard: React.FC = () => {
                                               : null
                                           }
                                           onChange={(date) => {
-                                            const currentSchedule = todo.schedule;
+                                            const currentSchedule =
+                                              todo.schedule;
                                             const newSchedule = date
                                               ?.toISOString()
                                               .split('T')[0];
-                                            
+
                                             // 같은 날짜를 두 번 클릭한 경우 미정으로 변경
-                                            const scheduleToSet = 
-                                              currentSchedule === newSchedule 
-                                                ? '미정' 
+                                            const scheduleToSet =
+                                              currentSchedule === newSchedule
+                                                ? '미정'
                                                 : newSchedule;
-                                            
-                                            const updatedTodos = [...assignRole[col]];
+
+                                            const updatedTodos = [
+                                              ...assignRole[col],
+                                            ];
                                             updatedTodos[idx] = {
                                               ...updatedTodos[idx],
                                               schedule: scheduleToSet,
@@ -840,7 +878,7 @@ const Dashboard: React.FC = () => {
                                               ...prev,
                                               [col]: updatedTodos,
                                             }));
-                                            
+
                                             // 미정으로 설정한 경우 즉시 달력 닫기
                                             if (scheduleToSet === '미정') {
                                               setEditingDate(null);
@@ -890,7 +928,10 @@ const Dashboard: React.FC = () => {
                     ),
                   ].map((col) => (
                     <div key={col} style={{ height: '100%' }}>
-                      <TaskCard $isUnassigned={col === '미할당'} draggable={false}>
+                      <TaskCard
+                        $isUnassigned={col === '미할당'}
+                        draggable={false}
+                      >
                         <TaskCardHeader $isUnassigned={col === '미할당'}>
                           <TaskCardTitle $isUnassigned={col === '미할당'}>
                             {col === '미할당' ? '미할당 작업 목록' : col}
@@ -899,7 +940,10 @@ const Dashboard: React.FC = () => {
 
                         <TaskCardList>
                           {(assignRole[col] ?? []).map((todo, idx) => (
-                            <TaskCardListItem key={`${col}__${idx}`} $isDraggable={false}>
+                            <TaskCardListItem
+                              key={`${col}__${idx}`}
+                              /*$isDraggable={false}*/
+                            >
                               {todo.action}
                               <TaskCardDate>
                                 {String(todo.schedule).trim() === '언급 없음' ||
@@ -965,86 +1009,128 @@ const Dashboard: React.FC = () => {
                           {allDetails.map((detail, idx) => {
                             // 회의 시간 분석인 경우 특별 처리
                             if (id === '0a5a835d-53d0-43a6-b821-7c36f603a071') {
-                                                            // 회의 시간 분석 파싱 - 각 섹션을 별도 항목으로 반환
+                              // 회의 시간 분석 파싱 - 각 섹션을 별도 항목으로 반환
                               const parseTimeAnalysis = (text: string) => {
                                 const items: string[] = [];
-                                
+
                                 // | 기준으로 섹션 분리
-                                const sections = text.split('|').map(section => section.trim()).filter(section => section);
-                                
-                                sections.forEach(section => {
+                                const sections = text
+                                  .split('|')
+                                  .map((section) => section.trim())
+                                  .filter((section) => section);
+
+                                sections.forEach((section) => {
                                   // 총 주제 수
                                   if (section.startsWith('총 주제 수:')) {
-                                    const match = section.match(/총 주제 수:\s*(\d+)/);
+                                    const match =
+                                      section.match(/총 주제 수:\s*(\d+)/);
                                     if (match) {
-                                      items.push(`<strong>총 주제 수:</strong> ${match[1]}개`);
+                                      items.push(
+                                        `<strong>총 주제 수:</strong> ${match[1]}개`
+                                      );
                                     }
                                   }
-                                  
+
                                   // 주요 주제별 소요 시간
-                                  else if (section.startsWith('주요 주제별 소요 시간:')) {
-                                    let content = '<strong>주요 주제별 소요 시간:</strong>\n';
-                                    const timeContent = section.replace('주요 주제별 소요 시간:', '').trim();
-                                    
+                                  else if (
+                                    section.startsWith('주요 주제별 소요 시간:')
+                                  ) {
+                                    let content =
+                                      '<strong>주요 주제별 소요 시간:</strong>\n';
+                                    const timeContent = section
+                                      .replace('주요 주제별 소요 시간:', '')
+                                      .trim();
+
                                     // 세미콜론으로 분리하여 각 항목 처리
-                                    const timeItems = timeContent.split(';').map(item => item.trim()).filter(item => item);
-                                    timeItems.forEach(item => {
-                                      if (item.includes(':') && item.includes('%')) {
+                                    const timeItems = timeContent
+                                      .split(';')
+                                      .map((item) => item.trim())
+                                      .filter((item) => item);
+                                    timeItems.forEach((item) => {
+                                      if (
+                                        item.includes(':') &&
+                                        item.includes('%')
+                                      ) {
                                         content += `\t• ${item}\n`;
                                       }
                                     });
                                     items.push(content.trim());
                                   }
-                                  
+
                                   // 주제 전환 빈도
-                                  else if (section.startsWith('주제 전환 빈도:')) {
-                                    const content = section.replace('주제 전환 빈도:', '').trim();
-                                    items.push(`<strong>주제 전환 빈도:</strong> ${content}`);
+                                  else if (
+                                    section.startsWith('주제 전환 빈도:')
+                                  ) {
+                                    const content = section
+                                      .replace('주제 전환 빈도:', '')
+                                      .trim();
+                                    items.push(
+                                      `<strong>주제 전환 빈도:</strong> ${content}`
+                                    );
                                   }
-                                  
+
                                   // 주제별 편중
                                   else if (section.startsWith('주제별 편중:')) {
-                                    const content = section.replace('주제별 편중:', '').trim();
-                                    items.push(`<strong>주제별 편중:</strong> ${content}`);
+                                    const content = section
+                                      .replace('주제별 편중:', '')
+                                      .trim();
+                                    items.push(
+                                      `<strong>주제별 편중:</strong> ${content}`
+                                    );
                                   }
-                                  
+
                                   // 효율 평가
                                   else if (section.startsWith('효율 평가:')) {
-                                    let content = '<strong>효율 평가:</strong>\n';
-                                    const evalContent = section.replace('효율 평가:', '').trim();
-                                    
+                                    let content =
+                                      '<strong>효율 평가:</strong>\n';
+                                    const evalContent = section
+                                      .replace('효율 평가:', '')
+                                      .trim();
+
                                     // 문장별로 분리하여 추가
-                                    const sentences = evalContent.split(/\.\s+/).filter(s => s.trim());
-                                    sentences.forEach(sentence => {
+                                    const sentences = evalContent
+                                      .split(/\.\s+/)
+                                      .filter((s) => s.trim());
+                                    sentences.forEach((sentence) => {
                                       if (sentence.trim()) {
-                                        content += `\t${sentence.trim()}${sentence.endsWith('.') ? '' : '.'}\n`;
+                                        content += `\t${sentence.trim()}${
+                                          sentence.endsWith('.') ? '' : '.'
+                                        }\n`;
                                       }
                                     });
                                     items.push(content.trim());
                                   }
                                 });
-                                
+
                                 return items;
                               };
-                              
+
                               const parsedItems = parseTimeAnalysis(detail);
-                              
+
                               return (
                                 <>
                                   {parsedItems.map((item, itemIdx) => (
                                     <li key={`${id}-${idx}-${itemIdx}`}>
                                       {item.includes('\n') ? (
                                         // 여러 줄인 경우 (주요 주제별 소요 시간, 효율 평가)
-                                        item.split('\n').map((line, lineIdx) => (
-                                          <div 
-                                            key={`${id}-${idx}-${itemIdx}-${lineIdx}`} 
-                                            style={{ marginBottom: '0.3rem' }}
-                                            dangerouslySetInnerHTML={{ __html: line }}
-                                          />
-                                        ))
+                                        item
+                                          .split('\n')
+                                          .map((line, lineIdx) => (
+                                            <div
+                                              key={`${id}-${idx}-${itemIdx}-${lineIdx}`}
+                                              style={{ marginBottom: '0.3rem' }}
+                                              dangerouslySetInnerHTML={{
+                                                __html: line,
+                                              }}
+                                            />
+                                          ))
                                       ) : (
                                         // 한 줄인 경우 (총 주제 수, 주제 전환 빈도, 주제별 편중)
-                                        <span dangerouslySetInnerHTML={{ __html: item }} />
+                                        <span
+                                          dangerouslySetInnerHTML={{
+                                            __html: item,
+                                          }}
+                                        />
                                       )}
                                     </li>
                                   ))}
@@ -1054,28 +1140,30 @@ const Dashboard: React.FC = () => {
                               // 다른 피드백 타입들은 기존 로직 사용
                               const sentences = detail
                                 .split(/([.!?]\s+)/)
-                                .filter(sentence => sentence.trim() !== '')
+                                .filter((sentence) => sentence.trim() !== '')
                                 .reduce((acc: string[], curr, index, array) => {
                                   if (index % 2 === 0) {
                                     // 문장 부분
-                                    const nextPunctuation = array[index + 1] || '';
+                                    const nextPunctuation =
+                                      array[index + 1] || '';
                                     acc.push((curr + nextPunctuation).trim());
                                   }
                                   return acc;
                                 }, [] as string[])
-                                .filter(sentence => sentence.length > 1);
+                                .filter((sentence) => sentence.length > 1);
 
                               return (
                                 <li key={`${id}-${idx}`}>
-                                  {sentences.length > 1 ? (
-                                    sentences.map((sentence, sentenceIdx) => (
-                                      <div key={`${id}-${idx}-${sentenceIdx}`} style={{ marginBottom: '0.5rem' }}>
-                                        {sentence}
-                                      </div>
-                                    ))
-                                  ) : (
-                                    detail
-                                  )}
+                                  {sentences.length > 1
+                                    ? sentences.map((sentence, sentenceIdx) => (
+                                        <div
+                                          key={`${id}-${idx}-${sentenceIdx}`}
+                                          style={{ marginBottom: '0.5rem' }}
+                                        >
+                                          {sentence}
+                                        </div>
+                                      ))
+                                    : detail}
                                 </li>
                               );
                             }
@@ -1109,11 +1197,17 @@ const Dashboard: React.FC = () => {
                       <img
                         src="/images/recommendfile.svg"
                         alt="추천문서"
-                        style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          filter: 'brightness(0) invert(1)',
+                        }}
                       />
                     </RecommendFileIcon>
                     <RecommendFileContent>
-                      <RecommendFileReason>{file.draft_ref_reason}</RecommendFileReason>
+                      <RecommendFileReason>
+                        {file.draft_ref_reason}
+                      </RecommendFileReason>
                       <RecommendFileLink
                         href={file.ref_interdoc_id}
                         target="_blank"
@@ -1131,7 +1225,9 @@ const Dashboard: React.FC = () => {
 
         {/* 배너: FloatingButton 위에 위치 */}
         {showBanner && (
-          <PreviewMeetingBanner onClick={() => setShowPreviewMeetingPopup(true)} />
+          <PreviewMeetingBanner
+            onClick={() => setShowPreviewMeetingPopup(true)}
+          />
         )}
         {/* 예정 회의 팝업 */}
         {showPreviewMeetingPopup && pendingPreviewMeeting && (
@@ -1144,7 +1240,7 @@ const Dashboard: React.FC = () => {
           />
         )}
       </MainContent>
-      
+
       {/* Floating 버튼들 */}
       <FloatingButtonContainer $isVisible={showFloatingButtons}>
         <FloatingButtonLight onClick={() => setShowPDFPopup(true)}>
@@ -1155,7 +1251,7 @@ const Dashboard: React.FC = () => {
           />
           PDF 다운로드
         </FloatingButtonLight>
-        
+
         {isCurrentUserPO() && (
           <FloatingButtonLight onClick={() => setShowMail_uneditPopup(true)}>
             <img
@@ -1166,10 +1262,14 @@ const Dashboard: React.FC = () => {
             메일전송하기
           </FloatingButtonLight>
         )}
-        
+
         {isCurrentUserPO() && (
-          <FloatingButtonLight 
-            onClick={isEditingSummary ? () => setShowMailPopup(true) : handleEditSummary}
+          <FloatingButtonLight
+            onClick={
+              isEditingSummary
+                ? () => setShowMailPopup(true)
+                : handleEditSummary
+            }
           >
             <img
               src="/images/edit.svg"
