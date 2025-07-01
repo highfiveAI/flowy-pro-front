@@ -1,15 +1,17 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { FiChevronUp, FiChevronDown, FiSearch, FiX, FiTrash } from 'react-icons/fi';
+import {
+  FiChevronUp,
+  FiChevronDown,
+  FiSearch,
+  FiX,
+  FiTrash,
+} from 'react-icons/fi';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import NewAdmin from './popup/newAdmin';
 import AlertModal from './popup/AlertModal';
 import ConfirmModal from './popup/ConfirmModal';
-import {
-  fetchSignupInfos,
-  fetchUsersByCompany,
-  putAdminUser,
-} from '../../../api/fetchSignupInfos';
+import { putAdminUser } from '../../../api/fetchSignupInfos';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -57,13 +59,13 @@ const AddButton = styled.button`
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 16px rgba(53, 23, 69, 0.2);
   font-weight: 600;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(53, 23, 69, 0.3);
     background: linear-gradient(135deg, #4b2067 0%, #5d2b7a 100%);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -94,7 +96,7 @@ const SearchContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  
+
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -138,9 +140,9 @@ const SearchInput = styled.input<{ $isExpanded: boolean }>`
   background: white;
   color: #374151;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: ${props => props.$isExpanded ? '280px' : '40px'};
-  opacity: ${props => props.$isExpanded ? '1' : '0'};
-  pointer-events: ${props => props.$isExpanded ? 'auto' : 'none'};
+  width: ${(props) => (props.$isExpanded ? '280px' : '40px')};
+  opacity: ${(props) => (props.$isExpanded ? '1' : '0')};
+  pointer-events: ${(props) => (props.$isExpanded ? 'auto' : 'none')};
 
   &:hover {
     border-color: #2d1155;
@@ -157,8 +159,8 @@ const SearchInput = styled.input<{ $isExpanded: boolean }>`
   }
 
   @media (max-width: 768px) {
-    width: ${props => props.$isExpanded ? '100%' : '40px'};
-    position: ${props => props.$isExpanded ? 'relative' : 'absolute'};
+    width: ${(props) => (props.$isExpanded ? '100%' : '40px')};
+    position: ${(props) => (props.$isExpanded ? 'relative' : 'absolute')};
   }
 `;
 
@@ -223,23 +225,23 @@ const Table = styled.table`
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     border-bottom: 1px solid #f1f5f9;
-    
+
     &:hover {
       background: linear-gradient(135deg, #fefbff 0%, #f8f5ff 100%);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(53, 23, 69, 0.08);
     }
-    
+
     &:last-child {
       border-bottom: none;
     }
-    
+
     /* 선택된 상태 */
     &.selected {
       background: linear-gradient(135deg, #f0ebf8 0%, #e5e0ee 100%);
       border-left: 4px solid #4b2067;
     }
-    
+
     &.selected:hover {
       background: linear-gradient(135deg, #e5e0ee 0%, #d4c7e8 100%);
     }
@@ -272,12 +274,12 @@ const SortIconContainer = styled.span`
   opacity: 0.4;
   transition: all 0.2s ease;
   vertical-align: middle;
-  
+
   &.active {
     opacity: 1;
     color: #2d1155;
   }
-  
+
   &.inactive {
     opacity: 0.2;
   }
@@ -291,47 +293,47 @@ const NewSortIcon = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  
+
   &.active {
     color: #2d1155;
   }
 `;
 
-const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
-  padding: 12px 24px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  margin-right: 12px;
-  background: ${(props) =>
-    props.variant === 'danger' 
-      ? 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)'
-      : 'linear-gradient(135deg, #351745 0%, #4b2067 100%)'};
-  color: white;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: ${(props) =>
-    props.variant === 'danger' 
-      ? '0 4px 16px rgba(220, 53, 69, 0.2)'
-      : '0 4px 16px rgba(53, 23, 69, 0.2)'};
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${(props) =>
-      props.variant === 'danger' 
-        ? '0 8px 24px rgba(220, 53, 69, 0.3)'
-        : '0 8px 24px rgba(53, 23, 69, 0.3)'};
-    background: ${(props) =>
-      props.variant === 'danger' 
-        ? 'linear-gradient(135deg, #c82333 0%, #a91e2c 100%)'
-        : 'linear-gradient(135deg, #4b2067 0%, #5d2b7a 100%)'};
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-`;
+// const Button = styled.button<{ variant?: 'primary' | 'danger' }>`
+//   padding: 12px 24px;
+//   border-radius: 12px;
+//   border: none;
+//   cursor: pointer;
+//   margin-right: 12px;
+//   background: ${(props) =>
+//     props.variant === 'danger'
+//       ? 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)'
+//       : 'linear-gradient(135deg, #351745 0%, #4b2067 100%)'};
+//   color: white;
+//   font-weight: 600;
+//   font-size: 14px;
+//   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+//   box-shadow: ${(props) =>
+//     props.variant === 'danger'
+//       ? '0 4px 16px rgba(220, 53, 69, 0.2)'
+//       : '0 4px 16px rgba(53, 23, 69, 0.2)'};
+
+//   &:hover {
+//     transform: translateY(-2px);
+//     box-shadow: ${(props) =>
+//       props.variant === 'danger'
+//         ? '0 8px 24px rgba(220, 53, 69, 0.3)'
+//         : '0 8px 24px rgba(53, 23, 69, 0.3)'};
+//     background: ${(props) =>
+//       props.variant === 'danger'
+//         ? 'linear-gradient(135deg, #c82333 0%, #a91e2c 100%)'
+//         : 'linear-gradient(135deg, #4b2067 0%, #5d2b7a 100%)'};
+//   }
+
+//   &:active {
+//     transform: translateY(0);
+//   }
+// `;
 
 // 페이지네이션 스타일
 const Pagination = styled.div`
@@ -346,9 +348,12 @@ const PageButton = styled.button<{ $active?: boolean }>`
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  border: 1px solid ${props => props.$active ? '#2d1155' : '#e5e7eb'};
-  background: ${props => props.$active ? 'linear-gradient(135deg, #2d1155 0%, #4b2067 100%)' : 'white'};
-  color: ${props => props.$active ? 'white' : '#6b7280'};
+  border: 1px solid ${(props) => (props.$active ? '#2d1155' : '#e5e7eb')};
+  background: ${(props) =>
+    props.$active
+      ? 'linear-gradient(135deg, #2d1155 0%, #4b2067 100%)'
+      : 'white'};
+  color: ${(props) => (props.$active ? 'white' : '#6b7280')};
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -358,8 +363,11 @@ const PageButton = styled.button<{ $active?: boolean }>`
   justify-content: center;
 
   &:hover:not(:disabled) {
-    background: ${props => props.$active ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#f9fafb'};
-    border-color: ${props => props.$active ? '#351745' : '#d1d5db'};
+    background: ${(props) =>
+      props.$active
+        ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)'
+        : '#f9fafb'};
+    border-color: ${(props) => (props.$active ? '#351745' : '#d1d5db')};
   }
 
   &:disabled {
@@ -415,8 +423,10 @@ const IconButton = styled.button<{ variant?: 'danger' }>`
   justify-content: center;
   font-size: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  ${props => props.variant === 'danger' ? `
+
+  ${(props) =>
+    props.variant === 'danger'
+      ? `
     background: rgba(255, 255, 255, 0.95);
     color: #8b5a8c;
     
@@ -427,7 +437,8 @@ const IconButton = styled.button<{ variant?: 'danger' }>`
       box-shadow: 0 4px 12px rgba(139, 90, 140, 0.3);
       border-color: rgba(124, 58, 237, 0.4);
     }
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #6b7280;
     
@@ -437,7 +448,7 @@ const IconButton = styled.button<{ variant?: 'danger' }>`
       transform: translateY(-1px);
     }
   `}
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -467,7 +478,7 @@ interface SortState {
 
 const AdminAdmin: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [companyList, setCompanyList] = useState<any[]>([]);
+  // const [companyList, setCompanyList] = useState<any[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     user_name: '',
@@ -480,11 +491,11 @@ const AdminAdmin: React.FC = () => {
     field: '',
     direction: null,
   });
-  
+
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   // 검색 상태
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -534,10 +545,8 @@ const AdminAdmin: React.FC = () => {
 
   useEffect(() => {
     fetchAdmins();
-    loadCompanyList();
+    // loadCompanyList();
   }, []);
-
-
 
   const handleCreateClick = () => {
     setFormData({
@@ -577,28 +586,29 @@ const AdminAdmin: React.FC = () => {
   // 필터링된 관리자 목록 계산
   const filteredUsers = useMemo(() => {
     let filtered = [...users];
-    
+
     // 검색 필터링
     if (searchTerm.trim()) {
-      filtered = filtered.filter((user) =>
-        user.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.user_login_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.company_name.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (user) =>
+          user.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.user_login_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.company_name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     // 정렬
     if (sortState.direction !== null) {
       filtered.sort((a, b) => {
         const aValue = a[sortState.field as keyof User] || '';
         const bValue = b[sortState.field as keyof User] || '';
-        
+
         return sortState.direction === 'asc'
           ? String(aValue).localeCompare(String(bValue))
           : String(bValue).localeCompare(String(aValue));
       });
     }
-    
+
     return filtered;
   }, [users, searchTerm, sortState]);
 
@@ -623,49 +633,60 @@ const AdminAdmin: React.FC = () => {
     setCurrentPage(1);
   }, [searchTerm, sortState]);
 
-  const loadCompanyList = async () => {
-    const data = await fetchSignupInfos();
-    setCompanyList(data.companies);
-  };
+  // const loadCompanyList = async () => {
+  //   const data = await fetchSignupInfos();
+  //   setCompanyList(data.companies);
+  // };
 
-  const loadUserList = async (company_id: string) => {
-    const users = await fetchUsersByCompany(company_id);
-    return users;
-  };
+  // const loadUserList = async (company_id: string) => {
+  //   const users = await fetchUsersByCompany(company_id);
+  //   return users;
+  // };
 
-  const handleCompanySelect = (company: any) => {
-    setFormData({
-      ...formData,
-      company_name: company.company_name,
-    });
-  };
+  // const handleCompanySelect = (company: any) => {
+  //   setFormData({
+  //     ...formData,
+  //     company_name: company.company_name,
+  //   });
+  // };
 
-  const handleSearch = () => {
-    // 검색 기능은 실시간으로 이미 동작 중
-  };
+  // const handleSearch = () => {
+  //   // 검색 기능은 실시간으로 이미 동작 중
+  // };
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+  // const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter') {
+  //     handleSearch();
+  //   }
+  // };
 
-  const handleAdminSubmit = async (e: React.FormEvent, userDataFromModal?: any) => {
+  const handleAdminSubmit = async (
+    e: React.FormEvent,
+    userDataFromModal?: any
+  ) => {
     e.preventDefault();
 
     // 모달에서 전달된 사용자 데이터가 있으면 우선 사용
     const userData = userDataFromModal || formData;
 
     if (!userData.user_id) {
-      showAlert('warning', '선택 필요', '관리자로 등록할 사용자를 선택해주세요.');
+      showAlert(
+        'warning',
+        '선택 필요',
+        '관리자로 등록할 사용자를 선택해주세요.'
+      );
       return;
     }
 
     try {
       const result = await putAdminUser(userData.user_id, false);
-      
+
       if (result.success) {
-        showAlert('success', '등록 완료', '관리자가 성공적으로 등록되었습니다.');
+        showAlert(
+          'success',
+          '등록 완료',
+          '관리자가 성공적으로 등록되었습니다.'
+        );
         setIsCreateModalOpen(false);
         setFormData({
           user_name: '',
@@ -677,14 +698,19 @@ const AdminAdmin: React.FC = () => {
         fetchAdmins();
       } else if (result.already_admin) {
         showConfirm(
-          '관리자 변경', 
-          result.message || '이미 관리자가 있습니다.\n 해당 사용자를 관리자로 변경하시겠습니까?',
+          '관리자 변경',
+          result.message ||
+            '이미 관리자가 있습니다.\n 해당 사용자를 관리자로 변경하시겠습니까?',
           async () => {
             closeConfirm();
             try {
               const forceResult = await putAdminUser(userData.user_id, true);
               if (forceResult.success) {
-                showAlert('success', '변경 완료', '관리자가 성공적으로 변경되었습니다.');
+                showAlert(
+                  'success',
+                  '변경 완료',
+                  '관리자가 성공적으로 변경되었습니다.'
+                );
                 setIsCreateModalOpen(false);
                 setFormData({
                   user_name: '',
@@ -695,7 +721,11 @@ const AdminAdmin: React.FC = () => {
                 });
                 fetchAdmins();
               } else {
-                showAlert('error', '변경 실패', forceResult.message || '관리자 변경에 실패했습니다.');
+                showAlert(
+                  'error',
+                  '변경 실패',
+                  forceResult.message || '관리자 변경에 실패했습니다.'
+                );
               }
             } catch (error) {
               console.error('관리자 변경 실패:', error);
@@ -704,7 +734,11 @@ const AdminAdmin: React.FC = () => {
           }
         );
       } else {
-        showAlert('error', '등록 실패', result.message || '관리자 등록에 실패했습니다.');
+        showAlert(
+          'error',
+          '등록 실패',
+          result.message || '관리자 등록에 실패했습니다.'
+        );
       }
     } catch (error) {
       console.error('관리자 등록 실패:', error);
@@ -726,9 +760,13 @@ const AdminAdmin: React.FC = () => {
               credentials: 'include',
             }
           );
-          
+
           if (response.ok) {
-            showAlert('success', '삭제 완료', '관리자가 성공적으로 삭제되었습니다.');
+            showAlert(
+              'success',
+              '삭제 완료',
+              '관리자가 성공적으로 삭제되었습니다.'
+            );
             fetchAdmins();
           } else {
             showAlert('error', '삭제 실패', '관리자 삭제에 실패했습니다.');
@@ -744,13 +782,23 @@ const AdminAdmin: React.FC = () => {
   // 정렬 아이콘 렌더링 함수
   const renderSortIcons = (field: string) => {
     return (
-      <SortIconContainer 
-        className={sortState.field === field ? 'active' : ''}
-      >
-        <NewSortIcon className={sortState.field === field && sortState.direction === 'asc' ? 'active' : ''}>
+      <SortIconContainer className={sortState.field === field ? 'active' : ''}>
+        <NewSortIcon
+          className={
+            sortState.field === field && sortState.direction === 'asc'
+              ? 'active'
+              : ''
+          }
+        >
           <FiChevronUp />
         </NewSortIcon>
-        <NewSortIcon className={sortState.field === field && sortState.direction === 'desc' ? 'active' : ''}>
+        <NewSortIcon
+          className={
+            sortState.field === field && sortState.direction === 'desc'
+              ? 'active'
+              : ''
+          }
+        >
           <FiChevronDown />
         </NewSortIcon>
       </SortIconContainer>
@@ -785,23 +833,29 @@ const AdminAdmin: React.FC = () => {
     setIsSearchExpanded(true);
   };
 
-
-
   // 모달 헬퍼 함수들
-  const showAlert = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => {
+  const showAlert = (
+    type: 'success' | 'error' | 'warning' | 'info',
+    title: string,
+    message: string
+  ) => {
     setAlertModal({ isOpen: true, type, title, message });
   };
 
-  const showConfirm = (title: string, message: string, onConfirm: () => void) => {
+  const showConfirm = (
+    title: string,
+    message: string,
+    onConfirm: () => void
+  ) => {
     setConfirmModal({ isOpen: true, title, message, onConfirm });
   };
 
   const closeAlert = () => {
-    setAlertModal(prev => ({ ...prev, isOpen: false }));
+    setAlertModal((prev) => ({ ...prev, isOpen: false }));
   };
 
   const closeConfirm = () => {
-    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
   };
 
   return (
@@ -813,9 +867,8 @@ const AdminAdmin: React.FC = () => {
 
         <FilterContainer>
           <div></div> {/* 빈 공간 */}
-          
           <SearchContainer>
-            <SearchIconButton 
+            <SearchIconButton
               onClick={handleSearchToggle}
               className={isSearchExpanded ? 'active' : ''}
             >
@@ -843,9 +896,9 @@ const AdminAdmin: React.FC = () => {
         </FilterContainer>
 
         <TableContainer>
-        <Table>
-          <thead>
-            <tr>
+          <Table>
+            <thead>
+              <tr>
                 <SortableHeader onClick={() => handleSort('user_id')}>
                   관리자 ID
                   {renderSortIcons('user_id')}
@@ -875,9 +928,9 @@ const AdminAdmin: React.FC = () => {
                   {renderSortIcons('company_name')}
                 </SortableHeader>
                 <th>작업</th>
-            </tr>
-          </thead>
-          <tbody>
+              </tr>
+            </thead>
+            <tbody>
               {currentUsers.map((user) => (
                 <tr key={user.user_id}>
                   <td>{user.user_id}</td>
@@ -890,30 +943,33 @@ const AdminAdmin: React.FC = () => {
                   <td onClick={(e) => e.stopPropagation()}>
                     <IconButton
                       variant="danger"
-                      onClick={(e) => { e.stopPropagation(); handleDelete(user.user_id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(user.user_id);
+                      }}
                       title="관리자 삭제"
                     >
                       <FiTrash />
                     </IconButton>
                   </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
         </TableContainer>
 
         {/* 페이지네이션 */}
         {totalPages > 1 && (
           <Pagination>
-            <PageNavButton 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            <PageNavButton
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
               이전
             </PageNavButton>
-            
+
             {pageNumbers.map((number) => (
-              <PageButton 
+              <PageButton
                 key={number}
                 $active={currentPage === number}
                 onClick={() => setCurrentPage(number)}
@@ -921,9 +977,11 @@ const AdminAdmin: React.FC = () => {
                 {number}
               </PageButton>
             ))}
-            
-            <PageNavButton 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+
+            <PageNavButton
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
             >
               다음
@@ -941,8 +999,6 @@ const AdminAdmin: React.FC = () => {
             onUserSelect={handleUserSelect}
           />
         </Modal>
-
-
       </MainContent>
 
       {/* 모달 컴포넌트들 */}

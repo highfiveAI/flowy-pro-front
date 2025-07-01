@@ -14,7 +14,6 @@ import {
   Input,
   InputGroup,
   Label,
-  PageTitle,
 } from './alterInfo.styles';
 
 const AlterInfo: React.FC = () => {
@@ -22,7 +21,7 @@ const AlterInfo: React.FC = () => {
   const [modalContent, setModalContent] = useState({
     title: '',
     description: <></>,
-    type: 'success' as 'success' | 'error'
+    type: 'success' as 'success' | 'error',
   });
   const [mypageUser, setMypageUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -106,7 +105,7 @@ const AlterInfo: React.FC = () => {
               새로운 정보가 즉시 적용됩니다.
             </>
           ),
-          type: 'success'
+          type: 'success',
         });
         setShowChangeModal(true);
       } else {
@@ -119,7 +118,7 @@ const AlterInfo: React.FC = () => {
               문제가 지속되면 관리자에게 문의하세요.
             </>
           ),
-          type: 'error'
+          type: 'error',
         });
         setShowChangeModal(true);
       }
@@ -133,7 +132,7 @@ const AlterInfo: React.FC = () => {
             잠시 후 다시 시도해주세요.
           </>
         ),
-        type: 'error'
+        type: 'error',
       });
       setShowChangeModal(true);
     }

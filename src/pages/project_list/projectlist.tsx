@@ -1,15 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { FiEdit2, FiPlus, FiCalendar, FiClock, FiSearch, FiChevronUp, FiChevronDown, FiUsers } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
 import {
-  fetchProject,
-  updateProjectName,
-} from "../../api/fetchProject";
-import type { ProjectUser, ProjectResponse } from "../../types/project";
-import { checkAuth } from "../../api/fetchAuthCheck";
-import { useAuth } from "../../contexts/AuthContext";
-import EditProjectPopup from "../insert_conference_info/conference_popup/EditProjectPopup";
-import NewProjectPopup from "../insert_conference_info/conference_popup/NewProjectPopup";
+  FiEdit2,
+  FiPlus,
+  FiCalendar,
+  FiSearch,
+  FiChevronUp,
+  FiChevronDown,
+  FiUsers,
+} from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { fetchProject } from '../../api/fetchProject';
+import type { ProjectUser, ProjectResponse } from '../../types/project';
+import { checkAuth } from '../../api/fetchAuthCheck';
+import { useAuth } from '../../contexts/AuthContext';
+import EditProjectPopup from '../insert_conference_info/conference_popup/EditProjectPopup';
+import NewProjectPopup from '../insert_conference_info/conference_popup/NewProjectPopup';
 import {
   AddButton,
   Container,
@@ -39,7 +44,7 @@ import {
   SortableHeader,
   SortIconContainer,
   SortIcon,
-} from "./projectlist.styles";
+} from './projectlist.styles';
 
 // 정렬 타입 정의
 type SortField = 'name' | 'date' | null;
@@ -49,15 +54,17 @@ const ProjectListPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, setUser, setLoading } = useAuth();
   const [projects, setProjects] = useState<ProjectUser[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  const [editId, setEditId] = useState<string | null>(null);
-  const [editName, setEditName] = useState<string>("");
+  // const [editId, setEditId] = useState<string | null>(null);
+  // const [editName , setEditName] = useState<string>('');
 
   // 프로젝트 수정 팝업 상태
   const [showEditProjectPopup, setShowEditProjectPopup] = useState(false);
-  const [editingProject, setEditingProject] = useState<ProjectResponse | null>(null);
+  const [editingProject, setEditingProject] = useState<ProjectResponse | null>(
+    null
+  );
 
   // 새 프로젝트 생성 팝업 상태
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
@@ -81,14 +88,16 @@ const ProjectListPage: React.FC = () => {
   // 정렬 함수
   const sortProjects = (projects: ProjectUser[]) => {
     if (!sortField) return projects;
-    
+
     const sorted = [...projects];
-    
+
     return sorted.sort((a, b) => {
       if (sortField === 'name') {
         const aValue: string = a.project.project_name;
         const bValue: string = b.project.project_name;
-        const result = aValue.localeCompare(bValue, 'ko', { sensitivity: 'base' });
+        const result = aValue.localeCompare(bValue, 'ko', {
+          sensitivity: 'base',
+        });
         return sortOrder === 'asc' ? result : -result;
       } else if (sortField === 'date') {
         const aValue = new Date(a.project.project_created_date);
@@ -96,7 +105,7 @@ const ProjectListPage: React.FC = () => {
         const result = aValue.getTime() - bValue.getTime();
         return sortOrder === 'asc' ? result : -result;
       }
-      
+
       return 0;
     });
   };
@@ -104,14 +113,19 @@ const ProjectListPage: React.FC = () => {
   // 검색어에 따른 프로젝트 필터링 및 정렬
   const filteredAndSortedProjects = sortProjects(
     projects.filter((project) =>
-      project.project.project_name.toLowerCase().includes(searchTerm.toLowerCase())
+      project.project.project_name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
     )
   );
 
   // 현재 페이지에 보여줄 프로젝트 계산
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProjects = filteredAndSortedProjects.slice(indexOfFirstItem, indexOfLastItem);
+  const currentProjects = filteredAndSortedProjects.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredAndSortedProjects.length / itemsPerPage);
 
   // 페이지네이션 관련
@@ -153,7 +167,7 @@ const ProjectListPage: React.FC = () => {
     const projectResponse: ProjectResponse = {
       projectId: project.project.project_id,
       projectName: project.project.project_name,
-      projectDetail: project.project.project_detail || "",
+      projectDetail: project.project.project_detail || '',
       projectCreatedDate: project.project.project_created_date,
     };
     setEditingProject(projectResponse);
@@ -172,21 +186,21 @@ const ProjectListPage: React.FC = () => {
     }
   };
 
-  const handleEditSave = async (id: string) => {
-    try {
-      await updateProjectName(id, editName);
-      alert("수정 완료");
-      setEditId(null);
+  // const handleEditSave = async (id: string) => {
+  //   try {
+  //     await updateProjectName(id, editName);
+  //     alert('수정 완료');
+  //     setEditId(null);
 
-      // 데이터 새로고침
-      if (user?.id) {
-        const data = await fetchProject(user.id);
-        if (data) setProjects(data);
-      }
-    } catch (err) {
-      alert("수정 실패");
-    }
-  };
+  //     // 데이터 새로고침
+  //     if (user?.id) {
+  //       const data = await fetchProject(user.id);
+  //       if (data) setProjects(data);
+  //     }
+  //   } catch (err) {
+  //     alert('수정 실패');
+  //   }
+  // };
 
   const closeNewProjectPopup = () => {
     setShowNewProjectPopup(false);
@@ -201,11 +215,11 @@ const ProjectListPage: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString)
-      .toLocaleDateString("ko-KR", { 
-        timeZone: "Asia/Seoul",
+      .toLocaleDateString('ko-KR', {
+        timeZone: 'Asia/Seoul',
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit'
+        day: '2-digit',
       })
       .replace(/\./g, '-')
       .replace(/-$/, ''); // 마지막 하이픈 제거
@@ -234,8 +248,7 @@ const ProjectListPage: React.FC = () => {
       <Header>
         <Title>분석결과 조회</Title>
         <AddButton onClick={() => setShowNewProjectPopup(true)}>
-          <FiPlus />
-          새 프로젝트
+          <FiPlus />새 프로젝트
         </AddButton>
       </Header>
 
@@ -264,9 +277,7 @@ const ProjectListPage: React.FC = () => {
         <EmptyState>
           <EmptyIcon>🔍</EmptyIcon>
           <EmptyTitle>검색 결과가 없습니다</EmptyTitle>
-          <EmptyDescription>
-            다른 검색어로 다시 시도해보세요.
-          </EmptyDescription>
+          <EmptyDescription>다른 검색어로 다시 시도해보세요.</EmptyDescription>
         </EmptyState>
       ) : (
         <>
@@ -294,9 +305,13 @@ const ProjectListPage: React.FC = () => {
                 {currentProjects.map((project, i) => (
                   <Tr
                     key={i + indexOfFirstItem}
-                    onClick={() => navigate(`/conferencelist/${project.project.project_id}`)}
+                    onClick={() =>
+                      navigate(`/conferencelist/${project.project.project_id}`)
+                    }
                   >
-                    <Td className="project-name">{project.project.project_name}</Td>
+                    <Td className="project-name">
+                      {project.project.project_name}
+                    </Td>
                     <Td className="date">
                       <DateBadge>
                         <FiCalendar />
@@ -335,7 +350,7 @@ const ProjectListPage: React.FC = () => {
               >
                 이전
               </PageNavButton>
-              
+
               {pageNumbers.map((num) => (
                 <PageButton
                   key={num}
@@ -345,7 +360,7 @@ const ProjectListPage: React.FC = () => {
                   {num}
                 </PageButton>
               ))}
-              
+
               <PageNavButton
                 onClick={() => setCurrentPage(endPage + 1)}
                 disabled={endPage >= totalPages}

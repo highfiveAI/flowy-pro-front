@@ -22,10 +22,21 @@ const Wrapper = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
-      radial-gradient(circle at 20% 50%, rgba(45, 17, 85, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(45, 17, 85, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 80%, rgba(45, 17, 85, 0.1) 0%, transparent 50%);
+    background: radial-gradient(
+        circle at 20% 50%,
+        rgba(45, 17, 85, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 20%,
+        rgba(45, 17, 85, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 40% 80%,
+        rgba(45, 17, 85, 0.1) 0%,
+        transparent 50%
+      );
     pointer-events: none;
   }
 `;
@@ -37,8 +48,7 @@ const Container = styled.div`
   border-radius: 30px;
   width: 100%;
   max-width: 500px;
-  box-shadow: 
-    0 20px 40px rgba(45, 17, 85, 0.1),
+  box-shadow: 0 20px 40px rgba(45, 17, 85, 0.1),
     0 10px 20px rgba(45, 17, 85, 0.05);
   border: 1px solid rgba(45, 17, 85, 0.1);
   text-align: center;
@@ -126,37 +136,36 @@ const Input = styled.input`
   }
 `;
 
-const Button = styled.button<{ disabled?: boolean; variant?: 'primary' | 'secondary' }>`
+const Button = styled.button<{
+  disabled?: boolean;
+  variant?: 'primary' | 'secondary';
+}>`
   width: 100%;
   height: 56px;
   border-radius: 12px;
-  background: ${({ variant, disabled }) => 
-    disabled 
-      ? 'rgba(45, 17, 85, 0.3)' 
+  background: ${({ variant, disabled }) =>
+    disabled
+      ? 'rgba(45, 17, 85, 0.3)'
       : variant === 'secondary'
-        ? 'rgba(45, 17, 85, 0.1)'
-        : 'linear-gradient(135deg, #2d1155 0%, #4a1e75 100%)'
-  };
-  color: ${({ variant, disabled }) => 
-    disabled 
+      ? 'rgba(45, 17, 85, 0.1)'
+      : 'linear-gradient(135deg, #2d1155 0%, #4a1e75 100%)'};
+  color: ${({ variant, disabled }) =>
+    disabled
       ? 'rgba(255, 255, 255, 0.7)'
       : variant === 'secondary'
-        ? '#2d1155'
-        : 'white'
-  };
-  border: ${({ variant }) => 
-    variant === 'secondary' ? '2px solid rgba(45, 17, 85, 0.2)' : 'none'
-  };
+      ? '#2d1155'
+      : 'white'};
+  border: ${({ variant }) =>
+    variant === 'secondary' ? '2px solid rgba(45, 17, 85, 0.2)' : 'none'};
   font-size: 16px;
   font-weight: 700;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   margin: 12px 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: ${({ disabled, variant }) => 
-    disabled || variant === 'secondary' 
-      ? 'none' 
-      : '0 8px 20px rgba(45, 17, 85, 0.3)'
-  };
+  box-shadow: ${({ disabled, variant }) =>
+    disabled || variant === 'secondary'
+      ? 'none'
+      : '0 8px 20px rgba(45, 17, 85, 0.3)'};
   position: relative;
   overflow: hidden;
 
@@ -167,22 +176,23 @@ const Button = styled.button<{ disabled?: boolean; variant?: 'primary' | 'second
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
     transition: left 0.6s ease;
   }
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: ${({ variant }) => 
-      variant === 'secondary' 
-        ? '0 8px 20px rgba(45, 17, 85, 0.2)' 
-        : '0 12px 25px rgba(45, 17, 85, 0.4)'
-    };
-    background: ${({ variant }) => 
+    box-shadow: ${({ variant }) =>
       variant === 'secondary'
-        ? 'rgba(45, 17, 85, 0.15)'
-        : undefined
-    };
+        ? '0 8px 20px rgba(45, 17, 85, 0.2)'
+        : '0 12px 25px rgba(45, 17, 85, 0.4)'};
+    background: ${({ variant }) =>
+      variant === 'secondary' ? 'rgba(45, 17, 85, 0.15)' : undefined};
 
     &::before {
       left: 100%;
@@ -198,17 +208,12 @@ const ResultBox = styled.div<{ success?: boolean }>`
   margin-top: 30px;
   padding: 20px;
   border-radius: 15px;
-  background: ${({ success }) => 
-    success 
-      ? 'rgba(39, 174, 96, 0.1)' 
-      : 'rgba(231, 76, 60, 0.1)'
-  };
-  border: 2px solid ${({ success }) => 
-    success 
-      ? 'rgba(39, 174, 96, 0.3)' 
-      : 'rgba(231, 76, 60, 0.3)'
-  };
-  color: ${({ success }) => success ? '#27ae60' : '#e74c3c'};
+  background: ${({ success }) =>
+    success ? 'rgba(39, 174, 96, 0.1)' : 'rgba(231, 76, 60, 0.1)'};
+  border: 2px solid
+    ${({ success }) =>
+      success ? 'rgba(39, 174, 96, 0.3)' : 'rgba(231, 76, 60, 0.3)'};
+  color: ${({ success }) => (success ? '#27ae60' : '#e74c3c')};
   font-weight: 600;
   font-size: 18px;
   text-align: center;
@@ -238,13 +243,8 @@ const Step = styled.div<{ active?: boolean; completed?: boolean }>`
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: ${({ active, completed }) => 
-    completed 
-      ? '#27ae60' 
-      : active 
-        ? '#2d1155' 
-        : 'rgba(45, 17, 85, 0.3)'
-  };
+  background: ${({ active, completed }) =>
+    completed ? '#27ae60' : active ? '#2d1155' : 'rgba(45, 17, 85, 0.3)'};
   transition: all 0.3s ease;
   position: relative;
 
@@ -258,7 +258,7 @@ const Step = styled.div<{ active?: boolean; completed?: boolean }>`
     height: 6px;
     border-radius: 50%;
     background: white;
-    opacity: ${({ completed }) => completed ? 1 : 0};
+    opacity: ${({ completed }) => (completed ? 1 : 0)};
     transition: opacity 0.3s ease;
   }
 `;
@@ -266,16 +266,15 @@ const Step = styled.div<{ active?: boolean; completed?: boolean }>`
 const StepLine = styled.div<{ completed?: boolean }>`
   width: 30px;
   height: 2px;
-  background: ${({ completed }) => 
-    completed ? '#27ae60' : 'rgba(45, 17, 85, 0.3)'
-  };
+  background: ${({ completed }) =>
+    completed ? '#27ae60' : 'rgba(45, 17, 85, 0.3)'};
   transition: background 0.3s ease;
 `;
 
 const FindId: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [showCodeInput, setShowCodeInput] = useState(false);
+  // const [showCodeInput, setShowCodeInput] = useState(false);
   const [code, setCode] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const [foundId, setFoundId] = useState('');
@@ -288,20 +287,24 @@ const FindId: React.FC = () => {
     isOpen: false,
     type: 'info' as 'success' | 'error' | 'warning' | 'info',
     title: '',
-    message: ''
+    message: '',
   });
 
-  const showAlert = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => {
+  const showAlert = (
+    type: 'success' | 'error' | 'warning' | 'info',
+    title: string,
+    message: string
+  ) => {
     setAlertModal({
       isOpen: true,
       type,
       title,
-      message
+      message,
     });
   };
 
   const closeAlert = () => {
-    setAlertModal(prev => ({ ...prev, isOpen: false }));
+    setAlertModal((prev) => ({ ...prev, isOpen: false }));
   };
 
   const handleEmailVerify = async () => {
@@ -313,11 +316,19 @@ const FindId: React.FC = () => {
     setIsSending(true);
     try {
       await sendEmailCode(email);
-      showAlert('success', '인증 코드 발송 완료', '이메일로 인증 코드가 발송되었습니다.\n이메일을 확인해주세요.');
-      setShowCodeInput(true);
+      showAlert(
+        'success',
+        '인증 코드 발송 완료',
+        '이메일로 인증 코드가 발송되었습니다.\n이메일을 확인해주세요.'
+      );
+      // setShowCodeInput(true);
       setCurrentStep(2);
     } catch (error: any) {
-      showAlert('error', '전송 실패', error.message || '이메일 전송에 실패했습니다.\n다시 시도해주세요.');
+      showAlert(
+        'error',
+        '전송 실패',
+        error.message || '이메일 전송에 실패했습니다.\n다시 시도해주세요.'
+      );
     } finally {
       setIsSending(false);
     }
@@ -325,7 +336,11 @@ const FindId: React.FC = () => {
 
   const handleCodeConfirm = async () => {
     if (code.length < 4) {
-      showAlert('warning', '인증 코드 확인', '올바른 인증 코드를 입력해주세요.');
+      showAlert(
+        'warning',
+        '인증 코드 확인',
+        '올바른 인증 코드를 입력해주세요.'
+      );
       return;
     }
     try {
@@ -334,10 +349,18 @@ const FindId: React.FC = () => {
         setIsVerified(true);
         setCurrentStep(3);
       } else {
-        showAlert('error', '인증 실패', '인증 코드가 올바르지 않습니다.\n다시 확인해주세요.');
+        showAlert(
+          'error',
+          '인증 실패',
+          '인증 코드가 올바르지 않습니다.\n다시 확인해주세요.'
+        );
       }
     } catch (error: any) {
-      showAlert('error', '인증 오류', error.message || '인증 중 오류가 발생했습니다.\n다시 시도해주세요.');
+      showAlert(
+        'error',
+        '인증 오류',
+        error.message || '인증 중 오류가 발생했습니다.\n다시 시도해주세요.'
+      );
     }
   };
 
@@ -352,7 +375,11 @@ const FindId: React.FC = () => {
         setNotFoundMsg('등록된 아이디가 없습니다.');
       }
     } catch (err: any) {
-      showAlert('error', '조회 실패', err.message || '아이디 조회 중 오류가 발생했습니다.');
+      showAlert(
+        'error',
+        '조회 실패',
+        err.message || '아이디 조회 중 오류가 발생했습니다.'
+      );
     }
   };
 
@@ -389,9 +416,9 @@ const FindId: React.FC = () => {
         <BackButton onClick={handleGoBack} title="로그인 페이지로 돌아가기">
           ←
         </BackButton>
-        
+
         <Title>아이디 찾기</Title>
-        
+
         <StepIndicator>
           <Step active={currentStep === 1} completed={currentStep > 1} />
           <StepLine completed={currentStep > 1} />
@@ -435,11 +462,11 @@ const FindId: React.FC = () => {
             <Button onClick={handleCodeConfirm} disabled={!code}>
               인증 확인
             </Button>
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               onClick={() => {
                 setCurrentStep(1);
-                setShowCodeInput(false);
+                // setShowCodeInput(false);
                 setCode('');
               }}
             >
@@ -457,16 +484,14 @@ const FindId: React.FC = () => {
             )}
 
             {notFoundMsg && (
-              <ResultBox success={false}>
-                {notFoundMsg}
-              </ResultBox>
+              <ResultBox success={false}>{notFoundMsg}</ResultBox>
             )}
 
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               onClick={() => {
                 setCurrentStep(1);
-                setShowCodeInput(false);
+                // setShowCodeInput(false);
                 setIsVerified(false);
                 setCode('');
                 setFoundId('');
@@ -487,7 +512,7 @@ const FindId: React.FC = () => {
         title={alertModal.title}
         message={alertModal.message}
       />
-      
+
       <LoadingModal
         isOpen={isSending}
         message="인증 코드를 발송하고 있습니다..."

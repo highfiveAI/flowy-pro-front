@@ -35,7 +35,6 @@ import {
   FileName,
   FileUploadWrapper,
   FormGroup,
-  LabelButtonWrapper,
   LeftPanel,
   MeetingList,
   NewProjectTextBottom,
@@ -54,7 +53,6 @@ import {
   SectionTitle,
   SortText,
   SortWrapper,
-  StyledAddAttendeeButton,
   StyledErrorMessage,
   StyledInput,
   StyledLabel,
@@ -80,15 +78,21 @@ function formatDateToKST(date: Date): string {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
+// 파일 상단에 타입 정의가 없다면 추가
+type Attendee = {
+    user_id: string;
+    name: string;
+    email: string;
+    user_jobname: string;
+};
+
 const InsertConferenceInfo: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
   const navigate = useNavigate();
   const [isCompleted /*, setIsCompleted*/] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [subject, setSubject] = React.useState('');
-  const [attendees, setAttendees] = React.useState([
-    { user_id: '', name: '', email: '', user_jobname: '' },
-  ]);
+  const [attendees, setAttendees] = React.useState<Attendee[]>([]);
   const [file, setFile] = React.useState<File | null>(null);
   const [error, setError] = React.useState<string>('');
   const [agenda, setAgenda] = React.useState('');
@@ -144,12 +148,12 @@ const InsertConferenceInfo: React.FC = () => {
     setExpandedIndex((prev) => (prev === index ? null : index));
   };
 
-  const handleAddAttendee = () => {
-    setAttendees([
-      ...attendees,
-      { user_id: '', name: '', email: '', user_jobname: '' },
-    ]);
-  };
+  // const handleAddAttendee = () => {
+  //   setAttendees([
+  //     ...attendees,
+  //     { user_id: '', name: '', email: '', user_jobname: '' },
+  //   ]);
+  // };
 
   const validateForm = (): boolean => {
     if (!projectName.trim() || !projectId.trim()) {
@@ -175,6 +179,7 @@ const InsertConferenceInfo: React.FC = () => {
     }
 
     if (!meetingDate) {
+      const md: any = meetingDate;
       setError('입력하지 않은 필수 항목이 있습니다.');
       return false;
     }
@@ -261,7 +266,7 @@ const InsertConferenceInfo: React.FC = () => {
 
         // 입력값 초기화
         setSubject('');
-        setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+        setAttendees([]);
         setFile(null);
         setAgenda('');
         setMeetingDate(null);
@@ -303,20 +308,22 @@ const InsertConferenceInfo: React.FC = () => {
       );
       const data = await res.json();
       console.log('API 응답 데이터:', data); // 디버깅을 위한 로그
-      
+
       const projectUsersData = data.users.map((u: any) => ({
         user_id: u.user_id,
         name: u.name,
         email: u.email,
         user_jobname: u.user_jobname,
       }));
-      
+
       setProjectUsers(projectUsersData);
-      
+
       // 현재 로그인된 사용자를 기본 회의장으로 설정
       if (user?.id) {
         // 현재 사용자가 프로젝트 참가자 목록에 있는지 확인
-        const currentUserInProject = projectUsersData.find((u: any) => u.user_id === user.id);
+        const currentUserInProject = projectUsersData.find(
+          (u: any) => u.user_id === user.id
+        );
         if (currentUserInProject) {
           setHostId(user.id);
           setHostJobname(currentUserInProject.user_jobname || '회의장');
@@ -326,27 +333,27 @@ const InsertConferenceInfo: React.FC = () => {
             user_id: user.id,
             name: user.name || '현재 사용자',
             email: user.email || '',
-            user_jobname: '회의장'
+            user_jobname: '회의장',
           };
           setProjectUsers([...projectUsersData, currentUserData]);
           setHostId(user.id);
           setHostJobname('회의장');
         }
       }
-      
-      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]); // 항상 1개 이상 입력란 유지
+
+      setAttendees([]);
     } catch (e) {
       console.error('프로젝트 사용자 정보를 가져오는데 실패했습니다:', e);
       setProjectUsers([]);
-      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
-      
+      setAttendees([]);
+
       // 에러가 발생해도 현재 사용자는 회의장으로 설정
       if (user?.id) {
         const currentUserData = {
           user_id: user.id,
           name: user.name || '현재 사용자',
           email: user.email || '',
-          user_jobname: '회의장'
+          user_jobname: '회의장',
         };
         setProjectUsers([currentUserData]);
         setHostId(user.id);
@@ -424,7 +431,7 @@ const InsertConferenceInfo: React.FC = () => {
       setSubject('');
       setAgenda('');
       setMeetingDate(null);
-      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+      setAttendees([]);
       setFile(null);
       // hostId, hostJobname은 유지 (현재 사용자가 기본 회의장으로 계속 설정됨)
       // 프로젝트 선택 상태는 유지 (사용자가 다시 선택할 필요 없도록)
@@ -450,7 +457,7 @@ const InsertConferenceInfo: React.FC = () => {
       }));
       setAttendees(attendeesData);
     } else {
-      setAttendees([{ user_id: '', name: '', email: '', user_jobname: '' }]);
+      setAttendees([]);
     }
 
     // 파일 상태 초기화 (새로운 음성 파일을 업로드할 수 있도록)
@@ -511,6 +518,8 @@ const InsertConferenceInfo: React.FC = () => {
     })();
   }, []);
 
+  console.log('attendees:', attendees);
+
   return (
     <PageWrapper>
       <ContentWrapper>
@@ -550,15 +559,15 @@ const InsertConferenceInfo: React.FC = () => {
                   sortedProjects.map((proj, index) => (
                     <div key={index}>
                       <ProjectListItem
-                        className={projectId === proj.projectId ? 'selected' : ''}
+                        className={
+                          projectId === proj.projectId ? 'selected' : ''
+                        }
                         onClick={() => {
                           handleProjectSelect(proj.projectId, proj.projectName);
                           toggleExpanded(index);
                         }}
                       >
-                        <span className="name">
-                          • {proj.projectName}
-                        </span>
+                        <span className="name">• {proj.projectName}</span>
                         <EditIcon
                           onClick={(e) => {
                             e.stopPropagation(); // 이벤트 버블링 방지
@@ -566,8 +575,10 @@ const InsertConferenceInfo: React.FC = () => {
                           }}
                         />
                         <span className="date">
-                          {new Date(proj.projectCreatedDate)
-                            .toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' })}
+                          {new Date(proj.projectCreatedDate).toLocaleDateString(
+                            'sv-SE',
+                            { timeZone: 'Asia/Seoul' }
+                          )}
                         </span>
                       </ProjectListItem>
 
@@ -624,10 +635,11 @@ const InsertConferenceInfo: React.FC = () => {
                                           {meeting.meeting_title}
                                         </div>
                                         <div className="meeting-date">
-                                          {new Date(meeting.meeting_date)
-                                            .toLocaleDateString('sv-SE', {
-                                              timeZone: 'Asia/Seoul',
-                                            })}
+                                          {new Date(
+                                            meeting.meeting_date
+                                          ).toLocaleDateString('sv-SE', {
+                                            timeZone: 'Asia/Seoul',
+                                          })}
                                         </div>
                                         <div className="meeting-attendees">
                                           참석자:{' '}

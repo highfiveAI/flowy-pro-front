@@ -26,12 +26,9 @@ import {
 import { useNavigate } from 'react-router-dom';
 import {
   Mic,
-  FileText,
   Users,
-  MessageSquare,
   Calendar as CalendarIcon,
   Search,
-  BarChart3,
   Mail,
   CheckSquare,
   TrendingUp,
@@ -46,7 +43,8 @@ const Intro: React.FC = () => {
     {
       icon: <Mic size={32} />,
       title: 'STT + 회의 요약',
-      description: 'AI 음성 인식으로 회의를 전사하고\n핵심 내용을 자동으로 요약합니다.',
+      description:
+        'AI 음성 인식으로 회의를 전사하고\n핵심 내용을 자동으로 요약합니다.',
     },
     {
       icon: <CheckSquare size={32} />,
@@ -56,38 +54,45 @@ const Intro: React.FC = () => {
     {
       icon: <TrendingUp size={32} />,
       title: '회의 피드백 제공',
-      description: '회의 효율성을 분석하고 개선점을\n제안하여 생산성을 높입니다.',
+      description:
+        '회의 효율성을 분석하고 개선점을\n제안하여 생산성을 높입니다.',
     },
     {
       icon: <Search size={32} />,
       title: '문서 양식 추천',
-      description: '회의 내용을 기반으로 웹 및 DB 서칭을 통해 최적의 문서 템플릿을 추천합니다.',
+      description:
+        '회의 내용을 기반으로 웹 및 DB 서칭을 통해 최적의 문서 템플릿을 추천합니다.',
     },
     {
-        icon: <Mail size={32} />,
-        title: '요약 메일 발송',
-        description: '회의 요약과 할 일, 피드백 내용을\n참석자들에게 자동으로 메일 발송합니다.',
-      },
-      {
-        icon: <Users size={32} />,
-        title: '프로젝트별 회의 관리',
-        description: '프로젝트별로 회의를 체계적으로 관리하고\n진행 상황을 한눈에 파악합니다.',
-      },
-      {
-        icon: <Download size={32} />,
-        title: 'PDF 다운로드',
-        description: '회의록과 분석 결과를 PDF 형태로\n저장하고 다운로드할 수 있습니다.',
-      },
+      icon: <Mail size={32} />,
+      title: '요약 메일 발송',
+      description:
+        '회의 요약과 할 일, 피드백 내용을\n참석자들에게 자동으로 메일 발송합니다.',
+    },
+    {
+      icon: <Users size={32} />,
+      title: '프로젝트별 회의 관리',
+      description:
+        '프로젝트별로 회의를 체계적으로 관리하고\n진행 상황을 한눈에 파악합니다.',
+    },
+    {
+      icon: <Download size={32} />,
+      title: 'PDF 다운로드',
+      description:
+        '회의록과 분석 결과를 PDF 형태로\n저장하고 다운로드할 수 있습니다.',
+    },
     {
       icon: <PieChart size={32} />,
       title: '회의 현황 대시보드',
-      description: '회의 통계와 효율성 지표를 시각화하여\n트렌드를 분석하고 개선합니다.',
+      description:
+        '회의 통계와 효율성 지표를 시각화하여\n트렌드를 분석하고 개선합니다.',
     },
     {
-        icon: <CalendarIcon size={32} />,
-        title: '개인 일정 & 할 일 관리',
-        description: '캘린더 연동으로 개인 회의 일정과\n할 일을 통합하여 관리합니다.',
-      },
+      icon: <CalendarIcon size={32} />,
+      title: '개인 일정 & 할 일 관리',
+      description:
+        '캘린더 연동으로 개인 회의 일정과\n할 일을 통합하여 관리합니다.',
+    },
   ];
 
   const processSteps = [
@@ -97,11 +102,13 @@ const Intro: React.FC = () => {
     },
     {
       title: '회의분석 요청',
-      description: '회의 정보를 입력하고 음성 파일을\n업로드/녹음하여 AI 분석을 시작합니다.',
+      description:
+        '회의 정보를 입력하고 음성 파일을\n업로드/녹음하여 AI 분석을 시작합니다.',
     },
     {
       title: '분석결과 조회',
-      description: 'AI가 분석한 회의 결과를 조회하고\n할 일과 추천 문서, 피드백을 확인합니다.',
+      description:
+        'AI가 분석한 회의 결과를 조회하고\n할 일과 추천 문서, 피드백을 확인합니다.',
     },
     {
       title: '캘린더',
@@ -128,9 +135,7 @@ const Intro: React.FC = () => {
           <br />
           모든 업무를 AI가 스마트하게 지원합니다.
         </HeroDescription>
-        <CTAButton onClick={() => navigate('/insert_info')}>
-          시작하기
-        </CTAButton>
+        <CTAButton onClick={() => navigate('/insert_info')}>시작하기</CTAButton>
       </HeroSection>
 
       <FeatureSection>
@@ -140,9 +145,7 @@ const Intro: React.FC = () => {
             <FeatureCard key={idx}>
               <FeatureIcon>{feature.icon}</FeatureIcon>
               <FeatureTitle>{feature.title}</FeatureTitle>
-              <FeatureDescription>
-                {feature.description}
-              </FeatureDescription>
+              <FeatureDescription>{feature.description}</FeatureDescription>
             </FeatureCard>
           ))}
         </FeatureGrid>
@@ -162,9 +165,7 @@ const Intro: React.FC = () => {
             <ProcessStep key={idx}>
               <StepNumber>{idx + 1}</StepNumber>
               <StepTitle>{step.title}</StepTitle>
-              <StepDescription>
-                {step.description}
-              </StepDescription>
+              <StepDescription>{step.description}</StepDescription>
             </ProcessStep>
           ))}
         </div>
@@ -175,9 +176,7 @@ const Intro: React.FC = () => {
         <CTADescription>
           Flowy Pro와 함께 회의의 모든 단계를 스마트하게 관리하세요.
         </CTADescription>
-        <CTAButton onClick={() => navigate('/sign_up')}>
-          시작하기
-        </CTAButton>
+        <CTAButton onClick={() => navigate('/sign_up')}>시작하기</CTAButton>
       </CTASection>
     </IntroContainer>
   );

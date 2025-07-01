@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Search, X, Users, Crown } from 'lucide-react';
+import { Search, Users, Crown } from 'lucide-react';
 
 type Attendee = {
   user_id: string;
@@ -39,12 +39,12 @@ const AttendInfoWrapper = styled.div`
   width: 100%;
 `;
 
-const SectionTitle = styled.h3`
-  color: #351745;
-  margin-bottom: 15px;
-  font-size: 1.1rem;
-  font-weight: 600;
-`;
+// const SectionTitle = styled.h3`
+//   color: #351745;
+//   margin-bottom: 15px;
+//   font-size: 1.1rem;
+//   font-weight: 600;
+// `;
 
 const UserSelectionPanel = styled.div`
   background: linear-gradient(135deg, #f8f5ff, #ede7f3);
@@ -76,7 +76,7 @@ const SearchInput = styled.input`
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.95);
   color: #351745;
-  
+
   &:focus {
     outline: none;
     border-color: #351745;
@@ -104,21 +104,21 @@ const UserGrid = styled.div`
   gap: 8px;
   max-height: 200px;
   overflow-y: auto;
-  
+
   /* 커스텀 스크롤바 */
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(53, 23, 69, 0.1);
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: rgba(53, 23, 69, 0.3);
     border-radius: 3px;
-    
+
     &:hover {
       background: rgba(53, 23, 69, 0.5);
     }
@@ -129,25 +129,27 @@ const UserCard = styled.div<{ $selected: boolean; $isHost: boolean }>`
   display: flex;
   align-items: center;
   padding: 8px;
-  border: 1px solid ${props => 
-    props.$isHost ? '#480b6a' : 
-    props.$selected ? '#351745' : 'rgba(53, 23, 69, 0.2)'
-  };
+  border: 1px solid
+    ${(props) =>
+      props.$isHost
+        ? '#480b6a'
+        : props.$selected
+        ? '#351745'
+        : 'rgba(53, 23, 69, 0.2)'};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: ${props => 
-    props.$isHost ? 'rgba(72, 11, 106, 0.05)' : 
-    props.$selected ? 'rgba(53, 23, 69, 0.05)' : 'white'
-  };
+  background: ${(props) =>
+    props.$isHost
+      ? 'rgba(72, 11, 106, 0.05)'
+      : props.$selected
+      ? 'rgba(53, 23, 69, 0.05)'
+      : 'white'};
 
   &:hover {
-    border-color: ${props => 
-      props.$isHost ? '#480b6a' : '#351745'
-    };
-    background: ${props => 
-      props.$isHost ? 'rgba(72, 11, 106, 0.08)' : 'rgba(53, 23, 69, 0.08)'
-    };
+    border-color: ${(props) => (props.$isHost ? '#480b6a' : '#351745')};
+    background: ${(props) =>
+      props.$isHost ? 'rgba(72, 11, 106, 0.08)' : 'rgba(53, 23, 69, 0.08)'};
   }
 `;
 
@@ -187,13 +189,13 @@ const UserRole = styled.input`
   margin-top: 3px;
   width: 100%;
   box-sizing: border-box;
-  
+
   &:focus {
     outline: none;
     border-color: #351745;
     box-shadow: 0 0 0 1px rgba(53, 23, 69, 0.1);
   }
-  
+
   &::placeholder {
     color: rgba(53, 23, 69, 0.5);
   }
@@ -260,7 +262,7 @@ const QuickButton = styled.button`
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: linear-gradient(135deg, #351745 0%, #4a1168 100%);
     color: white;
@@ -274,43 +276,47 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
   setAttendees,
   projectUsers = [],
   hostId,
-  setHostId,
+  // setHostId,
   hostJobname,
   setHostJobname,
-  currentUser,
+  // currentUser,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredUsers = projectUsers.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = projectUsers.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleHostSelect = (user_id: string) => {
-    setHostId(user_id);
-    const selectedUser = projectUsers.find((u) => u.user_id === user_id);
-    if (selectedUser) {
-      setHostJobname(selectedUser.user_jobname || '');
-      // 회의장이 참석자 목록에 있다면 제거
-      setAttendees(attendees.filter(att => att.user_id !== user_id));
-    }
-  };
+  // const handleHostSelect = (user_id: string) => {
+  //   setHostId(user_id);
+  //   const selectedUser = projectUsers.find((u) => u.user_id === user_id);
+  //   if (selectedUser) {
+  //     setHostJobname(selectedUser.user_jobname || '');
+  //     // 회의장이 참석자 목록에 있다면 제거
+  //     setAttendees(attendees.filter((att) => att.user_id !== user_id));
+  //   }
+  // };
 
   const handleAttendeeToggle = (user: ProjectUser) => {
-    const isSelected = attendees.some(att => att.user_id === user.user_id);
-    
+    const isSelected = attendees.some((att) => att.user_id === user.user_id);
+
     if (isSelected) {
       // 선택 해제
-      setAttendees(attendees.filter(att => att.user_id !== user.user_id));
+      setAttendees(attendees.filter((att) => att.user_id !== user.user_id));
     } else {
       // 선택 추가 (회의장이 아닌 경우에만)
       if (user.user_id !== hostId) {
-        setAttendees([...attendees, {
-          user_id: user.user_id,
-          name: user.name,
-          email: user.email,
-          user_jobname: user.user_jobname || ''
-        }]);
+        setAttendees([
+          ...attendees,
+          {
+            user_id: user.user_id,
+            name: user.name,
+            email: user.email,
+            user_jobname: user.user_jobname || '',
+          },
+        ]);
       }
     }
   };
@@ -319,7 +325,7 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
     if (user_id === hostId) {
       setHostJobname(role);
     } else {
-      const updated = attendees.map(att => 
+      const updated = attendees.map((att) =>
         att.user_id === user_id ? { ...att, user_jobname: role } : att
       );
       setAttendees(updated);
@@ -327,27 +333,32 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
   };
 
   const handleSelectAll = () => {
-    const availableUsers = projectUsers.filter(user => user.user_id !== hostId);
-    setAttendees(availableUsers.map(user => ({
-      user_id: user.user_id,
-      name: user.name,
-      email: user.email,
-      user_jobname: user.user_jobname || ''
-    })));
+    const availableUsers = projectUsers.filter(
+      (user) => user.user_id !== hostId
+    );
+    setAttendees(
+      availableUsers.map((user) => ({
+        user_id: user.user_id,
+        name: user.name,
+        email: user.email,
+        user_jobname: user.user_jobname || '',
+      }))
+    );
   };
 
   const handleClearAll = () => {
     setAttendees([]);
   };
 
-  const hostUser = projectUsers.find(user => user.user_id === hostId);
-  
+  const hostUser = projectUsers.find((user) => user.user_id === hostId);
+
   // 실제로 선택된 참석자만 필터링 (빈 user_id 제외)
-  const selectedAttendees = attendees.filter(att => att.user_id && att.user_id.trim() !== '');
+  const selectedAttendees = attendees.filter(
+    (att) => att.user_id && att.user_id.trim() !== ''
+  );
 
   return (
     <AttendInfoWrapper>
-      
       {/* 선택된 사용자 요약 */}
       {(hostUser || selectedAttendees.length > 0) && (
         <SelectedSummary>
@@ -361,44 +372,48 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
               {hostUser.name} (회의장)
             </HostTag>
           )}
-          {selectedAttendees.map(att => (
-            <SelectedTag key={att.user_id}>
-              {att.name}
-            </SelectedTag>
+          {selectedAttendees.map((att) => (
+            <SelectedTag key={att.user_id}>{att.name}</SelectedTag>
           ))}
         </SelectedSummary>
       )}
 
-             <UserSelectionPanel>
-         <SearchAndActionsRow>
-           <SearchBox>
-             <SearchIcon />
-             <SearchInput
-          type="text"
-               placeholder="이름 또는 이메일로 검색..."
-               value={searchTerm}
-               onChange={(e) => setSearchTerm(e.target.value)}
-        />
-           </SearchBox>
+      <UserSelectionPanel>
+        <SearchAndActionsRow>
+          <SearchBox>
+            <SearchIcon />
+            <SearchInput
+              type="text"
+              placeholder="이름 또는 이메일로 검색..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </SearchBox>
 
-           <QuickActions>
-             <QuickButton onClick={handleSelectAll}>전체 선택</QuickButton>
-             <QuickButton onClick={handleClearAll}>선택 해제</QuickButton>
-           </QuickActions>
-         </SearchAndActionsRow>
+          <QuickActions>
+            <QuickButton onClick={handleSelectAll}>전체 선택</QuickButton>
+            <QuickButton onClick={handleClearAll}>선택 해제</QuickButton>
+          </QuickActions>
+        </SearchAndActionsRow>
 
         <UserGrid>
           {filteredUsers.map((user) => {
             const isHost = user.user_id === hostId;
-            const isSelected = attendees.some(att => att.user_id === user.user_id);
-            const currentRole = isHost ? hostJobname : 
-              attendees.find(att => att.user_id === user.user_id)?.user_jobname || user.user_jobname || '';
-            const isCurrentUser = user.user_id === currentUser?.id;
+            const isSelected = attendees.some(
+              (att) => att.user_id === user.user_id
+            );
+            const currentRole = isHost
+              ? hostJobname
+              : attendees.find((att) => att.user_id === user.user_id)
+                  ?.user_jobname ||
+                user.user_jobname ||
+                '';
+            // const isCurrentUser = user.user_id === currentUser?.id;
 
             return (
-              <UserCard 
-                key={user.user_id} 
-                $selected={isSelected} 
+              <UserCard
+                key={user.user_id}
+                $selected={isSelected}
                 $isHost={isHost}
                 onClick={() => !isHost && handleAttendeeToggle(user)}
               >
@@ -414,15 +429,17 @@ const AttendInfo: React.FC<AttendInfoProps> = ({
                 </div>
                 <UserInfo>
                   <UserNameEmail>
-                  {user.name}
+                    {user.name}
                     {isHost && <Crown size={16} color="#480b6a" />}
                     <UserEmailSpan>/ {user.email}</UserEmailSpan>
                   </UserNameEmail>
                   <UserRole
-            type="text"
+                    type="text"
                     placeholder="역할 입력"
                     value={currentRole}
-                    onChange={(e) => handleRoleChange(user.user_id, e.target.value)}
+                    onChange={(e) =>
+                      handleRoleChange(user.user_id, e.target.value)
+                    }
                     onClick={(e) => e.stopPropagation()}
                   />
                 </UserInfo>

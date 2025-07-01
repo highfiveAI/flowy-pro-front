@@ -1,6 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { sendChatMessage } from '../../api/fetchChatbot';
+
+const KeywordContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  background-color: #f0f4fa;
+  flex-wrap: wrap;
+`;
+
+const KeywordButton = styled.button`
+  background-color: #e1ecf4;
+  border: none;
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #0366d6;
+
+  &:hover {
+    background-color: #d1e5f0;
+  }
+`;
 
 const Container = styled.div`
   max-width: 400px;
@@ -137,9 +160,81 @@ const LoadingDots: React.FC = () => {
 };
 
 const Chatbot: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      sender: 'bot',
+      text: '안녕하세요, 저는 플로위 AI 챗봇이에요.\n무엇을 원하시나요? 제가 도와드릴게요.',
+    },
+  ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleQuickSubmit = async (keyword: string) => {
+    if (loading) return;
+
+    // 유저 메시지 추가
+    const userMsg: Message = { sender: 'user', text: keyword };
+    setMessages((prev) => [...prev, userMsg]);
+
+    // 로딩 메시지 추가
+    const loadingMsg: Message = { sender: 'bot', loading: true };
+    setMessages((prev) => [...prev, loadingMsg]);
+    setLoading(true);
+
+    try {
+      const res = await sendChatMessage(keyword);
+      const cleaned = res.replace(/```json\n?/, '').replace(/\n?```$/, '');
+      const parsed = JSON.parse(cleaned);
+      const result = parsed.results?.[0];
+      const summary = parsed.llm_summary || '';
+
+      let botMsg: Message;
+
+      if (result) {
+        const doc = result.document || '문서 없음';
+        let link = result.metadata?.link || '';
+
+        if (link.startsWith('http:') && !link.startsWith('http://')) {
+          link = link.replace(/^http:/, 'http://');
+        }
+
+        botMsg = {
+          sender: 'bot',
+          doc,
+          link,
+          summary,
+        };
+      } else if (summary) {
+        botMsg = {
+          sender: 'bot',
+          summary,
+        };
+      } else {
+        throw new Error('결과가 완전히 비어 있습니다.');
+      }
+
+      setMessages((prev) => {
+        const filtered = prev.filter((m) => !m.loading);
+        return [...filtered, botMsg];
+      });
+    } catch (err) {
+      console.error('에러 발생:', err);
+      setMessages((prev) => {
+        const filtered = prev.filter((m) => !m.loading);
+        return [
+          ...filtered,
+          {
+            sender: 'bot',
+            text: '❗ 결과를 이해하지 못했어요. JSON 파싱에 실패했거나 예상치 못한 형식이에요.',
+          },
+        ];
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,7 +305,9 @@ const Chatbot: React.FC = () => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
   return (
     <Container>
       <Messages>
@@ -239,12 +336,29 @@ const Chatbot: React.FC = () => {
                       링크 열기
                     </LinkButton>
                   )}
+                  {msg.text &&
+                    msg.text
+                      .split('\n')
+                      .map((line, i) => <div key={i}>{line}</div>)}
                 </>
               )}
             </MessageBubble>
           );
         })}
+        <div ref={bottomRef} />
       </Messages>
+      <KeywordContainer>
+        {['로그인', '회의 분석', '아이디찾기'].map((kw, i) => (
+          <KeywordButton
+            key={i}
+            onClick={() => {
+              handleQuickSubmit(kw);
+            }}
+          >
+            {kw}
+          </KeywordButton>
+        ))}
+      </KeywordContainer>
 
       <InputArea onSubmit={handleSubmit}>
         <Input

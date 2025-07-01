@@ -7,7 +7,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -35,7 +34,7 @@ const DashboardContainer = styled.div`
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
   min-height: 100vh;
   position: relative;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -43,7 +42,8 @@ const DashboardContainer = styled.div`
     left: 0;
     right: 0;
     height: 200px;
-    background: linear-gradient(135deg, 
+    background: linear-gradient(
+      135deg,
       rgba(53, 23, 69, 0.05) 0%,
       rgba(53, 23, 69, 0.02) 30%,
       transparent 70%
@@ -62,7 +62,7 @@ const PageTitle = styled.h1`
   margin-bottom: 30px;
   position: relative;
   z-index: 1;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -83,7 +83,10 @@ const TabContainer = styled.div`
 
 const Tab = styled.button<{ $isActive?: boolean }>`
   padding: 8px 16px;
-  background: ${(props) => (props.$isActive ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#f5f5f5')};
+  background: ${(props) =>
+    props.$isActive
+      ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)'
+      : '#f5f5f5'};
   color: ${(props) => (props.$isActive ? '#fff' : '#666')};
   border: none;
   cursor: pointer;
@@ -99,7 +102,10 @@ const Tab = styled.button<{ $isActive?: boolean }>`
   }
 
   &:hover {
-    background: ${(props) => (props.$isActive ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#e0e0e0')};
+    background: ${(props) =>
+      props.$isActive
+        ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)'
+        : '#e0e0e0'};
   }
 `;
 
@@ -136,12 +142,12 @@ const FilterModeOption = styled.label`
   cursor: pointer;
   font-size: 14px;
   color: #666;
-  
-  input[type="radio"] {
+
+  input[type='radio'] {
     margin: 0;
     accent-color: #351745;
   }
-  
+
   &:hover {
     color: #351745;
   }
@@ -235,7 +241,7 @@ const MainContentContainer = styled.div`
   gap: 24px;
   height: calc(100vh - 400px); /* 헤더, 필터 등을 제외한 높이 */
   min-height: 600px;
-  
+
   @media (max-width: 1400px) {
     flex-direction: column;
     height: auto;
@@ -251,7 +257,7 @@ const SummarySection = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  
+
   @media (max-width: 1400px) {
     flex: none;
     margin-bottom: 24px;
@@ -348,7 +354,7 @@ const FeedbackSection = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  
+
   @media (max-width: 1400px) {
     flex: none;
   }
@@ -363,17 +369,17 @@ const FeedbackTitle = styled.h2`
   text-align: left;
 `;
 
-const FeedbackSubTitle = styled.div`
-  display: inline-block;
-  background: #f5f3f8;
-  color: #351745;
-  font-size: 15px;
-  font-weight: 700;
-  padding: 8px 32px;
-  border-radius: 32px;
-  text-align: center;
-  margin-bottom: 2px;
-`;
+// const FeedbackSubTitle = styled.div`
+//   display: inline-block;
+//   background: #f5f3f8;
+//   color: #351745;
+//   font-size: 15px;
+//   font-weight: 700;
+//   padding: 8px 32px;
+//   border-radius: 32px;
+//   text-align: center;
+//   margin-bottom: 2px;
+// `;
 
 // 피드백 유형 필터 스타일
 const FeedbackFilterSection = styled.div`
@@ -397,7 +403,7 @@ const FeedbackTypeGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 8px;
-  
+
   @media (max-width: 1200px) {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
@@ -410,8 +416,8 @@ const FeedbackTypeCheckbox = styled.div<{ $isSelected?: boolean }>`
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid ${props => props.$isSelected ? '#351745' : '#e0e0e0'};
-  background: ${props => props.$isSelected ? '#f8f5ff' : '#fff'};
+  border: 1px solid ${(props) => (props.$isSelected ? '#351745' : '#e0e0e0')};
+  background: ${(props) => (props.$isSelected ? '#f8f5ff' : '#fff')};
   transition: all 0.2s ease;
   position: relative;
 
@@ -430,9 +436,12 @@ const CheckboxInput = styled.input`
 const CustomCheckbox = styled.div<{ $isChecked?: boolean }>`
   width: 16px;
   height: 16px;
-  border: 2px solid ${props => props.$isChecked ? '#351745' : '#ccc'};
+  border: 2px solid ${(props) => (props.$isChecked ? '#351745' : '#ccc')};
   border-radius: 3px;
-  background: ${props => props.$isChecked ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)' : '#fff'};
+  background: ${(props) =>
+    props.$isChecked
+      ? 'linear-gradient(135deg, #351745 0%, #4a1168 100%)'
+      : '#fff'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -444,7 +453,7 @@ const CustomCheckbox = styled.div<{ $isChecked?: boolean }>`
     color: white;
     font-size: 10px;
     font-weight: bold;
-    opacity: ${props => props.$isChecked ? 1 : 0};
+    opacity: ${(props) => (props.$isChecked ? 1 : 0)};
     transition: opacity 0.2s ease;
   }
 `;
@@ -486,7 +495,7 @@ const FeedbackContent = styled.div`
   gap: 24px;
   flex: 1;
   overflow: hidden;
-  
+
   @media (max-width: 1200px) {
     flex-direction: column;
     gap: 16px;
@@ -651,13 +660,13 @@ const ModalButton = styled.button<{ $isPrimary?: boolean }>`
   `}
 `;
 
-const SelectedDateRange = styled.div`
-  font-size: 12px;
-  color: #666;
-  margin-top: 8px;
-  text-align: center;
-  font-family: 'Rethink Sans', sans-serif;
-`;
+// const SelectedDateRange = styled.div`
+//   font-size: 12px;
+//   color: #666;
+//   margin-top: 8px;
+//   text-align: center;
+//   font-family: 'Rethink Sans', sans-serif;
+// `;
 
 const AdminDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('month');
@@ -666,7 +675,7 @@ const AdminDashboard = () => {
   const getDefaultDateRange = useCallback((period: PeriodType) => {
     const today = new Date();
     const endDate = today.toISOString().split('T')[0];
-    
+
     const startDate = new Date(today);
     switch (period) {
       case 'year':
@@ -687,10 +696,10 @@ const AdminDashboard = () => {
       default:
         startDate.setMonth(startDate.getMonth() - 1);
     }
-    
+
     return {
       startDate: startDate.toISOString().split('T')[0],
-      endDate
+      endDate,
     };
   }, []);
 
@@ -714,15 +723,19 @@ const AdminDashboard = () => {
   const [error, setError] = useState<string | null>(null);
 
   // 조회 방식 상태 - 'project' 또는 'department'
-  const [filterMode, setFilterMode] = useState<'project' | 'department'>('department');
-  
+  const [filterMode, setFilterMode] = useState<'project' | 'department'>(
+    'department'
+  );
+
   // 필터 상태 - 기본값 "전체"
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<string>('');
-  
+
   // 피드백 유형 필터 상태
-  const [selectedFeedbackTypes, setSelectedFeedbackTypes] = useState<string[]>([]);
+  const [selectedFeedbackTypes, setSelectedFeedbackTypes] = useState<string[]>(
+    []
+  );
 
   // 대시보드 데이터 로드 - 계층적 필터링 적용
   const loadDashboardData = useCallback(async () => {
@@ -815,10 +828,11 @@ const AdminDashboard = () => {
   // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
     // 초기 period에 맞는 날짜 범위 설정
-    const { startDate: initialStartDate, endDate: initialEndDate } = getDefaultDateRange(selectedPeriod);
+    const { startDate: initialStartDate, endDate: initialEndDate } =
+      getDefaultDateRange(selectedPeriod);
     setStartDate(initialStartDate);
     setEndDate(initialEndDate);
-    
+
     loadFilterOptions();
     loadDashboardData();
   }, []);
@@ -829,7 +843,15 @@ const AdminDashboard = () => {
     if (dashboardData !== null) {
       loadDashboardData();
     }
-  }, [filterMode, selectedProject, selectedDepartment, selectedUser, selectedPeriod, startDate, endDate]);
+  }, [
+    filterMode,
+    selectedProject,
+    selectedDepartment,
+    selectedUser,
+    selectedPeriod,
+    startDate,
+    endDate,
+  ]);
 
   // 날짜 범위 변경 시 필터 옵션도 다시 로드
   useEffect(() => {
@@ -838,50 +860,56 @@ const AdminDashboard = () => {
     }
   }, [startDate, endDate, loadFilterOptions]);
 
-
-
   // 조회 방식 변경 핸들러
-  const handleFilterModeChange = useCallback((mode: 'project' | 'department') => {
-    console.log('▶ 조회 방식 변경:', mode);
-    setFilterMode(mode);
-    
-    // 조회 방식 변경 시 모든 필터 초기화
-    setSelectedProject('');
-    setSelectedDepartment('');
-    setSelectedUser('');
-    
-    // 필터 옵션 다시 로드
-    loadFilterOptions();
-  }, [loadFilterOptions]);
+  const handleFilterModeChange = useCallback(
+    (mode: 'project' | 'department') => {
+      console.log('▶ 조회 방식 변경:', mode);
+      setFilterMode(mode);
+
+      // 조회 방식 변경 시 모든 필터 초기화
+      setSelectedProject('');
+      setSelectedDepartment('');
+      setSelectedUser('');
+
+      // 필터 옵션 다시 로드
+      loadFilterOptions();
+    },
+    [loadFilterOptions]
+  );
 
   // 필터 변경 핸들러 - 조회 방식에 따른 연동 로직 구현
-  const handleProjectChange = useCallback(async (projectId: string) => {
-    console.log('▶ 프로젝트 선택 값:', projectId);
-    setSelectedProject(projectId);
+  const handleProjectChange = useCallback(
+    async (projectId: string) => {
+      console.log('▶ 프로젝트 선택 값:', projectId);
+      setSelectedProject(projectId);
 
-    // 프로젝트 변경 시 사용자 초기화
-    setSelectedUser('');
+      // 프로젝트 변경 시 사용자 초기화
+      setSelectedUser('');
 
-    // 프로젝트 선택 시 해당 프로젝트에 참여하는 사용자만 가져오기
-    try {
-      setFilterLoading(true);
-      const params: any = {
-        start_date: startDate,
-        end_date: endDate,
-      };
-      if (projectId) {
-        params.project_id = projectId;
-        console.log('▶ 프로젝트 기반 필터 옵션 요청:', params);
+      // 프로젝트 선택 시 해당 프로젝트에 참여하는 사용자만 가져오기
+      try {
+        setFilterLoading(true);
+        const params: any = {
+          start_date: startDate,
+          end_date: endDate,
+        };
+        if (projectId) {
+          params.project_id = projectId;
+          console.log('▶ 프로젝트 기반 필터 옵션 요청:', params);
+        }
+        const options: FilterOptions = await fetchDashboardFilterOptions(
+          params
+        );
+        setFilterOptions(options);
+        console.log('▶ 프로젝트 기반 필터 옵션 응답:', options);
+      } catch (err) {
+        console.error('프로젝트 기반 필터 옵션 갱신 오류:', err);
+      } finally {
+        setFilterLoading(false);
       }
-      const options: FilterOptions = await fetchDashboardFilterOptions(params);
-      setFilterOptions(options);
-      console.log('▶ 프로젝트 기반 필터 옵션 응답:', options);
-    } catch (err) {
-      console.error('프로젝트 기반 필터 옵션 갱신 오류:', err);
-    } finally {
-      setFilterLoading(false);
-    }
-  }, [startDate, endDate]);
+    },
+    [startDate, endDate]
+  );
 
   const handleDepartmentChange = useCallback(
     async (department: string) => {
@@ -894,14 +922,14 @@ const AdminDashboard = () => {
       // 부서 선택 시 해당 부서의 사용자만 가져오기
       try {
         setFilterLoading(true);
-              const params: any = {
-        start_date: startDate,
-        end_date: endDate,
-      };
-      if (department) {
-        params.department = department;
-        console.log('▶ 부서 기반 필터 옵션 요청:', params);
-      }
+        const params: any = {
+          start_date: startDate,
+          end_date: endDate,
+        };
+        if (department) {
+          params.department = department;
+          console.log('▶ 부서 기반 필터 옵션 요청:', params);
+        }
         const options: FilterOptions = await fetchDashboardFilterOptions(
           params
         );
@@ -916,60 +944,78 @@ const AdminDashboard = () => {
     [startDate, endDate]
   );
 
-  const handleUserChange = useCallback(async (userId: string) => {
-    console.log('▶ 사용자 선택 값:', userId);
-    setSelectedUser(userId);
+  const handleUserChange = useCallback(
+    async (userId: string) => {
+      console.log('▶ 사용자 선택 값:', userId);
+      setSelectedUser(userId);
 
-    // 사용자 선택 시 부서별 조회 모드에서만 해당 사용자의 부서로 자동 변경
-    if (userId && filterOptions && filterMode === 'department') {
-      const selectedUserInfo = filterOptions.users.find(user => user.id === userId);
-      if (selectedUserInfo && selectedUserInfo.department) {
-        console.log('▶ 사용자 부서 자동 선택:', selectedUserInfo.department);
-        setSelectedDepartment(selectedUserInfo.department);
-      }
-    } else if (!userId) {
-      // 사용자 선택 해제 시 필터 옵션을 다시 로드하여 전체 사용자 목록 갱신
-      try {
-        setFilterLoading(true);
-        const params: any = {
-          start_date: startDate,
-          end_date: endDate,
-        };
-        
-        // 조회 방식에 따라 필터 적용
-        if (filterMode === 'project' && selectedProject) {
-          params.project_id = selectedProject;
-        } else if (filterMode === 'department' && selectedDepartment) {
-          params.department = selectedDepartment;
+      // 사용자 선택 시 부서별 조회 모드에서만 해당 사용자의 부서로 자동 변경
+      if (userId && filterOptions && filterMode === 'department') {
+        const selectedUserInfo = filterOptions.users.find(
+          (user) => user.id === userId
+        );
+        if (selectedUserInfo && selectedUserInfo.department) {
+          console.log('▶ 사용자 부서 자동 선택:', selectedUserInfo.department);
+          setSelectedDepartment(selectedUserInfo.department);
         }
-        
-        const options: FilterOptions = await fetchDashboardFilterOptions(params);
-        setFilterOptions(options);
-        console.log('▶ 사용자 선택 해제 후 필터 옵션 갱신:', options);
-      } catch (err) {
-        console.error('사용자 선택 해제 후 필터 옵션 갱신 오류:', err);
-      } finally {
-        setFilterLoading(false);
+      } else if (!userId) {
+        // 사용자 선택 해제 시 필터 옵션을 다시 로드하여 전체 사용자 목록 갱신
+        try {
+          setFilterLoading(true);
+          const params: any = {
+            start_date: startDate,
+            end_date: endDate,
+          };
+
+          // 조회 방식에 따라 필터 적용
+          if (filterMode === 'project' && selectedProject) {
+            params.project_id = selectedProject;
+          } else if (filterMode === 'department' && selectedDepartment) {
+            params.department = selectedDepartment;
+          }
+
+          const options: FilterOptions = await fetchDashboardFilterOptions(
+            params
+          );
+          setFilterOptions(options);
+          console.log('▶ 사용자 선택 해제 후 필터 옵션 갱신:', options);
+        } catch (err) {
+          console.error('사용자 선택 해제 후 필터 옵션 갱신 오류:', err);
+        } finally {
+          setFilterLoading(false);
+        }
       }
-    }
-  }, [filterOptions, filterMode, selectedProject, selectedDepartment, startDate, endDate]);
+    },
+    [
+      filterOptions,
+      filterMode,
+      selectedProject,
+      selectedDepartment,
+      startDate,
+      endDate,
+    ]
+  );
 
+  const handlePeriodChange = useCallback(
+    (period: PeriodType) => {
+      console.log('▶ 기간 선택 값:', period);
+      setSelectedPeriod(period);
 
+      // period 변경 시 날짜 범위도 자동으로 업데이트
+      const { startDate: newStartDate, endDate: newEndDate } =
+        getDefaultDateRange(period);
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
 
-  const handlePeriodChange = useCallback((period: PeriodType) => {
-    console.log('▶ 기간 선택 값:', period);
-    setSelectedPeriod(period);
-    
-    // period 변경 시 날짜 범위도 자동으로 업데이트
-    const { startDate: newStartDate, endDate: newEndDate } = getDefaultDateRange(period);
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
-    
-    console.log(`▶ 기간 변경에 따른 날짜 범위 업데이트: ${newStartDate} ~ ${newEndDate}`);
-    
-    // 기간 변경 시 로딩 상태 표시
-    setLoading(true);
-  }, [getDefaultDateRange]);
+      console.log(
+        `▶ 기간 변경에 따른 날짜 범위 업데이트: ${newStartDate} ~ ${newEndDate}`
+      );
+
+      // 기간 변경 시 로딩 상태 표시
+      setLoading(true);
+    },
+    [getDefaultDateRange]
+  );
 
   // 기간별 레이블 매핑
   const periodLabels: Record<PeriodType, string> = useMemo(
@@ -1024,16 +1070,16 @@ const AdminDashboard = () => {
   // 피드백 유형별 테이블 데이터 필터링
   const filteredTableData = useMemo(() => {
     if (!dashboardData) return [];
-    
+
     let data = dashboardData.tableData;
-    
+
     // 선택된 피드백 유형이 있으면 필터링
     if (selectedFeedbackTypes.length > 0) {
-      data = data.filter(
-        (item) => selectedFeedbackTypes.includes(item.feedback_type)
+      data = data.filter((item) =>
+        selectedFeedbackTypes.includes(item.feedback_type)
       );
     }
-    
+
     return data;
   }, [dashboardData, selectedFeedbackTypes]);
 
@@ -1046,21 +1092,21 @@ const AdminDashboard = () => {
   // 피드백 유형별 차트 데이터 변환
   const chartDataByPeriod = useMemo(() => {
     if (!dashboardData) return [];
-    
+
     const dataByPeriod: Record<string, Record<string, number>> = {};
-    
+
     // 선택된 기간의 데이터만 필터링
     let filteredData = dashboardData.chartData.filter(
       (data) => data.period === selectedPeriod
     );
-    
+
     // 선택된 피드백 유형이 있으면 추가 필터링
     if (selectedFeedbackTypes.length > 0) {
-      filteredData = filteredData.filter(
-        (data) => selectedFeedbackTypes.includes(data.feedback_type)
+      filteredData = filteredData.filter((data) =>
+        selectedFeedbackTypes.includes(data.feedback_type)
       );
     }
-    
+
     // 기간별로 피드백 유형 데이터 그룹화
     filteredData.forEach((item) => {
       if (!dataByPeriod[item.year]) {
@@ -1068,7 +1114,7 @@ const AdminDashboard = () => {
       }
       dataByPeriod[item.year][item.feedback_type] = item.count;
     });
-    
+
     // 차트 데이터 형식으로 변환
     return Object.entries(dataByPeriod).map(([year, feedbackTypes]) => ({
       year,
@@ -1079,20 +1125,32 @@ const AdminDashboard = () => {
   // 고유한 피드백 유형들 추출
   const feedbackTypes = useMemo(() => {
     if (!dashboardData) return [];
-    const types = new Set(dashboardData.chartData.map(item => item.feedback_type));
+    const types = new Set(
+      dashboardData.chartData.map((item) => item.feedback_type)
+    );
     return Array.from(types);
   }, [dashboardData]);
 
   // 차트에 표시할 피드백 유형들 (선택된 것들 또는 전체)
   const displayedFeedbackTypes = useMemo(() => {
-    return selectedFeedbackTypes.length > 0 ? selectedFeedbackTypes : feedbackTypes;
+    return selectedFeedbackTypes.length > 0
+      ? selectedFeedbackTypes
+      : feedbackTypes;
   }, [selectedFeedbackTypes, feedbackTypes]);
 
   // 피드백 유형별 색상 정의
   const feedbackColors = useMemo(() => {
     const colors = [
-      '#351745', '#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', 
-      '#8dd1e1', '#d084d0', '#ffb347', '#87ceeb', '#dda0dd'
+      '#351745',
+      '#8884d8',
+      '#82ca9d',
+      '#ffc658',
+      '#ff7c7c',
+      '#8dd1e1',
+      '#d084d0',
+      '#ffb347',
+      '#87ceeb',
+      '#dda0dd',
     ];
     const colorMap: Record<string, string> = {};
     feedbackTypes.forEach((type, index) => {
@@ -1108,13 +1166,13 @@ const AdminDashboard = () => {
         <LineChart data={chartDataByPeriod}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
-          <YAxis 
+          <YAxis
             label={{ value: '건수', angle: -90, position: 'insideLeft' }}
             tickFormatter={(value) => `${value}건`}
             domain={[0, 'dataMax']}
             allowDecimals={false}
           />
-          <Tooltip 
+          <Tooltip
             formatter={(value, name) => [`${value}건`, name]}
             labelFormatter={(label) => `기간: ${label}`}
           />
@@ -1164,10 +1222,10 @@ const AdminDashboard = () => {
 
   // 피드백 유형 선택 핸들러
   const handleFeedbackTypeChange = useCallback((feedbackType: string) => {
-    setSelectedFeedbackTypes(prev => {
+    setSelectedFeedbackTypes((prev) => {
       if (prev.includes(feedbackType)) {
         // 이미 선택된 경우 제거
-        return prev.filter(type => type !== feedbackType);
+        return prev.filter((type) => type !== feedbackType);
       } else {
         // 선택되지 않은 경우 추가
         return [...prev, feedbackType];
@@ -1237,7 +1295,9 @@ const AdminDashboard = () => {
                 name="filterMode"
                 value="department"
                 checked={filterMode === 'department'}
-                onChange={(e) => handleFilterModeChange(e.target.value as 'department')}
+                onChange={(e) =>
+                  handleFilterModeChange(e.target.value as 'department')
+                }
               />
               부서별 조회
             </FilterModeOption>
@@ -1247,7 +1307,9 @@ const AdminDashboard = () => {
                 name="filterMode"
                 value="project"
                 checked={filterMode === 'project'}
-                onChange={(e) => handleFilterModeChange(e.target.value as 'project')}
+                onChange={(e) =>
+                  handleFilterModeChange(e.target.value as 'project')
+                }
               />
               프로젝트별 조회
             </FilterModeOption>
@@ -1278,7 +1340,11 @@ const AdminDashboard = () => {
                   </Select>
                   {filterLoading && (
                     <div
-                      style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}
+                      style={{
+                        fontSize: '12px',
+                        color: '#666',
+                        marginTop: '4px',
+                      }}
                     >
                       로딩 중...
                     </div>
@@ -1294,7 +1360,11 @@ const AdminDashboard = () => {
                   >
                     <option value="">전체 사용자</option>
                     {filterOptions?.users?.map(
-                      (user: { id: string; name: string; login_id: string }) => (
+                      (user: {
+                        id: string;
+                        name: string;
+                        login_id: string;
+                      }) => (
                         <option key={user.id} value={user.id}>
                           {user.name} ({user.login_id})
                         </option>
@@ -1303,7 +1373,11 @@ const AdminDashboard = () => {
                   </Select>
                   {filterLoading && (
                     <div
-                      style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}
+                      style={{
+                        fontSize: '12px',
+                        color: '#666',
+                        marginTop: '4px',
+                      }}
                     >
                       로딩 중...
                     </div>
@@ -1329,7 +1403,11 @@ const AdminDashboard = () => {
                   </Select>
                   {filterLoading && (
                     <div
-                      style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}
+                      style={{
+                        fontSize: '12px',
+                        color: '#666',
+                        marginTop: '4px',
+                      }}
                     >
                       로딩 중...
                     </div>
@@ -1345,7 +1423,11 @@ const AdminDashboard = () => {
                   >
                     <option value="">전체 사용자</option>
                     {filterOptions?.users?.map(
-                      (user: { id: string; name: string; login_id: string }) => (
+                      (user: {
+                        id: string;
+                        name: string;
+                        login_id: string;
+                      }) => (
                         <option key={user.id} value={user.id}>
                           {user.name} ({user.login_id})
                         </option>
@@ -1354,7 +1436,11 @@ const AdminDashboard = () => {
                   </Select>
                   {filterLoading && (
                     <div
-                      style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}
+                      style={{
+                        fontSize: '12px',
+                        color: '#666',
+                        marginTop: '4px',
+                      }}
                     >
                       로딩 중...
                     </div>
@@ -1493,13 +1579,15 @@ const AdminDashboard = () => {
 
         <FeedbackSection>
           <FeedbackTitle>Feedback</FeedbackTitle>
-          
+
           {/* 피드백 유형 선택 필터 */}
           <FeedbackFilterSection>
             <FeedbackFilterHeader>
               <FeedbackFilterLabel>피드백 유형 선택</FeedbackFilterLabel>
               <SelectAllButton onClick={handleSelectAllFeedbackTypes}>
-                {selectedFeedbackTypes.length === feedbackTypes.length ? '전체 해제' : '전체 선택'}
+                {selectedFeedbackTypes.length === feedbackTypes.length
+                  ? '전체 해제'
+                  : '전체 선택'}
               </SelectAllButton>
             </FeedbackFilterHeader>
             <FeedbackTypeGrid>
@@ -1514,13 +1602,15 @@ const AdminDashboard = () => {
                     checked={selectedFeedbackTypes.includes(feedbackType)}
                     onChange={() => handleFeedbackTypeChange(feedbackType)}
                   />
-                  <CustomCheckbox $isChecked={selectedFeedbackTypes.includes(feedbackType)} />
+                  <CustomCheckbox
+                    $isChecked={selectedFeedbackTypes.includes(feedbackType)}
+                  />
                   <CheckboxLabel>{feedbackType}</CheckboxLabel>
                 </FeedbackTypeCheckbox>
               ))}
             </FeedbackTypeGrid>
           </FeedbackFilterSection>
-          
+
           <FeedbackContent>
             <ChartContainer>{chartComponent}</ChartContainer>
             <TableContainer>
