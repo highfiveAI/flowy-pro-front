@@ -708,10 +708,8 @@ export const StyledTextarea = styled.textarea`
 `;
 
 export const DatePickerWrapper = styled.div`
-  position: fixed !important;
-  left: 50% !important;
-  top: 200px !important;
-  transform: translateX(-50%) !important;
+  position: relative;
+  width: 100%;
   /* 입력 컨테이너 스타일 */
   .react-datepicker-wrapper {
     width: 100%;
