@@ -10,7 +10,6 @@ import NanumHumanBoldBase64 from '../static/fonts/NanumHumanBold.ttf.base64.js';
  * @param summary - 회의 요약
  * @param tasks - 작업 목록
  * @param feedback - 피드백
- * @param recommendFiles - 추천 문서
  */
 export function generateMeetingPDF({
   checked,
@@ -18,14 +17,12 @@ export function generateMeetingPDF({
   summary,
   tasks,
   feedback,
-  recommendFiles,
 }: {
   checked: { [key: string]: boolean };
   meetingInfo: any;
   summary: any;
   tasks: any;
   feedback: any;
-  recommendFiles: any;
 }) {
   // @ts-ignore
   const pdfMake = window.pdfMake;
@@ -56,14 +53,12 @@ export function generateMeetingPDF({
       summary: '요약',
       tasks: '작업목록',
       feedback: '피드백',
-      recommend: '추천문서',
-      recommendFiles: '추천문서',
     };
     let included = Object.entries(checked)
       .filter(([key, value]) => value && itemMap[key])
       .map(([key]) => itemMap[key])
       .filter((v, i, arr) => arr.indexOf(v) === i);
-    const allItems = ['기본정보', '요약', '작업목록', '피드백', '추천문서'];
+    const allItems = ['기본정보', '요약', '작업목록', '피드백'];
     let includedStr = included.join('_');
     if (
       included.length === allItems.length &&
@@ -294,38 +289,7 @@ export function generateMeetingPDF({
       });
     }
 
-    // [추천 문서]
-    if (checked.recommend || checked.recommendFiles) {
-      content.push(
-        { text: '[ 추천 문서 ]', style: 'sectionTitle' },
-        {
-          canvas: [
-            {
-              type: 'line',
-              x1: 0,
-              y1: 0,
-              x2: 520,
-              y2: 0,
-              lineWidth: 1,
-              lineColor: '#aaa',
-            },
-          ],
-        }
-      );
-      if (!Array.isArray(recommendFiles) || recommendFiles.length === 0) {
-        content.push({ text: '추천된 문서가 없습니다.', style: 'body' });
-      } else {
-        recommendFiles.forEach((file: any, idx: number) => {
-          const fileName =
-            typeof file === 'string' ? file : file.file_name || file.toString();
-          content.push({ text: `${idx + 1}. ${fileName}`, style: 'body' });
-        });
-      }
-      content.push({
-        text: '',
-        margin: [0, 0, 0, 10] as [number, number, number, number],
-      });
-    }
+
 
     // pdfMake 문서 정의
     const docDefinition = {

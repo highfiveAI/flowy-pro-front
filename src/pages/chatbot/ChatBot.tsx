@@ -171,6 +171,8 @@ const Chatbot: React.FC = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const keywords = ['로그인', '회의 분석', '아이디찾기', '비밀번호 찾기'];
+
   const handleQuickSubmit = async (keyword: string) => {
     if (loading) return;
 
@@ -348,7 +350,7 @@ const Chatbot: React.FC = () => {
         <div ref={bottomRef} />
       </Messages>
       <KeywordContainer>
-        {['로그인', '회의 분석', '아이디찾기'].map((kw, i) => (
+        {keywords.map((kw, i) => (
           <KeywordButton
             key={i}
             onClick={() => {

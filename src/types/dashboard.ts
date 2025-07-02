@@ -24,8 +24,7 @@ export interface TableData {
   filtered_avg: string; // 조회 평균 (필터링된 결과)
   pop: string; // PoP (이전 기간 대비 현재 기간)
   total_avg: string; // 전체 평균
-  vs_total: string; // 전체 대비
-}
+  vs_total: string;
 
 export interface DashboardResponse {
   summary: DashboardSummary[];
