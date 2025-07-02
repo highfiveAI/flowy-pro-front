@@ -296,7 +296,6 @@ interface PDFPopupProps {
   summary?: any;
   tasks?: any;
   feedback?: any;
-  recommendFiles?: any;
 }
 
 const PDF_ITEMS = [
@@ -305,7 +304,6 @@ const PDF_ITEMS = [
   { key: 'summary', label: '회의 요약' },
   { key: 'tasks', label: '작업 목록' },
   { key: 'feedback', label: '회의 피드백' },
-  { key: 'recommend', label: '추천 문서' },
 ];
 
 // pdfMake 동적 로드 훅
@@ -331,8 +329,7 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
   meetingInfo, 
   summary, 
   tasks, 
-  feedback, 
-  recommendFiles 
+  feedback 
 }) => {
   usePdfMakeScript();
   const [checked, setChecked] = useState({
@@ -341,7 +338,6 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
     summary: false,
     tasks: false,
     feedback: false,
-    recommend: false,
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -370,13 +366,12 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
         summary: value,
         tasks: value,
         feedback: value,
-        recommend: value,
       });
       
     } else {
       setChecked(prev => {
         const newChecked = { ...prev, [key]: value };
-        const allItemsChecked = ['info', 'summary', 'tasks', 'feedback', 'recommend']
+        const allItemsChecked = ['info', 'summary', 'tasks', 'feedback']
           .every(k => newChecked[k as keyof typeof newChecked]);
         return { ...newChecked, all: allItemsChecked };
       });
@@ -397,7 +392,6 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
          summary,
          tasks,
          feedback,
-         recommendFiles,
        });
     } catch (error) {
       console.error('PDF 생성 실패:', error);
