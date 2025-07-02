@@ -86,6 +86,16 @@ type Attendee = {
   user_jobname: string;
 };
 
+// 허용된 오디오 파일 형식
+const ALLOWED_AUDIO_FORMATS = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm'];
+
+// 파일 형식 검증 함수
+const isValidAudioFile = (file: File): boolean => {
+  const fileName = file.name.toLowerCase();
+  const fileExtension = fileName.split('.').pop();
+  return fileExtension ? ALLOWED_AUDIO_FORMATS.includes(fileExtension) : false;
+};
+
 const InsertConferenceInfo: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
   // const navigate = useNavigate();
@@ -488,7 +498,16 @@ const InsertConferenceInfo: React.FC = () => {
     setIsDragging(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setFile(e.dataTransfer.files[0]);
+      const droppedFile = e.dataTransfer.files[0];
+      
+      // 파일 형식 검증
+      if (!isValidAudioFile(droppedFile)) {
+        setError('파일형식이 알맞지 않습니다');
+        return;
+      }
+      
+      setFile(droppedFile);
+      setError(''); // 성공 시 에러 메시지 초기화
       e.dataTransfer.clearData();
     }
   };
@@ -833,7 +852,7 @@ const InsertConferenceInfo: React.FC = () => {
                                 이곳에 파일을 드래그하거나 아이콘을 클릭하세요.
                               </DropZoneMessage>
                               <FileUploadWrapper>
-                                <FileUpload setFile={setFile} />
+                                <FileUpload setFile={setFile} setError={setError} />
                               </FileUploadWrapper>
                               <RecordUploadWrapper>
                                 <RecordInfoUpload setFile={setFile} />
@@ -978,7 +997,7 @@ const InsertConferenceInfo: React.FC = () => {
                                 이곳에 파일을 드래그하거나 아이콘을 클릭하세요.
                               </DropZoneMessage>
                               <FileUploadWrapper>
-                                <FileUpload setFile={setFile} />
+                                <FileUpload setFile={setFile} setError={setError} />
                               </FileUploadWrapper>
                               <RecordUploadWrapper>
                                 <RecordInfoUpload setFile={setFile} />
