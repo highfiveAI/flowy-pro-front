@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { FiMail, FiX } from 'react-icons/fi';
 
 import type { Feedback, SummaryLog } from '../Dashboard.types';
 import type { Todo } from '../../../types/project';
 import { postSummaryTask } from '../../../api/fetchProject';
+import AlertModal from '../../find_id/popup/AlertModal';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -11,185 +13,278 @@ const ModalOverlay = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
 `;
+
 const ModalBox = styled.div`
   background: #fff;
-  border-radius: 50px;
-  border: 1px solid #351745;
-  box-shadow: 4px 0px 4px 0px rgba(75, 13, 110, 0.21);
-  padding: 48px 40px 40px 40px;
-  min-width: 420px;
-  max-width: 95vw;
-  min-height: 400px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 540px;
+  max-height: 85vh;
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  overflow: hidden;
 `;
-const TopRow = styled.div`
+
+const PopupHeader = styled.div`
+  background: linear-gradient(135deg, #6a4c93 0%, #4b2067 100%);
+  padding: 24px 28px;
   display: flex;
   align-items: center;
-  margin-bottom: 32px;
-  margin-top: 28px;
+  gap: 12px;
+  position: relative;
 `;
-const MailIcon = styled.img`
-  width: 38px;
-  height: 38px;
-  margin-right: 16px;
+
+const PopupIcon = styled.div`
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
 `;
-const Title = styled.h2`
-  font-size: 1.8rem;
-  color: #4b2067;
-  font-weight: 700;
+
+const PopupTitle = styled.h2`
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 600;
   margin: 0;
+  flex: 1;
 `;
-const ReceiverBox = styled.div`
-  width: 90%;
-  max-width: 340px;
-  margin: 0 auto;
-  background: #fff;
-  border: 2px solid #7c5ba6;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+`;
+
+const ScrollableBody = styled.div`
+  padding: 32px 28px;
+  overflow-y: auto;
+  flex: 1;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+`;
+
+const ReceiverSection = styled.div`
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
   border-radius: 12px;
   padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin-bottom: 20px;
 `;
+
 const SectionLabel = styled.div`
-  font-size: 1.34rem;
-  color: #4b2067;
-  font-weight: 700;
-  margin-bottom: 18px;
-  margin-top: 0;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 20px;
   text-align: center;
-  align-self: center;
 `;
-// const InfoBox = styled.div`
-//   background: #ededed;
-//   border-radius: 16px;
-//   padding: 20px 16px;
-//   min-height: 40px;
-//   max-height: 120px;
-//   margin-bottom: 24px;
-//   overflow-y: auto;
-//   color: #333;
-// `;
+
 const CheckboxGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-bottom: 24px;
-  margin-top: 24px;
-  align-items: flex-start;
+  gap: 16px;
 `;
+
 const CheckboxLabel = styled.label`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  font-size: 1.13rem;
-  color: #4b2067;
-  font-weight: 700;
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 500;
   cursor: pointer;
   gap: 8px;
-  width: 100%;
 `;
+
+const CheckboxRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
 const Checkbox = styled.input.attrs({ type: 'checkbox' })`
-  margin-right: 10px;
-  accent-color: #4b2067;
   width: 18px;
   height: 18px;
+  accent-color: #6a4c93;
+  cursor: pointer;
 `;
+
+const UserList = styled.div`
+  padding-left: 30px;
+  color: #6a4c93;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-top: 8px;
+  word-break: break-all;
+`;
+
+const CustomReceiverContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-left: 30px;
+  position: relative;
+`;
+
 const ReceiverInput = styled.input`
-  width: 65%;
-  border: none;
-  background: #ededed;
+  width: 70%;
+  border: 1px solid #ddd;
+  background: #fff;
   border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 1rem;
-  margin-left: 0;
-  color: #4b2067;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #6a4c93;
+    box-shadow: 0 0 0 2px rgba(106, 76, 147, 0.1);
+  }
+
+  &::placeholder {
+    color: #adb5bd;
+  }
 `;
+
+const Dropdown = styled.div`
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 4px;
+  position: absolute;
+  width: 70%;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
+
+const DropdownItem = styled.div`
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: #f8f9fa;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #f1f1f1;
+  }
+`;
+
+const SelectedReceivers = styled.div`
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
 const SelectedReceiver = styled.span`
   display: inline-flex;
   align-items: center;
-  background: #e6f7f7;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 13px;
-  color: #00b6b6;
+  background: #f3e5f5;
+  color: #6a4c93;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
 `;
+
 const RemoveButton = styled.button`
   background: none;
   border: none;
-  color: #00b6b6;
-  margin-left: 4px;
-  padding: 0 4px;
+  color: #6a4c93;
+  margin-left: 6px;
+  padding: 0;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1;
+  transition: color 0.2s ease;
+
   &:hover {
-    color: #008080;
+    color: #4b2067;
   }
 `;
-const BottomButton = styled.button`
-  width: 100%;
-  background: #00b6b6;
-  color: #fff;
-  border: none;
-  border-radius: 32px;
-  padding: 18px 0;
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin-top: 20px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-`;
-const NoticeText = styled.span`
-  display: block; /* 간격 주려면 block 또는 margin-top */
-  margin-top: 0.5rem; /* 위 간격 */
-  color: #007bff; /* 파란색 (Bootstrap 기준 파랑) */
-  font-size: 0.875rem; /* 선택적으로 글씨 조금 작게 */
+
+const NoticeText = styled.div`
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+  font-style: italic;
 `;
 
-// Tooltip 스타일 추가
-// const TooltipWrapper = styled.div`
-//   position: relative;
-//   display: flex;
-//   width: 100%;
-//   justify-content: center;
-// `;
-// const TooltipText = styled.div<{ $show?: boolean }>`
-//   visibility: ${(props) => (props.$show ? 'visible' : 'hidden')};
-//   opacity: ${(props) => (props.$show ? 1 : 0)};
-//   position: absolute;
-//   bottom: 100%;
-//   left: 50%;
-//   transform: translateX(-50%);
-//   background-color: rgba(78, 42, 132, 0.6);
-//   color: white;
-//   padding: 8px 12px;
-//   border-radius: 8px;
-//   font-size: 13px;
-//   white-space: nowrap;
-//   z-index: 10;
-//   transition: opacity 0.2s;
-//   pointer-events: none;
-//
-//   &::after {
-//     content: '';
-//     position: absolute;
-//     top: 100%;
-//     left: 50%;
-//     transform: translateX(-50%);
-//     border-width: 14px;
-//     border-style: solid;
-//     border-color: rgba(78, 42, 132, 0.5) transparent transparent transparent;
-//   }
-// `;
+const ActionButton = styled.button`
+  width: 100%;
+  background: linear-gradient(135deg, #6a4c93 0%, #4b2067 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(106, 76, 147, 0.3);
+
+  &:hover {
+    background: linear-gradient(135deg, #4b2067 0%, #3a1851 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(106, 76, 147, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
 
 interface MailingDashboardProps {
   offModify: () => void;
@@ -255,6 +350,9 @@ const MailingDashboard = ({
   // const [showPreview, setShowPreview] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // 알림 모달 상태 추가
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   // 메일 미리보기용 데이터
   const mailPreview: MailSection[] = [];
@@ -415,11 +513,13 @@ const MailingDashboard = ({
       onClose();
       return;
     }
+    
     // (기타: 개별 수신자 지정 등)
     const payload = makeMeetingInfoForMail();
     console.log('백엔드로 보낼 payload:', payload);
+    
     try {
-      await fetch(
+      const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`,
         {
           method: 'POST',
@@ -427,9 +527,17 @@ const MailingDashboard = ({
           body: JSON.stringify(payload),
         }
       );
-      onClose();
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // 메일 발송 성공 시 알림 모달 표시
+      setShowSuccessAlert(true);
+      return; // 성공 시 함수 종료
     } catch (e) {
       alert('메일 발송에 실패했습니다.');
+      return; // 실패 시에도 함수 종료
     }
   };
 
@@ -476,237 +584,208 @@ const MailingDashboard = ({
   };
 
   return (
-    <ModalOverlay>
-      <ModalBox>
-        <TopRow>
-          <MailIcon src="/images/sendmail.svg" alt="메일" />
-          <Title>회의 결과 수정 및 메일 발송</Title>
-        </TopRow>
+    <>
+      <ModalOverlay>
+        <ModalBox>
+          <PopupHeader>
+            <PopupIcon>
+              <FiMail />
+            </PopupIcon>
+            <PopupTitle>회의 결과 수정 및 메일 발송</PopupTitle>
+            <CloseButton onClick={onClose}>
+              <FiX size={18} />
+            </CloseButton>
+          </PopupHeader>
 
-        <ReceiverBox>
-          <SectionLabel>수신 대상자 선택</SectionLabel>
-          <CheckboxGroup>
-            {/* 프로젝트 참여자 전체 */}
-            <CheckboxLabel>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Checkbox
-                  checked={receivers.allProject}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setReceivers((prev) => ({
-                        ...prev,
-                        allProject: true,
-                        allAttendees: false,
-                        custom: false,
-                      }));
-                    } else {
-                      setReceivers((prev) => ({
-                        ...prev,
-                        allProject: false,
-                      }));
-                    }
-                  }}
-                />
-                프로젝트 참여자 전체 수신
-              </div>
-              {receivers.allProject && (
-                <div
-                  style={{
-                    paddingLeft: '36px',
-                    color: '#00b6b6',
-                    fontSize: 13,
-                    width: '100%',
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  {meetingInfo.project_users
-                    .map((user) => user.user_name)
-                    .join(', ')}
-                </div>
-              )}
-            </CheckboxLabel>
-
-            {/* 회의 참석자 전체 */}
-            <CheckboxLabel>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Checkbox
-                  checked={receivers.allAttendees}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setReceivers((prev) => ({
-                        ...prev,
-                        allProject: false,
-                        allAttendees: true,
-                        custom: false,
-                      }));
-                    } else {
-                      setReceivers((prev) => ({
-                        ...prev,
-                        allAttendees: false,
-                      }));
-                    }
-                  }}
-                />
-                회의 참석자 전체 수신
-              </div>
-              {receivers.allAttendees && (
-                <div
-                  style={{
-                    paddingLeft: '36px',
-                    color: '#00b6b6',
-                    fontSize: 13,
-                    width: '100%',
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  {meetingInfo.attendees.map((a) => a.user_name).join(', ')}
-                </div>
-              )}
-            </CheckboxLabel>
-
-            {/* 개별 수신자 지정 */}
-            <CheckboxLabel>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Checkbox
-                  checked={receivers.custom}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setReceivers((prev) => ({
-                        ...prev,
-                        allProject: false,
-                        allAttendees: false,
-                        custom: true,
-                      }));
-                    } else {
-                      setReceivers((prev) => ({
-                        ...prev,
-                        custom: false,
-                        selectedCustom: [],
-                      }));
-                    }
-                  }}
-                />
-                개별 수신자 지정
-              </div>
-              {receivers.custom && (
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '100%',
-                    paddingLeft: '36px',
-                    position: 'relative',
-                  }}
-                  ref={dropdownContainerRef}
-                >
-                  <ReceiverInput
-                    placeholder="이름 검색"
-                    value={receivers.customValue}
-                    onChange={(e) =>
-                      setReceivers((prev) => ({
-                        ...prev,
-                        customValue: e.target.value,
-                      }))
-                    }
-                    onKeyPress={handleKeyPress}
-                    onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  />
-                  {isDropdownOpen && filteredCandidates.length > 0 && (
-                    <div
-                      style={{
-                        background: '#fff',
-                        border: '1px solid #eee',
-                        borderRadius: 6,
-                        marginTop: 2,
-                        zIndex: 10,
-                        position: 'absolute',
-                        width: '65%',
-                        maxHeight: '150px',
-                        overflowY: 'auto',
+          <ScrollableBody>
+            <ReceiverSection>
+              <SectionLabel>수신 대상자 선택</SectionLabel>
+              <CheckboxGroup>
+                {/* 프로젝트 참여자 전체 */}
+                <CheckboxLabel>
+                  <CheckboxRow>
+                    <Checkbox
+                      checked={receivers.allProject}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setReceivers((prev) => ({
+                            ...prev,
+                            allProject: true,
+                            allAttendees: false,
+                            custom: false,
+                          }));
+                        } else {
+                          setReceivers((prev) => ({
+                            ...prev,
+                            allProject: false,
+                          }));
+                        }
                       }}
-                    >
-                      {filteredCandidates.map((user) => (
-                        <div
-                          key={user.user_id}
-                          style={{ padding: '4px 8px', cursor: 'pointer' }}
-                          onMouseDown={() => {
-                            setReceivers((r) => ({
-                              ...r,
-                              selectedCustom: [...r.selectedCustom, user],
-                              customValue: '',
-                            }));
-                            setIsDropdownOpen(false);
-                          }}
-                        >
-                          {user.user_name}
-                        </div>
-                      ))}
-                    </div>
+                    />
+                    프로젝트 참여자 전체 수신
+                  </CheckboxRow>
+                  {receivers.allProject && (
+                    <UserList>
+                      {meetingInfo.project_users
+                        .map((user) => user.user_name)
+                        .join(', ')}
+                    </UserList>
                   )}
-                  <div
-                    style={{
-                      marginTop: 4,
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(3, auto)',
-                      gap: '4px 8px',
-                      justifyContent: 'start',
-                    }}
-                  >
-                    {receivers.selectedCustom.map((user) => (
-                      <SelectedReceiver key={user.user_id}>
-                        {user.user_name}
-                        <RemoveButton
-                          onMouseDown={() => removeReceiver(user.user_id)}
-                        >
-                          ×
-                        </RemoveButton>
-                      </SelectedReceiver>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </CheckboxLabel>
-          </CheckboxGroup>
-        </ReceiverBox>
+                </CheckboxLabel>
 
-        {/* 안내 문구 */}
-        <NoticeText>
-          *수신 대상자를 선택하지 않으면 메일은 전송되지 않아요*
-        </NoticeText>
+                {/* 회의 참석자 전체 */}
+                <CheckboxLabel>
+                  <CheckboxRow>
+                    <Checkbox
+                      checked={receivers.allAttendees}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setReceivers((prev) => ({
+                            ...prev,
+                            allProject: false,
+                            allAttendees: true,
+                            custom: false,
+                          }));
+                        } else {
+                          setReceivers((prev) => ({
+                            ...prev,
+                            allAttendees: false,
+                          }));
+                        }
+                      }}
+                    />
+                    회의 참석자 전체 수신
+                  </CheckboxRow>
+                  {receivers.allAttendees && (
+                    <UserList>
+                      {meetingInfo.attendees.map((a) => a.user_name).join(', ')}
+                    </UserList>
+                  )}
+                </CheckboxLabel>
 
-        {/* 버튼 + 툴팁 */}
-        <BottomButton
-          onClick={() => {
-            const payload = makeMeetingInfoForMail();
-            console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
-            console.log(JSON.stringify(payload, null, 2));
-            onClose();
-            offModify();
-            handleSaveSummaryTasks();
-            handleSendMail();
-          }}
-        >
-          수정하고 메일 보내기
-        </BottomButton>
+                {/* 개별 수신자 지정 */}
+                <CheckboxLabel>
+                  <CheckboxRow>
+                    <Checkbox
+                      checked={receivers.custom}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setReceivers((prev) => ({
+                            ...prev,
+                            allProject: false,
+                            allAttendees: false,
+                            custom: true,
+                          }));
+                        } else {
+                          setReceivers((prev) => ({
+                            ...prev,
+                            custom: false,
+                            selectedCustom: [],
+                          }));
+                        }
+                      }}
+                    />
+                    개별 수신자 지정
+                  </CheckboxRow>
+                  {receivers.custom && (
+                    <CustomReceiverContainer ref={dropdownContainerRef}>
+                      <ReceiverInput
+                        placeholder="프로젝트 참여자 이름 검색"
+                        value={receivers.customValue}
+                        onChange={(e) =>
+                          setReceivers((prev) => ({
+                            ...prev,
+                            customValue: e.target.value,
+                          }))
+                        }
+                        onKeyPress={handleKeyPress}
+                        onClick={() => setIsDropdownOpen((prev) => !prev)}
+                      />
+                      {isDropdownOpen && filteredCandidates.length > 0 && (
+                        <Dropdown>
+                          {filteredCandidates.map((user) => (
+                            <DropdownItem
+                              key={user.user_id}
+                              onMouseDown={() => {
+                                setReceivers((r) => ({
+                                  ...r,
+                                  selectedCustom: [...r.selectedCustom, user],
+                                  customValue: '',
+                                }));
+                                setIsDropdownOpen(false);
+                              }}
+                            >
+                              {user.user_name}
+                            </DropdownItem>
+                          ))}
+                        </Dropdown>
+                      )}
+                      <SelectedReceivers>
+                        {receivers.selectedCustom.map((user) => (
+                          <SelectedReceiver key={user.user_id}>
+                            {user.user_name}
+                            <RemoveButton
+                              onMouseDown={() => removeReceiver(user.user_id)}
+                            >
+                              ×
+                            </RemoveButton>
+                          </SelectedReceiver>
+                        ))}
+                      </SelectedReceivers>
+                    </CustomReceiverContainer>
+                  )}
+                </CheckboxLabel>
+              </CheckboxGroup>
+            </ReceiverSection>
 
-        {/* 닫기 버튼 */}
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: 24,
-            right: 28,
-            background: 'none',
-            border: 'none',
-            fontSize: 22,
-            color: '#4B2067',
-            cursor: 'pointer',
-          }}
-        >
-          &times;
-        </button>
-      </ModalBox>
-    </ModalOverlay>
+            <NoticeText>
+              수신 대상자를 선택하지 않으면 메일은 전송되지 않습니다
+            </NoticeText>
+
+            <ActionButton
+              onClick={async () => {
+                const payload = makeMeetingInfoForMail();
+                console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
+                console.log(JSON.stringify(payload, null, 2));
+                
+                try {
+                  // 먼저 데이터 저장
+                  await handleSaveSummaryTasks();
+                  
+                  // 그 다음 메일 발송 (성공 시 알림 모달 표시)
+                  await handleSendMail();
+                  
+                  // 수정 모드 종료
+                  offModify();
+                } catch (error) {
+                  console.error('버튼 클릭 처리 중 오류:', error);
+                }
+              }}
+            >
+              
+              수정하고 메일 보내기
+            </ActionButton>
+          </ScrollableBody>
+        </ModalBox>
+      </ModalOverlay>
+
+      {/* 메일 발송 완료 알림 모달 */}
+      {showSuccessAlert && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 3000 }}>
+          <AlertModal
+            isOpen={showSuccessAlert}
+            onClose={() => {
+              setShowSuccessAlert(false);
+              onClose();
+            }}
+            type="success"
+            title="메일 발송 완료"
+            message="회의 결과가 성공적으로 발송되었습니다."
+            confirmText="확인"
+          />
+        </div>
+      )}
+    </>
   );
 };
 

@@ -10,17 +10,18 @@ import ResultContents from '../result/ResultContents';
 
 // 한국어 locale 등록
 registerLocale('ko', ko);
-import { useNavigate } from 'react-router-dom';
 import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg 임포트
 import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
 import { useAuth } from '../../contexts/AuthContext';
 
 // import { checkAuth } from "../../api/fetchAuthCheck";
-import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup'; // 팝업 컴포넌트 임포트
+import PreviewMeetingBanner from '../dashboard/popup/PreviewMeetingBanner.tsx';
+import AnalysisRequestedPopup from './conference_popup/AnalysisRequestedPopup';
 import type { ProjectResponse } from '../../types/project';
 import { fetchMeetingsWithUsers } from '../../api/fetchProject';
 import EditProjectPopup from './conference_popup/EditProjectPopup.tsx';
+
 import {
   ContainerWrapper,
   ContentWrapper,
@@ -79,15 +80,15 @@ function formatDateToKST(date: Date): string {
 
 // 파일 상단에 타입 정의가 없다면 추가
 type Attendee = {
-    user_id: string;
-    name: string;
-    email: string;
-    user_jobname: string;
+  user_id: string;
+  name: string;
+  email: string;
+  user_jobname: string;
 };
 
 const InsertConferenceInfo: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [isCompleted /*, setIsCompleted*/] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [subject, setSubject] = React.useState('');
@@ -111,8 +112,8 @@ const InsertConferenceInfo: React.FC = () => {
   const [projectMeetings, setProjectMeetings] = React.useState<any[]>([]); // 프로젝트 회의 목록 상태 추가
   const [selectedMeeting, setSelectedMeeting] = React.useState<any>(null); // 선택된 회의 상태 추가
   const [hostId, setHostId] = React.useState('');
-  const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
-    React.useState(false);
+  // const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
+  //   React.useState(false);
 
   // const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
@@ -140,6 +141,8 @@ const InsertConferenceInfo: React.FC = () => {
   // );
 
   const [showEditProjectPopup, setShowEditProjectPopup] = useState(false);
+  const [showBanner, setShowBanner] = React.useState(false);
+  const [showPopup, setShowPopup] = React.useState(false);
 
   const toggleExpanded = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -176,7 +179,7 @@ const InsertConferenceInfo: React.FC = () => {
     }
 
     if (!meetingDate) {
-      const md: any = meetingDate;
+      // const md: any = meetingDate;
       setError('입력하지 않은 필수 항목이 있습니다.');
       return false;
     }
@@ -259,7 +262,7 @@ const InsertConferenceInfo: React.FC = () => {
         console.log('통합 STT 서버 응답:', result);
 
         // 성공 시 팝업 띄우기
-        setShowAnalysisRequestedPopup(true);
+        // setShowAnalysisRequestedPopup(true);
 
         // 입력값 초기화
         setSubject('');
@@ -280,6 +283,7 @@ const InsertConferenceInfo: React.FC = () => {
         setIsLoading(false);
       }
     }
+    setShowBanner(true);
   };
 
   // 프로젝트 선택 핸들러 함수
@@ -749,7 +753,7 @@ const InsertConferenceInfo: React.FC = () => {
                         <StyledLabel htmlFor="meeting-date">
                           회의 일시 <span>*</span>
                         </StyledLabel>
-                        <DatePickerWrapper>
+                        <DatePickerWrapper style={{ zIndex: 1000 }}>
                           <DatePicker
                             selected={meetingDate}
                             onChange={(date: Date | null) =>
@@ -900,7 +904,7 @@ const InsertConferenceInfo: React.FC = () => {
                         <StyledLabel htmlFor="meeting-date">
                           회의 일시 <span>*</span>
                         </StyledLabel>
-                        <DatePickerWrapper>
+                        <DatePickerWrapper style={{ zIndex: 1000 }}>
                           <DatePicker
                             selected={meetingDate}
                             onChange={(date: Date | null) =>
@@ -1008,13 +1012,11 @@ const InsertConferenceInfo: React.FC = () => {
       {showNewProjectPopup && (
         <NewProjectPopup onClose={() => setShowNewProjectPopup(false)} />
       )}
-      {showAnalysisRequestedPopup && (
-        <AnalysisRequestedPopup
-          onClose={() => {
-            setShowAnalysisRequestedPopup(false);
-            navigate('/'); // 홈으로 이동
-          }}
-        />
+      {showBanner && !showPopup && (
+        <PreviewMeetingBanner onClick={() => setShowPopup(true)} />
+      )}
+      {showPopup && (
+        <AnalysisRequestedPopup onClose={() => setShowPopup(false)} />
       )}
       {showEditProjectPopup && editingProject && (
         <EditProjectPopup
