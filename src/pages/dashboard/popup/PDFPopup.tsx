@@ -176,17 +176,19 @@ const CheckboxGroup = styled.div`
   gap: 16px;
 `;
 
-const CheckboxLabel = styled.label`
+const CheckboxLabel = styled.label<{ $disabled?: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  cursor: pointer;
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
   padding: 12px;
   border-radius: 12px;
   transition: all 0.2s ease;
+  opacity: ${props => props.$disabled ? 0.7 : 1};
+  background: ${props => props.$disabled ? 'rgba(45, 17, 85, 0.02)' : 'transparent'};
   
   &:hover {
-    background: rgba(45, 17, 85, 0.05);
+    background: ${props => props.$disabled ? 'rgba(45, 17, 85, 0.02)' : 'rgba(45, 17, 85, 0.05)'};
   }
 `;
 
@@ -334,7 +336,7 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
   usePdfMakeScript();
   const [checked, setChecked] = useState({
     all: false,
-    info: false,
+    info: true, // 회의 기본 정보는 항상 체크됨
     summary: false,
     tasks: false,
     feedback: false,
@@ -359,10 +361,16 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
 
   const handleCheck = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.checked;
+    
+    // 회의 기본 정보(info)는 변경할 수 없음
+    if (key === 'info') {
+      return;
+    }
+    
     if (key === 'all') {
       setChecked({
         all: value,
-        info: value,
+        info: true, // 회의 기본 정보는 항상 true
         summary: value,
         tasks: value,
         feedback: value,
@@ -425,11 +433,12 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
             <ContentBox>
               <CheckboxGroup>
                 {PDF_ITEMS.map((item) => (
-                  <CheckboxLabel key={item.key}>
+                  <CheckboxLabel key={item.key} $disabled={item.key === 'info'}>
                     <Checkbox
                       checked={checked[item.key as keyof typeof checked]}
                       onChange={handleCheck(item.key)}
                       readOnly={item.key !== 'all' && checked.all}
+                      disabled={item.key === 'info'}
                     />
                     <CheckboxText>{item.label}</CheckboxText>
                   </CheckboxLabel>
@@ -438,7 +447,7 @@ const PDFPopup: React.FC<PDFPopupProps> = ({
               
               <NoticeText>
                 <FiCheck />
-                선택한 내용으로 PDF 문서가 생성됩니다
+                회의 기본 정보는 항상 포함되며, 추가로 선택한 내용이 PDF에 포함됩니다
               </NoticeText>
             </ContentBox>
           </Section>
