@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useRef, useEffect } from "react";
+import styled from "styled-components";
 
 const ChatContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     sans-serif;
 `;
 
@@ -14,8 +14,9 @@ const MessageContainer = styled.div`
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
+  height: 1000px;
   min-height: 100px;
-  max-height: 400px;
+  max-height: 1000px;
   overflow-y: auto;
   border: 1px solid #e0e0e0;
 `;
@@ -27,6 +28,7 @@ const UserMessage = styled.div`
   border-radius: 18px;
   margin-bottom: 10px;
   max-width: 70%;
+  width: fit-content; /* 텍스트 길이에 맞게 */
   margin-left: auto;
   word-wrap: break-word;
 `;
@@ -38,6 +40,7 @@ const BotMessage = styled.div`
   border-radius: 18px;
   margin-bottom: 10px;
   max-width: 70%;
+  width: fit-content; /* 텍스트 길이에 맞게 */
   border: 1px solid #e0e0e0;
   word-wrap: break-word;
   white-space: pre-wrap;
@@ -125,21 +128,21 @@ const Dot = styled.div`
 
 interface Message {
   id: string;
-  type: 'user' | 'bot';
+  type: "user" | "bot";
   content: string;
   timestamp: Date;
 }
 
 const StreamingChatComponent: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -151,20 +154,20 @@ const StreamingChatComponent: React.FC = () => {
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      type: 'user',
+      type: "user",
       content: inputValue.trim(),
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInputValue('');
+    setInputValue("");
     setIsLoading(true);
 
     const botMessageId = (Date.now() + 1).toString();
     const botMessage: Message = {
       id: botMessageId,
-      type: 'bot',
-      content: '',
+      type: "bot",
+      content: "",
       timestamp: new Date(),
     };
 
@@ -185,8 +188,16 @@ const StreamingChatComponent: React.FC = () => {
       setIsLoading(false);
 
       eventSource.onmessage = (event) => {
-        const char = event.data;
+        // 1. 백엔드에서 보낸 종료 신호를 확인합니다.
+        if (event.data === "[DONE]") {
+          console.log("Streaming finished.");
+          eventSource.close(); // EventSource 연결을 스스로 닫습니다.
+          setIsStreaming(false); // 스트리밍 상태를 false로 변경합니다.
+          return;
+        }
 
+        // 2. 종료 신호가 아닐 경우에만 메시지를 화면에 추가합니다.
+        const char = event.data;
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === botMessageId
@@ -197,7 +208,7 @@ const StreamingChatComponent: React.FC = () => {
       };
 
       eventSource.onerror = (error) => {
-        console.error('EventSource error:', error);
+        console.error("EventSource error:", error);
         eventSource.close();
         setIsStreaming(false);
 
@@ -209,7 +220,7 @@ const StreamingChatComponent: React.FC = () => {
                   ...msg,
                   content:
                     msg.content ||
-                    '죄송합니다. 응답을 가져오는 중 오류가 발생했습니다.',
+                    "죄송합니다. 응답을 가져오는 중 오류가 발생했습니다.",
                 }
               : msg
           )
@@ -217,7 +228,7 @@ const StreamingChatComponent: React.FC = () => {
       };
 
       eventSource.onopen = () => {
-        console.log('EventSource connection opened');
+        console.log("EventSource connection opened");
       };
 
       // 연결이 자동으로 닫힐 때 처리
@@ -227,7 +238,7 @@ const StreamingChatComponent: React.FC = () => {
         originalClose.call(this);
       };
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
       setIsLoading(false);
       setIsStreaming(false);
 
@@ -237,7 +248,7 @@ const StreamingChatComponent: React.FC = () => {
             ? {
                 ...msg,
                 content:
-                  '죄송합니다. 메시지를 전송하는 중 오류가 발생했습니다.',
+                  "죄송합니다. 메시지를 전송하는 중 오류가 발생했습니다.",
               }
             : msg
         )
@@ -246,7 +257,7 @@ const StreamingChatComponent: React.FC = () => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -263,6 +274,13 @@ const StreamingChatComponent: React.FC = () => {
 
   // 컴포넌트 언마운트 시 연결 정리
   useEffect(() => {
+    const initialBotMessage: Message = {
+      id: "initial-bot-message",
+      type: "bot",
+      content: "안녕하세요, Flowy AI 챗봇이에요. 무엇을 도와드릴까요?",
+      timestamp: new Date(),
+    };
+    setMessages([initialBotMessage]);
     return () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
@@ -272,11 +290,11 @@ const StreamingChatComponent: React.FC = () => {
 
   return (
     <ChatContainer>
-      <h1>AI 챗봇</h1>
+      <h1>Flowy AI 챗봇</h1>
 
       <MessageContainer>
         {messages.map((message) =>
-          message.type === 'user' ? (
+          message.type === "user" ? (
             <UserMessage key={message.id}>{message.content}</UserMessage>
           ) : (
             <BotMessage key={message.id}>
