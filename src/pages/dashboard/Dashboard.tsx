@@ -117,6 +117,9 @@ const Dashboard: React.FC = () => {
   // Floating 버튼 관련 state
   const [showFloatingButtons, setShowFloatingButtons] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
+  
+  // 버튼 잠금 상태 관리
+  const [isButtonsLocked, setIsButtonsLocked] = useState(false);
 
   // 현재 사용자가 PO(회의장)인지 확인하는 함수
   const isCurrentUserPO = () => {
@@ -126,10 +129,8 @@ const Dashboard: React.FC = () => {
     // console.log('PO role_id:', poRoleId);
 
     if (!user?.id || !projectUser.length || !poRoleId) {
-      // console.log('기본 조건 실패 - 권한 없음');
       return false;
     }
-
     const currentUserInMeeting = projectUser.find(
       (pu) => pu.user_id === user.id
     );
@@ -264,6 +265,38 @@ const Dashboard: React.FC = () => {
           // console.log('현재 사용자 ID:', user?.id);
           // console.log('회의 참석자들:', extractedUsers);
           // console.log('========================');
+          
+          // 데이터 로딩 완료 후 예정 회의 조회 (PO만)
+          // extractedUsers와 poRoleId가 모두 준비된 상태에서 권한 확인
+          if (user?.id && poRoleId && extractedUsers.length > 0) {
+            const currentUserInMeeting = extractedUsers.find((pu: any) => pu.user_id === user.id);
+            const isPO = currentUserInMeeting?.role_id === poRoleId;
+            
+            console.log('=== 예정 회의 조회 (데이터 로딩 후) ===');
+            console.log('현재 사용자 ID:', user.id);
+            console.log('PO role_id:', poRoleId);
+            console.log('회의 참석자들:', extractedUsers);
+            console.log('현재 사용자 회의 정보:', currentUserInMeeting);
+            console.log('PO 권한 여부:', isPO);
+            console.log('====================================');
+            
+            if (isPO) {
+              console.log('🔍 PO 권한 확인됨 - fetchPendingPreviewMeeting 호출 시작');
+              fetchPendingPreviewMeeting(meetingId)
+                .then((data) => {
+                  console.log('✅ fetchPendingPreviewMeeting 성공:', data);
+                  if ((Array.isArray(data) && data.length > 0) || (data && data.has_pending_meeting)) {
+                    setShowBanner(true);
+                    setPendingPreviewMeeting(Array.isArray(data) ? data[0] : data.pending_meeting);
+                  }
+                })
+                .catch((error) => {
+                  console.error('❌ 예정 회의 조회 실패:', error);
+                });
+            } else {
+              console.log('❌ PO 권한 없음 - fetchPendingPreviewMeeting 호출하지 않음');
+            }
+          }
         }
       });
       fetchDraftLogs(meetingId).then((data) => {
@@ -429,20 +462,17 @@ const Dashboard: React.FC = () => {
 
   const handleEditSummary = () => {
     setIsEditingSummary(true);
+    setIsButtonsLocked(true); // 다른 버튼들 잠금
   };
 
   // 예정 회의 팝업 핸들러들
   const handleConfirmPreviewMeeting = async (confirmData: any) => {
     try {
-      await confirmPreviewMeeting(
-        meetingId!,
-        pendingPreviewMeeting.meeting_id,
-        confirmData
-      );
-      setShowPreviewMeetingPopup(false);
+      await confirmPreviewMeeting(meetingId!, pendingPreviewMeeting.meeting_id, confirmData);
+      // 팝업 닫기는 PreviewMeetingPopup의 closeAlertModal에서 처리
+
       setShowBanner(false);
       setPendingPreviewMeeting(null);
-      alert('캘린더에 등록되었습니다!');
     } catch (error) {
       console.error('캘린더 등록 실패:', error);
       alert('캘린더 등록에 실패했습니다.');
@@ -452,10 +482,9 @@ const Dashboard: React.FC = () => {
   const handleRejectPreviewMeeting = async () => {
     try {
       await rejectPreviewMeeting(meetingId!, pendingPreviewMeeting.meeting_id);
-      setShowPreviewMeetingPopup(false);
+      // 팝업 닫기는 PreviewMeetingPopup의 closeAlertModal에서 처리
       setShowBanner(false);
       setPendingPreviewMeeting(null);
-      alert('예정 회의를 거부했습니다.');
     } catch (error) {
       console.error('예정 회의 거부 실패:', error);
       alert('거부 처리에 실패했습니다.');
@@ -541,8 +570,13 @@ const Dashboard: React.FC = () => {
             }}
           >
             <SpeechBubbleButton
-              onClick={() => setShowPDFPopup(true)}
-              style={{ marginLeft: 8 }}
+              onClick={() => !isButtonsLocked && setShowPDFPopup(true)}
+              style={{ 
+                marginLeft: 8,
+                opacity: isButtonsLocked ? 0.5 : 1,
+                cursor: isButtonsLocked ? 'not-allowed' : 'pointer'
+              }}
+              disabled={isButtonsLocked}
             >
               <img
                 src="/images/recommendfile.svg"
@@ -559,8 +593,13 @@ const Dashboard: React.FC = () => {
             &nbsp;&nbsp;&nbsp;
             {isCurrentUserPO() && (
               <SpeechBubbleButton
-                onClick={() => setShowMail_uneditPopup(true)}
-                style={{ marginLeft: 8 }}
+                onClick={() => !isButtonsLocked && setShowMail_uneditPopup(true)}
+                style={{ 
+                  marginLeft: 8,
+                  opacity: isButtonsLocked ? 0.5 : 1,
+                  cursor: isButtonsLocked ? 'not-allowed' : 'pointer'
+                }}
+                disabled={isButtonsLocked}
               >
                 <img
                   src="/images/sendmail.svg"
@@ -605,6 +644,7 @@ const Dashboard: React.FC = () => {
           <MailingDashboard
             offModify={() => setIsEditingSummary(false)}
             onClose={() => setShowMailPopup(false)}
+            onUnlockButtons={() => setIsButtonsLocked(false)} // 버튼 잠금 해제 콜백 추가
             summary={summaryLog}
             tasks={assignRole}
             feedback={feedback}
@@ -1243,7 +1283,14 @@ const Dashboard: React.FC = () => {
 
       {/* Floating 버튼들 */}
       <FloatingButtonContainer $isVisible={showFloatingButtons}>
-        <FloatingButtonLight onClick={() => setShowPDFPopup(true)}>
+        <FloatingButtonLight 
+          onClick={() => !isButtonsLocked && setShowPDFPopup(true)}
+          style={{ 
+            opacity: isButtonsLocked ? 0.5 : 1,
+            cursor: isButtonsLocked ? 'not-allowed' : 'pointer'
+          }}
+          disabled={isButtonsLocked}
+        >
           <img
             src="/images/recommendfile.svg"
             alt="PDF"
@@ -1253,7 +1300,14 @@ const Dashboard: React.FC = () => {
         </FloatingButtonLight>
 
         {isCurrentUserPO() && (
-          <FloatingButtonLight onClick={() => setShowMail_uneditPopup(true)}>
+          <FloatingButtonLight 
+            onClick={() => !isButtonsLocked && setShowMail_uneditPopup(true)}
+            style={{ 
+              opacity: isButtonsLocked ? 0.5 : 1,
+              cursor: isButtonsLocked ? 'not-allowed' : 'pointer'
+            }}
+            disabled={isButtonsLocked}
+          >
             <img
               src="/images/sendmail.svg"
               alt="메일"

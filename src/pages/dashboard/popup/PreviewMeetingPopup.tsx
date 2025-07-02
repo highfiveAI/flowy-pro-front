@@ -939,26 +939,17 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
   });
 
   const handleConfirm = () => {
-    // Date 객체를 ISO 문자열로 변환
-    const confirmData = {
-      ...editData,
-      meeting_date: editData.meeting_date.toISOString(),
-    };
-    onConfirm(confirmData);
-
-    // 등록 알림 모달 표시 (보라색)
+    // 알림 모달만 표시 (서버 API 호출하지 않음)
     setAlertModal({
       isOpen: true,
-      variant: 'success', // success variant를 보라색으로 사용
+      variant: 'success',
       title: '일정 등록 완료',
       message: '회의 일정이 캘린더에 성공적으로 등록되었습니다.',
     });
   };
 
   const handleReject = () => {
-    onReject();
-
-    // 삭제 알림 모달 표시
+    // 알림 모달만 표시 (서버 API 호출하지 않음)
     setAlertModal({
       isOpen: true,
       variant: 'danger',
@@ -968,8 +959,24 @@ const PreviewMeetingPopup: React.FC<PreviewMeetingPopupProps> = ({
   };
 
   const closeAlertModal = () => {
+    // 알림 모달 닫기
     setAlertModal((prev) => ({ ...prev, isOpen: false }));
-    onClose(); // 알림 모달 닫으면서 메인 팝업도 닫기
+    
+    // 어떤 액션이었는지에 따라 실제 API 호출
+    if (alertModal.variant === 'success') {
+      // 일정 등록 - onConfirm 호출
+      const confirmData = {
+        ...editData,
+        meeting_date: editData.meeting_date.toISOString(),
+      };
+      onConfirm(confirmData);
+    } else if (alertModal.variant === 'danger') {
+      // 일정 삭제 - onReject 호출
+      onReject();
+    }
+    
+    // 메인 팝업도 닫기
+    onClose();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
