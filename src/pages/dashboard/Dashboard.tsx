@@ -117,6 +117,9 @@ const Dashboard: React.FC = () => {
   // Floating 버튼 관련 state
   const [showFloatingButtons, setShowFloatingButtons] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
+  
+  // 버튼 잠금 상태 관리
+  const [isButtonsLocked, setIsButtonsLocked] = useState(false);
 
   // 현재 사용자가 PO(회의장)인지 확인하는 함수
   const isCurrentUserPO = () => {
@@ -459,6 +462,7 @@ const Dashboard: React.FC = () => {
 
   const handleEditSummary = () => {
     setIsEditingSummary(true);
+    setIsButtonsLocked(true); // 다른 버튼들 잠금
   };
 
   // 예정 회의 팝업 핸들러들
@@ -566,8 +570,13 @@ const Dashboard: React.FC = () => {
             }}
           >
             <SpeechBubbleButton
-              onClick={() => setShowPDFPopup(true)}
-              style={{ marginLeft: 8 }}
+              onClick={() => !isButtonsLocked && setShowPDFPopup(true)}
+              style={{ 
+                marginLeft: 8,
+                opacity: isButtonsLocked ? 0.5 : 1,
+                cursor: isButtonsLocked ? 'not-allowed' : 'pointer'
+              }}
+              disabled={isButtonsLocked}
             >
               <img
                 src="/images/recommendfile.svg"
@@ -584,8 +593,13 @@ const Dashboard: React.FC = () => {
             &nbsp;&nbsp;&nbsp;
             {isCurrentUserPO() && (
               <SpeechBubbleButton
-                onClick={() => setShowMail_uneditPopup(true)}
-                style={{ marginLeft: 8 }}
+                onClick={() => !isButtonsLocked && setShowMail_uneditPopup(true)}
+                style={{ 
+                  marginLeft: 8,
+                  opacity: isButtonsLocked ? 0.5 : 1,
+                  cursor: isButtonsLocked ? 'not-allowed' : 'pointer'
+                }}
+                disabled={isButtonsLocked}
               >
                 <img
                   src="/images/sendmail.svg"
@@ -630,6 +644,7 @@ const Dashboard: React.FC = () => {
           <MailingDashboard
             offModify={() => setIsEditingSummary(false)}
             onClose={() => setShowMailPopup(false)}
+            onUnlockButtons={() => setIsButtonsLocked(false)} // 버튼 잠금 해제 콜백 추가
             summary={summaryLog}
             tasks={assignRole}
             feedback={feedback}
@@ -1268,7 +1283,14 @@ const Dashboard: React.FC = () => {
 
       {/* Floating 버튼들 */}
       <FloatingButtonContainer $isVisible={showFloatingButtons}>
-        <FloatingButtonLight onClick={() => setShowPDFPopup(true)}>
+        <FloatingButtonLight 
+          onClick={() => !isButtonsLocked && setShowPDFPopup(true)}
+          style={{ 
+            opacity: isButtonsLocked ? 0.5 : 1,
+            cursor: isButtonsLocked ? 'not-allowed' : 'pointer'
+          }}
+          disabled={isButtonsLocked}
+        >
           <img
             src="/images/recommendfile.svg"
             alt="PDF"
@@ -1278,7 +1300,14 @@ const Dashboard: React.FC = () => {
         </FloatingButtonLight>
 
         {isCurrentUserPO() && (
-          <FloatingButtonLight onClick={() => setShowMail_uneditPopup(true)}>
+          <FloatingButtonLight 
+            onClick={() => !isButtonsLocked && setShowMail_uneditPopup(true)}
+            style={{ 
+              opacity: isButtonsLocked ? 0.5 : 1,
+              cursor: isButtonsLocked ? 'not-allowed' : 'pointer'
+            }}
+            disabled={isButtonsLocked}
+          >
             <img
               src="/images/sendmail.svg"
               alt="메일"
