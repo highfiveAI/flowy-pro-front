@@ -10,7 +10,6 @@ import ResultContents from '../result/ResultContents';
 
 // 한국어 locale 등록
 registerLocale('ko', ko);
-import { useNavigate } from 'react-router-dom';
 import NewMeetingIcon from '/images/newmeetingicon.svg'; // newmeetingicon.svg 임포트
 import AddProjectIcon from '/images/addprojecticon.svg'; // addprojecticon.svg 임포트
 import NewProjectPopup from './conference_popup/NewProjectPopup'; // Popup 컴포넌트 임포트
@@ -81,15 +80,25 @@ function formatDateToKST(date: Date): string {
 
 // 파일 상단에 타입 정의가 없다면 추가
 type Attendee = {
-    user_id: string;
-    name: string;
-    email: string;
-    user_jobname: string;
+  user_id: string;
+  name: string;
+  email: string;
+  user_jobname: string;
+};
+
+// 허용된 오디오 파일 형식
+const ALLOWED_AUDIO_FORMATS = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm'];
+
+// 파일 형식 검증 함수
+const isValidAudioFile = (file: File): boolean => {
+  const fileName = file.name.toLowerCase();
+  const fileExtension = fileName.split('.').pop();
+  return fileExtension ? ALLOWED_AUDIO_FORMATS.includes(fileExtension) : false;
 };
 
 const InsertConferenceInfo: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [isCompleted /*, setIsCompleted*/] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [subject, setSubject] = React.useState('');
@@ -113,8 +122,8 @@ const InsertConferenceInfo: React.FC = () => {
   const [projectMeetings, setProjectMeetings] = React.useState<any[]>([]); // 프로젝트 회의 목록 상태 추가
   const [selectedMeeting, setSelectedMeeting] = React.useState<any>(null); // 선택된 회의 상태 추가
   const [hostId, setHostId] = React.useState('');
-  const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
-    React.useState(false);
+  // const [showAnalysisRequestedPopup, setShowAnalysisRequestedPopup] =
+  //   React.useState(false);
 
   // const [hostEmail, setHostEmail] = useState('');
   const [hostJobname, setHostJobname] = useState('');
@@ -180,7 +189,7 @@ const InsertConferenceInfo: React.FC = () => {
     }
 
     if (!meetingDate) {
-      const md: any = meetingDate;
+      // const md: any = meetingDate;
       setError('입력하지 않은 필수 항목이 있습니다.');
       return false;
     }
@@ -263,7 +272,7 @@ const InsertConferenceInfo: React.FC = () => {
         console.log('통합 STT 서버 응답:', result);
 
         // 성공 시 팝업 띄우기
-        setShowAnalysisRequestedPopup(true);
+        // setShowAnalysisRequestedPopup(true);
 
         // 입력값 초기화
         setSubject('');
@@ -489,7 +498,16 @@ const InsertConferenceInfo: React.FC = () => {
     setIsDragging(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setFile(e.dataTransfer.files[0]);
+      const droppedFile = e.dataTransfer.files[0];
+      
+      // 파일 형식 검증
+      if (!isValidAudioFile(droppedFile)) {
+        setError('파일형식이 알맞지 않습니다');
+        return;
+      }
+      
+      setFile(droppedFile);
+      setError(''); // 성공 시 에러 메시지 초기화
       e.dataTransfer.clearData();
     }
   };
@@ -834,7 +852,7 @@ const InsertConferenceInfo: React.FC = () => {
                                 이곳에 파일을 드래그하거나 아이콘을 클릭하세요.
                               </DropZoneMessage>
                               <FileUploadWrapper>
-                                <FileUpload setFile={setFile} />
+                                <FileUpload setFile={setFile} setError={setError} />
                               </FileUploadWrapper>
                               <RecordUploadWrapper>
                                 <RecordInfoUpload setFile={setFile} />
@@ -979,7 +997,7 @@ const InsertConferenceInfo: React.FC = () => {
                                 이곳에 파일을 드래그하거나 아이콘을 클릭하세요.
                               </DropZoneMessage>
                               <FileUploadWrapper>
-                                <FileUpload setFile={setFile} />
+                                <FileUpload setFile={setFile} setError={setError} />
                               </FileUploadWrapper>
                               <RecordUploadWrapper>
                                 <RecordInfoUpload setFile={setFile} />

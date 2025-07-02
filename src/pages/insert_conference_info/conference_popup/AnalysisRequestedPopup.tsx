@@ -137,8 +137,8 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  
-  ${props => {
+
+  ${(props) => {
     switch (props.variant) {
       case 'secondary':
         return `
@@ -175,11 +175,11 @@ interface AnalysisRequestedPopupProps {
   onNotRegister?: () => void;
 }
 
-const AnalysisRequestedPopup: React.FC<AnalysisRequestedPopupProps> = ({ 
-  onClose, 
-  onLater, 
-  onRegister, 
-  onNotRegister 
+const AnalysisRequestedPopup: React.FC<AnalysisRequestedPopupProps> = ({
+  onClose,
+  onLater,
+  onRegister,
+  // onNotRegister
 }) => {
   return (
     <Modal>
@@ -195,20 +195,19 @@ const AnalysisRequestedPopup: React.FC<AnalysisRequestedPopupProps> = ({
             <FiX />
           </CloseButton>
         </ModalHeader>
-        
+
         <ModalBody>
           <Description>
-            회의 분석이 완료되었습니다.<br />
+            회의 분석이 완료되었습니다.
+            <br />
             <Highlight>[회의 관리]</Highlight>에서 결과를 확인하실 수 있습니다.
           </Description>
-          
+
           <ButtonContainer>
             <Button variant="secondary" onClick={onLater || onClose}>
               나중에
             </Button>
-            <Button onClick={onRegister || onClose}>
-              확인
-            </Button>
+            <Button onClick={onRegister || onClose}>확인</Button>
           </ButtonContainer>
         </ModalBody>
       </ModalContent>

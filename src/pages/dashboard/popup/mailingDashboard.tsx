@@ -289,6 +289,7 @@ const ActionButton = styled.button`
 interface MailingDashboardProps {
   offModify: () => void;
   onClose: () => void;
+  onUnlockButtons?: () => void; // 버튼 잠금 해제 콜백
   summary: SummaryLog | null;
   tasks: any;
   feedback: Feedback[];
@@ -315,6 +316,7 @@ type MailSection =
 const MailingDashboard = ({
   offModify,
   onClose,
+  onUnlockButtons,
   summary,
   tasks,
   feedback,
@@ -757,6 +759,9 @@ const MailingDashboard = ({
                   
                   // 수정 모드 종료
                   offModify();
+                  
+                  // 버튼 잠금 해제
+                  onUnlockButtons?.();
                 } catch (error) {
                   console.error('버튼 클릭 처리 중 오류:', error);
                 }

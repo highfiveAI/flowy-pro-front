@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 export const Container = styled.div`
   min-height: 100vh;
@@ -33,7 +33,7 @@ export const MeetingAnalysisHeader = styled.div`
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     transform: translateY(-2px);
   }
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 20px;
@@ -49,7 +49,7 @@ export const MeetingAnalysisTitle = styled.h2`
   margin: 0;
   font-weight: 700;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  
+
   @media (max-width: 768px) {
     font-size: 1.5rem;
   }
@@ -85,7 +85,11 @@ export const SectionHeader = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
     pointer-events: none;
   }
 `;
@@ -103,7 +107,7 @@ export const SectionTitle = styled.h3`
 export const SectionBody = styled.div`
   padding: 32px 28px;
   background: #fff;
-  
+
   @media (max-width: 768px) {
     padding: 24px 20px;
   }
@@ -143,12 +147,12 @@ export const BasicInfoGrid = styled.div`
   display: grid;
   grid-template-columns: 150px 1fr;
   gap: 20px 32px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 120px 1fr;
     gap: 16px 24px;
   }
-  
+
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -159,7 +163,7 @@ export const InfoLabel = styled.div`
   font-weight: 600;
   color: #351745;
   font-size: 0.9375rem;
-  
+
   @media (max-width: 576px) {
     margin-bottom: 4px;
   }
@@ -224,7 +228,7 @@ export const TaskGridContainer = styled.div`
   max-height: 650px;
   overflow-y: auto;
   padding: 24px;
-  
+
   &::-webkit-scrollbar {
     width: 10px;
   }
@@ -240,7 +244,7 @@ export const TaskGridContainer = styled.div`
   &::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, #4a1d5a 0%, #5d2470 100%);
   }
-  
+
   @media (max-width: 992px) {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
@@ -254,40 +258,33 @@ export const TaskGridContainer = styled.div`
 
 export const TaskCard = styled.div<{ $isUnassigned?: boolean }>`
   border-radius: 16px;
-  border: 2px solid ${(props) => 
-    props.$isUnassigned 
-      ? 'rgba(210, 0, 0, 0.3)' 
-      : 'rgba(53, 23, 69, 0.1)'
-  };
+  border: 2px solid
+    ${(props) =>
+      props.$isUnassigned ? 'rgba(210, 0, 0, 0.3)' : 'rgba(53, 23, 69, 0.1)'};
   background: ${(props) =>
-    props.$isUnassigned 
-      ? 'rgba(210, 0, 0, 0.02)' 
-      : 'linear-gradient(135deg, #fff 0%, #f8f9ff 100%)'
-  };
+    props.$isUnassigned
+      ? 'rgba(210, 0, 0, 0.02)'
+      : 'linear-gradient(135deg, #fff 0%, #f8f9ff 100%)'};
   padding: 24px;
   min-height: 220px;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  cursor: ${(props) => props.draggable ? 'grab' : 'default'};
+  cursor: ${(props) => (props.draggable ? 'grab' : 'default')};
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: ${(props) =>
       props.$isUnassigned
         ? '0 8px 30px rgba(210, 0, 0, 0.15)'
-        : '0 8px 30px rgba(53, 23, 69, 0.15)'
-    };
+        : '0 8px 30px rgba(53, 23, 69, 0.15)'};
     border-color: ${(props) =>
-      props.$isUnassigned
-        ? 'rgba(210, 0, 0, 0.4)'
-        : 'rgba(53, 23, 69, 0.2)'
-    };
+      props.$isUnassigned ? 'rgba(210, 0, 0, 0.4)' : 'rgba(53, 23, 69, 0.2)'};
   }
 
   &:active {
-    cursor: ${(props) => props.draggable ? 'grabbing' : 'default'};
+    cursor: ${(props) => (props.draggable ? 'grabbing' : 'default')};
   }
 `;
 
@@ -297,11 +294,9 @@ export const TaskCardHeader = styled.div<{ $isUnassigned?: boolean }>`
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 2px solid ${(props) => 
-    props.$isUnassigned 
-      ? 'rgba(210, 0, 0, 0.1)' 
-      : 'rgba(53, 23, 69, 0.1)'
-  };
+  border-bottom: 2px solid
+    ${(props) =>
+      props.$isUnassigned ? 'rgba(210, 0, 0, 0.1)' : 'rgba(53, 23, 69, 0.1)'};
 `;
 
 export const TaskCardTitle = styled.h4<{ $isUnassigned?: boolean }>`
@@ -378,7 +373,7 @@ export const RecommendFileCard = styled.div`
   border-radius: 12px;
   border-left: 4px solid #351745;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
     transform: translateY(-2px);
@@ -499,7 +494,7 @@ export const InputWrapper = styled.div`
   border-radius: 16px;
   border: 1px solid rgba(53, 23, 69, 0.05);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 12px;
@@ -542,19 +537,18 @@ export const AddButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(53, 23, 69, 0.2);
-  
+
   &:hover {
-    background: linear-gradient(135deg, #e0c6f7 0%,rgb(202, 186, 231) 100%);
+    background: linear-gradient(135deg, #e0c6f7 0%, rgb(202, 186, 231) 100%);
     color: #351745;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(177, 156, 217, 0.3);
   }
-  
 
   &:active {
     transform: translateY(-1px);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -598,8 +592,9 @@ export const RedSection = styled.div<{ isEditing?: boolean }>`
   border-radius: 0.5rem;
   position: relative;
   z-index: 1;
-  border: 2px solid ${({ isEditing }) => (isEditing ? '#b19cd9' : 'transparent')};
-  animation: ${({ isEditing }) => isEditing ? moveGlow : 'none'} 2s infinite;
+  border: 2px solid
+    ${({ isEditing }) => (isEditing ? '#b19cd9' : 'transparent')};
+  animation: ${({ isEditing }) => (isEditing ? moveGlow : 'none')} 2s infinite;
   background: ${({ isEditing }) =>
     isEditing
       ? 'linear-gradient(135deg, #f8f9ff 60%, #e8e0ee 100%)'
@@ -620,7 +615,7 @@ export const FloatingButtonContainer = styled.div<{ $isVisible: boolean }>`
   opacity: ${({ $isVisible }) => ($isVisible ? 1 : 0)};
   visibility: ${({ $isVisible }) => ($isVisible ? 'visible' : 'hidden')};
   transition: all 0.3s ease-in-out;
-  
+
   @media (max-width: 768px) {
     right: 16px;
     gap: 8px;
@@ -708,21 +703,19 @@ export const EditModeInput = styled.input`
   font-size: 0.9375rem;
   color: #333;
   transition: all 0.2s ease;
-  box-shadow: inset 0 2px 4px rgba(53, 23, 69, 0.1), 
-              0 2px 8px rgba(53, 23, 69, 0.15);
+  box-shadow: inset 0 2px 4px rgba(53, 23, 69, 0.1),
+    0 2px 8px rgba(53, 23, 69, 0.15);
   box-sizing: border-box;
-
 
   &:focus {
     outline: none;
     border-color: #4a1d5a;
     background: #fff;
     box-shadow: inset 0 2px 6px rgba(53, 23, 69, 0.15),
-                0 4px 20px rgba(53, 23, 69, 0.25);
+      0 4px 20px rgba(53, 23, 69, 0.25);
     transform: scale(1.02);
   }
 
-  
   &::placeholder {
     color: #9ca3af;
     font-style: italic;
@@ -733,10 +726,11 @@ export const EditModeInput = styled.input`
   animation: subtle-pulse 2s ease-in-out infinite;
 
   @keyframes subtle-pulse {
-    0%, 100% { 
+    0%,
+    100% {
       border-color: #351745;
     }
-    50% { 
+    50% {
       border-color: #4a1d5a;
     }
   }

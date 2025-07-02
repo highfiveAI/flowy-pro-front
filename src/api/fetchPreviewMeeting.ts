@@ -1,6 +1,13 @@
 // 1. 확인 대기 중인 예정 회의 조회
 export const fetchPendingPreviewMeeting = async (meetingId: string) => {
   try {
+    console.log('🔍 fetchPendingPreviewMeeting 시작');
+    console.log('환경변수 VITE_API_URL:', import.meta.env.VITE_API_URL);
+    console.log('meetingId:', meetingId);
+    console.log('현재 환경:', import.meta.env.MODE);
+    console.log('개발 환경 여부:', import.meta.env.DEV);
+    console.log('프로덕션 환경 여부:', import.meta.env.PROD);
+    
     const url = `${import.meta.env.VITE_API_URL}/api/v1/meetings/pending?meeting_id=${meetingId}`;
     console.log('🔍 API 요청 URL:', url);
     
