@@ -271,8 +271,8 @@ const InsertConferenceInfo: React.FC = () => {
         const result = await response.json();
         console.log('통합 STT 서버 응답:', result);
 
-        // 성공 시 팝업 띄우기
-        // setShowAnalysisRequestedPopup(true);
+        // 성공 시 바로 분석 완료 팝업 띄우기
+        setShowPopup(true);
 
         // 입력값 초기화
         setSubject('');
@@ -293,7 +293,6 @@ const InsertConferenceInfo: React.FC = () => {
         setIsLoading(false);
       }
     }
-    setShowBanner(true);
   };
 
   // 프로젝트 선택 핸들러 함수
@@ -772,7 +771,7 @@ const InsertConferenceInfo: React.FC = () => {
                         <StyledLabel htmlFor="meeting-date">
                           회의 일시 <span>*</span>
                         </StyledLabel>
-                        <DatePickerWrapper style={{ zIndex: 1000 }}>
+                        <DatePickerWrapper>
                           <DatePicker
                             selected={meetingDate}
                             onChange={(date: Date | null) =>
@@ -923,7 +922,7 @@ const InsertConferenceInfo: React.FC = () => {
                         <StyledLabel htmlFor="meeting-date">
                           회의 일시 <span>*</span>
                         </StyledLabel>
-                        <DatePickerWrapper style={{ zIndex: 1000 }}>
+                        <DatePickerWrapper>
                           <DatePicker
                             selected={meetingDate}
                             onChange={(date: Date | null) =>
