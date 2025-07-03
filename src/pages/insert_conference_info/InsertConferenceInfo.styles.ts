@@ -421,7 +421,7 @@ export const NewProjectWrapper = styled.div`
 export const MeetingList = styled.div`
   .meeting-list {
     margin-top: 10px;
-    max-height: 180px;
+    max-height: 200px;
     overflow-y: auto;
   }
 
@@ -517,6 +517,7 @@ export const StyledUploadButton = styled.button`
 `;
 
 export const PageWrapper = styled.div`
+  cursor: default;
   display: flex;
   width: 100%;
   min-height: 100vh;
