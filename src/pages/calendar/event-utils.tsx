@@ -21,6 +21,7 @@ export type CalendarEvent = {
   completed?: boolean;
   created_at: string;
   updated_at: string;
+  meeting_id?: string; // calendar와 meeting 1:1 연동
 };
 
 export const INITIAL_EVENTS: CalendarEvent[] = [

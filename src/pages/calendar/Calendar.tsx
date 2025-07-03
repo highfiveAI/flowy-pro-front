@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import type { CalendarEvent } from './event-utils';
+import type { CalendarEvent as OriginalCalendarEvent } from './event-utils';
 import { isSameDay } from 'date-fns';
 
 import {
@@ -54,6 +54,10 @@ type ProjectUser = {
   name: string;
   email: string;
   user_jobname: string;
+};
+
+type CalendarEvent = OriginalCalendarEvent & {
+    meeting_id?: string;
 };
 
 function formatYearMonth(date: Date) {
@@ -432,23 +436,30 @@ export default function CalendarPage() {
 
   // completed만 수정하는 간단한 핸들러
   const handleEditCompleted = (id: string, completed: boolean) => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/v1/calendar/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
+    // 해당 id로 이벤트 찾기
+    const event = events.find(ev => ev.id === id);
+    // meeting_id가 있으면 body에 포함
+    const body: any = {
         calendar_id: id,
         completed: completed,
-      }),
+    };
+    if (event && event.meeting_id) {
+        body.meeting_id = event.meeting_id;
+    }
+    fetch(`${import.meta.env.VITE_API_URL}/api/v1/calendar/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        setEvents((prev) =>
-          prev.map((ev) =>
-            ev.id === id ? { ...ev, completed: data.completed } : ev
-          )
-        );
-      });
+        .then((res) => res.json())
+        .then((data) => {
+            setEvents((prev) =>
+                prev.map((ev) =>
+                    ev.id === id ? { ...ev, completed: data.completed } : ev
+                )
+            );
+        });
   };
 
   // 팝업 닫기 함수 추가 (팝업이 닫힐 때 포커스 해제)
