@@ -88,21 +88,21 @@ const ScrollableBody = styled.div`
   padding: 32px 28px;
   overflow-y: auto;
   flex: 1;
-  
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
   }
@@ -262,10 +262,14 @@ const NoticeText = styled.div`
   font-style: italic;
 `;
 
-const ActionButton = styled.button`
-  width: 100%;
-  background: linear-gradient(135deg, #6a4c93 0%, #4b2067 100%);
-  color: white;
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+`;
+
+const ActionButton = styled.button<{ variant?: 'primary' | 'secondary' }>`
+  flex: 1;
   border: none;
   border-radius: 12px;
   padding: 16px 0;
@@ -273,13 +277,31 @@ const ActionButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(106, 76, 147, 0.3);
 
-  &:hover {
-    background: linear-gradient(135deg, #4b2067 0%, #3a1851 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(106, 76, 147, 0.4);
-  }
+  ${(props) =>
+    props.variant === 'secondary'
+      ? `
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+    
+    &:hover {
+      background: #e9ecef;
+      color: #495057;
+      transform: translateY(-1px);
+    }
+  `
+      : `
+    background: linear-gradient(135deg, #6a4c93 0%, #4b2067 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(106, 76, 147, 0.3);
+    
+    &:hover {
+      background: linear-gradient(135deg, #4b2067 0%, #3a1851 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(106, 76, 147, 0.4);
+    }
+  `}
 
   &:active {
     transform: translateY(0);
@@ -289,6 +311,7 @@ const ActionButton = styled.button`
 interface MailingDashboardProps {
   offModify: () => void;
   onClose: () => void;
+  onUnlockButtons?: () => void; // 버튼 잠금 해제 콜백
   summary: SummaryLog | null;
   tasks: any;
   feedback: Feedback[];
@@ -315,6 +338,7 @@ type MailSection =
 const MailingDashboard = ({
   offModify,
   onClose,
+  onUnlockButtons,
   summary,
   tasks,
   feedback,
@@ -353,6 +377,7 @@ const MailingDashboard = ({
 
   // 알림 모달 상태 추가
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   // 메일 미리보기용 데이터
   const mailPreview: MailSection[] = [];
@@ -495,29 +520,35 @@ const MailingDashboard = ({
   };
 
   // db update용 함수(구현 예정)
-  const handleDbUpdate = () => {
-    // db에 update 기능 구현 예정
+  // const handleDbUpdate = () => {
+  //   // db에 update 기능 구현 예정
+  // };
+
+  // 수신 대상자 유효성 검사 함수
+  const validateReceivers = () => {
+    // 1) 아무것도 체크 안 한 경우
+    if (!receivers.allProject && !receivers.allAttendees && !receivers.custom) {
+      return false;
+    }
+    // 2) 개별 수신자 지정만 체크하고 아무도 선택 안 한 경우
+    if (receivers.custom && receivers.selectedCustom.length === 0) {
+      return false;
+    }
+    return true;
   };
 
   // 메일 발송 및 조건 분기 함수
   const handleSendMail = async () => {
-    // 1) 아무것도 체크 안 한 경우
-    if (!receivers.allProject && !receivers.allAttendees && !receivers.custom) {
-      // 아무도 선택하지 않았으면 메일을 보내지 않고 함수 종료
-      onClose();
+    if (!validateReceivers()) {
+      // 유효성 검사 실패 시 오류 모달 표시
+      setShowErrorAlert(true);
       return;
     }
-    // 2) 개별 수신자 지정만 체크하고 아무도 선택 안 한 경우
-    if (receivers.custom && receivers.selectedCustom.length === 0) {
-      handleDbUpdate();
-      onClose();
-      return;
-    }
-    
+
     // (기타: 개별 수신자 지정 등)
     const payload = makeMeetingInfoForMail();
     console.log('백엔드로 보낼 payload:', payload);
-    
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`,
@@ -527,11 +558,11 @@ const MailingDashboard = ({
           body: JSON.stringify(payload),
         }
       );
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       // 메일 발송 성공 시 알림 모달 표시
       setShowSuccessAlert(true);
       return; // 성공 시 함수 종료
@@ -539,6 +570,13 @@ const MailingDashboard = ({
       alert('메일 발송에 실패했습니다.');
       return; // 실패 시에도 함수 종료
     }
+  };
+
+  // 수정 취소 핸들러
+  const handleCancel = () => {
+    offModify();
+    onUnlockButtons?.(); // 버튼 잠금 해제
+    onClose();
   };
 
   // 받아온 assignRole(할 일 목록) insert할 때 정형화 된 형태로 변경
@@ -742,36 +780,61 @@ const MailingDashboard = ({
               수신 대상자를 선택하지 않으면 메일은 전송되지 않습니다
             </NoticeText>
 
-            <ActionButton
-              onClick={async () => {
-                const payload = makeMeetingInfoForMail();
-                console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
-                console.log(JSON.stringify(payload, null, 2));
-                
-                try {
-                  // 먼저 데이터 저장
-                  await handleSaveSummaryTasks();
-                  
-                  // 그 다음 메일 발송 (성공 시 알림 모달 표시)
-                  await handleSendMail();
-                  
-                  // 수정 모드 종료
-                  offModify();
-                } catch (error) {
-                  console.error('버튼 클릭 처리 중 오류:', error);
-                }
-              }}
-            >
-              
-              수정하고 메일 보내기
-            </ActionButton>
+            <ButtonContainer>
+              <ActionButton variant="secondary" onClick={handleCancel}>
+                수정 취소
+              </ActionButton>
+
+              <ActionButton
+                onClick={async () => {
+                  // 유효성 검사
+                  if (!validateReceivers()) {
+                    setShowErrorAlert(true);
+                    return;
+                  }
+
+                  const payload = makeMeetingInfoForMail();
+                  console.log(
+                    '==== [메일로 보낼 최종 meeting_info payload] ===='
+                  );
+                  console.log(JSON.stringify(payload, null, 2));
+
+                  try {
+                    // 먼저 데이터 저장
+                    await handleSaveSummaryTasks();
+
+                    // 그 다음 메일 발송 (성공 시 알림 모달 표시)
+                    await handleSendMail();
+
+                    // 수정 모드 종료
+                    offModify();
+
+                    // 버튼 잠금 해제
+                    onUnlockButtons?.();
+                  } catch (error) {
+                    console.error('버튼 클릭 처리 중 오류:', error);
+                  }
+                }}
+              >
+                수정하고 메일 보내기
+              </ActionButton>
+            </ButtonContainer>
           </ScrollableBody>
         </ModalBox>
       </ModalOverlay>
 
       {/* 메일 발송 완료 알림 모달 */}
       {showSuccessAlert && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 3000 }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 3000,
+          }}
+        >
           <AlertModal
             isOpen={showSuccessAlert}
             onClose={() => {
@@ -781,6 +844,29 @@ const MailingDashboard = ({
             type="success"
             title="메일 발송 완료"
             message="회의 결과가 성공적으로 발송되었습니다."
+            confirmText="확인"
+          />
+        </div>
+      )}
+
+      {/* 수신자 선택 오류 알림 모달 */}
+      {showErrorAlert && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 3000,
+          }}
+        >
+          <AlertModal
+            isOpen={showErrorAlert}
+            onClose={() => setShowErrorAlert(false)}
+            type="error"
+            title="수신자 설정 필요"
+            message="수신 대상자를 선택해야 수정 내용이 저장됩니다."
             confirmText="확인"
           />
         </div>

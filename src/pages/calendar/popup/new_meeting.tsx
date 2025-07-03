@@ -7,10 +7,9 @@ import {
   FiCalendar,
   FiSearch,
   FiUser,
-  FiChevronDown,
-  FiChevronUp,
+  // FiChevronDown,
+  // FiChevronUp,
 } from 'react-icons/fi';
-import { RiVipCrownFill } from 'react-icons/ri';
 
 // 한국어 locale 등록
 registerLocale('ko', ko);
@@ -95,27 +94,27 @@ const UserSelectionPanel = styled.div`
   border: 1px solid rgba(0, 180, 186, 0.1);
 `;
 
-const HostSelectionSection = styled.div`
-  margin-bottom: 24px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid rgba(0, 180, 186, 0.1);
-`;
+// const HostSelectionSection = styled.div`
+//   margin-bottom: 24px;
+//   padding-bottom: 20px;
+//   border-bottom: 2px solid rgba(0, 180, 186, 0.1);
+// `;
 
-const HostSectionTitle = styled.h4`
-  color: #00798d;
-  margin-bottom: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  user-select: none;
+// const HostSectionTitle = styled.h4`
+//   color: #00798d;
+//   margin-bottom: 12px;
+//   font-size: 1rem;
+//   font-weight: 600;
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+//   cursor: pointer;
+//   user-select: none;
 
-  &:hover {
-    color: #00b4ba;
-  }
-`;
+//   &:hover {
+//     color: #00b4ba;
+//   }
+// `;
 
 const AttendeesSectionTitle = styled.h4`
   color: #00798d;
@@ -271,17 +270,17 @@ const UserEmail = styled.span`
   margin-left: 6px;
 `;
 
-const HostBadge = styled.div`
-  background: linear-gradient(135deg, #00b4ba, #009ca2);
-  color: white;
-  font-size: 0.65rem;
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-`;
+// const HostBadge = styled.div`
+//   background: linear-gradient(135deg, #00b4ba, #009ca2);
+//   color: white;
+//   font-size: 0.65rem;
+//   padding: 2px 4px;
+//   border-radius: 3px;
+//   font-weight: 500;
+//   display: flex;
+//   align-items: center;
+//   gap: 2px;
+// `;
 
 const SelectedCount = styled.div`
   background: rgba(0, 180, 186, 0.1);
@@ -564,9 +563,6 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
   const [subject, setSubject] = useState('');
   const [meetingDate, setMeetingDate] = useState<Date | null>(null);
   const [agenda, setAgenda] = useState('');
-  const [hostId, setHostId] = useState('');
-  // const [hostEmail, setHostEmail] = useState('');
-  // const [hostJobname, setHostJobname] = useState('');
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -576,7 +572,7 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   // 회의장 선택 토글 상태
-  const [isHostSectionExpanded, setIsHostSectionExpanded] = useState(true);
+  // const [isHostSectionExpanded, setIsHostSectionExpanded] = useState(true);
 
   // 필터링된 사용자 목록 (검색어 적용)
   const filteredUsers = projectUsers.filter(
@@ -606,24 +602,6 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
     }
   };
 
-  const handleHostSelect = (user_id: string) => {
-    setHostId(user_id);
-    const selectedUser = projectUsers.find((u) => u.user_id === user_id);
-    if (selectedUser) {
-      // setHostEmail(selectedUser.email || '');
-      // setHostJobname(selectedUser.user_jobname || '');
-
-      // 회의장으로 선택된 사용자는 참석자 목록에서 제거
-      setAttendees((prev) => prev.filter((a) => a.user_id !== user_id));
-
-      // 회의장 선택 후 토글 닫기
-      setIsHostSectionExpanded(false);
-    } else {
-      // setHostEmail('');
-      // setHostJobname('');
-    }
-  };
-
   // 전체 선택/해제 핸들러
   const handleSelectAll = () => {
     if (allSelected) {
@@ -631,10 +609,9 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
       setAttendees([]);
       setAllSelected(false);
     } else {
-      // 전체 선택: hostId 제외한 모든 사용자를 참석자로 선택
-      const availableUsers = projectUsers.filter((u) => u.user_id !== hostId);
+      // 전체 선택: 모든 사용자를 참석자로 선택
       setAttendees(
-        availableUsers.map((u) => ({
+        projectUsers.map((u) => ({
           user_id: u.user_id,
           name: u.name,
           email: u.email,
@@ -647,39 +624,14 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
 
   // 전체 선택 상태 체크
   useEffect(() => {
-    const availableUsers = projectUsers.filter((u) => u.user_id !== hostId);
     const selectedCount = attendees.length;
-    setAllSelected(
-      selectedCount > 0 && selectedCount === availableUsers.length
-    );
-  }, [attendees, hostId, projectUsers]);
-
-  // 회의장이 선택되지 않은 경우 토글 자동 열기
-  useEffect(() => {
-    if (!hostId) {
-      setIsHostSectionExpanded(true);
-    }
-  }, [hostId]);
-
-  // 전체 선택 상태 동기화
-  React.useEffect(() => {
-    const restUsers = projectUsers.filter((u) => u.user_id !== hostId);
-    const selectedIds = attendees.map((a) => a.user_id).filter(Boolean);
-    setAllSelected(
-      selectedIds.length === restUsers.length &&
-        restUsers.length > 0 &&
-        selectedIds.every((id) => restUsers.some((u) => u.user_id === id))
-    );
-  }, [attendees, projectUsers, hostId]);
+    setAllSelected(selectedCount > 0 && selectedCount === projectUsers.length);
+  }, [attendees, projectUsers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subject.trim() || !meetingDate) {
       setError('필수 항목을 입력해주세요.');
-      return;
-    }
-    if (!hostId) {
-      setError('회의장을 선택해주세요.');
       return;
     }
     // 참석자 유효성 검사
@@ -688,7 +640,7 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
       setError('모든 참석자를 선택해주세요.');
       return;
     }
-    // 최소 2명 이상의 참석자 확인 (회의장 + 최소 1명의 참석자)
+    // 최소 1명의 참석자 확인
     if (attendees.filter((a) => a.user_id).length < 1) {
       setError('최소 1명의 참석자가 필요합니다.');
       return;
@@ -696,16 +648,11 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
     setIsSubmitting(true);
     setError('');
     try {
-      // const meeting_date = new Date(meetingDate).toISOString();
-
-      // 회의장과 참석자를 합쳐서 users 배열 생성
-      const users = [
-        { user_id: hostId, role_id: '20ea65e2-d3b7-4adb-a8ce-9e67a2f21999' }, // 회의장
-        ...attendees.map((a) => ({
-          user_id: a.user_id,
-          role_id: 'a55afc22-b4c1-48a4-9513-c66ff6ed3965', // 참석자
-        })),
-      ];
+      // 모든 사용자를 참석자로
+      const users = attendees.map((a) => ({
+        user_id: a.user_id,
+        role_id: 'a55afc22-b4c1-48a4-9513-c66ff6ed3965', // 참석자 role_id
+      }));
 
       const body = {
         project_id: projectId,
@@ -810,67 +757,6 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
                 회의 참석자 <span style={{ color: '#dc3545' }}>*</span>
               </StyledLabel>
               <UserSelectionPanel>
-                {/* 회의장 선택 섹션 */}
-                <HostSelectionSection>
-                  <HostSectionTitle
-                    onClick={() =>
-                      setIsHostSectionExpanded(!isHostSectionExpanded)
-                    }
-                  >
-                    <RiVipCrownFill /> 회의장 선택
-                    {hostId && !isHostSectionExpanded && (
-                      <span
-                        style={{
-                          fontSize: '0.85rem',
-                          color: '#6b7280',
-                          fontWeight: '400',
-                          marginLeft: '8px',
-                        }}
-                      >
-                        (
-                        {projectUsers.find((u) => u.user_id === hostId)?.name ||
-                          '선택됨'}
-                        )
-                      </span>
-                    )}
-                    {isHostSectionExpanded ? (
-                      <FiChevronUp />
-                    ) : (
-                      <FiChevronDown />
-                    )}
-                  </HostSectionTitle>
-                  {isHostSectionExpanded && (
-                    <UserGrid>
-                      {projectUsers.map((user) => (
-                        <UserCard
-                          key={user.user_id}
-                          $selected={hostId === user.user_id}
-                          $isHost={hostId === user.user_id}
-                          onClick={() => handleHostSelect(user.user_id)}
-                        >
-                          <UserCheckbox
-                            type="radio"
-                            name="host"
-                            checked={hostId === user.user_id}
-                            onChange={() => handleHostSelect(user.user_id)}
-                          />
-                          <UserInfo>
-                            <UserName>
-                              {user.name}
-                              <UserEmail>{user.email}</UserEmail>
-                              {hostId === user.user_id && (
-                                <HostBadge>
-                                  <RiVipCrownFill /> 회의장
-                                </HostBadge>
-                              )}
-                            </UserName>
-                          </UserInfo>
-                        </UserCard>
-                      ))}
-                    </UserGrid>
-                  )}
-                </HostSelectionSection>
-
                 {/* 참석자 선택 섹션 */}
                 <div>
                   <AttendeesSectionTitle>
@@ -894,37 +780,34 @@ const NewMeetingPopup: React.FC<NewMeetingPopupProps> = ({
                   </SearchAndActionsRow>
 
                   <UserGrid>
-                    {filteredUsers
-                      .filter((user) => user.user_id !== hostId)
-                      .map((user) => {
-                        const isSelected = attendees.some(
-                          (a) => a.user_id === user.user_id
-                        );
-                        return (
-                          <UserCard
-                            key={user.user_id}
-                            $selected={isSelected}
-                            $isHost={false}
-                            onClick={() => handleAttendeeToggle(user)}
-                          >
-                            <UserCheckbox
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => handleAttendeeToggle(user)}
-                            />
-                            <UserInfo>
-                              <UserName>
-                                {user.name}
-                                <UserEmail>{user.email}</UserEmail>
-                              </UserName>
-                            </UserInfo>
-                          </UserCard>
-                        );
-                      })}
+                    {filteredUsers.map((user) => {
+                      const isSelected = attendees.some(
+                        (a) => a.user_id === user.user_id
+                      );
+                      return (
+                        <UserCard
+                          key={user.user_id}
+                          $selected={isSelected}
+                          $isHost={false}
+                          onClick={() => handleAttendeeToggle(user)}
+                        >
+                          <UserCheckbox
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleAttendeeToggle(user)}
+                          />
+                          <UserInfo>
+                            <UserName>
+                              {user.name}
+                              <UserEmail>{user.email}</UserEmail>
+                            </UserName>
+                          </UserInfo>
+                        </UserCard>
+                      );
+                    })}
                   </UserGrid>
 
-                  {filteredUsers.filter((user) => user.user_id !== hostId)
-                    .length === 0 && (
+                  {filteredUsers.length === 0 && (
                     <div
                       style={{
                         textAlign: 'center',

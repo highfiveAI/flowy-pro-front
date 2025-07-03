@@ -86,6 +86,27 @@ type Attendee = {
   user_jobname: string;
 };
 
+// 허용된 오디오 파일 형식
+const ALLOWED_AUDIO_FORMATS = [
+  'flac',
+  'm4a',
+  'mp3',
+  'mp4',
+  'mpeg',
+  'mpga',
+  'oga',
+  'ogg',
+  'wav',
+  'webm',
+];
+
+// 파일 형식 검증 함수
+const isValidAudioFile = (file: File): boolean => {
+  const fileName = file.name.toLowerCase();
+  const fileExtension = fileName.split('.').pop();
+  return fileExtension ? ALLOWED_AUDIO_FORMATS.includes(fileExtension) : false;
+};
+
 const InsertConferenceInfo: React.FC = () => {
   const { user, setUser, setLoading } = useAuth();
   // const navigate = useNavigate();
@@ -141,7 +162,7 @@ const InsertConferenceInfo: React.FC = () => {
   // );
 
   const [showEditProjectPopup, setShowEditProjectPopup] = useState(false);
-  const [showBanner, setShowBanner] = React.useState(false);
+  const [showBanner /*, setShowBanner*/] = React.useState(false);
   const [showPopup, setShowPopup] = React.useState(false);
 
   const toggleExpanded = (index: number) => {
@@ -261,8 +282,8 @@ const InsertConferenceInfo: React.FC = () => {
         const result = await response.json();
         console.log('통합 STT 서버 응답:', result);
 
-        // 성공 시 팝업 띄우기
-        // setShowAnalysisRequestedPopup(true);
+        // 성공 시 바로 분석 완료 팝업 띄우기
+        setShowPopup(true);
 
         // 입력값 초기화
         setSubject('');
@@ -283,7 +304,6 @@ const InsertConferenceInfo: React.FC = () => {
         setIsLoading(false);
       }
     }
-    setShowBanner(true);
   };
 
   // 프로젝트 선택 핸들러 함수
@@ -488,7 +508,16 @@ const InsertConferenceInfo: React.FC = () => {
     setIsDragging(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setFile(e.dataTransfer.files[0]);
+      const droppedFile = e.dataTransfer.files[0];
+
+      // 파일 형식 검증
+      if (!isValidAudioFile(droppedFile)) {
+        setError('파일형식이 알맞지 않습니다');
+        return;
+      }
+
+      setFile(droppedFile);
+      setError(''); // 성공 시 에러 메시지 초기화
       e.dataTransfer.clearData();
     }
   };
@@ -753,7 +782,7 @@ const InsertConferenceInfo: React.FC = () => {
                         <StyledLabel htmlFor="meeting-date">
                           회의 일시 <span>*</span>
                         </StyledLabel>
-                        <DatePickerWrapper style={{ zIndex: 1000 }}>
+                        <DatePickerWrapper>
                           <DatePicker
                             selected={meetingDate}
                             onChange={(date: Date | null) =>
@@ -833,7 +862,10 @@ const InsertConferenceInfo: React.FC = () => {
                                 이곳에 파일을 드래그하거나 아이콘을 클릭하세요.
                               </DropZoneMessage>
                               <FileUploadWrapper>
-                                <FileUpload setFile={setFile} />
+                                <FileUpload
+                                  setFile={setFile}
+                                  setError={setError}
+                                />
                               </FileUploadWrapper>
                               <RecordUploadWrapper>
                                 <RecordInfoUpload setFile={setFile} />
@@ -904,7 +936,7 @@ const InsertConferenceInfo: React.FC = () => {
                         <StyledLabel htmlFor="meeting-date">
                           회의 일시 <span>*</span>
                         </StyledLabel>
-                        <DatePickerWrapper style={{ zIndex: 1000 }}>
+                        <DatePickerWrapper>
                           <DatePicker
                             selected={meetingDate}
                             onChange={(date: Date | null) =>
@@ -978,7 +1010,10 @@ const InsertConferenceInfo: React.FC = () => {
                                 이곳에 파일을 드래그하거나 아이콘을 클릭하세요.
                               </DropZoneMessage>
                               <FileUploadWrapper>
-                                <FileUpload setFile={setFile} />
+                                <FileUpload
+                                  setFile={setFile}
+                                  setError={setError}
+                                />
                               </FileUploadWrapper>
                               <RecordUploadWrapper>
                                 <RecordInfoUpload setFile={setFile} />
