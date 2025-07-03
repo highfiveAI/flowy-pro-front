@@ -421,6 +421,8 @@ export const NewProjectWrapper = styled.div`
 export const MeetingList = styled.div`
   .meeting-list {
     margin-top: 10px;
+    max-height: 180px;
+    overflow-y: auto;
   }
 
   .meeting-item {

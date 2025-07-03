@@ -31,6 +31,7 @@ const pulse = keyframes`
 `;
 
 export const IntroContainer = styled.div`
+  cursor: default;
   width: 100%;
   min-height: 100vh;
   background: linear-gradient(135deg, #f8f5ff 0%, #e3cfee 100%);
