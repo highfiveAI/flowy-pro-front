@@ -32,6 +32,38 @@ export const sendEmailCode = async (
   }
 };
 
+export const sendPwEmailCode = async (
+  email: string,
+  user_login_id: string
+): Promise<{ message: string; code?: string }> => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/users/find_pw/send_code`,
+      {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          user_login_id: user_login_id,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data?.detail || '서버 오류 발생');
+    }
+
+    return data; // { message: "...", code: "123456" }
+  } catch (error: any) {
+    throw new Error(error.message || '네트워크 오류');
+  }
+};
+
 export const verifyCode = async (
   input_code: string
 ): Promise<{ verified: boolean }> => {
