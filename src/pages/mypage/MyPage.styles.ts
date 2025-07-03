@@ -56,10 +56,6 @@ export const FormContainer = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 25px 50px rgba(45, 17, 85, 0.15);
-  }
 `;
 
 export const InputGroup = styled.div`
