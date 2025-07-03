@@ -88,21 +88,21 @@ const ScrollableBody = styled.div`
   padding: 32px 28px;
   overflow-y: auto;
   flex: 1;
-  
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
   }
@@ -278,7 +278,9 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'secondary' }>`
   cursor: pointer;
   transition: all 0.2s ease;
 
-  ${props => props.variant === 'secondary' ? `
+  ${(props) =>
+    props.variant === 'secondary'
+      ? `
     background: #f8f9fa;
     color: #6c757d;
     border: 2px solid #e9ecef;
@@ -288,7 +290,8 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'secondary' }>`
       color: #495057;
       transform: translateY(-1px);
     }
-  ` : `
+  `
+      : `
     background: linear-gradient(135deg, #6a4c93 0%, #4b2067 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(106, 76, 147, 0.3);
@@ -517,9 +520,9 @@ const MailingDashboard = ({
   };
 
   // db update용 함수(구현 예정)
-  const handleDbUpdate = () => {
-    // db에 update 기능 구현 예정
-  };
+  // const handleDbUpdate = () => {
+  //   // db에 update 기능 구현 예정
+  // };
 
   // 수신 대상자 유효성 검사 함수
   const validateReceivers = () => {
@@ -541,11 +544,11 @@ const MailingDashboard = ({
       setShowErrorAlert(true);
       return;
     }
-    
+
     // (기타: 개별 수신자 지정 등)
     const payload = makeMeetingInfoForMail();
     console.log('백엔드로 보낼 payload:', payload);
-    
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/stt/meeting/send-update-email`,
@@ -555,11 +558,11 @@ const MailingDashboard = ({
           body: JSON.stringify(payload),
         }
       );
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       // 메일 발송 성공 시 알림 모달 표시
       setShowSuccessAlert(true);
       return; // 성공 시 함수 종료
@@ -778,13 +781,10 @@ const MailingDashboard = ({
             </NoticeText>
 
             <ButtonContainer>
-              <ActionButton
-                variant="secondary"
-                onClick={handleCancel}
-              >
+              <ActionButton variant="secondary" onClick={handleCancel}>
                 수정 취소
               </ActionButton>
-              
+
               <ActionButton
                 onClick={async () => {
                   // 유효성 검사
@@ -794,19 +794,21 @@ const MailingDashboard = ({
                   }
 
                   const payload = makeMeetingInfoForMail();
-                  console.log('==== [메일로 보낼 최종 meeting_info payload] ====');
+                  console.log(
+                    '==== [메일로 보낼 최종 meeting_info payload] ===='
+                  );
                   console.log(JSON.stringify(payload, null, 2));
-                  
+
                   try {
                     // 먼저 데이터 저장
                     await handleSaveSummaryTasks();
-                    
+
                     // 그 다음 메일 발송 (성공 시 알림 모달 표시)
                     await handleSendMail();
-                    
+
                     // 수정 모드 종료
                     offModify();
-                    
+
                     // 버튼 잠금 해제
                     onUnlockButtons?.();
                   } catch (error) {
@@ -823,7 +825,16 @@ const MailingDashboard = ({
 
       {/* 메일 발송 완료 알림 모달 */}
       {showSuccessAlert && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 3000 }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 3000,
+          }}
+        >
           <AlertModal
             isOpen={showSuccessAlert}
             onClose={() => {
@@ -840,7 +851,16 @@ const MailingDashboard = ({
 
       {/* 수신자 선택 오류 알림 모달 */}
       {showErrorAlert && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 3000 }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 3000,
+          }}
+        >
           <AlertModal
             isOpen={showErrorAlert}
             onClose={() => setShowErrorAlert(false)}
