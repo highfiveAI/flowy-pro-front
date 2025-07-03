@@ -372,7 +372,7 @@ export const NewProjectTextBottom = styled.span`
 
 export const NewProjectWrapper = styled.div`
   position: absolute;
-  top: -40px;
+  top: -50px;
   right: 0;
   display: flex;
   align-items: center;
