@@ -564,7 +564,7 @@ MailingDashboardProps) => {
             <PopupIcon>
               <FiMail />
             </PopupIcon>
-            <PopupTitle>회의 결과 수정 및 메일 발송</PopupTitle>
+            <PopupTitle>회의 결과 메일 발송</PopupTitle>
             <CloseButton onClick={onClose}>
               <FiX size={18} />
             </CloseButton>

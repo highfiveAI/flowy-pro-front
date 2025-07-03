@@ -775,6 +775,12 @@ const AdminDashboard = () => {
       const data: DashboardResponse = await fetchDashboardStats(params);
       setDashboardData(data);
       console.log('▶ 대시보드 데이터 응답:', data);
+
+      // 백엔드에서 auto_department가 반환된 경우 부서 필터를 자동으로 업데이트
+      if (data.auto_department && filterMode === 'department' && !selectedDepartment) {
+        console.log('▶ 자동 부서 설정:', data.auto_department);
+        setSelectedDepartment(data.auto_department);
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : '데이터 로드에 실패했습니다.'
