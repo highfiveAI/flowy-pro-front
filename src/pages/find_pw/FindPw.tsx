@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   fetchChangePassword,
-  sendEmailCode,
   sendPwEmailCode,
   verifyCodeWithUserLoginIdAndPw,
 } from '../../api/fetchFindId';
