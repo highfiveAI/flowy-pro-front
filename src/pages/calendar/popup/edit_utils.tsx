@@ -10,8 +10,9 @@ interface EditEventPopProps {
     end?: Date | string;
     completed?: boolean;
     comment?: string;
+    meeting_id?: string;
   };
-  onSave: (id: string, completed: boolean) => void;
+  onSave: (id: string, completed: boolean, meeting_id?: string) => void;
   onClose: () => void;
 }
 
@@ -361,7 +362,7 @@ const EditEventPop: React.FC<EditEventPopProps> = ({
           />
         </Row>
         <BtnRow>
-          <Button onClick={() => onSave(event.id, completed)}>저장</Button>
+          <Button onClick={() => onSave(event.id, completed, event.meeting_id)}>저장</Button>
           <Button style={{ background: '#aaa' }} onClick={onClose}>
             닫기
           </Button>
