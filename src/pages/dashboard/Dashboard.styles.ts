@@ -1,6 +1,7 @@
 import styled, { keyframes } from 'styled-components';
 
 export const Container = styled.div`
+  cursor: default;
   min-height: 100vh;
   position: relative;
   background-color: #f8f9fa;

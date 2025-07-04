@@ -646,8 +646,13 @@ const InsertConferenceInfo: React.FC = () => {
                               <SectionTitle>회의 목록</SectionTitle>
                               <div className="meeting-list">
                                 {projectMeetings.length > 0 ? (
-                                  projectMeetings.map(
-                                    (meeting, meetingIndex) => (
+                                  projectMeetings
+                                    .filter(
+                                      (meeting) =>
+                                        meeting.analysis_status !== 'completed' &&
+                                        meeting.analysis_status !== 'analyzing'
+                                    )
+                                    .map((meeting, meetingIndex) => (
                                       <div
                                         key={meetingIndex}
                                         className={`meeting-item ${
@@ -679,8 +684,7 @@ const InsertConferenceInfo: React.FC = () => {
                                             .join(', ') || '없음'}
                                         </div>
                                       </div>
-                                    )
-                                  )
+                                    ))
                                 ) : (
                                   <span>회의가 없습니다.</span>
                                 )}
