@@ -649,7 +649,7 @@ const InsertConferenceInfo: React.FC = () => {
                                   projectMeetings
                                     .filter(
                                       (meeting) =>
-                                        meeting.analysis_status !== 'pending' &&
+                                        meeting.analysis_status !== 'completed' &&
                                         meeting.analysis_status !== 'analyzing'
                                     )
                                     .map((meeting, meetingIndex) => (
