@@ -3,6 +3,7 @@ import { Outlet /*, useLocation*/ } from "react-router-dom";
 import Navbar from "./Navbar";
 import { useAuth } from "../contexts/AuthContext";
 import Loading from "./Loading";
+import StickyIcon from "./StickyIcon";
 
 const NAVBAR_HEIGHT = "70px";
 
@@ -79,6 +80,7 @@ const Layout: React.FC = () => {
       <MainContent>
         <Outlet />
       </MainContent>
+      <StickyIcon />
     </LayoutWrapper>
   );
 };
