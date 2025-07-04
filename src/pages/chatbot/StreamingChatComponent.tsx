@@ -1,130 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import {
+  Container,
+  Header,
+  Title,
+  Subtitle,
+  ChatContainer,
+  Messages,
+  MessageBubble,
+  InputArea,
+  Input,
+  SendButton,
+  LoadingDots,
+  LoadingDot,
+  MessageText
+} from './ChatBot.styles';
 
-const ChatContainer = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-    sans-serif;
-`;
-
-const MessageContainer = styled.div`
-  background: #f5f5f5;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-  height: 700px;
-  min-height: 100px;
-  max-height: 700px;
-  overflow-y: auto;
-  border: 1px solid #e0e0e0;
-`;
-
-const UserMessage = styled.div`
-  background: #007bff;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 18px;
-  margin-bottom: 10px;
-  max-width: 70%;
-  width: fit-content; /* 텍스트 길이에 맞게 */
-  margin-left: auto;
-  word-wrap: break-word;
-`;
-
-const BotMessage = styled.div`
-  background: white;
-  color: #333;
-  padding: 10px 15px;
-  border-radius: 18px;
-  margin-bottom: 10px;
-  max-width: 70%;
-  width: fit-content; /* 텍스트 길이에 맞게 */
-  border: 1px solid #e0e0e0;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-`;
-
-const Input = styled.input`
-  flex: 1;
-  padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 25px;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.3s;
-
-  &:focus {
-    border-color: #007bff;
-  }
-
-  &:disabled {
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-  }
-`;
-
-const SendButton = styled.button`
-  padding: 12px 24px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
-  &:hover:not(:disabled) {
-    background: #0056b3;
-  }
-
-  &:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-`;
-
-const LoadingIndicator = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #666;
-  font-size: 14px;
-  margin-top: 10px;
-`;
-
-const Dot = styled.div`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #007bff;
-  animation: bounce 1.4s infinite both;
-
-  &:nth-child(1) {
-    animation-delay: -0.32s;
-  }
-  &:nth-child(2) {
-    animation-delay: -0.16s;
-  }
-
-  @keyframes bounce {
-    0%,
-    80%,
-    100% {
-      transform: scale(0);
-    }
-    40% {
-      transform: scale(1);
-    }
-  }
-`;
+const LoadingDotsComponent: React.FC = () => {
+  return (
+    <LoadingDots>
+      <LoadingDot />
+      <LoadingDot />
+      <LoadingDot />
+    </LoadingDots>
+  );
+};
 
 interface Message {
   id: string;
@@ -289,58 +188,71 @@ const StreamingChatComponent: React.FC = () => {
   }, []);
 
   return (
-    <ChatContainer>
-      <h1>Flowy AI 챗봇</h1>
+    <Container>
+      <Header>
+        <Title>Flowy pro Chatbot</Title>
+      </Header>
+      
+      <ChatContainer>
+        <Messages>
+          {messages.map((message) =>
+            message.type === 'user' ? (
+              <MessageBubble key={message.id} isUser={true}>
+                <MessageText>{message.content}</MessageText>
+              </MessageBubble>
+            ) : (
+              <MessageBubble key={message.id} isUser={false}>
+                <MessageText>
+                  {message.content}
+                  {isStreaming &&
+                    message.id === messages[messages.length - 1]?.id && (
+                      <span style={{ opacity: 0.5 }}>▊</span>
+                    )}
+                </MessageText>
+              </MessageBubble>
+            )
+          )}
 
-      <MessageContainer>
-        {messages.map((message) =>
-          message.type === 'user' ? (
-            <UserMessage key={message.id}>{message.content}</UserMessage>
+          {isLoading && (
+            <MessageBubble isUser={false}>
+              <MessageText>
+                응답을 기다리는 중
+                <LoadingDotsComponent />
+              </MessageText>
+            </MessageBubble>
+          )}
+
+          <div ref={messagesEndRef} />
+        </Messages>
+
+        <InputArea onSubmit={(e) => {
+          e.preventDefault();
+          handleSendMessage();
+        }}>
+          <Input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="메시지를 입력하세요..."
+            disabled={isLoading || isStreaming}
+          />
+
+          {isStreaming ? (
+            <SendButton type="button" onClick={handleStopStreaming}>
+              중지
+            </SendButton>
           ) : (
-            <BotMessage key={message.id}>
-              {message.content}
-              {isStreaming &&
-                message.id === messages[messages.length - 1]?.id && (
-                  <span style={{ opacity: 0.5 }}>▊</span>
-                )}
-            </BotMessage>
-          )
-        )}
-
-        {isLoading && (
-          <LoadingIndicator>
-            <Dot />
-            <Dot />
-            <Dot />
-            <span>응답을 기다리는 중...</span>
-          </LoadingIndicator>
-        )}
-
-        <div ref={messagesEndRef} />
-      </MessageContainer>
-
-      <InputContainer>
-        <Input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="메시지를 입력하세요..."
-          disabled={isLoading || isStreaming}
-        />
-
-        {isStreaming ? (
-          <SendButton onClick={handleStopStreaming}>중지</SendButton>
-        ) : (
-          <SendButton
-            onClick={handleSendMessage}
-            disabled={isLoading || !inputValue.trim()}
-          >
-            전송
-          </SendButton>
-        )}
-      </InputContainer>
-    </ChatContainer>
+            <SendButton
+              type="submit"
+              disabled={isLoading || !inputValue.trim()}
+            >
+              전송
+            </SendButton>
+          )}
+        </InputArea>
+      </ChatContainer>
+    </Container>
   );
 };
 

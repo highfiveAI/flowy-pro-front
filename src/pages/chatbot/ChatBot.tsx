@@ -1,126 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
 import { sendChatMessage } from '../../api/fetchChatbot';
-
-const KeywordContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
-  background-color: #f0f4fa;
-  flex-wrap: wrap;
-`;
-
-const KeywordButton = styled.button`
-  background-color: #e1ecf4;
-  border: none;
-  border-radius: 16px;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  color: #0366d6;
-
-  &:hover {
-    background-color: #d1e5f0;
-  }
-`;
-
-const Container = styled.div`
-  max-width: 400px;
-  margin: 40px auto;
-  border: 1px solid #ccc;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  height: 600px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-`;
-
-const InputArea = styled.form`
-  display: flex;
-  border-top: 1px solid #ddd;
-`;
-
-const Input = styled.input`
-  flex: 1;
-  border: none;
-  padding: 16px;
-  font-size: 16px;
-  outline: none;
-`;
-
-const SendButton = styled.button`
-  padding: 0 20px;
-  background: #4a90e2;
-  color: white;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-
-  &:hover {
-    background: #3578c0;
-  }
-
-  &:disabled {
-    background: #a0c1f7;
-    cursor: not-allowed;
-  }
-`;
-
-const LinkButton = styled.button`
-  width: 100%;
-  margin-top: 12px;
-  background-color: #4a90e2;
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-
-  &:hover {
-    background-color: #3578c0;
-  }
-`;
-
-const Messages = styled.div`
-  flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  background-color: #f9f9f9;
-
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const MessageBubble = styled.div<{ isUser?: boolean }>`
-  background: ${({ isUser }) => (isUser ? '#d0ebff' : '#ffffff')};
-  color: #333;
-  padding: 12px 16px;
-  border-radius: 12px;
-  max-width: 75%;
-  word-break: break-word;
-  white-space: pre-wrap;
-  line-height: 1.4;
-  min-width: 0;
-
-  display: inline-block;
-
-  align-self: ${({ isUser }) => (isUser ? 'flex-end' : 'flex-start')};
-  margin-left: ${({ isUser }) => (isUser ? 'auto' : '0')};
-
-  text-align: ${({ isUser }) => (isUser ? 'right' : 'left')};
-
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  border-bottom-right-radius: ${({ isUser }) => (isUser ? '0' : '12px')};
-  border-bottom-left-radius: ${({ isUser }) => (isUser ? '12px' : '0')};
-`;
-
-// ... types
+import {
+  Container,
+  Header,
+  Title,
+  Subtitle,
+  ChatContainer,
+  KeywordContainer,
+  KeywordButton,
+  Messages,
+  MessageBubble,
+  LoadingDots,
+  LoadingDot,
+  LinkButton,
+  InputArea,
+  Input,
+  SendButton,
+  MessageContent,
+  MessageSection,
+  MessageLabel,
+  MessageText
+} from './ChatBot.styles';
 
 type Message = {
   sender: 'user' | 'bot';
@@ -131,31 +31,13 @@ type Message = {
   loading?: boolean; // 로딩 표시용 플래그
 };
 
-// ... 점 애니메이션
-
-const DotWrapper = styled.span`
-  font-weight: bold;
-  font-size: 20px;
-  letter-spacing: 4px;
-  display: inline-block;
-  width: 24px; /* 고정된 너비 지정 */
-  white-space: nowrap; /* 줄바꿈 방지 */
-`;
-
-const LoadingDots: React.FC = () => {
-  const [count, setCount] = useState(1);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((c) => (c === 3 ? 1 : c + 1));
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
-
+const LoadingDotsComponent: React.FC = () => {
   return (
-    <DotWrapper>
-      {Array.from({ length: 3 }, (_, i) => (i < count ? '.' : ' '))}
-    </DotWrapper>
+    <LoadingDots>
+      <LoadingDot />
+      <LoadingDot />
+      <LoadingDot />
+    </LoadingDots>
   );
 };
 
@@ -310,69 +192,96 @@ const Chatbot: React.FC = () => {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+  
   return (
     <Container>
-      <Messages>
-        {messages.map((msg, idx) => {
-          const isUser = msg.sender === 'user';
+      <Header>
+        <Title>플로위 AI 챗봇</Title>
+        <Subtitle>무엇을 도와드릴까요?</Subtitle>
+      </Header>
+      
+      <ChatContainer>
+        <KeywordContainer>
+          {keywords.map((kw, i) => (
+            <KeywordButton
+              key={i}
+              onClick={() => {
+                handleQuickSubmit(kw);
+              }}
+            >
+              {kw}
+            </KeywordButton>
+          ))}
+        </KeywordContainer>
 
-          // 로딩 메시지일 경우 점 애니메이션 표시
-          if (msg.loading) {
+        <Messages>
+          {messages.map((msg, idx) => {
+            const isUser = msg.sender === 'user';
+
+            // 로딩 메시지일 경우 점 애니메이션 표시
+            if (msg.loading) {
+              return (
+                <MessageBubble key={idx} isUser={false}>
+                  <MessageContent>
+                    <span>챗봇 응답 중</span>
+                    <LoadingDotsComponent />
+                  </MessageContent>
+                </MessageBubble>
+              );
+            }
+
             return (
-              <MessageBubble key={idx} isUser={false}>
-                챗봇 응답 중 <LoadingDots />
+              <MessageBubble key={idx} isUser={isUser}>
+                {isUser ? (
+                  <MessageText>{msg.text}</MessageText>
+                ) : (
+                  <MessageContent>
+                    {msg.doc && (
+                      <MessageSection>
+                        <MessageLabel>📄 안내</MessageLabel>
+                        <MessageText>{msg.doc}</MessageText>
+                      </MessageSection>
+                    )}
+                    {msg.summary && (
+                      <MessageSection>
+                        <MessageLabel>📝 챗봇 응답</MessageLabel>
+                        <MessageText>{msg.summary}</MessageText>
+                      </MessageSection>
+                    )}
+                    {msg.link && (
+                      <LinkButton onClick={() => window.open(msg.link, '_blank')}>
+                        링크 열기
+                      </LinkButton>
+                    )}
+                    {msg.text && (
+                      <MessageSection>
+                        <MessageText>
+                          {msg.text
+                            .split('\n')
+                            .map((line, i) => <div key={i}>{line}</div>)}
+                        </MessageText>
+                      </MessageSection>
+                    )}
+                  </MessageContent>
+                )}
               </MessageBubble>
             );
-          }
+          })}
+          <div ref={bottomRef} />
+        </Messages>
 
-          return (
-            <MessageBubble key={idx} isUser={isUser}>
-              {isUser ? (
-                msg.text
-              ) : (
-                <>
-                  {msg.doc && <div>📄 안내: {msg.doc}</div>}
-                  {msg.summary && <div>📝 챗봇 응답: {msg.summary}</div>}
-                  {msg.link && (
-                    <LinkButton onClick={() => window.open(msg.link, '_blank')}>
-                      링크 열기
-                    </LinkButton>
-                  )}
-                  {msg.text &&
-                    msg.text
-                      .split('\n')
-                      .map((line, i) => <div key={i}>{line}</div>)}
-                </>
-              )}
-            </MessageBubble>
-          );
-        })}
-        <div ref={bottomRef} />
-      </Messages>
-      <KeywordContainer>
-        {keywords.map((kw, i) => (
-          <KeywordButton
-            key={i}
-            onClick={() => {
-              handleQuickSubmit(kw);
-            }}
-          >
-            {kw}
-          </KeywordButton>
-        ))}
-      </KeywordContainer>
-
-      <InputArea onSubmit={handleSubmit}>
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="메시지를 입력하세요..."
-          disabled={loading}
-        />
-        <SendButton type="submit" disabled={loading}>
-          {loading ? '전송 중...' : '전송'}
-        </SendButton>
-      </InputArea>
+        <InputArea onSubmit={handleSubmit}>
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="메시지를 입력하세요..."
+            disabled={loading}
+          />
+          <SendButton type="submit" disabled={loading}>
+            {loading ? '전송 중...' : '전송'}
+          </SendButton>
+        </InputArea>
+      </ChatContainer>
     </Container>
   );
 };
