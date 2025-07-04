@@ -34,12 +34,25 @@ export const ControlsSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto 32px auto;
   flex-wrap: wrap;
   gap: 32px;
   min-height: 56px;
   padding: 8px 0;
+  padding-right: 70px; /* 오른쪽 패널 크기만큼 패딩 추가 */
+  
+  @media (max-width: 1440px) {
+    max-width: 1200px;
+  }
+  
+  @media (max-width: 1200px) {
+    max-width: 1000px;
+  }
+  
+  @media (max-width: 1024px) {
+    max-width: 900px;
+  }
 `;
 
 export const SectionTitle = styled.h2`
@@ -74,7 +87,7 @@ export const SearchInput = styled.input`
   border: 2px solid #e5e7eb;
   border-radius: 12px;
   font-size: 0.875rem;
-  width: 80px;
+  width: 50px;
   background: white;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
@@ -104,6 +117,7 @@ export const FilterContainer = styled.div`
   align-items: center;
   gap: 24px;
   flex-wrap: wrap;
+  margin-right: 90px; /* 프로젝트 필터 이동 */
 `;
 
 export const FilterCheckbox = styled.label`
@@ -165,25 +179,34 @@ export const FilterCheckbox = styled.label`
 `;
 
 export const FilterSelect = styled.select`
-  padding: 10px 16px;
+  padding: 10px 30px 10px 16px;
   border: 2px solid #e5e7eb;
   border-radius: 12px;
   font-size: 0.875rem;
   background: white;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%232d1155" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
   color: #374151;
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 192px;
   max-width: 240px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   
   &:focus {
     outline: none;
     border-color: #2d1155;
     box-shadow: 0 0 0 3px rgba(45, 17, 85, 0.1);
+    background: white;
   }
   
   &:hover {
     border-color: #9ca3af;
+    background: white;
   }
 `;
 
@@ -493,20 +516,23 @@ export const CalendarFixedBox = styled.div`
 
 // 우측 패널 (일정 미정 task)
 export const UnscheduledPanel = styled.div<{ $open: boolean }>`
-  width: ${props => props.$open ? '320px' : '60px'};
-  min-width: ${props => props.$open ? '320px' : '60px'};
+  width: ${props => props.$open ? '350px' : '60px'};
+  min-width: ${props => props.$open ? '360px' : '60px'};
   background: white;
   border-radius: 20px;
   box-shadow: 0 4px 24px rgba(45, 17, 85, 0.08);
-  padding: ${props => props.$open ? '24px' : '20px'};
-  margin-left: 50px;
+  padding: ${props => props.$open ? '24px' : '0'};
+  margin-left: 10px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  height: fit-content;
+  height: ${props => props.$open ? 'fit-content' : '60px'};
   position: sticky;
   top: 40px;
   overflow: hidden;
   flex-shrink: 0;
   z-index: 10;
+  display: ${props => props.$open ? 'block' : 'flex'};
+  justify-content: ${props => props.$open ? 'initial' : 'center'};
+  align-items: ${props => props.$open ? 'initial' : 'center'};
 `;
 
 export const TaskList = styled.div`
