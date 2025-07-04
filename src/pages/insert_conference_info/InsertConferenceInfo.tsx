@@ -121,6 +121,7 @@ const InsertConferenceInfo: React.FC = () => {
   const [result /*, setResult*/] = React.useState<any>(null);
   const [projectName, setProjectName] = React.useState<string>('');
   const [projectId, setProjectId] = React.useState<string>('');
+  const [meetingId, setMeetingId] = React.useState<string>('');
   const [username, setUsername] = React.useState<string>('');
 
   // const [showPopup, setShowPopup] = React.useState<boolean>(false); // 팝업 표시 상태 추가
@@ -245,6 +246,8 @@ const InsertConferenceInfo: React.FC = () => {
       formData.append('host_name', hostName);
       formData.append('host_email', hostEmail);
       formData.append('host_role', hostJobname);
+      console.log("미팅아이디ㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣ", meetingId)
+      formData.append('meeting_id', meetingId || '')
       attendeesUserId.forEach((id) => formData.append('attendees_ids', id));
       attendeesName.forEach((name) => formData.append('attendees_name', name));
       attendeesEmail.forEach((email) =>
@@ -461,6 +464,8 @@ const InsertConferenceInfo: React.FC = () => {
   // 회의 선택 시 폼에 정보 자동 입력
   const handleMeetingSelect = (meeting: any) => {
     setSelectedMeeting(meeting);
+    setMeetingId(meeting.meeting_id);
+    console.log("미팅아이디ㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣㅣ",meeting.meeting_id);
     setSubject(meeting.meeting_title || '');
     setAgenda(meeting.meeting_agenda || '');
     setMeetingDate(
