@@ -43,7 +43,7 @@ const MainContent = styled.main`
 // `;
 
 const Layout: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   // const location = useLocation();
 
   // 로딩 중일 때는 Loading 컴포넌트 표시
