@@ -43,7 +43,7 @@ const MainContent = styled.main`
 // `;
 
 const Layout: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   // const location = useLocation();
 
   // 로딩 중일 때는 Loading 컴포넌트 표시
@@ -61,19 +61,7 @@ const Layout: React.FC = () => {
   //   return <Navigate to="/login" state={{ from: location }} replace />;
   // }
 
-  // 로그인한 상태일 때는 기존 레이아웃 사용
-  if (user) {
-    return (
-      <LayoutWrapper>
-        <Navbar />
-        <MainContent>
-          <Outlet />
-        </MainContent>
-      </LayoutWrapper>
-    );
-  }
-
-  // 로그인하지 않은 상태일 때는 공개 레이아웃 사용 (로그인, 회원가입 페이지 등)
+  // 로그인 상태에 관계없이 StickyIcon이 표시되도록 통일
   return (
     <LayoutWrapper>
       <Navbar />

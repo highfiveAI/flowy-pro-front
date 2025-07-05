@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
         <Menu>
           {!user || role === "user" ? (
             <>
-              <MenuItem onClick={() => navigate("/intro")}>Flowy</MenuItem>
+              <MenuItem onClick={() => navigate("/intro")}>서비스 소개</MenuItem>
               <MenuItem onClick={() => navigate("/insert_info")}>
                 회의분석 요청
               </MenuItem>

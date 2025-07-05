@@ -261,8 +261,8 @@ export default function CalendarPage() {
           project_name: item.project.project_name,
         }));
         setProjects(projectList);
-        if (projectList.length > 0)
-          setSelectedProjectId(projectList[0].project_id);
+        // 기본값을 "전체 프로젝트"로 설정 (null)
+        setSelectedProjectId(null);
       });
   }, [userId]);
 
@@ -665,7 +665,7 @@ export default function CalendarPage() {
       <Header></Header>
 
       <ControlsSection>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '50px' }}>
           <SectionTitle style={{ margin: 0 }}>
             {formatYearMonth(value)}
           </SectionTitle>
