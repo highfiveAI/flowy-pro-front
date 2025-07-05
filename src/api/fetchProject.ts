@@ -59,6 +59,8 @@ export async function fetchMeetingsWithUsers(
     }
 
     const data = await response.json();
+
+    console.log("회의 데이터: ", data)
     return data;
   } catch (error) {
     console.error('Failed to fetch meetings with users:', error);

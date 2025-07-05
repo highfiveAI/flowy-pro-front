@@ -38,12 +38,6 @@ export const SignUpContainer = styled.div`
   z-index: 1;
   transition: all 0.3s ease;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-      0 25px 70px rgba(0, 0, 0, 0.2),
-      0 12px 40px rgba(0, 0, 0, 0.15);
-  }
 `;
 
 export const LogoImg = styled.img`

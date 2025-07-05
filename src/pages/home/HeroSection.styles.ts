@@ -13,6 +13,7 @@ const slideUpAnimation = keyframes`
 `;
 
 export const Hero = styled.section`
+  cursor: default;
   width: 100vw;
   height: 100vh;
   min-width: 320px;
